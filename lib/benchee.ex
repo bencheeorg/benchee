@@ -1,6 +1,8 @@
 defmodule Benchee do
   @default_config %{time: 5}
 
+  alias Benchee.{Statistics, Time}
+
   @doc """
   Returns the initial benchmark suite data structure for Benshee.
   Given an optional map of configuration options, converts seconds in there
@@ -20,7 +22,7 @@ defmodule Benchee do
   @seconds_to_microseconds 1_000_000
   defp convert_time_to_micro_s(config) do
     {_, config} = Map.get_and_update! config, :time, fn(seconds) ->
-      {seconds, seconds * @seconds_to_microseconds}
+      {seconds, Time.seconds_to_microseconds(seconds)}
     end
     config
   end
@@ -58,14 +60,12 @@ defmodule Benchee do
   Creates a report of the benchmark suite run.
   """
   def report(%{jobs: jobs}) do
+
     Enum.map jobs, fn(%{name: name, run_times: times}) ->
-      "#{name} #{Enum.count(times)} #{average(times)}"
+      %{average: average, ips: ips, std_dev: std_dev} = Statistics.statistics(times)
+      "#{name} #{ips} #{average}μs #{std_dev}"
     end
   end
 
-  defp average(series) do
-    total = Enum.sum(series)
-    iterations = Enum.count(series)
-    total / iterations
-  end
+
 end
