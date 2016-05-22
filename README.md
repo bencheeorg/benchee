@@ -1,12 +1,18 @@
 # Benchee [![Build Status](https://travis-ci.org/PragTob/benchee.svg?branch=travis)](https://travis-ci.org/PragTob/benchee)
 
-Library for easy and nice benchmarking. Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) from the ruby world, but of course it is a more functional spin.
+Library for easy and nice (micro) benchmarking. Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) from the ruby world, but of course it is a more functional spin.
+
+It allows you to easily compare the performance of different pieces of code/functions.
 
 Provides you with:
 
 * average execution time (the lower the better)
 * iterations per second (the higher the better)
 * standard deviation (how much do the results vary)
+
+Benchee does not:
+
+* Keep results of previous and compare them, if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark)
 
 ## Usage
 
