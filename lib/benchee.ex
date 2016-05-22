@@ -32,6 +32,7 @@ defmodule Benchee do
   the benchmark results added.
   """
   def benchmark(suite = %{config: %{time: time}}, name, function) do
+    IO.puts "Benchmarking #{name}..."
     run_times = do_benchmark(time, function)
     job = %{name: name, run_times: run_times}
     {_, suite} = Map.get_and_update! suite, :jobs, fn(jobs) ->
