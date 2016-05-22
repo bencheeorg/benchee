@@ -62,8 +62,10 @@ defmodule Benchee do
   def report(%{jobs: jobs}) do
 
     Enum.map jobs, fn(%{name: name, run_times: times}) ->
-      %{average: average, ips: ips, std_dev: std_dev} = Statistics.statistics(times)
-      "#{name} #{ips} #{average}μs #{std_dev}"
+      %{average:      average,
+        ips:          ips,
+        std_dev_ratio: std_dev_ratio} = Statistics.statistics(times)
+      "#{name} #{ips} #{average}μs (±#{std_dev_ratio * 100.0}%)"
     end
   end
 

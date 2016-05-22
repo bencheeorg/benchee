@@ -5,7 +5,7 @@ defmodule Benchee.Statistics do
   Calculates statistical data based on a series of run times in microseconds.
 
   iex> Benchee.Statistics.statistics([200, 400, 400, 400, 500, 500, 700, 900])
-  %{average: 500.0, std_dev: 200.0, ips: 2000.0}
+  %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}
   """
   def statistics(run_times) do
     total_time            = Enum.sum(run_times)
@@ -13,11 +13,13 @@ defmodule Benchee.Statistics do
     average_time          = total_time / iterations
     iterations_per_second = iterations_per_second(iterations, total_time)
     standard_deviation    = standard_deviation(run_times, average_time, iterations)
+    standard_dev_ratio    = standard_deviation / average_time
 
     %{
-      average: average_time,
-      ips:     iterations_per_second,
-      std_dev: standard_deviation
+      average:       average_time,
+      ips:           iterations_per_second,
+      std_dev:       standard_deviation,
+      std_dev_ratio: standard_dev_ratio
     }
   end
 
