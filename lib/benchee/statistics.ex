@@ -19,7 +19,7 @@ defmodule Benchee.Statistics do
       average:       average_time,
       ips:           iterations_per_second,
       std_dev:       standard_deviation,
-      std_dev_ratio: standard_dev_ratio
+      std_dev_ratio: standard_dev_ratio,
     }
   end
 

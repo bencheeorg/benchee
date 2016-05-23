@@ -57,6 +57,7 @@ defmodule Benchee do
     microseconds
   end
 
+  @label_width 30
   @doc """
   Creates a report of the benchmark suite run.
   """
@@ -66,7 +67,9 @@ defmodule Benchee do
       %{average:      average,
         ips:          ips,
         std_dev_ratio: std_dev_ratio} = Statistics.statistics(times)
-      "#{name} #{ips} #{average}μs (±#{std_dev_ratio * 100.0}%)\n"
+        
+      "~*s  ~.2f ~.2f~ts (~ts~.2f%)\n"
+      |> :io_lib.format([-@label_width, name, ips, average, "μs", "±", std_dev_ratio * 100.0])
     end
   end
 
