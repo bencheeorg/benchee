@@ -1,7 +1,7 @@
 defmodule Benchee do
   @default_config %{time: 5}
 
-  alias Benchee.{Statistics, Time}
+  alias Benchee.{Time}
 
   @doc """
   Returns the initial benchmark suite data structure for Benshee.
