@@ -2,27 +2,33 @@ defmodule Benchee.Formatters.String do
   @label_width 30
   @ips_width 15
   @average_width 15
-  @deviation_width 15
 
   @doc """
   Formats the benchmark statistics to a report suitable for an output on the CLI.
+
+  iex> jobs = [%{name: "My Job", average: 200.0, ips: 5000.0, std_dev_ratio: 0.1}]
+  iex> Benchee.Formatters.String.format(jobs)
+  ["Name                          ips            average        deviation\n",
+  "My Job                        5000.00        200.00μs       (±10.00%)\n"]
   """
   def format(jobs) do
     [column_descriptors | job_reports(jobs)]
   end
 
   defp column_descriptors do
-    "~*s~*s~*s~*s\n"
+    "~*s~*s~*s~s\n"
     |> :io_lib.format([-@label_width, "Name", -@ips_width, "ips",
-                       -@average_width, "average", -@deviation_width, "deviation"])
+                       -@average_width, "average", "deviation"])
+    |> to_string
   end
 
   defp job_reports(jobs) do
     Enum.map jobs, fn(%{name: name, average: average, ips: ips, std_dev_ratio: std_dev_ratio}) ->
-      "~*s~*.2f~*ts~*ts\n"
+      "~*s~*.2f~*ts~ts\n"
       |> :io_lib.format([-@label_width, name, -@ips_width, ips,
                          -@average_width, average_out(average),
-                         -@deviation_width, deviation_out(std_dev_ratio)])
+                         deviation_out(std_dev_ratio)])
+      |> to_string
     end
   end
 
