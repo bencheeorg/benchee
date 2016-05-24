@@ -7,7 +7,7 @@ defmodule Benchee.Formatters.String do
   @doc """
   Formats the benchmark statistics to a report suitable for an output on the CLI.
   """
-  def format(%{jobs: jobs}) do
+  def format(jobs) do
     [column_descriptors | job_reports(jobs)]
   end
 
@@ -18,11 +18,7 @@ defmodule Benchee.Formatters.String do
   end
 
   defp job_reports(jobs) do
-    Enum.map jobs, fn(%{name: name, run_times: times}) ->
-      %{average:      average,
-        ips:          ips,
-        std_dev_ratio: std_dev_ratio} = Benchee.Statistics.statistics(times)
-
+    Enum.map jobs, fn(%{name: name, average: average, ips: ips, std_dev_ratio: std_dev_ratio}) ->
       "~*s~*.2f~*ts~*ts\n"
       |> :io_lib.format([-@label_width, name, -@ips_width, ips,
                          -@average_width, average_out(average),
