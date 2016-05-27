@@ -1,10 +1,10 @@
 defmodule BencheeTest do
   use ExUnit.Case
-  import ExUnit.CaptureLog
+  import ExUnit.CaptureIO
   doctest Benchee
 
   test "integration" do
-    capture_log fn ->
+    capture_io fn ->
       result =
         Benchee.init(%{time: 0.1})
         |> Benchee.benchmark("Sleeps", fn -> :timer.sleep(10) end)
