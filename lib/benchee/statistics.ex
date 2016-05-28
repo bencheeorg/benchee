@@ -13,14 +13,14 @@ defmodule Benchee.Statistics do
   * std_dev_ratio - standard deviation expressed as how much it is relative to
                     the average
 
-  iex> times = [200, 400, 400, 400, 500, 500, 700, 900]
-  iex> suite = %{jobs: [%{name: "My Job", run_times: times}]}
+  iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
+  iex> suite = %{jobs: [{"My Job", run_times}]}
   iex> Benchee.Statistics.statistics(suite)
-  [%{name: "My Job", average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}]
+  [{"My Job", %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}}]
   """
   def statistics(%{jobs: jobs}) do
-    Enum.map jobs, fn(%{name: name, run_times: times}) ->
-       Map.put Benchee.Statistics.job_statistics(times), :name, name
+    Enum.map jobs, fn({name, run_times}) ->
+      {name, Benchee.Statistics.job_statistics(run_times)}
     end
   end
 
