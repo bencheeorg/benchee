@@ -3,6 +3,8 @@ defmodule BencheeTest do
   import ExUnit.CaptureIO
   doctest Benchee
 
+  @header_regex         ~r/Name.+ips.+average.+deviation/
+  @sleep_benchmark_rgex ~r/Name.+ips.+average.+deviation/
   test "integration" do
     capture_io fn ->
       result =
@@ -12,9 +14,8 @@ defmodule BencheeTest do
         |> Benchee.Formatters.String.format
 
       [header, benchmark_stats] = result
-      assert Regex.match?(~r/Name.+ips.+average.+deviation/, header)
-
-      assert Regex.match?(~r/Sleeps/, benchmark_stats)
+      assert Regex.match?(@header_regex, header)
+      assert Regex.match?(@sleep_benchmark_rgex, benchmark_stats)
     end
   end
 end
