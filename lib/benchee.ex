@@ -19,7 +19,6 @@ defmodule Benchee do
     %{config: config, jobs: []}
   end
 
-  @seconds_to_microseconds 1_000_000
   defp convert_time_to_micro_s(config) do
     {_, config} = Map.get_and_update! config, :time, fn(seconds) ->
       {seconds, Time.seconds_to_microseconds(seconds)}
@@ -29,7 +28,7 @@ defmodule Benchee do
 
   @doc """
   Runs the given benchmark for the configured time and returns a suite with
-  the benchmark results added.
+  the benchmark run_times added.
   """
   def benchmark(suite = %{config: %{time: time}}, name, function) do
     IO.puts "Benchmarking #{name}..."
@@ -41,15 +40,15 @@ defmodule Benchee do
     suite
   end
 
-  defp do_benchmark(time, function, results \\ [], total_run_time \\ 0)
+  defp do_benchmark(time, function, run_times \\ [], time_taken \\ 0)
 
-  defp do_benchmark(time, _, results, time_taken) when time_taken > time do
-    results
+  defp do_benchmark(time, _, run_times, time_taken) when time_taken > time do
+    run_times
   end
 
-  defp do_benchmark(time, function, results, total_run_time) do
+  defp do_benchmark(time, function, run_times, time_taken) do
     run_time = measure_call(function)
-    do_benchmark(time, function, [run_time | results], total_run_time + run_time)
+    do_benchmark(time, function, [run_time | run_times], time_taken + run_time)
   end
 
   defp measure_call(function) do
