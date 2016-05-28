@@ -4,7 +4,7 @@ defmodule BencheeTest do
   doctest Benchee
 
   @header_regex         ~r/Name.+ips.+average.+deviation/
-  @sleep_benchmark_rgex ~r/Name.+ips.+average.+deviation/
+  @sleep_benchmark_rgex ~r/Sleeps\s+\d+.+\s+\d+\.\d+.+\s+.+\d+\.\d+/
   test "integration" do
     capture_io fn ->
       result =
