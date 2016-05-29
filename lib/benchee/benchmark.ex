@@ -5,7 +5,8 @@ defmodule Benchee.Benchmark do
   """
   def benchmark(suite = %{config: %{time: time}}, name, function) do
     IO.puts "Benchmarking #{name}..."
-    run_times = do_benchmark(time, function)
+    finish_time = current_time + time
+    run_times = do_benchmark(finish_time, function)
     job = {name, run_times}
     {_, suite} = Map.get_and_update! suite, :jobs, fn(jobs) ->
       {jobs, [job | jobs]}
@@ -13,15 +14,19 @@ defmodule Benchee.Benchmark do
     suite
   end
 
-  defp do_benchmark(time, function, run_times \\ [], time_taken \\ 0)
+  defp current_time do
+    :erlang.system_time :micro_seconds
+  end
 
-  defp do_benchmark(time, _, run_times, time_taken) when time_taken > time do
+  defp do_benchmark(finish_time, function, run_times \\ [], now \\ 0)
+
+  defp do_benchmark(finish_time, _, run_times, now) when now > finish_time do
     run_times
   end
 
-  defp do_benchmark(time, function, run_times, time_taken) do
+  defp do_benchmark(finish_time, function, run_times, _now) do
     run_time = measure_call(function)
-    do_benchmark(time, function, [run_time | run_times], time_taken + run_time)
+    do_benchmark(finish_time, function, [run_time | run_times], current_time())
   end
 
   defp measure_call(function) do
