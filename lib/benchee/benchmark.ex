@@ -6,6 +6,8 @@ defmodule Benchee.Benchmark do
   def benchmark(suite = %{config: %{time: time}}, name, function) do
     IO.puts "Benchmarking #{name}..."
     finish_time = current_time + time
+    prewarm(function)
+    :erlang.garbage_collect
     run_times = do_benchmark(finish_time, function)
     job = {name, run_times}
     {_, suite} = Map.get_and_update! suite, :jobs, fn(jobs) ->
@@ -16,6 +18,12 @@ defmodule Benchee.Benchmark do
 
   defp current_time do
     :erlang.system_time :micro_seconds
+  end
+
+  # testing has shown that sometimes the first call is significantly slower
+  # than the second (like 2 vs 800) so prewarm one time.
+  defp prewarm(function) do
+    measure_call(function)
   end
 
   defp do_benchmark(finish_time, function, run_times \\ [], now \\ 0)
