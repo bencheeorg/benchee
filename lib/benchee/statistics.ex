@@ -4,7 +4,7 @@ defmodule Benchee.Statistics do
   times and then compute statistics like the average and the standard devaition.
   """
 
-  alias Benchee.Time
+  alias Benchee.{Time, Statistics}
 
   @doc """
   Takes a job suite with job run times, returns a map representing the statistics
@@ -25,7 +25,7 @@ defmodule Benchee.Statistics do
   """
   def statistics(%{jobs: jobs}) do
     Enum.map jobs, fn({name, run_times}) ->
-      {name, Benchee.Statistics.job_statistics(run_times)}
+      {name, Statistics.job_statistics(run_times)}
     end
   end
 

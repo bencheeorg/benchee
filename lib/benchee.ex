@@ -4,6 +4,8 @@ defmodule Benchee do
   as the very high level `Benchee.run` API.
   """
 
+  alias Benchee.{Statistics, Formatters, Config, Benchmark}
+
   @doc """
   High level interface that runs the given benchmarks and prints the results on
   the console. It is given an optional config and an array of tuples
@@ -19,8 +21,8 @@ defmodule Benchee do
     config
     |> Benchee.init
     |> run_benchmarks(jobs)
-    |> Benchee.Statistics.statistics
-    |> Benchee.Formatters.Console.format
+    |> Statistics.statistics
+    |> Formatters.Console.format
     |> IO.puts
   end
 
@@ -40,7 +42,7 @@ defmodule Benchee do
   %{config: %{time: 1_000_000}, jobs: []}
   """
   def init(config \\ %{}) do
-    Benchee.Config.init(config)
+    Config.init(config)
   end
 
   @doc """
@@ -48,7 +50,7 @@ defmodule Benchee do
   the benchmarking results added to jobs..
   """
   def benchmark(suite, name, function) do
-    Benchee.Benchmark.benchmark(suite, name, function)
+    Benchmark.benchmark(suite, name, function)
   end
 
   @doc """
@@ -60,6 +62,6 @@ defmodule Benchee do
   [{"My Job", %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}}]
   """
   def statistics(suite) do
-    Benchee.Statistics.statistics(suite)
+    Statistics.statistics(suite)
   end
 end
