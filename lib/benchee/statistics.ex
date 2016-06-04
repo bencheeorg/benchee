@@ -7,8 +7,8 @@ defmodule Benchee.Statistics do
   alias Benchee.{Time, Statistics}
 
   @doc """
-  Takes a job suite with job run times, returns a map representing the statistics
-  of the job as follows:
+  Takes a job suite with job run times, returns a map representing the
+  statistics of the job as follows:
 
   * average       - average run time of the job in μs (the lower the better)
   * ips           - iterations per second, how often can it be executed in one
@@ -21,7 +21,8 @@ defmodule Benchee.Statistics do
   iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
   iex> suite = %{jobs: [{"My Job", run_times}]}
   iex> Benchee.Statistics.statistics(suite)
-  [{"My Job", %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}}]
+  [{"My Job",
+    %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}}]
   """
   def statistics(%{jobs: jobs}) do
     Enum.map jobs, fn({name, run_times}) ->
@@ -33,21 +34,22 @@ defmodule Benchee.Statistics do
   Calculates statistical data based on a series of run times for a job
   in microseconds.
 
-  iex> Benchee.Statistics.job_statistics([200, 400, 400, 400, 500, 500, 700, 900])
+  iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
+  iex> Benchee.Statistics.job_statistics(run_times)
   %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}
   """
   def job_statistics(run_times) do
     total_time          = Enum.sum(run_times)
     iterations          = Enum.count(run_times)
-    average_time        = total_time / iterations
+    average             = total_time / iterations
     ips                 = iterations_per_second(iterations, total_time)
-    deviation           = standard_deviation(run_times, average_time, iterations)
-    standard_dev_ratio  = standard_deviation / average_time
+    deviation           = standard_deviation(run_times, average, iterations)
+    standard_dev_ratio  = deviation / average
 
     %{
-      average:       average_time,
-      ips:           iterations_per_second,
-      std_dev:       standard_deviation,
+      average:       average,
+      ips:           ips,
+      std_dev:       deviation,
       std_dev_ratio: standard_dev_ratio,
     }
   end
