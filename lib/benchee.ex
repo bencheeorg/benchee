@@ -15,7 +15,7 @@ defmodule Benchee do
     Benchee.init(config)
     |> run_benchmarks(jobs)
     |> Benchee.Statistics.statistics
-    |> Benchee.Formatters.String.format
+    |> Benchee.Formatters.Console.format
     |> IO.puts
   end
 

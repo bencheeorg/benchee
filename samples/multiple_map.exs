@@ -38,5 +38,5 @@ Benchee.init(%{time: 3})
 |> Benchee.benchmark("map with ++ and TCO", fn -> MyMap.map2(list, map_function) end)
 |> Benchee.benchmark("simple map without TCO", fn -> MyMap.map3(list, map_function) end)
 |> Benchee.Statistics.statistics
-|> Benchee.Formatters.String.format
+|> Benchee.Formatters.Console.format
 |> IO.puts

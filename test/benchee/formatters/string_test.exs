@@ -1,4 +1,4 @@
-defmodule Benchee.Formatters.StringTest do
+defmodule Benchee.Formatters.ConsoleTest do
   use ExUnit.Case
-  doctest Benchee.Formatters.String
+  doctest Benchee.Formatters.Console
 end
