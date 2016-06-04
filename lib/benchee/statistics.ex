@@ -111,7 +111,7 @@ defmodule Benchee.Statistics do
     middle = div(iterations, 2)
 
     if Integer.is_odd(iterations) do
-      Enum.at(sorted, middle) |> to_float
+      sorted |> Enum.at(middle) |> to_float
     else
       (Enum.at(sorted, middle) + Enum.at(sorted, middle - 1)) / 2
     end

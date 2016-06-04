@@ -25,7 +25,7 @@ defmodule Benchee.Time do
 
       iex> Benchee.Time.seconds_to_microseconds(1.234)
       1_234_000.0
-      
+
   """
   def seconds_to_microseconds(seconds) do
     seconds * @seconds_to_microseconds
