@@ -18,7 +18,7 @@ defmodule Benchee.Formatters.Console do
   ```
   iex> jobs = [{"My Job", %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1}}]
   iex> Benchee.Formatters.Console.format(jobs)
-  ["Name                          ips            average        deviation\n",
+  ["\nName                          ips            average        deviation\n",
   "My Job                        5000.00        200.00μs       (±10.00%)\n"]
 
   ```
@@ -29,7 +29,7 @@ defmodule Benchee.Formatters.Console do
   end
 
   defp column_descriptors do
-    "~*s~*s~*s~s\n"
+    "\n~*s~*s~*s~s\n"
     |> :io_lib.format([-@label_width, "Name", -@ips_width, "ips",
                        -@average_width, "average", "deviation"])
     |> to_string

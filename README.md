@@ -36,6 +36,7 @@ Running this scripts produces an output like:
 tobi@happy ~/github/benchee $ mix run samples/run.exs
 Benchmarking flat_map...
 Benchmarking map.flatten...
+
 Name                          ips            average        deviation
 map.flatten                   1291.71        774.17μs       (±16.24%)
 flat_map                      840.80         1189.34μs      (±5.44%)
