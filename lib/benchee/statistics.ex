@@ -42,7 +42,7 @@ defmodule Benchee.Statistics do
       iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
       iex> Benchee.Statistics.job_statistics(run_times)
       %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}
-      
+
   """
   def job_statistics(run_times) do
     total_time          = Enum.sum(run_times)
@@ -58,6 +58,23 @@ defmodule Benchee.Statistics do
       std_dev:       deviation,
       std_dev_ratio: standard_dev_ratio,
     }
+  end
+
+  @doc """
+  Sorts the given jobs fastest to slowest by average.
+
+  ## Examples
+
+      iex> second = {"Second", %{average: 200.0}}
+      iex> third  = {"Third",  %{average: 400.0}}
+      iex> first  = {"First",  %{average: 100.0}}
+      iex> Benchee.Statistics.sort([second, third, first])
+      [{"First",  %{average: 100.0}},
+       {"Second", %{average: 200.0}},
+       {"Third",  %{average: 400.0}}]
+  """
+  def sort(jobs) do
+    Enum.sort_by jobs, fn({_, %{average: average}}) -> average end
   end
 
   defp iterations_per_second(iterations, time_microseconds) do

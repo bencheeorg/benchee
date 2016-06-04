@@ -4,6 +4,8 @@ defmodule Benchee.Formatters.Console do
   output through `IO.puts` on the console.
   """
 
+  alias Benchee.Statistics
+
   @label_width 30
   @ips_width 15
   @average_width 15
@@ -34,15 +36,19 @@ defmodule Benchee.Formatters.Console do
   end
 
   defp job_reports(jobs) do
-    Enum.map jobs, fn({name, %{average:       average,
-                               ips:           ips,
-                               std_dev_ratio: std_dev_ratio}}) ->
-      "~*s~*.2f~*ts~ts\n"
-      |> :io_lib.format([-@label_width, name, -@ips_width, ips,
-                         -@average_width, average_out(average),
-                         deviation_out(std_dev_ratio)])
-      |> to_string
-    end
+    jobs
+    |> Statistics.sort
+    |> Enum.map(&format_job/1)
+  end
+
+  defp format_job({name, %{average:       average,
+                           ips:           ips,
+                           std_dev_ratio: std_dev_ratio}}) do
+    "~*s~*.2f~*ts~ts\n"
+    |> :io_lib.format([-@label_width, name, -@ips_width, ips,
+                       -@average_width, average_out(average),
+                       deviation_out(std_dev_ratio)])
+    |> to_string
   end
 
   defp average_out(average) do
