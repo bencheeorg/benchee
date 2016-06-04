@@ -12,12 +12,16 @@ defmodule Benchee.Statistics do
   statistics of the job as follows:
 
     * average       - average run time of the job in μs (the lower the better)
-    * ips           - iterations per second, how often can it be executed in one
-      second (the higher the better)
+    * ips           - iterations per second, how often can the given function be
+      executed within one second (the higher the better)
     * std_dev       - standard deviation, a measurement how much results vary
       (the higher the more the results vary)
     * std_dev_ratio - standard deviation expressed as how much it is relative to
       the average
+    * median        - when all measured times are sorted, this is the middle
+      value (or average of the two middle values when the number of times is
+      even). More stable than the average and somewhat more likely to be a
+      typical you see.
 
   ## Examples
 
@@ -107,9 +111,13 @@ defmodule Benchee.Statistics do
     middle = div(iterations, 2)
 
     if Integer.is_odd(iterations) do
-      Enum.at(sorted, middle)
+      Enum.at(sorted, middle) |> to_float
     else
       (Enum.at(sorted, middle) + Enum.at(sorted, middle - 1)) / 2
     end
+  end
+
+  defp to_float(maybe_integer) do
+    maybe_integer / 1
   end
 end

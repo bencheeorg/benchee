@@ -9,6 +9,7 @@ defmodule Benchee.Formatters.Console do
   @label_width 30
   @ips_width 15
   @average_width 15
+  @deviation_width 15
 
   @doc """
   Formats the benchmark statistics to a report suitable for output on the CLI.
@@ -16,10 +17,10 @@ defmodule Benchee.Formatters.Console do
   ## Examples
 
   ```
-  iex> jobs = [{"My Job", %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1}}]
+  iex> jobs = [{"My Job", %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1, median: 190.0}}]
   iex> Benchee.Formatters.Console.format(jobs)
-  ["\nName                          ips            average        deviation\n",
-  "My Job                        5000.00        200.00μs       (±10.00%)\n"]
+  ["\nName                          ips            average        deviation      median\n",
+  "My Job                        5000.00        200.00μs       (±10.00%)      190.0μs\n"]
 
   ```
 
@@ -29,9 +30,10 @@ defmodule Benchee.Formatters.Console do
   end
 
   defp column_descriptors do
-    "\n~*s~*s~*s~s\n"
+    "\n~*s~*s~*s~*s~s\n"
     |> :io_lib.format([-@label_width, "Name", -@ips_width, "ips",
-                       -@average_width, "average", "deviation"])
+                       -@average_width, "average",
+                       -@deviation_width, "deviation", "median"])
     |> to_string
   end
 
@@ -43,17 +45,25 @@ defmodule Benchee.Formatters.Console do
 
   defp format_job({name, %{average:       average,
                            ips:           ips,
-                           std_dev_ratio: std_dev_ratio}}) do
-    "~*s~*.2f~*ts~ts\n"
+                           std_dev_ratio: std_dev_ratio,
+                           median:         median}}) do
+    "~*s~*.2f~*ts~*ts~ts\n"
     |> :io_lib.format([-@label_width, name, -@ips_width, ips,
                        -@average_width, average_out(average),
-                       deviation_out(std_dev_ratio)])
+                       -@deviation_width, deviation_out(std_dev_ratio),
+                       median_out(median)])
     |> to_string
   end
 
   defp average_out(average) do
     "~.2f~ts"
     |> :io_lib.format([average, "μs"])
+    |> to_string
+  end
+
+  defp median_out(median) do
+    "~.1f~ts"
+    |> :io_lib.format([median, "μs"])
     |> to_string
   end
 

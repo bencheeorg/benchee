@@ -3,7 +3,7 @@ defmodule BencheeTest do
   import ExUnit.CaptureIO
   doctest Benchee
 
-  @header_regex         ~r/^Name.+ips.+average.+deviation$/m
+  @header_regex         ~r/^Name.+ips.+average.+deviation.+median$/m
 
   test "integration step by step" do
     capture_io fn ->
@@ -78,6 +78,6 @@ defmodule BencheeTest do
   end
 
   defp body_regex(benchmark_name) do
-    ~r/^#{benchmark_name}\s+\d+.+\s+\d+\.\d+.+\s+.+\d+\.\d+/m
+    ~r/^#{benchmark_name}\s+\d+.+\s+\d+\.\d+.+\s+.+\d+\.\d+.+\s+\d+\.\d+.+/m
   end
 end

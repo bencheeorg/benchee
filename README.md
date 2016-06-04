@@ -7,8 +7,9 @@ It allows you to easily compare the performance of different pieces of code/func
 Provides you with:
 
 * average   - average execution time (the lower the better)
-* ips       - iterations per second (the higher the better)
+* ips       - iterations per second, how often can the given function be executed within one second (the higher the better)
 * deviation - standard deviation (how much do the results vary), given as a percentage of the average
+* median    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of times is even). More stable than the average and somewhat more likely to be a typical you see.
 
 Benchee does not:
 
@@ -37,9 +38,9 @@ tobi@happy ~/github/benchee $ mix run samples/run.exs
 Benchmarking flat_map...
 Benchmarking map.flatten...
 
-Name                          ips            average        deviation
-map.flatten                   1291.71        774.17μs       (±16.24%)
-flat_map                      840.80         1189.34μs      (±5.44%)
+Name                          ips            average        deviation      median
+map.flatten                   1041.75        959.92μs       (±11.35%)      932.0μs
+flat_map                      762.55         1311.40μs      (±11.64%)      1260.0μs
 ```
 
 See the general description for the meaning of the different statistics.
