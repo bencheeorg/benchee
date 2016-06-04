@@ -69,9 +69,11 @@ When [available in Hex](https://hex.pm/docs/publish), the package can be install
 
 Add benchee to your list of dependencies in `mix.exs`:
 
-    def deps do
-      [{:benchee, "~> 0.1.0", only: :dev}]
-    end
+```elixir
+def deps do
+  [{:benchee, "~> 0.1.0", only: :dev}]
+end
+```
 
 Install via `mix deps.get` and then happy benchmarking :)
 
