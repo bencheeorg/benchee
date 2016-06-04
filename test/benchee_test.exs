@@ -4,8 +4,7 @@ defmodule BencheeTest do
   doctest Benchee
 
   @header_regex         ~r/^Name.+ips.+average.+deviation$/m
-  @sleep_benchmark_regex ~r/^Sleeps\s+\d+.+\s+\d+\.\d+.+\s+.+\d+\.\d+/m
-  @magic_benchmark_regex ~r/^Magic\s+\d+.+\s+\d+\.\d+.+\s+.+\d+\.\d+/m
+
   test "integration step by step" do
     capture_io fn ->
       result =
@@ -16,7 +15,7 @@ defmodule BencheeTest do
 
       [header, benchmark_stats] = result
       assert Regex.match?(@header_regex, header)
-      assert Regex.match?(@sleep_benchmark_regex, benchmark_stats)
+      assert Regex.match?(body_regex("Sleeps"), benchmark_stats)
     end
   end
 
@@ -26,7 +25,7 @@ defmodule BencheeTest do
     end
 
     assert Regex.match?(@header_regex, output)
-    assert Regex.match?(@sleep_benchmark_regex, output)
+    assert Regex.match?(body_regex("Sleeps"), output)
   end
 
   test "integration multiple funs in .run" do
@@ -37,7 +36,48 @@ defmodule BencheeTest do
     end
 
     assert Regex.match?(@header_regex, output)
-    assert Regex.match?(@sleep_benchmark_regex, output)
-    assert Regex.match?(@magic_benchmark_regex, output)
+    assert Regex.match?(body_regex("Sleeps"), output)
+    assert Regex.match?(body_regex("Magic"), output)
+  end
+
+  test "integration high level README example" do
+    output = capture_io fn ->
+      list = Enum.to_list(1..10_000)
+      map_fun = fn(i) -> [i, i * i] end
+
+      Benchee.run(%{time: 0.1},
+                   [{"flat_map", fn -> Enum.flat_map(list, map_fun) end},
+                    {"map.flatten",
+                    fn -> list |> Enum.map(map_fun) |> List.flatten end}])
+    end
+
+    readme_sample_asserts(output)
+  end
+
+  test "integration expanded README example" do
+    output = capture_io fn ->
+      list = Enum.to_list(1..10_000)
+      map_fun = fn(i) -> [i, i * i] end
+
+      Benchee.init(%{time: 0.1})
+      |> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
+      |> Benchee.benchmark("map.flatten",
+                           fn -> list |> Enum.map(map_fun) |> List.flatten end)
+      |> Benchee.statistics
+      |> Benchee.Formatters.Console.format
+      |> IO.puts
+    end
+
+    readme_sample_asserts(output)
+  end
+
+  defp readme_sample_asserts(output) do
+    assert Regex.match?(@header_regex, output)
+    assert Regex.match?(body_regex("flat_map"), output)
+    assert Regex.match?(body_regex("map.flatten"), output)
+  end
+
+  defp body_regex(benchmark_name) do
+    ~r/^#{benchmark_name}\s+\d+.+\s+\d+\.\d+.+\s+.+\d+\.\d+/m
   end
 end
