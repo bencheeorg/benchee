@@ -11,14 +11,18 @@ defmodule Benchee.Config do
   Configuration times are given in seconds, but are converted to microseconds.
 
   Possible options:
-  * time - total run time of a single benchmark (determines how often it is
-           executed)
 
-  iex> Benchee.Config.init
-  %{config: %{time: 5_000_000}, jobs: []}
+    * time - total run time of a single benchmark (determines how often it is
+      executed)
 
-  iex> Benchee.Config.init %{time: 1}
-  %{config: %{time: 1_000_000}, jobs: []}
+  ## Examples
+
+      iex> Benchee.Config.init
+      %{config: %{time: 5_000_000}, jobs: []}
+
+      iex> Benchee.Config.init %{time: 1}
+      %{config: %{time: 1_000_000}, jobs: []}
+
   """
   @default_config %{time: 5}
   def init(config \\ %{}) do

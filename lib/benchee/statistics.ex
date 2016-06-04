@@ -10,19 +10,22 @@ defmodule Benchee.Statistics do
   Takes a job suite with job run times, returns a map representing the
   statistics of the job as follows:
 
-  * average       - average run time of the job in μs (the lower the better)
-  * ips           - iterations per second, how often can it be executed in one
-                    second (the higher the better)
-  * std_dev       - standard deviation, a measurement how much results vary
-                    (the higher the more the results vary)
-  * std_dev_ratio - standard deviation expressed as how much it is relative to
-                    the average
+    * average       - average run time of the job in μs (the lower the better)
+    * ips           - iterations per second, how often can it be executed in one
+      second (the higher the better)
+    * std_dev       - standard deviation, a measurement how much results vary
+      (the higher the more the results vary)
+    * std_dev_ratio - standard deviation expressed as how much it is relative to
+      the average
 
-  iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
-  iex> suite = %{jobs: [{"My Job", run_times}]}
-  iex> Benchee.Statistics.statistics(suite)
-  [{"My Job",
-    %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}}]
+  ## Examples
+
+      iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
+      iex> suite = %{jobs: [{"My Job", run_times}]}
+      iex> Benchee.Statistics.statistics(suite)
+      [{"My Job",
+        %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}}]
+
   """
   def statistics(%{jobs: jobs}) do
     Enum.map jobs, fn({name, run_times}) ->
@@ -34,9 +37,12 @@ defmodule Benchee.Statistics do
   Calculates statistical data based on a series of run times for a job
   in microseconds.
 
-  iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
-  iex> Benchee.Statistics.job_statistics(run_times)
-  %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}
+  ## Examples
+
+      iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
+      iex> Benchee.Statistics.job_statistics(run_times)
+      %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}
+      
   """
   def job_statistics(run_times) do
     total_time          = Enum.sum(run_times)

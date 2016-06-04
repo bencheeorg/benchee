@@ -6,8 +6,10 @@ defmodule Benchee.Benchmark do
   """
 
   @doc """
-  Runs the given benchmark for the configured time and returns a suite with
-  the benchmarking results added to jobs..
+  Runs the given benchmark for the time configured in the benchmark suite and
+  returns a the benchmarking suite results added to the  `:jobs` key.
+  Runs garbage collection before running the given function and measuring
+  the times so that previous benchmarks don't interfere with its result.
   """
   def benchmark(suite = %{config: %{time: time}}, name, function) do
     IO.puts "Benchmarking #{name}..."

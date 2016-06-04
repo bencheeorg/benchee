@@ -12,10 +12,13 @@ defmodule Benchee do
   of names and functions to benchmark. For configuration options see the
   documentation of Benchee.init/1.
 
-  Example:
-  `Benchee.run(%{time: 3},
-               [{"My Benchmark", fn -> 1 + 1 end},
-                {"My other benchmrk", fn -> "1" ++ "1" end}])`
+  ## Examples
+
+      Benchee.run(%{time: 3},
+                   [{"My Benchmark", fn -> 1 + 1 end},
+                    {"My other benchmrk", fn -> "1" ++ "1" end}])
+      # Prints a summary of the benchmark to the console
+
   """
   def run(config \\ %{}, jobs) do
     config
@@ -33,34 +36,42 @@ defmodule Benchee do
   end
 
   @doc """
-  Convenience access to `Benchee.Config.init` to initialize the configuration.
+  Convenience access to `Benchee.Config.init/1` to initialize the configuration.
 
-  iex> Benchee.init
-  %{config: %{time: 5_000_000}, jobs: []}
+  ## Examples
 
-  iex> Benchee.init %{time: 1}
-  %{config: %{time: 1_000_000}, jobs: []}
+      iex> Benchee.init
+      %{config: %{time: 5_000_000}, jobs: []}
+
+      iex> Benchee.init %{time: 1}
+      %{config: %{time: 1_000_000}, jobs: []}
+
   """
   def init(config \\ %{}) do
     Config.init(config)
   end
 
   @doc """
-  Runs the given benchmark for the configured time and returns a suite with
-  the benchmarking results added to jobs..
+  Convenience access to `Benchee.Benchmark.benchmark/3` to runs the given
+  benchmark for the configured time and returns a suite with the benchmarking
+  results added.
   """
   def benchmark(suite, name, function) do
     Benchmark.benchmark(suite, name, function)
   end
 
   @doc """
-  Convenience access to Benchee.Statistics.statistics to generate statistics.
+  Convenience access to `Benchee.Statistics.statistics/1` to generate
+  statistics.
 
-  iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
-  iex> suite = %{jobs: [{"My Job", run_times}]}
-  iex> Benchee.Statistics.statistics(suite)
-  [{"My Job",
-    %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}}]
+  ## Examples
+
+      iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
+      iex> suite = %{jobs: [{"My Job", run_times}]}
+      iex> Benchee.Statistics.statistics(suite)
+      [{"My Job",
+        %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}}]
+
   """
   def statistics(suite) do
     Statistics.statistics(suite)

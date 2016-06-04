@@ -29,7 +29,9 @@ defmodule Benchee.Mixfile do
   defp deps do
     [
       {:mix_test_watch, "~> 0.2",      only: :dev},
-      {:credo,          "~> 0.4-beta", only: [:dev]}
+      {:credo,          "~> 0.4-beta", only: :dev},
+      {:ex_doc,         "~> 0.11",     only: :dev},
+      {:earmark,        "~> 0.2",       only: :dev}
     ]
   end
 end

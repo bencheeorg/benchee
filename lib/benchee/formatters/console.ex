@@ -11,10 +11,16 @@ defmodule Benchee.Formatters.Console do
   @doc """
   Formats the benchmark statistics to a report suitable for output on the CLI.
 
+  ## Examples
+
+  ```
   iex> jobs = [{"My Job", %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1}}]
   iex> Benchee.Formatters.Console.format(jobs)
   ["Name                          ips            average        deviation\n",
   "My Job                        5000.00        200.00μs       (±10.00%)\n"]
+
+  ```
+
   """
   def format(jobs) do
     [column_descriptors | job_reports(jobs)]
