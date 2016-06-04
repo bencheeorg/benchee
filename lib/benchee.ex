@@ -12,7 +12,8 @@ defmodule Benchee do
                 {"My other benchmrk", fn -> "1" ++ "1" end}])`
   """
   def run(config \\ %{}, jobs) do
-    Benchee.init(config)
+    config
+    |> Benchee.init
     |> run_benchmarks(jobs)
     |> Benchee.Statistics.statistics
     |> Benchee.Formatters.Console.format

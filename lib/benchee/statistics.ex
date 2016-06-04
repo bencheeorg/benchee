@@ -32,12 +32,12 @@ defmodule Benchee.Statistics do
   %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}
   """
   def job_statistics(run_times) do
-    total_time            = Enum.sum(run_times)
-    iterations            = Enum.count(run_times)
-    average_time          = total_time / iterations
-    iterations_per_second = iterations_per_second(iterations, total_time)
-    standard_deviation    = standard_deviation(run_times, average_time, iterations)
-    standard_dev_ratio    = standard_deviation / average_time
+    total_time          = Enum.sum(run_times)
+    iterations          = Enum.count(run_times)
+    average_time        = total_time / iterations
+    ips                 = iterations_per_second(iterations, total_time)
+    deviation           = standard_deviation(run_times, average_time, iterations)
+    standard_dev_ratio  = standard_deviation / average_time
 
     %{
       average:       average_time,
