@@ -74,3 +74,11 @@ Add benchee to your list of dependencies in `mix.exs`:
     end
 
 Install via `mix deps.get` and then happy benchmarking :)
+
+## Development
+
+* `mix deps.get` to install dependencies
+* `mix test` to run tests or `mix test.watch` to run them continuously
+* `mix credo` or `mix credo --strict` to find code style problems
+
+Happy to review and accept pull requests or issues :)
