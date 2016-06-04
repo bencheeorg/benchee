@@ -1,3 +1,7 @@
+list = Enum.to_list(1..10_000)
+map_fun = fn(i) -> [i, i * i] end
+
 Benchee.run(%{time: 3},
-             [{"My Benchmark", fn -> Enum.to_list(1..10_000) end},
-              {"My other benchmrk", fn -> Enum.to_list(1..100_000) end}])
+             [{"flat_map", fn -> Enum.flat_map(list, map_fun) end},
+              {"map.flatten",
+              fn -> list |> Enum.map(map_fun) |> List.flatten end}])
