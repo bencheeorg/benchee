@@ -15,6 +15,20 @@ Benchee does not:
 
 * Keep results of previous and compare them, if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark)
 
+## Installation
+
+When [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+
+Add benchee to your list of dependencies in `mix.exs`:
+
+```elixir
+def deps do
+  [{:benchee, "~> 0.1.0", only: :dev}]
+end
+```
+
+Install via `mix deps.get` and then happy benchmarking as described in Usage :)
+
 ## Usage
 
 After installing just write a little benchmarking script:
@@ -64,20 +78,6 @@ This is also part of the official API and allows a more fine grained control.
 Do you just want to have all the raw run times? Grab them before `Benchee.statistics`! Just want to have the calculated statistics and use your own formatting? Grab the result of `Benchee.statistics`! Or, maybe you want to write to a file or send an HTTP post to some online service? Just replace the `IO.puts`.
 
 This way Benchee should be flexible enough to suit your needs and be extended at will.
-
-## Installation
-
-When [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
-
-Add benchee to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [{:benchee, "~> 0.1.0", only: :dev}]
-end
-```
-
-Install via `mix deps.get` and then happy benchmarking :)
 
 ## Development
 
