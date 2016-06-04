@@ -70,7 +70,11 @@ defmodule Benchee do
       iex> suite = %{jobs: [{"My Job", run_times}]}
       iex> Benchee.Statistics.statistics(suite)
       [{"My Job",
-        %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}}]
+        %{average:       500.0,
+          std_dev:       200.0,
+          std_dev_ratio: 0.4,
+          ips:           2000.0,
+          median:        450.0}}]
 
   """
   def statistics(suite) do

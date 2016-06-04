@@ -5,6 +5,7 @@ defmodule Benchee.Statistics do
   """
 
   alias Benchee.{Time, Statistics}
+  require Integer
 
   @doc """
   Takes a job suite with job run times, returns a map representing the
@@ -24,7 +25,11 @@ defmodule Benchee.Statistics do
       iex> suite = %{jobs: [{"My Job", run_times}]}
       iex> Benchee.Statistics.statistics(suite)
       [{"My Job",
-        %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}}]
+        %{average:       500.0,
+          std_dev:       200.0,
+          std_dev_ratio: 0.4,
+          ips:           2000.0,
+          median:        450.0}}]
 
   """
   def statistics(%{jobs: jobs}) do
@@ -41,7 +46,11 @@ defmodule Benchee.Statistics do
 
       iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
       iex> Benchee.Statistics.job_statistics(run_times)
-      %{average: 500.0, std_dev: 200.0, std_dev_ratio: 0.4, ips: 2000.0}
+      %{average:       500.0,
+        std_dev:       200.0,
+        std_dev_ratio: 0.4,
+        ips:           2000.0,
+        median:        450.0}
 
   """
   def job_statistics(run_times) do
@@ -51,12 +60,14 @@ defmodule Benchee.Statistics do
     ips                 = iterations_per_second(iterations, total_time)
     deviation           = standard_deviation(run_times, average, iterations)
     standard_dev_ratio  = deviation / average
+    median              = compute_median(run_times, iterations)
 
     %{
       average:       average,
       ips:           ips,
       std_dev:       deviation,
       std_dev_ratio: standard_dev_ratio,
+      median:        median,
     }
   end
 
@@ -87,5 +98,18 @@ defmodule Benchee.Statistics do
     end
     variance = total_variance / iterations
     :math.sqrt variance
+  end
+
+  defp compute_median(run_times, iterations) do
+    # this is rather inefficient, as O(log(n) * n + n) - there are
+    # O(n) algorithms to do compute this should it get to be a problem.
+    sorted = Enum.sort(run_times)
+    middle = div(iterations, 2)
+
+    if Integer.is_odd(iterations) do
+      Enum.at(sorted, middle)
+    else
+      (Enum.at(sorted, middle) + Enum.at(sorted, middle - 1)) / 2
+    end
   end
 end

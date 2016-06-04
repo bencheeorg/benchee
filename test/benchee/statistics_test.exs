@@ -12,11 +12,13 @@ defmodule Benchee.StatistcsTest do
     assert_in_delta stats_1.std_dev, 147.32, 0.01
     assert_in_delta stats_1.std_dev_ratio, 0.37, 0.01
     assert_in_delta stats_1.ips, 2538, 1
+    assert stats_1.median == 430
 
     assert stats_2.average == 14
     assert_in_delta stats_2.std_dev, 5.25, 0.01
     assert_in_delta stats_2.std_dev_ratio, 0.37, 0.01
     assert_in_delta stats_2.ips, 71428, 1
+    assert stats_2.median == 14
   end
 
   test "sort sorts the benchmarks correctly and retains all date" do
