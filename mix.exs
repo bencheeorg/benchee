@@ -2,15 +2,21 @@ defmodule Benchee.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :benchee,
-     version: "0.0.1",
-     elixir: "~> 1.2",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps,
-     package: package,
-     name: "Benchee"
-   ]
+    [
+      app: :benchee,
+      version: "0.0.1",
+      elixir: "~> 1.2",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps,
+      package: package,
+      name: "Benchee",
+      source_url: "https://github.com/PragTob/benchee",
+      description: """
+      Versatilely benchmark any code and get statistics about them such as:
+      average, iterations per second, standard deviation and the median.
+      """
+    ]
   end
 
   def application do
@@ -22,11 +28,14 @@ defmodule Benchee.Mixfile do
       {:mix_test_watch, "~> 0.2",      only: :dev},
       {:credo,          "~> 0.4-beta", only: :dev},
       {:ex_doc,         "~> 0.11",     only: :dev},
-      {:earmark,        "~> 0.2",       only: :dev}
+      {:earmark,        "~> 0.2",      only: :dev}
     ]
   end
 
   defp package do
-    [licenses: ["MIT"]]
+    [
+      maintainers: ["Tobias Pfeiffer"],
+      licenses: ["MIT"]
+    ]
   end
 end
