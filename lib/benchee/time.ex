@@ -1,4 +1,8 @@
 defmodule Benchee.Time do
+  @moduledoc """
+  Simple time conversions.
+  """
+
   @seconds_to_microseconds 1_000_000
 
   @doc """

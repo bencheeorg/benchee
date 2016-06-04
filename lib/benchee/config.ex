@@ -1,4 +1,8 @@
 defmodule Benchee.Config do
+  @moduledoc """
+  Functions to handle the configuration of Benchee, exposes `init` function.
+  """
+
   alias Benchee.Time
 
   @doc """

@@ -1,4 +1,9 @@
 defmodule Benchee.Formatters.Console do
+  @moduledoc """
+  Formatter to transform the statistics output into a structure suitable for
+  output through `IO.puts` on the console.
+  """
+
   @label_width 30
   @ips_width 15
   @average_width 15

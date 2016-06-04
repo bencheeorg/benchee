@@ -1,4 +1,10 @@
 defmodule Benchee.Benchmark do
+  @moduledoc """
+  Functionality related to the actual benchmarking. Meaning running the
+  given functions and recording their individual run times in a list.
+  Exposes `benchmark` function.
+  """
+
   @doc """
   Runs the given benchmark for the configured time and returns a suite with
   the benchmarking results added to jobs..

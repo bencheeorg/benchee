@@ -1,4 +1,8 @@
 defmodule Benchee do
+  @moduledoc """
+  Top level module providing convenience access to needed functions as well
+  as the very high level `Benchee.run` API.
+  """
 
   @doc """
   High level interface that runs the given benchmarks and prints the results on
@@ -27,13 +31,7 @@ defmodule Benchee do
   end
 
   @doc """
-  Returns the initial benchmark configuration for Benhee, composed of defauls
-  and an optional custom confiuration.
-  Configuration times are given in seconds, but are converted to microseconds.
-
-  Possible options:
-  * time - total run time of a single benchmark (determines how often it is
-           executed)
+  Convenience access to `Benchee.Config.init` to initialize the configuration.
 
   iex> Benchee.init
   %{config: %{time: 5_000_000}, jobs: []}

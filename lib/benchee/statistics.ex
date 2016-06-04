@@ -1,4 +1,9 @@
 defmodule Benchee.Statistics do
+  @moduledoc """
+  Statistics related functionality that is meant to take the raw benchmark run
+  times and then compute statistics like the average and the standard devaition.
+  """
+
   alias Benchee.Time
 
   @doc """
