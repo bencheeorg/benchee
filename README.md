@@ -1,6 +1,6 @@
 # Benchee [![Build Status](https://travis-ci.org/PragTob/benchee.svg?branch=travis)](https://travis-ci.org/PragTob/benchee)
 
-Library for easy and nice (micro) benchmarking. It allows you to easily compare the performance of different pieces of code/functions. Benchee is also versatile and extensible.
+Library for easy and nice (micro) benchmarking. It allows you to easily compare the performance of different pieces of code/functions. Benchee is also versatile and extensible, relying only on functions - no macros!
 
 Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) from the ruby world, but of course it is a more functional spin.
 
@@ -14,6 +14,8 @@ Provides you with:
 Benchee does not:
 
 * Keep results of previous and compare them, if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark)
+
+Make sure to check out the [available plugins](#plugins)!
 
 ## Installation
 
@@ -98,3 +100,11 @@ This way Benchee should be flexible enough to suit your needs and be extended at
 * `mix credo` or `mix credo --strict` to find code style problems
 
 Happy to review and accept pull requests or issues :)
+
+## Plugins
+
+Packages that work with Benchee one way or another to enhance its functionality.
+
+* [BencheeCSV](//github.com/PragTob/benchee_csv) - generate CSV from your Benchee benchmark results so you can import them into your favorite spreadsheet tool and make fancy graphs
+
+(You didn't really expect to find tons of plugins here when the library was just released, did you? ;) )
