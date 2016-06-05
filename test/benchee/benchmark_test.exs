@@ -1,6 +1,7 @@
 defmodule Benchee.BenchmarkTest do
   use ExUnit.Case
   import ExUnit.CaptureIO
+  alias Benchee.Statistics
 
   doctest Benchee.Benchmark
 
@@ -23,7 +24,23 @@ defmodule Benchee.BenchmarkTest do
       {time, _} = :timer.tc fn -> Benchee.benchmark(suite, "", fn -> 0 end) end
 
       assert_in_delta projected, time, 500,
-                      "Benchmark excution took too long #{time} vs. #{projected}"
+                      "excution took too long #{time} vs. #{projected}"
+    end
+  end
+
+  test "variance does not skyrocket on very fast functions" do
+    capture_io fn ->
+      range = 0..10
+      stats = %{config: %{time: 100_000}, jobs: []}
+              |> Benchee.benchmark("noop", fn -> 0 end)
+              |> Benchee.benchmark("map", fn ->
+                Enum.map(range, fn(i) -> i end)
+              end)
+              |> Statistics.statistics
+
+      Enum.each stats, fn({_, %{std_dev_ratio: std_dev_ratio}}) ->
+        assert std_dev_ratio < 1.0
+      end
     end
   end
 end

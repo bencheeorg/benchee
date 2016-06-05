@@ -73,6 +73,15 @@ defmodule BencheeTest do
     readme_sample_asserts(output)
   end
 
+  test "integration super fast function" do
+    output = capture_io fn ->
+      Benchee.run(%{time: 0.1}, [{"Sleeps", fn -> 0 end}])
+    end
+
+    assert Regex.match? ~r/fast/, output
+    assert Regex.match? ~r/unreliable/, output
+  end
+
   defp readme_sample_asserts(output) do
     assert Regex.match?(@header_regex, output)
     assert Regex.match?(body_regex("flat_map"), output)
