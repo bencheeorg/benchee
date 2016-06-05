@@ -6,3 +6,4 @@ erl_crash.dump
 elixir_build_*
 .tool-versions
 doc
+mix.lock
