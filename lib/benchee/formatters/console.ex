@@ -55,13 +55,13 @@ defmodule Benchee.Formatters.Console do
   end
 
   defp average_out(average) do
-    "~.2f~ts"
+    "~.6f~ts"
     |> :io_lib.format([average, "μs"])
     |> to_string
   end
 
   defp median_out(median) do
-    "~.1f~ts"
+    "~.6f~ts"
     |> :io_lib.format([median, "μs"])
     |> to_string
   end
