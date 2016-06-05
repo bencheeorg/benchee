@@ -39,7 +39,7 @@ defmodule Benchee.Benchmark do
   # If a function executes way too fast measurements are too unreliable and
   # with too high variance. Therefore determine an n how often it should be
   # executed in the measurement cycle.
-  @minimum_execution_time 20
+  @minimum_execution_time 10
   @times_multiplicator 10
   defp determine_n_times(function) do
     prewarm function

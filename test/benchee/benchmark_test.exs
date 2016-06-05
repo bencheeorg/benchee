@@ -39,7 +39,7 @@ defmodule Benchee.BenchmarkTest do
               |> Statistics.statistics
 
       Enum.each stats, fn({_, %{std_dev_ratio: std_dev_ratio}}) ->
-        assert std_dev_ratio < 1.0
+        assert std_dev_ratio < 1.2
       end
     end
   end

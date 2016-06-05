@@ -1,3 +1,4 @@
+range = 1..10
 Benchee.run(%{time: 3},
              [{"Integer addition",          fn -> 1 + 1 end},
               {"String concatention",       fn -> "1" <> "1" end},
@@ -5,7 +6,7 @@ Benchee.run(%{time: 3},
               {"++ array concat",           fn -> [1] ++ [1] end},
               {"noop",                      fn -> end},
               {"Enum.map (10)",             fn ->
-                Enum.map(1..10, fn(i) -> i end)
+                Enum.map(range, fn(i) -> i end)
               end}])
 
 
