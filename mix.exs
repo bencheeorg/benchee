@@ -13,7 +13,7 @@ defmodule Benchee.Mixfile do
       name: "Benchee",
       source_url: "https://github.com/PragTob/benchee",
       description: """
-      Versatilely benchmark any code and get statistics about them such as:
+      Versatile (micro) benchmarking that is extensible. Get statistics such as:
       average, iterations per second, standard deviation and the median.
       """
     ]
@@ -35,7 +35,8 @@ defmodule Benchee.Mixfile do
   defp package do
     [
       maintainers: ["Tobias Pfeiffer"],
-      licenses: ["MIT"]
+      licenses: ["MIT"],
+      links: %{github: "https://github.com/PragTob/benchee"}
     ]
   end
 end
