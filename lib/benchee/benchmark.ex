@@ -63,8 +63,8 @@ defmodule Benchee.Benchmark do
   end
 
   @repeat_notice """
-  The function you are trying to benchmark is super fast, making time measures unreliable!
-  Benchee won't measure individual runs but rather run it a couple of times and report the average back. Measures will still be correct, but there's less trust in the statistical results. If possible, increase the input size so that an individual run takes more than #{@minimum_execution_time}μs
+  Warning: The function you are trying to benchmark is super fast, making time measures unreliable!
+  Benchee won't measure individual runs but rather run it a couple of times and report the average back. Measures will still be correct, but the overhead of running it n times goes into the measurement. Also statistical results aren't as good, as they are based on averages now. If possible, increase the input size so that an individual run takes more than #{@minimum_execution_time}μs
   """
   defp repeat_notice do
     IO.puts @repeat_notice
