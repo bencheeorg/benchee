@@ -43,4 +43,13 @@ defmodule Benchee.Formatters.ConsoleTest do
     assert [header, result] = Console.format [first]
     refute Regex.match? ~r/(Comparison|x slower)/, Enum.join([header, result])
   end
+
+  test "It gives fast averages and medians more precision" do
+    fast  = {"First",  %{average: 0.15, ips: 10_000.0,
+                         std_dev_ratio: 0.1, median: 0.0125}}
+
+    assert [_, result] = Console.format [fast]
+    assert Regex.match? ~r/0.150μs/, result
+    assert Regex.match? ~r/0.0125μs/, result
+  end
 end
