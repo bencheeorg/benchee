@@ -19,7 +19,7 @@ defmodule Benchee.RepeatN do
   @doc """
   Calls the given function n times.
   """
-  def repeat_n(function, 0) do
+  def repeat_n(_function, 0) do
     # noop
   end
 

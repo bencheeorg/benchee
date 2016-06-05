@@ -63,7 +63,7 @@ defmodule Benchee.Formatters.Console do
   defp float_precision(float) when float < 0.01, do: 5
   defp float_precision(float) when float < 0.1, do: 4
   defp float_precision(float) when float < 0.2, do: 3
-  defp float_precision(float), do: 2
+  defp float_precision(_float), do: 2
 
   defp median_out(median) do
     "~.#{float_precision(median)}f~ts"
