@@ -18,7 +18,6 @@ defmodule Benchee.Benchmark do
     finish_time = current_time + time
     :erlang.garbage_collect
     {n, initial_run_time} = determine_n_times(function)
-    IO.puts n
     run_times = do_benchmark(finish_time, function, [initial_run_time], n)
     job = {name, run_times}
     {_, suite} = Map.get_and_update! suite, :jobs, fn(jobs) ->
@@ -40,7 +39,7 @@ defmodule Benchee.Benchmark do
   # If a function executes way too fast measurements are too unreliable and
   # with too high variance. Therefore determine an n how often it should be
   # executed in the measurement cycle.
-  @minimum_execution_time 5
+  @minimum_execution_time 20
   @times_multiplicator 10
   defp determine_n_times(function) do
     prewarm function
@@ -53,9 +52,8 @@ defmodule Benchee.Benchmark do
   end
 
   defp try_n_times(function, n) do
-    prewarm function, n # prewarm
+    prewarm function, n
     run_time = measure_call_n_times function, n
-    IO.inspect run_time
     if run_time >= @minimum_execution_time do
       repeat_notice
       {n, run_time / n}

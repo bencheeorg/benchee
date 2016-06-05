@@ -3,7 +3,10 @@ Benchee.run(%{time: 3},
               {"String concatention",       fn -> "1" <> "1" end},
               {"adding a head to an array", fn -> [1 | [1]] end},
               {"++ array concat",           fn -> [1] ++ [1] end},
-              {"noop",                      fn -> end}])
+              {"noop",                      fn -> end},
+              {"Enum.map (10)",             fn ->
+                Enum.map(1..10, fn(i) -> i end)
+              end}])
 
 
 # Before  adding running fast functions multiple times, these where just too
