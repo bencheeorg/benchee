@@ -26,6 +26,8 @@ defmodule BencheeTest do
 
     assert Regex.match?(@header_regex, output)
     assert Regex.match?(body_regex("Sleeps"), output)
+    refute Regex.match? ~r/Compariosn/, output
+    refute Regex.match? ~r/x slower/, output
   end
 
   test "integration multiple funs in .run" do
@@ -75,6 +77,9 @@ defmodule BencheeTest do
     assert Regex.match?(@header_regex, output)
     assert Regex.match?(body_regex("flat_map"), output)
     assert Regex.match?(body_regex("map.flatten"), output)
+    assert Regex.match?(~r/Comparison/, output)
+    assert Regex.match?(~r/^map.flatten\s+\d+\.\d+$/m, output)
+    assert Regex.match?(~r/^flat_map\s+\d+\.\d+\s+- \d\.\d+x slower$/m, output)
   end
 
   defp body_regex(benchmark_name) do

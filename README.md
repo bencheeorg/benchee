@@ -53,8 +53,12 @@ Benchmarking flat_map...
 Benchmarking map.flatten...
 
 Name                          ips            average        deviation      median
-map.flatten                   1041.75        959.92μs       (±11.35%)      932.0μs
-flat_map                      762.55         1311.40μs      (±11.64%)      1260.0μs
+map.flatten                   1311.84        762.29μs       (±13.77%)      747.0μs
+flat_map                      896.17         1115.86μs      (±9.54%)       1136.0μs
+
+Comparison:
+map.flatten                   1311.84
+flat_map                      896.17          - 1.46x slower
 ```
 
 See the general description for the meaning of the different statistics.

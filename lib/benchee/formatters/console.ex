@@ -26,7 +26,8 @@ defmodule Benchee.Formatters.Console do
 
   """
   def format(jobs) do
-    [column_descriptors | job_reports(jobs)]
+    sorted = Statistics.sort(jobs)
+    [column_descriptors | job_reports(sorted) ++ comparison_report(sorted)]
   end
 
   defp column_descriptors do
@@ -38,9 +39,7 @@ defmodule Benchee.Formatters.Console do
   end
 
   defp job_reports(jobs) do
-    jobs
-    |> Statistics.sort
-    |> Enum.map(&format_job/1)
+    Enum.map(jobs, &format_job/1)
   end
 
   defp format_job({name, %{average:       average,
@@ -71,5 +70,37 @@ defmodule Benchee.Formatters.Console do
     "(~ts~.2f%)"
     |> :io_lib.format(["±", std_dev_ratio * 100.0])
     |> to_string
+  end
+
+  defp comparison_report([_reference]) do
+    [] # No need for a comparison when only one benchmark was run
+  end
+
+  defp comparison_report([reference | other_jobs]) do
+    report = [reference_report(reference) | comparisons(reference, other_jobs)]
+    [comparison_descriptor | report]
+  end
+
+  defp reference_report({name, %{ips: ips}}) do
+    "~*s~.2f\n"
+    |> :io_lib.format([-@label_width, name, ips])
+    |> to_string
+  end
+
+  defp comparisons({_, reference_stats}, jobs_to_compare) do
+    Enum.map jobs_to_compare, fn(job = {_, job_stats}) ->
+      # IO.inspect {reference, job}
+      format_comparison(job, (reference_stats.ips / job_stats.ips))
+    end
+  end
+
+  defp format_comparison({name, %{ips: ips}}, times_slower) do
+    "~*s~*.2f - ~.2fx slower\n"
+    |> :io_lib.format([-@label_width, name, -@ips_width, ips, times_slower])
+    |> to_string
+  end
+
+  defp comparison_descriptor do
+    "\nComparison: \n"
   end
 end
