@@ -1,8 +1,8 @@
 # Benchee [![Build Status](https://travis-ci.org/PragTob/benchee.svg?branch=travis)](https://travis-ci.org/PragTob/benchee)
 
-Library for easy and nice (micro) benchmarking. Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) from the ruby world, but of course it is a more functional spin.
+Library for easy and nice (micro) benchmarking. It allows you to easily compare the performance of different pieces of code/functions. Benchee is also versatile and extensible.
 
-It allows you to easily compare the performance of different pieces of code/functions.
+Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) from the ruby world, but of course it is a more functional spin.
 
 Provides you with:
 
@@ -77,6 +77,14 @@ Benchee.init(%{time: 3})
 |> Benchee.Formatters.Console.format
 |> IO.puts
 ```
+
+This is how the "functional transformation" works here:
+
+1. Configure general parameters
+2. run n benchmarks with the given parameters gathering raw run times per function
+3. Generate statistics based on the raw run times
+4. Format the statistics in a suitable way
+5. Output the formatted statistics
 
 This is also part of the official API and allows a more fine grained control.
 Do you just want to have all the raw run times? Grab them before `Benchee.statistics`! Just want to have the calculated statistics and use your own formatting? Grab the result of `Benchee.statistics`! Or, maybe you want to write to a file or send an HTTP post to some online service? Just replace the `IO.puts`.
