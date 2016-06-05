@@ -45,7 +45,7 @@ defmodule Benchee.Formatters.Console do
   defp format_job({name, %{average:       average,
                            ips:           ips,
                            std_dev_ratio: std_dev_ratio,
-                           median:         median}}) do
+                           median:        median}}) do
     "~*s~*.2f~*ts~*ts~ts\n"
     |> :io_lib.format([-@label_width, name, -@ips_width, ips,
                        -@average_width, average_out(average),
@@ -80,7 +80,6 @@ defmodule Benchee.Formatters.Console do
   defp comparison_report([_reference]) do
     [] # No need for a comparison when only one benchmark was run
   end
-
   defp comparison_report([reference | other_jobs]) do
     report = [reference_report(reference) | comparisons(reference, other_jobs)]
     [comparison_descriptor | report]
