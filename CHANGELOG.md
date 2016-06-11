@@ -9,6 +9,7 @@
 
 * configuring a warmup time to run functions before measurements are taken can be configured via the `warmup` key in the config defaulting to 2 (seconds)
 * additionally supply the total standard deviation of iterations per second as `std_dev_ips` after `Benchee.Statistics.statistics`
+* statistics in console output are aligned right now for better comparisons
 
 ## Bugfixes
 
