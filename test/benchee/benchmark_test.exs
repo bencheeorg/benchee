@@ -2,6 +2,7 @@ defmodule Benchee.BenchmarkTest do
   use ExUnit.Case
   import ExUnit.CaptureIO
   alias Benchee.Statistics
+  alias Benchee.Benchmark
 
   doctest Benchee.Benchmark
 
@@ -74,11 +75,20 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure doesn't print out information about warmup (annoying)" do
     output = capture_io fn ->
-      stats = %{config: %{time: 1000, warmup: 500}, jobs: []}
-              |> Benchee.benchmark("noop", fn -> 0 end)
-              |> Benchee.measure
+      %{config: %{time: 1000, warmup: 500}, jobs: []}
+      |> Benchee.benchmark("noop", fn -> 0 end)
+      |> Benchee.measure
     end
 
     refute output =~ ~r/warmup/i
+  end
+
+  test ".measure never calls the function if warmup and time are 0" do
+    output = capture_io fn ->
+      %{config: %{time: 0, warmup: 0}, jobs: [{"", fn -> IO.puts "called" end}]}
+      |> Benchmark.measure
+    end
+
+    refute output =~ ~r/called/i
   end
 end

@@ -41,6 +41,10 @@ defmodule Benchee.Benchmark do
     measure_runtimes(function, time)
   end
 
+  defp measure_runtimes(_function, 0) do
+    []
+  end
+
   defp measure_runtimes(function, time) do
     finish_time = current_time + time
     :erlang.garbage_collect
