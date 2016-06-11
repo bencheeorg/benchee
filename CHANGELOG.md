@@ -1,4 +1,4 @@
-# 0.2.0 TBD
+# 0.2.0 (June 11, 2016)
 
 ## Backwards Incompatible Changes
 
