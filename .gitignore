@@ -7,3 +7,4 @@ elixir_build_*
 .tool-versions
 doc
 mix.lock
+docs

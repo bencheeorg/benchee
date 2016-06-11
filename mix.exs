@@ -28,7 +28,8 @@ defmodule Benchee.Mixfile do
       {:mix_test_watch, "~> 0.2",  only: :dev},
       {:credo,          "~> 0.4",  only: :dev},
       {:ex_doc,         "~> 0.11", only: :dev},
-      {:earmark,        "~> 0.2",  only: :dev}
+      {:earmark,        "~> 0.2",  only: :dev},
+      {:inch_ex,        "~> 0.5",  only: :docs}
     ]
   end
 
