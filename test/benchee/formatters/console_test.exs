@@ -44,12 +44,33 @@ defmodule Benchee.Formatters.ConsoleTest do
     refute Regex.match? ~r/(Comparison|x slower)/, Enum.join([header, result])
   end
 
-  test "It gives fast averages and medians more precision" do
+  test "It formats small averages and medians more precisely" do
     fast  = {"First",  %{average: 0.15, ips: 10_000.0,
                          std_dev_ratio: 0.1, median: 0.0125}}
 
     assert [_, result] = Console.format [fast]
     assert Regex.match? ~r/0.150μs/, result
     assert Regex.match? ~r/0.0125μs/, result
+  end
+
+  test "it doesn't end in an empty line when there's only on result" do
+    fast  = {"First",  %{average: 0.15, ips: 10_000.0,
+                         std_dev_ratio: 0.1, median: 0.0125}}
+
+    assert [_, result] = Console.format [fast]
+
+    assert String.last(result) != "\n"
+  end
+
+  test "it doesn't end in an empty line with multiple results" do
+    first  = {"First",  %{average: 100.0, ips: 10_000.0,
+                          std_dev_ratio: 0.1, median: 90.0}}
+    second = {"Second", %{average: 200.0, ips: 5_000.0,
+                          std_dev_ratio: 0.1, median: 195.5}}
+
+    jobs = [second, first]
+
+    [_, _, _, _comp_header, _reference, slower] = Console.format(jobs)
+    assert String.last(slower) != "\n"
   end
 end

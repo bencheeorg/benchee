@@ -21,7 +21,7 @@ defmodule Benchee.Formatters.Console do
   iex> jobs = [{"My Job", %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1, median: 190.0}}]
   iex> Benchee.Formatters.Console.format(jobs)
   ["\nName                                    ips        average    deviation         median\n",
-  "My Job                              5000.00       200.00μs    (±10.00%)       190.00μs\n"]
+  "My Job                              5000.00       200.00μs    (±10.00%)       190.00μs"]
 
   ```
 
@@ -29,6 +29,7 @@ defmodule Benchee.Formatters.Console do
   def format(jobs) do
     sorted = Statistics.sort(jobs)
     [column_descriptors | job_reports(sorted) ++ comparison_report(sorted)]
+    |> remove_last_blank_line
   end
 
   defp column_descriptors do
@@ -107,4 +108,12 @@ defmodule Benchee.Formatters.Console do
   defp comparison_descriptor do
     "\nComparison: \n"
   end
+
+  defp remove_last_blank_line([head]) do
+    [String.rstrip(head)]
+  end
+  defp remove_last_blank_line([head | tail]) do
+    [head | remove_last_blank_line(tail)]
+  end
+
 end
