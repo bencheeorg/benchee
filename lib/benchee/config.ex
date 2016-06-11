@@ -7,7 +7,7 @@ defmodule Benchee.Config do
 
   @doc """
   Returns the initial benchmark configuration for Benhee, composed of defauls
-  and an optional custom confiuration.
+  and an optional custom configuration.
   Configuration times are given in seconds, but are converted to microseconds.
 
   Possible options:
