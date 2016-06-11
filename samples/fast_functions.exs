@@ -1,3 +1,7 @@
+# This benchmark is not entirely recommended as the functions are way too fast
+# it's meant to show how this is not feasible or show improvements when I get
+# a new idea to improve this.
+
 range = 1..10
 Benchee.run(%{time: 3},
              [{"Integer addition",          fn -> 1 + 1 end},
@@ -9,7 +13,27 @@ Benchee.run(%{time: 3},
                 Enum.map(range, fn(i) -> i end)
               end}])
 
-
+# tobi@happy ~/github/benchee $ mix run samples/fast_functions.exs
+# samples/fast_functions.exs:11: warning: an expression is always required on the right side of ->. Please provide a value after ->
+#
+# ** lots of complains about too fast function execution **
+#
+# Name                          ips            average        deviation      median
+# ++ array concat               82969267.26    0.0121μs       (±16.71%)      0.0120μs
+# adding a head to an array     82868502.33    0.0121μs       (±100.61%)     0.0120μs
+# String concatention           82845306.42    0.0121μs       (±62.76%)      0.0120μs
+# Integer addition              81872809.30    0.0122μs       (±24.77%)      0.0120μs
+# noop                          81112598.69    0.0123μs       (±147.62%)     0.0120μs
+# Enum.map (10)                 1423971.66     0.70μs         (±104.11%)     0.64μs
+#
+# Comparison:
+# ++ array concat               82969267.26
+# adding a head to an array     82868502.33     - 1.00x slower
+# String concatention           82845306.42     - 1.00x slower
+# Integer addition              81872809.30     - 1.01x slower
+# noop                          81112598.69     - 1.02x slower
+# Enum.map (10)                 1423971.66      - 58.27x slower
+##
 # Before  adding running fast functions multiple times, these where just too
 # damn fast and unstable, take a look at these consecutive runs with integer
 # addition going first or last and super high deviations.

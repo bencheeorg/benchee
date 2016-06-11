@@ -93,6 +93,8 @@ Do you just want to have all the raw run times? Grab them before `Benchee.statis
 
 This way Benchee should be flexible enough to suit your needs and be extended at will.
 
+For more example usages and benchmarks have a look at the [`samples`](https://github.com/PragTob/benchee/tree/master/samples) directory!
+
 ## Development
 
 * `mix deps.get` to install dependencies
