@@ -8,8 +8,8 @@ defmodule Benchee.Statistics do
   require Integer
 
   @doc """
-  Takes a job suite with job run times, returns a map representing the
-  statistics of the job as follows:
+  Takes a job `suite` with job run times, returns a map representing the
+  statistics of the job suite as follows:
 
     * average       - average run time of the job in μs (the lower the better)
     * ips           - iterations per second, how often can the given function be
@@ -18,11 +18,17 @@ defmodule Benchee.Statistics do
       (the higher the more the results vary)
     * std_dev_ratio - standard deviation expressed as how much it is relative to
       the average
-    * std_dev_ips   - the absolute standard deviation of iterations per second (= ips * std_dev_ratio)
+    * std_dev_ips   - the absolute standard deviation of iterations per second
+      (= ips * std_dev_ratio)
     * median        - when all measured times are sorted, this is the middle
       value (or average of the two middle values when the number of times is
       even). More stable than the average and somewhat more likely to be a
       typical you see.
+
+  ## Parameters
+
+  * `suite` - the job suite after running the measurements, required to have the
+    run_times available under the `run_times` key
 
   ## Examples
 
