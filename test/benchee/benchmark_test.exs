@@ -26,7 +26,8 @@ defmodule Benchee.BenchmarkTest do
       assert new_suite.config == suite.config
       assert [{name, run_times}] = new_suite.run_times
       assert name == "Name"
-      assert Enum.count(run_times) >= 9 # should be 10 but gotta give it a bit leeway
+      # should be 9 (10 minus one prewarm) but gotta give it a bit leeway
+      assert Enum.count(run_times) >= 8
     end
   end
 
