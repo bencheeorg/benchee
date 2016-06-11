@@ -38,17 +38,18 @@ defmodule Benchee.Benchmark do
   end
 
   defp run_warmup(function, time) do
-    measure_runtimes(function, time)
+    measure_runtimes(function, time, false)
   end
 
-  defp measure_runtimes(_function, 0) do
+    defp measure_runtimes(function, time, display_repeat_notice \\ true)
+  defp measure_runtimes(_function, 0, _) do
     []
   end
 
-  defp measure_runtimes(function, time) do
+  defp measure_runtimes(function, time, display_repeat_notice) do
     finish_time = current_time + time
     :erlang.garbage_collect
-    {n, initial_run_time} = determine_n_times(function)
+    {n, initial_run_time} = determine_n_times(function, display_repeat_notice)
     do_benchmark(finish_time, function, [initial_run_time], n)
   end
 
@@ -67,12 +68,13 @@ defmodule Benchee.Benchmark do
   # executed in the measurement cycle.
   @minimum_execution_time 10
   @times_multiplicator 10
-  defp determine_n_times(function) do
+  defp determine_n_times(function, display_repeat_notice) do
     prewarm function
     run_time = measure_call function
     if run_time >= @minimum_execution_time do
       {1, run_time}
     else
+      if display_repeat_notice, do: repeat_notice
       try_n_times(function, @times_multiplicator)
     end
   end
@@ -81,7 +83,6 @@ defmodule Benchee.Benchmark do
     prewarm function, n
     run_time = measure_call_n_times function, n
     if run_time >= @minimum_execution_time do
-      repeat_notice
       {n, run_time / n}
     else
       try_n_times(function, n * @times_multiplicator)

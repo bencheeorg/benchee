@@ -75,13 +75,25 @@ defmodule BencheeTest do
     readme_sample_asserts(output)
   end
 
-  test "integration super fast function" do
+  test "integration super fast function print warnings" do
     output = capture_io fn ->
-      Benchee.run(%{time: 0.1, warmup: 0}, [{"Sleeps", fn -> 0 end}])
+      Benchee.run(%{time: 0.01, warmup: 0}, [{"Sleeps", fn -> 0 end}])
     end
 
     assert Regex.match? ~r/fast/, output
     assert Regex.match? ~r/unreliable/, output
+  end
+
+  test "integration super fast function warning is printed once per job" do
+    output = capture_io fn ->
+      Benchee.run(%{time: 0.01, warmup: 0.01}, [{"Sleeps", fn -> 0 end}])
+    end
+
+    warnings = output
+               |> String.split("\n")
+               |>Enum.filter(fn(line) -> line =~ ~r/fast/ end)
+
+    assert Enum.count(warnings) == 1
   end
 
   defp readme_sample_asserts(output) do
@@ -91,6 +103,8 @@ defmodule BencheeTest do
     assert Regex.match?(~r/Comparison/, output)
     assert Regex.match?(~r/^map.flatten\s+\d+\.\d+$/m, output)
     assert Regex.match?(~r/^flat_map\s+\d+\.\d+\s+- \d\.\d+x slower$/m, output)
+
+    refute Regex.match?(~r/fast/i, output)
   end
 
   defp body_regex(benchmark_name) do
