@@ -29,20 +29,15 @@ defmodule Benchee.Benchmark do
   """
   def measure(suite = %{jobs: jobs, config: %{time: time, warmup: warmup}}) do
     run_times = Enum.map jobs, fn({name, function}) ->
-                  run_warmup name, function, warmup
-                  job_run_times = measure_job name, function, time
+                  IO.puts "Benchmarking #{name}..."
+                  run_warmup function, warmup
+                  job_run_times = measure_runtimes function, time
                   {name, job_run_times}
                 end
     Map.put suite, :run_times, run_times
   end
 
-  defp run_warmup(name, function, time) do
-    IO.puts "Running warmup for #{name}..."
-    measure_runtimes(function, time)
-  end
-
-  defp measure_job(name, function, time) do
-    IO.puts "Benchmarking #{name}..."
+  defp run_warmup(function, time) do
     measure_runtimes(function, time)
   end
 

@@ -41,7 +41,7 @@ defmodule Benchee.BenchmarkTest do
     end
   end
 
-  test ".benchmark doesn't take longer for fast funs even with warmup" do
+  test ".measure doesn't take longer for fast funs even with warmup" do
     capture_io fn ->
       time      = 10_000
       warmup    = 5_000
@@ -70,5 +70,15 @@ defmodule Benchee.BenchmarkTest do
         assert std_dev_ratio < 1.2
       end
     end
+  end
+
+  test ".measure doesn't print out information about warmup (annoying)" do
+    output = capture_io fn ->
+      stats = %{config: %{time: 1000, warmup: 500}, jobs: []}
+              |> Benchee.benchmark("noop", fn -> 0 end)
+              |> Benchee.measure
+    end
+
+    refute output =~ ~r/warmup/i
   end
 end
