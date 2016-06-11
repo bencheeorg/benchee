@@ -71,9 +71,10 @@ defmodule Benchee do
       iex> Benchee.Statistics.statistics(suite)
       [{"My Job",
         %{average:       500.0,
+          ips:           2000.0,
           std_dev:       200.0,
           std_dev_ratio: 0.4,
-          ips:           2000.0,
+          std_dev_ips:   800.0,
           median:        450.0}}]
 
   """

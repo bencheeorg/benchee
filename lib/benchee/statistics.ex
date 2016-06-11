@@ -18,6 +18,7 @@ defmodule Benchee.Statistics do
       (the higher the more the results vary)
     * std_dev_ratio - standard deviation expressed as how much it is relative to
       the average
+    * std_dev_ips   - the absolute standard deviation of iterations per second (= ips * std_dev_ratio)
     * median        - when all measured times are sorted, this is the middle
       value (or average of the two middle values when the number of times is
       even). More stable than the average and somewhat more likely to be a
@@ -30,9 +31,10 @@ defmodule Benchee.Statistics do
       iex> Benchee.Statistics.statistics(suite)
       [{"My Job",
         %{average:       500.0,
+          ips:           2000.0,
           std_dev:       200.0,
           std_dev_ratio: 0.4,
-          ips:           2000.0,
+          std_dev_ips:   800.0,
           median:        450.0}}]
 
   """
@@ -51,9 +53,10 @@ defmodule Benchee.Statistics do
       iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
       iex> Benchee.Statistics.job_statistics(run_times)
       %{average:       500.0,
+        ips:           2000.0,
         std_dev:       200.0,
         std_dev_ratio: 0.4,
-        ips:           2000.0,
+        std_dev_ips:   800.0,
         median:        450.0}
 
   """
@@ -64,6 +67,7 @@ defmodule Benchee.Statistics do
     ips                 = iterations_per_second(iterations, total_time)
     deviation           = standard_deviation(run_times, average, iterations)
     standard_dev_ratio  = deviation / average
+    standard_dev_ips    = ips * standard_dev_ratio
     median              = compute_median(run_times, iterations)
 
     %{
@@ -71,6 +75,7 @@ defmodule Benchee.Statistics do
       ips:           ips,
       std_dev:       deviation,
       std_dev_ratio: standard_dev_ratio,
+      std_dev_ips:   standard_dev_ips,
       median:        median,
     }
   end
