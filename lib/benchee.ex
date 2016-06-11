@@ -23,29 +23,21 @@ defmodule Benchee do
   def run(config \\ %{}, jobs) do
     config
     |> Benchee.init
-    |> run_benchmarks(jobs)
+    |> Map.put(:jobs, jobs)
+    |> Benchee.measure
     |> Statistics.statistics
     |> Formatters.Console.format
     |> IO.puts
   end
 
-  defp run_benchmarks(suite, jobs) do
-    Enum.reduce jobs, suite, fn({name, function}, suite) ->
-      benchmark(suite, name, function)
-    end
-  end
-
   @doc """
   Convenience access to `Benchee.Config.init/1` to initialize the configuration.
 
-  ## Examples
+  Possible options:
 
-      iex> Benchee.init
-      %{config: %{time: 5_000_000}, jobs: []}
-
-      iex> Benchee.init %{time: 1}
-      %{config: %{time: 1_000_000}, jobs: []}
-
+    * time   - total run time in seconds of a single benchmark (determines how
+      often it is executed). Defaults to 5.
+    * warmup - the time in seconds for which the benchmarking function should be run without gathering results. Defaults to 2.
   """
   def init(config \\ %{}) do
     Config.init(config)
@@ -75,7 +67,7 @@ defmodule Benchee do
   ## Examples
 
       iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
-      iex> suite = %{jobs: [{"My Job", run_times}]}
+      iex> suite = %{run_times: [{"My Job", run_times}]}
       iex> Benchee.Statistics.statistics(suite)
       [{"My Job",
         %{average:       500.0,

@@ -3,8 +3,8 @@ defmodule Benchee.StatistcsTest do
   doctest Benchee.Statistics
 
   test "statistics computes the statistics for all jobs correctly" do
-    suite = %{jobs: [{"Job 1", [600, 470, 170, 430, 300]},
-                     {"Job 2", [17, 15, 23, 7, 9, 13]}]}
+    suite = %{run_times: [{"Job 1", [600, 470, 170, 430, 300]},
+                          {"Job 2", [17, 15, 23, 7, 9, 13]}]}
 
     [{_, stats_1}, {_, stats_2}] = Benchee.Statistics.statistics suite
 

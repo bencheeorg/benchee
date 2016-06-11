@@ -9,13 +9,7 @@ defmodule Benchee.Benchmark do
 
   @doc """
   Adds the given function and its associated name to the benchmarking jobs to
-  be run in this benchmarking suite.
-
-  ## Examples
-
-  iex> fun = fn -> 100 * 100 end
-  iex> Benchee.Benchmark.benchmark(%{jobs: []}, "100 square", fun)
-  %{jobs: [{"100 square", fun}]}
+  be run in this benchmarking suite under the `:jobs` key.
   """
   def benchmark(suite = %{jobs: jobs}, name, function) do
     %{suite | jobs: [{name, function} | jobs]}

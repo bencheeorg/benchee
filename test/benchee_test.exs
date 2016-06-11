@@ -3,13 +3,14 @@ defmodule BencheeTest do
   import ExUnit.CaptureIO
   doctest Benchee
 
-  @header_regex         ~r/^Name.+ips.+average.+deviation.+median$/m
-
+  @header_regex ~r/^Name.+ips.+average.+deviation.+median$/m
+  @test_times   %{time: 0.1, warmup: 0.02}
   test "integration step by step" do
     capture_io fn ->
       result =
-        Benchee.init(%{time: 0.1})
+        Benchee.init(@test_times)
         |> Benchee.benchmark("Sleeps", fn -> :timer.sleep(10) end)
+        |> Benchee.measure
         |> Benchee.Statistics.statistics
         |> Benchee.Formatters.Console.format
 
@@ -21,7 +22,7 @@ defmodule BencheeTest do
 
   test "integration high level interface .run" do
     output = capture_io fn ->
-      Benchee.run(%{time: 0.1}, [{"Sleeps", fn -> :timer.sleep(10) end}])
+      Benchee.run(@test_times, [{"Sleeps", fn -> :timer.sleep(10) end}])
     end
 
     assert Regex.match?(@header_regex, output)
@@ -32,7 +33,7 @@ defmodule BencheeTest do
 
   test "integration multiple funs in .run" do
     output = capture_io fn ->
-      Benchee.run(%{time: 0.1},
+      Benchee.run(@test_times,
                   [{"Sleeps", fn -> :timer.sleep(10) end},
                    {"Magic", fn -> Enum.to_list(1..100)  end}])
     end
@@ -47,7 +48,7 @@ defmodule BencheeTest do
       list = Enum.to_list(1..10_000)
       map_fun = fn(i) -> [i, i * i] end
 
-      Benchee.run(%{time: 0.1},
+      Benchee.run(@test_times,
                    [{"flat_map", fn -> Enum.flat_map(list, map_fun) end},
                     {"map.flatten",
                     fn -> list |> Enum.map(map_fun) |> List.flatten end}])
@@ -61,10 +62,11 @@ defmodule BencheeTest do
       list = Enum.to_list(1..10_000)
       map_fun = fn(i) -> [i, i * i] end
 
-      Benchee.init(%{time: 0.1})
+      Benchee.init(@test_times)
       |> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
       |> Benchee.benchmark("map.flatten",
                            fn -> list |> Enum.map(map_fun) |> List.flatten end)
+      |> Benchee.measure
       |> Benchee.statistics
       |> Benchee.Formatters.Console.format
       |> IO.puts
@@ -75,7 +77,7 @@ defmodule BencheeTest do
 
   test "integration super fast function" do
     output = capture_io fn ->
-      Benchee.run(%{time: 0.1}, [{"Sleeps", fn -> 0 end}])
+      Benchee.run(%{time: 0.1, warmup: 0}, [{"Sleeps", fn -> 0 end}])
     end
 
     assert Regex.match? ~r/fast/, output

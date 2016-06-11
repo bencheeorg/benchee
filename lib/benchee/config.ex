@@ -12,19 +12,21 @@ defmodule Benchee.Config do
 
   Possible options:
 
-    * time - total run time of a single benchmark (determines how often it is
-      executed)
+    * time   - total run time in seconds of a single benchmark (determines how
+      often it is executed). Defaults to 5.
+    * warmup - the time in seconds for which the benchmarking function should be run without gathering results. Defaults to 2.
 
   ## Examples
 
-      iex> Benchee.Config.init
-      %{config: %{time: 5_000_000}, jobs: []}
+      iex> Benchee.init
+      %{config: %{time: 5_000_000, warmup: 2_000_000}, jobs: []}
 
-      iex> Benchee.Config.init %{time: 1}
-      %{config: %{time: 1_000_000}, jobs: []}
+      iex> Benchee.init %{time: 1, warmup: 0.2}
+      %{config: %{time: 1_000_000, warmup: 200_000.0}, jobs: []}
 
   """
   @default_config %{time: 5, warmup: 2}
+  @time_keys [:time, :warmup]
   def init(config \\ %{}) do
     config = convert_time_to_micro_s(Map.merge(@default_config, config))
     :ok = :timer.start
@@ -32,9 +34,11 @@ defmodule Benchee.Config do
   end
 
   defp convert_time_to_micro_s(config) do
-    {_, config} = Map.get_and_update! config, :time, fn(seconds) ->
-      {seconds, Time.seconds_to_microseconds(seconds)}
+    Enum.reduce @time_keys, config, fn(key, new_config) ->
+      {_, new_config} = Map.get_and_update! new_config, key, fn(seconds) ->
+        {seconds, Time.seconds_to_microseconds(seconds)}
+      end
+      new_config
     end
-    config
   end
 end
