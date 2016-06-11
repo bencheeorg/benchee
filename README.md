@@ -45,7 +45,10 @@ Benchee.run(%{time: 3},
               fn -> list |> Enum.map(map_fun) |> List.flatten end}])
 ```
 
-First configuration options are passed, the only option available so far is `time` which is the time in seconds for how long each individual benchmark should run.
+First configuration options are passed, the only options available so far are:
+
+* `time`   - the time in seconds for how long each individual benchmark should be run and measure. Defaults to 5.
+* `warmup` - the warmup time in seconds for which a benchmark should be run without measuring times. This simulates a warm/already running system. Defaults to 2.
 
 Running this scripts produces an output like:
 
@@ -75,6 +78,7 @@ Benchee.init(%{time: 3})
 |> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
 |> Benchee.benchmark("map.flatten",
                      fn -> list |> Enum.map(map_fun) |> List.flatten end)
+|> Benchee.measure
 |> Benchee.statistics
 |> Benchee.Formatters.Console.format
 |> IO.puts
@@ -83,7 +87,7 @@ Benchee.init(%{time: 3})
 This is how the "functional transformation" works here:
 
 1. Configure general parameters
-2. run n benchmarks with the given parameters gathering raw run times per function
+2. run n benchmarks with the given parameters gathering raw run times per function (done in 2 steps, gathering the benchmarks and then running them `Benchee.measure`)
 3. Generate statistics based on the raw run times
 4. Format the statistics in a suitable way
 5. Output the formatted statistics

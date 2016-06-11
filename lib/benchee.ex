@@ -10,7 +10,7 @@ defmodule Benchee do
   High level interface that runs the given benchmarks and prints the results on
   the console. It is given an optional config and an array of tuples
   of names and functions to benchmark. For configuration options see the
-  documentation of Benchee.init/1.
+  documentation of `Benchee.Config.init/1`.
 
   ## Examples
 
@@ -45,7 +45,7 @@ defmodule Benchee do
 
   @doc """
   Convenience access to `Benchee.Benchmark.benchmark/3` to define the benchmarks
-  to run in this benchmarking suite..
+  to run in this benchmarking suite.`
   """
   def benchmark(suite, name, function) do
     Benchmark.benchmark(suite, name, function)

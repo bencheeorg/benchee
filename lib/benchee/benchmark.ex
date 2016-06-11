@@ -9,7 +9,8 @@ defmodule Benchee.Benchmark do
 
   @doc """
   Adds the given function and its associated name to the benchmarking jobs to
-  be run in this benchmarking suite under the `:jobs` key.
+  be run in this benchmarking suite as a tuple {name, function} to the list
+  under the `:jobs` key.
   """
   def benchmark(suite = %{jobs: jobs}, name, function) do
     %{suite | jobs: [{name, function} | jobs]}
@@ -20,6 +21,8 @@ defmodule Benchee.Benchmark do
   Executes the benchmarks defined before by first running the defined functions
   for `warmup` time without gathering results and them running them for `time`
   gathering their run times.
+
+  This means the total run time of a single benchmarking job is warmup + time.
 
   Warmup is usually important for run times with JIT but it seems to have some
   effect on the BEAM as well.

@@ -46,6 +46,7 @@ Benchee.init
                      fn -> MyMap.map_body(list, map_function) end)
 |> Benchee.benchmark("map tco no reverse",
                      fn -> MyMap.map_tco_no_reverse(list, map_function) end)
+|> Benchee.measure
 |> Benchee.Statistics.statistics
 |> Benchee.Formatters.Console.format
 |> IO.puts
