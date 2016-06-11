@@ -5,11 +5,12 @@ Benchee.init(%{time: 3})
 |> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
 |> Benchee.benchmark("map.flatten",
                      fn -> list |> Enum.map(map_fun) |> List.flatten end)
+|> Benchee.measure
 |> Benchee.statistics
 |> Benchee.Formatters.Console.format
 |> IO.puts
 
-# tobi@happy ~/github/benchee $ mix run samples/run_expanded.exs 
+# tobi@happy ~/github/benchee $ mix run samples/run_expanded.exs
 # Benchmarking flat_map...
 # Benchmarking map.flatten...
 #

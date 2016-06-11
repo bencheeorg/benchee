@@ -24,7 +24,7 @@ defmodule Benchee.Config do
       %{config: %{time: 1_000_000}, jobs: []}
 
   """
-  @default_config %{time: 5}
+  @default_config %{time: 5, warmup: 2}
   def init(config \\ %{}) do
     config = convert_time_to_micro_s(Map.merge(@default_config, config))
     :ok = :timer.start

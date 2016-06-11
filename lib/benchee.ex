@@ -52,12 +52,20 @@ defmodule Benchee do
   end
 
   @doc """
-  Convenience access to `Benchee.Benchmark.benchmark/3` to runs the given
-  benchmark for the configured time and returns a suite with the benchmarking
-  results added.
+  Convenience access to `Benchee.Benchmark.benchmark/3` to define the benchmarks
+  to run in this benchmarking suite..
   """
   def benchmark(suite, name, function) do
     Benchmark.benchmark(suite, name, function)
+  end
+
+
+  @doc """
+  Convenience access to `Benchee.Benchmark.measure/1` to run the defined
+  benchmarks and measure their run time.
+  """
+  def measure(suite) do
+    Benchmark.measure(suite)
   end
 
   @doc """

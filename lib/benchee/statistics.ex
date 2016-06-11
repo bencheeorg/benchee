@@ -38,9 +38,9 @@ defmodule Benchee.Statistics do
           median:        450.0}}]
 
   """
-  def statistics(%{jobs: jobs}) do
-    Enum.map jobs, fn({name, run_times}) ->
-      {name, Statistics.job_statistics(run_times)}
+  def statistics(%{run_times: run_times}) do
+    Enum.map run_times, fn({name, job_run_times}) ->
+      {name, Statistics.job_statistics(job_run_times)}
     end
   end
 

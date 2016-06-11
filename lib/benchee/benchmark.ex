@@ -8,22 +8,52 @@ defmodule Benchee.Benchmark do
   alias Benchee.RepeatN
 
   @doc """
-  Runs the given benchmark for the time configured in the benchmark suite and
-  returns a the benchmarking suite results added to the  `:jobs` key.
-  Runs garbage collection before running the given function and measuring
-  the times so that previous benchmarks don't interfere with its result.
+  Adds the given function and its associated name to the benchmarking jobs to
+  be run in this benchmarking suite.
+
+  ## Examples
+
+  iex> fun = fn -> 100 * 100 end
+  iex> Benchee.Benchmark.benchmark(%{jobs: []}, "100 square", fun)
+  %{jobs: [{"100 square", fun}]}
   """
-  def benchmark(suite = %{config: %{time: time}}, name, function) do
+  def benchmark(suite = %{jobs: jobs}, name, function) do
+    %{suite | jobs: [{name, function} | jobs]}
+  end
+
+
+  @doc """
+  Executes the benchmarks defined before by first running the defined functions
+  for `warmup` time without gathering results and them running them for `time`
+  gathering their run times.
+
+  Warmup is usually important for run times with JIT but it seems to have some
+  effect on the BEAM as well.
+  """
+  def measure(suite = %{jobs: jobs, config: %{time: time, warmup: warmup}}) do
+    run_times = Enum.map jobs, fn({name, function}) ->
+                  run_warmup name, function, warmup
+                  job_run_times = measure_job name, function, time
+                  {name, job_run_times}
+                end
+    Map.put suite, :run_times, run_times
+  end
+
+  defp run_warmup(name, function, time) do
+    IO.puts "Running warmup for #{name}..."
+    measure_runtimes(function, time)
+  end
+
+  defp measure_job(name, function, time) do
     IO.puts "Benchmarking #{name}..."
+    measure_runtimes(function, time)
+  end
+
+  defp measure_runtimes(function, time) do
     finish_time = current_time + time
     :erlang.garbage_collect
     {n, initial_run_time} = determine_n_times(function)
-    run_times = do_benchmark(finish_time, function, [initial_run_time], n)
-    job = {name, run_times}
-    {_, suite} = Map.get_and_update! suite, :jobs, fn(jobs) ->
-      {jobs, [job | jobs]}
-    end
-    suite
+    do_benchmark(finish_time, function, [initial_run_time], n)
   end
 
   defp current_time do
