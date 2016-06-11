@@ -25,7 +25,7 @@ Add benchee to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:benchee, "~> 0.1.0", only: :dev}]
+  [{:benchee, "~> 0.1", only: :dev}]
 end
 ```
 
