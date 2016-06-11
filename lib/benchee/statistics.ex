@@ -8,7 +8,7 @@ defmodule Benchee.Statistics do
   require Integer
 
   @doc """
-  Takes a job `suite` with job run times, returns a map representing the
+  Takes a job suite with job run times, returns a map representing the
   statistics of the job suite as follows:
 
     * average       - average run time of the job in μs (the lower the better)
@@ -27,8 +27,8 @@ defmodule Benchee.Statistics do
 
   ## Parameters
 
-  * `suite` - the job suite after running the measurements, required to have the
-    run_times available under the `run_times` key
+  * `suite` - the job suite represented as a map after running the measurements,
+    required to have the run_times available under the `run_times` key
 
   ## Examples
 
