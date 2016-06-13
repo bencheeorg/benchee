@@ -1,5 +1,7 @@
 # 0.2.0 (June 11, 2016)
 
+This release introduces warmup for benchmarks, nicer console output and the new `Benchee.measure` that runs the benchmarks previously defined instead of running them instantly.
+
 ## Backwards Incompatible Changes
 
 * `Benchee.benchmark/3` now doesn't run the benchmark anymore but simply adds it to `:jobs` in the config. The whole benchmark suite is then run via `Benchee.measure/1`. This only affects you if you used the more verbose way of defining benchmarks, `Benchee.run/2` should still work as expected.
