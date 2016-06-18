@@ -1,8 +1,8 @@
 # Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee) [![docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/) [![Inline docs](http://inch-ci.org/github/PragTob/benchee.svg)](http://inch-ci.org/github/PragTob/benchee) [![Build Status](https://travis-ci.org/PragTob/benchee.svg?branch=travis)](https://travis-ci.org/PragTob/benchee)
 
-Library for easy and nice (micro) benchmarking. It allows you to compare the performance of different pieces of code and functions at a glance. Benchee is also versatile and extensible, relying only on functions - no macros!
+Library for easy and nice (micro) benchmarking in Elixir. It allows you to compare the performance of different pieces of code and functions at a glance. Benchee is also versatile and extensible, relying only on functions - no macros!
 
-Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) from the ruby world, but of course it is a more functional spin.
+Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) from the ruby world, but of course it is a more functional spin as it fully lives in the Elixir world.
 
 Provides you with the following statistical data:
 
@@ -35,7 +35,7 @@ Install via `mix deps.get` and then happy benchmarking as described in Usage :)
 
 ## Usage
 
-After installing just write a little benchmarking script:
+After installing just write a little Elixir benchmarking script:
 
 ```elixir
 list = Enum.to_list(1..10_000)
