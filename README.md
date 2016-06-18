@@ -49,10 +49,11 @@ Benchee.run(%{time: 3},
 
 First configuration options are passed, the only options available so far are:
 
-* `time`   - the time in seconds for how long each individual benchmark should be run and measure. Defaults to 5.
-* `warmup` - the warmup time in seconds for which a benchmark should be run without measuring times. This simulates a warm/already running system. Defaults to 2.
+* `warmup` - the time in seconds for which a benchmark should be run without measuring times before real measurements start. This simulates a _"warm"_ running system. Defaults to 2.
+* `time`   - the time in seconds for how long each individual benchmark should be run and measured. Defaults to 5.
 
-Running this scripts produces an output like:
+
+Running this script produces an output like:
 
 ```
 tobi@happy ~/github/benchee $ mix run samples/run.exs
@@ -70,7 +71,7 @@ flat_map                      896.17          - 1.46x slower
 
 See the general description for the meaning of the different statistics.
 
-It is important to note that the way shown here is just the convenience interface. The same benchmark in its more verbose form looks like this:
+It is important to note that the benchmarking code shown before is the convenience interface. The same benchmark in its more verbose form looks like this:
 
 ```elixir
 list = Enum.to_list(1..10_000)
@@ -86,18 +87,18 @@ Benchee.init(%{time: 3})
 |> IO.puts
 ```
 
-This is how the "functional transformation" works here:
+This is a take on the _functional transformation_ of data applied to benchmarks here:
 
-1. Configure general parameters
-2. run n benchmarks with the given parameters gathering raw run times per function (done in 2 steps, gathering the benchmarks and then running them `Benchee.measure`)
+1. Configure the benchmarking suite to be run
+2. run n benchmarks with the given configuration gathering raw run times per function (done in 2 steps, gathering the benchmarks and then running them with `Benchee.measure`)
 3. Generate statistics based on the raw run times
 4. Format the statistics in a suitable way
 5. Output the formatted statistics
 
-This is also part of the official API and allows a more fine grained control.
+This is also part of the official API and allows for more fine grained control.
 Do you just want to have all the raw run times? Grab them before `Benchee.statistics`! Just want to have the calculated statistics and use your own formatting? Grab the result of `Benchee.statistics`! Or, maybe you want to write to a file or send an HTTP post to some online service? Just replace the `IO.puts`.
 
-This way Benchee should be flexible enough to suit your needs and be extended at will.
+This way Benchee should be flexible enough to suit your needs and be extended at will. Have a look at the [available plugins](#plugins).
 
 For more example usages and benchmarks have a look at the [`samples`](https://github.com/PragTob/benchee/tree/master/samples) directory!
 
@@ -111,7 +112,7 @@ Happy to review and accept pull requests or issues :)
 
 ## Plugins
 
-Packages that work with Benchee one way or another to enhance its functionality.
+Packages that work with Benchee to provide additional functionality.
 
 * [BencheeCSV](//github.com/PragTob/benchee_csv) - generate CSV from your Benchee benchmark results so you can import them into your favorite spreadsheet tool and make fancy graphs
 
