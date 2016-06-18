@@ -102,14 +102,6 @@ This way Benchee should be flexible enough to suit your needs and be extended at
 
 For more example usages and benchmarks have a look at the [`samples`](https://github.com/PragTob/benchee/tree/master/samples) directory!
 
-## Development
-
-* `mix deps.get` to install dependencies
-* `mix test` to run tests or `mix test.watch` to run them continuously
-* `mix credo` or `mix credo --strict` to find code style problems
-
-Happy to review and accept pull requests or issues :)
-
 ## Plugins
 
 Packages that work with Benchee to provide additional functionality.
@@ -117,3 +109,21 @@ Packages that work with Benchee to provide additional functionality.
 * [BencheeCSV](//github.com/PragTob/benchee_csv) - generate CSV from your Benchee benchmark results so you can import them into your favorite spreadsheet tool and make fancy graphs
 
 (You didn't really expect to find tons of plugins here when the library was just released, did you? ;) )
+
+## Contributing
+
+Contributions to Benchee are very welcome! Bug reports, documentation, spelling corrections, whole features, feature ideas, bugfixes, new plugins, fancy graphics... all of those (and probably more) are much appreciated contributions!
+
+A couple of (hopefully) helpful points:
+
+* Feel free to ask for help and guidance on an issue/PR ("How can I implement this?", "How could I test this?", ...)
+* Feel free to open early/not yet complete pull requests to get some early feedback
+* When in doubt if something is a good idea open an issue first to discuss it
+* In case I don't respond feel free to bump the issue/PR or ping me on other places
+
+## Development
+
+* `mix deps.get` to install dependencies
+* `mix test` to run tests or `mix test.watch` to run them continuously while you change files
+* `mix credo` or `mix credo --strict` to find code style problems (no too strict with the 80 width limit for sample output in the docs)
+
