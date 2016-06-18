@@ -114,6 +114,8 @@ Packages that work with Benchee to provide additional functionality.
 
 Contributions to Benchee are very welcome! Bug reports, documentation, spelling corrections, whole features, feature ideas, bugfixes, new plugins, fancy graphics... all of those (and probably more) are much appreciated contributions!
 
+You can get started with a look at the [open issues](https://github.com/PragTob/benchee/issues).
+
 A couple of (hopefully) helpful points:
 
 * Feel free to ask for help and guidance on an issue/PR ("How can I implement this?", "How could I test this?", ...)
