@@ -1,21 +1,23 @@
 # Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee)[![docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/)[![Inline docs](http://inch-ci.org/github/PragTob/benchee.svg)](http://inch-ci.org/github/PragTob/benchee)[![Build Status](https://travis-ci.org/PragTob/benchee.svg?branch=travis)](https://travis-ci.org/PragTob/benchee)
 
-Library for easy and nice (micro) benchmarking. It allows you to easily compare the performance of different pieces of code/functions. Benchee is also versatile and extensible, relying only on functions - no macros!
+Library for easy and nice (micro) benchmarking. It allows you to compare the performance of different pieces of code and functions at a glance. Benchee is also versatile and extensible, relying only on functions - no macros!
 
 Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) from the ruby world, but of course it is a more functional spin.
 
-Provides you with:
+Provides you with the following statistical data:
 
 * average   - average execution time (the lower the better)
 * ips       - iterations per second, how often can the given function be executed within one second (the higher the better)
-* deviation - standard deviation (how much do the results vary), given as a percentage of the average
-* median    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of times is even). More stable than the average and somewhat more likely to be a typical you see.
+* deviation - standard deviation (how much do the results vary), given as a percentage of the average (raw absolute values also available)
+* median    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of samples is even). More stable than the average and somewhat more likely to be a typical value you see.
+
+Benchee also first runs the functions for a given warmup time without recording the results, to simulate a _"warm"_ running system. 
 
 Benchee does not:
 
 * Keep results of previous and compare them, if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark)
 
-Make sure to check out the [available plugins](#plugins)!
+Benchee has no runtime dependencies and is aimed at being the core benchmarking logic. Further functionality is provided through plugins that then pull in dependencies, such as CSV export. Check out the [available plugins](#plugins)!
 
 ## Installation
 
