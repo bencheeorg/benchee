@@ -129,6 +129,6 @@ defmodule Benchee.Statistics do
   end
 
   defp to_float(maybe_integer) do
-    maybe_integer / 1
+    :erlang.float maybe_integer
   end
 end
