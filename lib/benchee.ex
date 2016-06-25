@@ -16,7 +16,7 @@ defmodule Benchee do
 
       Benchee.run(%{time: 3},
                   %{"My Benchmark" => fn -> 1 + 1 end,
-                    "My other benchmrk", fn -> "1" ++ "1" end})
+                    "My other benchmrk" => fn -> "1" ++ "1" end})
       # Prints a summary of the benchmark to the console
 
   """

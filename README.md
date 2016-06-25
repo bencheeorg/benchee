@@ -11,7 +11,7 @@ Provides you with the following statistical data:
 * deviation - standard deviation (how much do the results vary), given as a percentage of the average (raw absolute values also available)
 * median    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of samples is even). More stable than the average and somewhat more likely to be a typical value you see.
 
-Benchee also first runs the functions for a given warmup time without recording the results, to simulate a _"warm"_ running system. 
+Benchee also first runs the functions for a given warmup time without recording the results, to simulate a _"warm"_ running system.
 
 Benchee does not:
 
@@ -42,9 +42,9 @@ list = Enum.to_list(1..10_000)
 map_fun = fn(i) -> [i, i * i] end
 
 Benchee.run(%{time: 3},
-             [{"flat_map", fn -> Enum.flat_map(list, map_fun) end},
-              {"map.flatten",
-              fn -> list |> Enum.map(map_fun) |> List.flatten end}])
+            %{"flat_map" => fn -> Enum.flat_map(list, map_fun) end},
+              "map.flatten" =>
+              fn -> list |> Enum.map(map_fun) |> List.flatten end})
 ```
 
 First configuration options are passed, the only options available so far are:
@@ -128,4 +128,3 @@ A couple of (hopefully) helpful points:
 * `mix deps.get` to install dependencies
 * `mix test` to run tests or `mix test.watch` to run them continuously while you change files
 * `mix credo` or `mix credo --strict` to find code style problems (no too strict with the 80 width limit for sample output in the docs)
-

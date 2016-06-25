@@ -4,14 +4,12 @@
 
 range = 1..10
 Benchee.run(%{time: 3},
-             [{"Integer addition",          fn -> 1 + 1 end},
-              {"String concatention",       fn -> "1" <> "1" end},
-              {"adding a head to an array", fn -> [1 | [1]] end},
-              {"++ array concat",           fn -> [1] ++ [1] end},
-              {"noop",                      fn -> end},
-              {"Enum.map (10)",             fn ->
-                Enum.map(range, fn(i) -> i end)
-              end}])
+  %{"Integer addition"          => fn -> 1 + 1 end,
+    "String concatention"       => fn -> "1" <> "1" end,
+    "adding a head to an array" => fn -> [1 | [1]] end,
+    "++ array concat"           => fn -> [1] ++ [1] end,
+    "noop"                      => fn -> 0 end,
+    "Enum.map(10)"              => fn -> Enum.map(range, fn(i) -> i end) end})
 
 # tobi@happy ~/github/benchee $ mix run samples/fast_functions.exs
 # samples/fast_functions.exs:11: warning: an expression is always required on the right side of ->. Please provide a value after ->
