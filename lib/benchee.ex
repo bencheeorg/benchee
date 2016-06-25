@@ -15,12 +15,17 @@ defmodule Benchee do
   ## Examples
 
       Benchee.run(%{time: 3},
-                   [{"My Benchmark", fn -> 1 + 1 end},
-                    {"My other benchmrk", fn -> "1" ++ "1" end}])
+                  %{"My Benchmark" => fn -> 1 + 1 end,
+                    "My other benchmrk", fn -> "1" ++ "1" end})
       # Prints a summary of the benchmark to the console
 
   """
-  def run(config \\ %{}, jobs) do
+  def run(config \\ %{}, jobs)
+  def run(config, jobs) when is_list(jobs) do
+    map_jobs = Enum.into jobs, %{}
+    run(config, map_jobs)
+  end
+  def run(config, jobs) do
     config
     |> Benchee.init
     |> Map.put(:jobs, jobs)

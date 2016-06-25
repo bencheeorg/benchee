@@ -13,7 +13,7 @@ defmodule Benchee.Benchmark do
   under the `:jobs` key.
   """
   def benchmark(suite = %{jobs: jobs}, name, function) do
-    %{suite | jobs: [{name, function} | jobs]}
+    %{suite | jobs: Map.put(jobs, name, function)}
   end
 
 
@@ -41,7 +41,7 @@ defmodule Benchee.Benchmark do
     measure_runtimes(function, time, false)
   end
 
-    defp measure_runtimes(function, time, display_repeat_notice \\ true)
+  defp measure_runtimes(function, time, display_repeat_notice \\ true)
   defp measure_runtimes(_function, 0, _) do
     []
   end

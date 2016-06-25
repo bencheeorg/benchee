@@ -19,10 +19,10 @@ defmodule Benchee.Config do
   ## Examples
 
       iex> Benchee.init
-      %{config: %{time: 5_000_000, warmup: 2_000_000}, jobs: []}
+      %{config: %{time: 5_000_000, warmup: 2_000_000}, jobs: %{}}
 
       iex> Benchee.init %{time: 1, warmup: 0.2}
-      %{config: %{time: 1_000_000, warmup: 200_000.0}, jobs: []}
+      %{config: %{time: 1_000_000, warmup: 200_000.0}, jobs: %{}}
 
   """
   @default_config %{time: 5, warmup: 2}
@@ -30,7 +30,7 @@ defmodule Benchee.Config do
   def init(config \\ %{}) do
     config = convert_time_to_micro_s(Map.merge(@default_config, config))
     :ok = :timer.start
-    %{config: config, jobs: []}
+    %{config: config, jobs: %{}}
   end
 
   defp convert_time_to_micro_s(config) do
