@@ -21,6 +21,31 @@ defmodule Benchee.Formatters.ConsoleTest do
     assert Regex.match?(~r/Third/,  result_3)
   end
 
+  test "adjusts the label width to longest name" do
+    third_name = String.duplicate("a", 40)
+    first  = {"First",  %{average: 100.0, ips: 10_000.0,
+                          std_dev_ratio: 0.1, median: 90.0}}
+    second = {"Second", %{average: 200.0, ips: 5_000.0,
+                          std_dev_ratio: 0.1, median: 195.5}}
+    third  = {third_name,  %{average: 400.0, ips: 2_500.0,
+                             std_dev_ratio: 0.1, median: 375.0}}
+
+    # Just normally long names, expect default width of 30 + 13
+    [header, result_1, result_2 | _dont_care ] = Console.format([first, second])
+
+    assert_column_width "Name", header, 43
+    assert_column_width "First", result_1, 43
+    assert_column_width "Second", result_2, 43
+
+    # Include extra long name, expect width of 41 + 13 == 54
+    [header, result_1, result_2, result_3 | _dont_care ] = Console.format([first, second, third])
+
+    assert_column_width "Name", header, 54
+    assert_column_width "First", result_1, 54
+    assert_column_width "Second", result_2, 54
+    assert_column_width third_name, result_3, 54
+  end
+
   test "creates comparisons" do
     first  = {"First",  %{average: 100.0, ips: 10_000.0,
                           std_dev_ratio: 0.1, median: 90.0}}
@@ -72,5 +97,13 @@ defmodule Benchee.Formatters.ConsoleTest do
 
     [_, _, _, _comp_header, _reference, slower] = Console.format(jobs)
     assert String.last(slower) != "\n"
+  end
+
+  defp assert_column_width(name, string, expected_width) do
+    n = Regex.escape name
+    {:ok, regex} = Regex.compile "(#{n} +([0-9\.]+|ips)) "
+    assert Regex.match? regex, string
+    assert expected_width == Regex.run(regex, string, capture: :all_but_first)
+      |> hd() |> String.length()
   end
 end

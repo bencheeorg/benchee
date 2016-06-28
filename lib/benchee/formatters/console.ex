@@ -28,28 +28,37 @@ defmodule Benchee.Formatters.Console do
   """
   def format(jobs) do
     sorted = Statistics.sort(jobs)
-    [column_descriptors | job_reports(sorted) ++ comparison_report(sorted)]
+    label_width = label_width jobs
+    [column_descriptors(label_width) | job_reports(sorted, label_width) ++ comparison_report(sorted)]
     |> remove_last_blank_line
   end
 
-  defp column_descriptors do
+  defp column_descriptors(label_width) do
     "\n~*s~*s~*s~*s~*s\n"
-    |> :io_lib.format([-@label_width, "Name", @ips_width, "ips",
+    |> :io_lib.format([-label_width, "Name", @ips_width, "ips",
                        @average_width, "average",
                        @deviation_width, "deviation", @median_width, "median"])
     |> to_string
   end
 
-  defp job_reports(jobs) do
-    Enum.map(jobs, &format_job/1)
+  defp label_width(jobs) do
+    jobs
+      |> Enum.map(fn({job_name, _}) -> String.length(job_name) + 1 end)
+      |> Stream.concat([@label_width])
+      |> Enum.max
+  end
+
+  defp job_reports(jobs, label_width) do
+    Enum.map(jobs, fn(job) -> format_job job, label_width end)
   end
 
   defp format_job({name, %{average:       average,
                            ips:           ips,
                            std_dev_ratio: std_dev_ratio,
-                           median:        median}}) do
+                           median:        median}
+                         }, label_width) do
     "~*s~*.2f~*ts~*ts~*ts\n"
-    |> :io_lib.format([-@label_width, name, @ips_width, ips,
+    |> :io_lib.format([-label_width, name, @ips_width, ips,
                        @average_width, average_out(average),
                        @deviation_width, deviation_out(std_dev_ratio),
                        @median_width, median_out(median)])
