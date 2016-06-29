@@ -29,7 +29,8 @@ defmodule Benchee.Formatters.Console do
   def format(jobs) do
     sorted = Statistics.sort(jobs)
     label_width = label_width jobs
-    [column_descriptors(label_width) | job_reports(sorted, label_width) ++ comparison_report(sorted, label_width)]
+    [column_descriptors(label_width) | job_reports(sorted, label_width)
+      ++ comparison_report(sorted, label_width)]
     |> remove_last_blank_line
   end
 
@@ -93,8 +94,10 @@ defmodule Benchee.Formatters.Console do
     [] # No need for a comparison when only one benchmark was run
   end
   defp comparison_report([reference | other_jobs], label_width) do
-    report = [reference_report(reference, label_width) | comparisons(reference, label_width, other_jobs)]
-    [comparison_descriptor | report]
+    [
+      comparison_descriptor(), reference_report(reference, label_width) |
+      comparisons(reference, label_width, other_jobs)
+    ]
   end
 
   defp reference_report({name, %{ips: ips}}, label_width) do
