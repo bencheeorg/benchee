@@ -6,7 +6,7 @@ defmodule Benchee.Formatters.Console do
 
   alias Benchee.Statistics
 
-  @label_width 30
+  @default_label_width 29
   @ips_width 13
   @average_width 15
   @deviation_width 13
@@ -42,10 +42,11 @@ defmodule Benchee.Formatters.Console do
   end
 
   defp label_width(jobs) do
-    jobs
-      |> Enum.map(fn({job_name, _}) -> String.length(job_name) + 1 end)
-      |> Stream.concat([@label_width])
+    max_label_width = jobs
+      |> Enum.map(fn({job_name, _}) -> String.length(job_name) end)
+      |> Stream.concat([@default_label_width])
       |> Enum.max
+    max_label_width + 1
   end
 
   defp job_reports(jobs, label_width) do
