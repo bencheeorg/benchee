@@ -1,6 +1,7 @@
 defmodule Benchee.BenchmarkTest do
   use ExUnit.Case
   import ExUnit.CaptureIO
+  import Benchee.TestHelpers
   alias Benchee.Statistics
   alias Benchee.Benchmark
 
@@ -16,7 +17,7 @@ defmodule Benchee.BenchmarkTest do
 
   test ".mease runs a benchmark suite and enriches it with results" do
     capture_io fn ->
-      suite = %{config: %{time: 100_000, warmup: 0}, jobs: []}
+      suite = %{config: %{time: 103_000, warmup: 20_000}, jobs: []}
       new_suite =
         suite
         |> Benchee.benchmark("Name", fn -> :timer.sleep(10) end)
@@ -44,32 +45,36 @@ defmodule Benchee.BenchmarkTest do
   end
 
   test ".measure doesn't take longer for fast funs even with warmup" do
-    capture_io fn ->
-      time      = 10_000
-      warmup    = 5_000
-      projected = time + warmup
-      suite = %{config: %{time: time, warmup: warmup},
-                jobs: [{"", fn -> 0 end}]}
-      {time, _} = :timer.tc fn -> Benchee.measure(suite) end
+    retrying fn ->
+      capture_io fn ->
+        time      = 20_000
+        warmup    = 10_000
+        projected = time + warmup
+        suite = %{config: %{time: time, warmup: warmup},
+                  jobs: [{"", fn -> 0 end}]}
+        {time, _} = :timer.tc fn -> Benchee.measure(suite) end
 
-      assert_in_delta projected, time, 500,
-                      "excution took too long #{time} vs. #{projected}"
+        assert_in_delta projected, time, 2000,
+                        "excution took too long #{time} vs. #{projected}"
+      end
     end
   end
 
   test "variance does not skyrocket on very fast functions" do
-    capture_io fn ->
-      range = 0..10
-      stats = %{config: %{time: 100_000, warmup: 20_000}, jobs: []}
-              |> Benchee.benchmark("noop", fn -> 0 end)
-              |> Benchee.benchmark("map", fn ->
-                   Enum.map(range, fn(i) -> i end)
-                 end)
-              |> Benchee.measure
-              |> Statistics.statistics
+    retrying fn ->
+      capture_io fn ->
+        range = 0..10
+        stats = %{config: %{time: 20_000, warmup: 10_000}, jobs: []}
+                |> Benchee.benchmark("noop", fn -> 0 end)
+                |> Benchee.benchmark("map", fn ->
+                     Enum.map(range, fn(i) -> i end)
+                   end)
+                |> Benchee.measure
+                |> Statistics.statistics
 
-      Enum.each stats, fn({_, %{std_dev_ratio: std_dev_ratio}}) ->
-        assert std_dev_ratio < 1.2
+        Enum.each stats, fn({_, %{std_dev_ratio: std_dev_ratio}}) ->
+          assert std_dev_ratio < 2.0
+        end
       end
     end
   end

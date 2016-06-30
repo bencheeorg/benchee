@@ -6,6 +6,7 @@ defmodule Benchee.Mixfile do
       app: :benchee,
       version: "0.2.0",
       elixir: "~> 1.2",
+      elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps,
@@ -18,6 +19,9 @@ defmodule Benchee.Mixfile do
       """
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_),     do: ["lib"]
 
   def application do
     [applications: [:logger]]
