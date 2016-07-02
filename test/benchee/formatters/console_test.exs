@@ -30,20 +30,20 @@ defmodule Benchee.Formatters.ConsoleTest do
     third  = {third_name,  %{average: 400.0, ips: 2_500.0,
                              std_dev_ratio: 0.1, median: 375.0}}
 
-    # Just normally long names, expect default width of 30 + 13
+    expected_width = 43 # Normally long names, expect default width of 30 + 13
     [header, result_1, result_2 | _dont_care ] = Console.format([first, second])
 
-    assert_column_width "Name", header, 43
-    assert_column_width "First", result_1, 43
-    assert_column_width "Second", result_2, 43
+    assert_column_width "Name", header, expected_width
+    assert_column_width "First", result_1, expected_width
+    assert_column_width "Second", result_2, expected_width
 
-    # Include extra long name, expect width of 41 + 13 == 54
+    expected_width_wide = 54 # Include extra long name, expect width of 41 + 13
     [header, result_1, result_2, result_3 | _dont_care ] = Console.format([first, second, third])
 
-    assert_column_width "Name", header, 54
-    assert_column_width "First", result_1, 54
-    assert_column_width "Second", result_2, 54
-    assert_column_width third_name, result_3, 54
+    assert_column_width "Name", header, expected_width_wide
+    assert_column_width "First", result_1, expected_width_wide
+    assert_column_width "Second", result_2, expected_width_wide
+    assert_column_width third_name, result_3, expected_width_wide
   end
 
   test "creates comparisons" do
@@ -68,11 +68,11 @@ defmodule Benchee.Formatters.ConsoleTest do
     second  = {second_name,  %{average: 400.0, ips: 2_500.0,
                                std_dev_ratio: 0.1, median: 375.0}}
 
-    # Include extra long name, expect width of 41 + 13 == 54
+    expected_width = 54 # With extra long name, expect width of 41 + 13
     [_, _, _, _comp_header, reference, slower] = Console.format([first, second])
 
-    assert_column_width "First", reference, 54
-    assert_column_width second_name, slower, 54
+    assert_column_width "First", reference, expected_width
+    assert_column_width second_name, slower, expected_width
   end
 
   test "it doesn't create comparisons with only one benchmark run" do
