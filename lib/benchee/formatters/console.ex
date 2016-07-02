@@ -6,7 +6,7 @@ defmodule Benchee.Formatters.Console do
 
   alias Benchee.Statistics
 
-  @default_label_width 29
+  @default_label_width 4 # Length of column header
   @ips_width 13
   @average_width 15
   @deviation_width 13
@@ -20,8 +20,8 @@ defmodule Benchee.Formatters.Console do
   ```
   iex> jobs = [{"My Job", %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1, median: 190.0}}]
   iex> Benchee.Formatters.Console.format(jobs)
-  ["\nName                                    ips        average    deviation         median\n",
-  "My Job                              5000.00       200.00μs    (±10.00%)       190.00μs"]
+  ["\nName             ips        average    deviation         median\n",
+  "My Job       5000.00       200.00μs    (±10.00%)       190.00μs"]
 
   ```
 

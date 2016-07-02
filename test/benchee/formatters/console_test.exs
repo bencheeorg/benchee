@@ -31,7 +31,7 @@ defmodule Benchee.Formatters.ConsoleTest do
                              std_dev_ratio: 0.1, median: 375.0}}
 
     # Normally long names, expect default minimum width of 29 characters.
-    expected_width = 29
+    expected_width = 6
     [header, result_1, result_2 | _dont_care ] = Console.format([first, second])
 
     assert_column_width "Name", header, expected_width
