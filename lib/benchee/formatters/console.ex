@@ -95,7 +95,8 @@ defmodule Benchee.Formatters.Console do
   end
   defp comparison_report([reference | other_jobs], label_width) do
     [
-      comparison_descriptor(), reference_report(reference, label_width) |
+      comparison_descriptor,
+      reference_report(reference, label_width) |
       comparisons(reference, label_width, other_jobs)
     ]
   end
