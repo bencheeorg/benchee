@@ -30,14 +30,16 @@ defmodule Benchee.Formatters.ConsoleTest do
     third  = {third_name,  %{average: 400.0, ips: 2_500.0,
                              std_dev_ratio: 0.1, median: 375.0}}
 
-    expected_width = 43 # Normally long names, expect default width of 30 + 13
+    # Normally long names, expect default minimum width of 29 characters.
+    expected_width = 29
     [header, result_1, result_2 | _dont_care ] = Console.format([first, second])
 
     assert_column_width "Name", header, expected_width
     assert_column_width "First", result_1, expected_width
     assert_column_width "Second", result_2, expected_width
 
-    expected_width_wide = 54 # Include extra long name, expect width of 41 + 13
+    # Include extra long name, expect width of 40 characters
+    expected_width_wide = 40
     [header, result_1, result_2, result_3 | _dont_care ] = Console.format([first, second, third])
 
     assert_column_width "Name", header, expected_width_wide
@@ -68,7 +70,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     second  = {second_name,  %{average: 400.0, ips: 2_500.0,
                                std_dev_ratio: 0.1, median: 375.0}}
 
-    expected_width = 54 # With extra long name, expect width of 41 + 13
+    expected_width = 40 # With extra long name, expect width of 40 characters
     [_, _, _, _comp_header, reference, slower] = Console.format([first, second])
 
     assert_column_width "First", reference, expected_width
@@ -114,10 +116,13 @@ defmodule Benchee.Formatters.ConsoleTest do
   end
 
   defp assert_column_width(name, string, expected_width) do
+    # add 13 characters for the ips column, and an extra space between the columns
+    expected_width = expected_width + 14
     n = Regex.escape name
     regex = Regex.compile! "(#{n} +([0-9\.]+|ips))( |$)"
     assert Regex.match? regex, string
     assert expected_width == Regex.run(regex, string, capture: :all_but_first)
-      |> hd() |> String.length()
+                             |> hd
+                             |> String.length
   end
 end
