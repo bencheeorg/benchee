@@ -14,7 +14,7 @@ defmodule Benchee.BenchmarkTest do
     assert new_suite == %{jobs: [{"two", two_fun}, {"one", one_fun}]}
   end
 
-  test ".mease runs a benchmark suite and enriches it with results" do
+  test ".measure runs a benchmark suite and enriches it with results" do
     capture_io fn ->
       suite = %{config: %{parallel: 1, time: 100_000, warmup: 0}, jobs: []}
       new_suite =
@@ -22,13 +22,25 @@ defmodule Benchee.BenchmarkTest do
         |> Benchee.benchmark("Name", fn -> :timer.sleep(10) end)
         |> Benchee.measure
 
-
       assert new_suite.config == suite.config
       assert [{name, run_times}] = new_suite.run_times
       assert name == "Name"
       assert length(run_times) == 1
       # should be 9 (10 minus one prewarm) but gotta give it a bit leeway
       assert Enum.count(List.flatten(run_times)) >= 8
+    end
+  end
+
+  test ".measure can run multiple benchmarks in parallel" do
+    capture_io fn ->
+      suite = %{config: %{parallel: 10, time: 100_000, warmup: 0}, jobs: [{"", fn -> :timer.sleep 10 end}]}
+      new_suite = Benchee.measure suite
+      [result1 | _tail] = new_suite.run_times
+      {"", run_times} = result1
+
+      assert length(run_times) == 10
+      # (as above) should be 90 (100 minus one prewarm per parallel) but gotta give it a bit leeway
+      assert length(List.flatten(run_times)) >= 80
     end
   end
 
