@@ -67,14 +67,16 @@ defmodule Benchee.Statistics do
 
   """
   def job_statistics(run_times) do
-    total_time          = Enum.sum(run_times)
-    iterations          = Enum.count(run_times)
+    flat_run_times      = List.flatten(run_times)
+    parallel            = length(run_times)
+    total_time          = Enum.sum(flat_run_times)
+    iterations          = Enum.count(flat_run_times)
     average             = total_time / iterations
-    ips                 = iterations_per_second(iterations, total_time)
-    deviation           = standard_deviation(run_times, average, iterations)
+    ips                 = iterations_per_second(iterations, total_time) * parallel
+    deviation           = standard_deviation(flat_run_times, average, iterations)
     standard_dev_ratio  = deviation / average
     standard_dev_ips    = ips * standard_dev_ratio
-    median              = compute_median(run_times, iterations)
+    median              = compute_median(flat_run_times, iterations)
 
     %{
       average:       average,
