@@ -31,7 +31,7 @@ defmodule Benchee.Benchmark do
   """
   def measure(suite = %{jobs: jobs, config: %{parallel: parallel, time: time, warmup: warmup}}) do
     run_times = Enum.map jobs, fn({name, function}) ->
-      IO.puts "Benchmarking name: #{name}, parallel: #{parallel}, time: #{time / 1_000_000}, warmup: #{warmup / 1_000_000}..."
+      IO.puts "Benchmarking #{name}..."
       job_run_times = pmap 1..parallel, fn(_) ->
         run_warmup function, warmup
         measure_runtimes function, time
