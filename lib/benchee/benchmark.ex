@@ -45,7 +45,7 @@ defmodule Benchee.Benchmark do
     # only run func through Task.async when >1 parallel is requiested
     case collection do
       [arg] ->
-        func.(arg)
+        [func.(arg)]
       parallel ->
         parallel
         |> Enum.map(&Task.async(fn -> func.(&1) end))
