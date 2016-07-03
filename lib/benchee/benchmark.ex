@@ -32,18 +32,19 @@ defmodule Benchee.Benchmark do
   def measure(suite = %{jobs: jobs, config: %{parallel: parallel, time: time, warmup: warmup}}) do
     run_times = Enum.map jobs, fn({name, function}) ->
       IO.puts "Benchmarking name: #{name}, parallel: #{parallel}, time: #{time / 1_000_000}, warmup: #{warmup / 1_000_000}..."
-      job_run_times =
-        1..parallel
-        |> Enum.map(fn(_) ->
-             Task.async(fn ->
-               run_warmup function, warmup
-               measure_runtimes function, time
-             end)
-           end)
-        |> Enum.map(&Task.await(&1, :infinity)) # assuming the bench function will end!
+      job_run_times = pmap 1..parallel, fn(_) ->
+        run_warmup function, warmup
+        measure_runtimes function, time
+      end
       {name, job_run_times}
     end
     Map.put suite, :run_times, run_times
+  end
+
+  defp pmap(collection, func) do
+    collection
+    |> Enum.map(&Task.async(fn -> func.(&1) end))
+    |> Enum.map(&Task.await(&1, :infinity))
   end
 
   defp run_warmup(function, time) do
