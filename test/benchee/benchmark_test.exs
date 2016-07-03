@@ -33,14 +33,14 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure can run multiple benchmarks in parallel" do
     capture_io fn ->
-      suite = %{config: %{parallel: 10, time: 100_000, warmup: 0}, jobs: [{"", fn -> :timer.sleep 10 end}]}
+      suite = %{config: %{parallel: 10, time: 50_000, warmup: 0}, jobs: [{"", fn -> :timer.sleep 10 end}]}
       new_suite = Benchee.measure suite
       [result1 | _tail] = new_suite.run_times
       {"", run_times} = result1
 
       assert length(run_times) == 10
-      # (as above) should be 90 (100 minus one prewarm per parallel) but gotta give it a bit leeway
-      assert length(List.flatten(run_times)) >= 80
+      # (as above) should be 40 (50 minus one prewarm per parallel) but gotta give it a bit leeway (even more since parallel)
+      assert length(List.flatten(run_times)) >= 20 # is at least faster than on process in parallel
     end
   end
 
