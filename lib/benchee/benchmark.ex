@@ -42,9 +42,15 @@ defmodule Benchee.Benchmark do
   end
 
   defp pmap(collection, func) do
-    collection
-    |> Enum.map(&Task.async(fn -> func.(&1) end))
-    |> Enum.map(&Task.await(&1, :infinity))
+    # only run func through Task.async when >1 parallel is requiested
+    case collection do
+      [arg] ->
+        func.(arg)
+      parallel ->
+        parallel
+        |> Enum.map(&Task.async(fn -> func.(&1) end))
+        |> Enum.map(&Task.await(&1, :infinity))
+    end
   end
 
   defp run_warmup(function, time) do
