@@ -12,20 +12,22 @@ defmodule Benchee.Config do
 
   Possible options:
 
-    * time   - total run time in seconds of a single benchmark (determines how
-      often it is executed). Defaults to 5.
-    * warmup - the time in seconds for which the benchmarking function should be run without gathering results. Defaults to 2.
+    * parallel - the amount of parallel processes that are spawned to run the benchmark in
+    * time     - total run time in seconds of a single benchmark (determines how
+                 often it is executed). Defaults to 5.
+    * warmup   - the time in seconds for which the benchmarking function should be run
+                 without gathering results. Defaults to 2.
 
   ## Examples
 
       iex> Benchee.init
-      %{config: %{time: 5_000_000, warmup: 2_000_000}, jobs: []}
+      %{config: %{parallel: 1, time: 5_000_000, warmup: 2_000_000}, jobs: []}
 
       iex> Benchee.init %{time: 1, warmup: 0.2}
-      %{config: %{time: 1_000_000, warmup: 200_000.0}, jobs: []}
+      %{config: %{parallel: 1, time: 1_000_000, warmup: 200_000.0}, jobs: []}
 
   """
-  @default_config %{time: 5, warmup: 2}
+  @default_config %{parallel: 1, time: 5, warmup: 2}
   @time_keys [:time, :warmup]
   def init(config \\ %{}) do
     config = convert_time_to_micro_s(Map.merge(@default_config, config))

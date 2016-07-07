@@ -15,20 +15,33 @@ defmodule Benchee.BenchmarkTest do
     assert new_suite == %{jobs: [{"two", two_fun}, {"one", one_fun}]}
   end
 
-  test ".mease runs a benchmark suite and enriches it with results" do
+  test ".measure runs a benchmark suite and enriches it with results" do
     capture_io fn ->
-      suite = %{config: %{time: 103_000, warmup: 20_000}, jobs: []}
+      suite = %{config: %{parallel: 1, time: 103_000, warmup: 20_000}, jobs: []}
       new_suite =
         suite
         |> Benchee.benchmark("Name", fn -> :timer.sleep(10) end)
         |> Benchee.measure
 
-
       assert new_suite.config == suite.config
       assert [{name, run_times}] = new_suite.run_times
       assert name == "Name"
+      assert length(run_times) == 1
       # should be 9 (10 minus one prewarm) but gotta give it a bit leeway
-      assert Enum.count(run_times) >= 8
+      assert Enum.count(List.flatten(run_times)) >= 8
+    end
+  end
+
+  test ".measure can run multiple benchmarks in parallel" do
+    capture_io fn ->
+      suite = %{config: %{parallel: 10, time: 50_000, warmup: 0}, jobs: [{"", fn -> :timer.sleep 10 end}]}
+      new_suite = Benchee.measure suite
+      [result1 | _tail] = new_suite.run_times
+      {"", run_times} = result1
+
+      assert length(run_times) == 10
+      # (as above) should be 40 (50 minus one prewarm per parallel) but gotta give it a bit leeway (even more since parallel)
+      assert length(List.flatten(run_times)) >= 20 # is at least faster than on process in parallel
     end
   end
 
@@ -50,7 +63,7 @@ defmodule Benchee.BenchmarkTest do
         time      = 20_000
         warmup    = 10_000
         projected = time + warmup
-        suite = %{config: %{time: time, warmup: warmup},
+        suite = %{config: %{parallel: 1, time: time, warmup: warmup},
                   jobs: [{"", fn -> 0 end}]}
         {time, _} = :timer.tc fn -> Benchee.measure(suite) end
 
@@ -64,7 +77,7 @@ defmodule Benchee.BenchmarkTest do
     retrying fn ->
       capture_io fn ->
         range = 0..10
-        stats = %{config: %{time: 20_000, warmup: 10_000}, jobs: []}
+        stats = %{config: %{parallel: 1,time: 20_000, warmup: 10_000}, jobs: []}
                 |> Benchee.benchmark("noop", fn -> 0 end)
                 |> Benchee.benchmark("map", fn ->
                      Enum.map(range, fn(i) -> i end)
@@ -81,7 +94,7 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure doesn't print out information about warmup (annoying)" do
     output = capture_io fn ->
-      %{config: %{time: 1000, warmup: 500}, jobs: []}
+      %{config: %{parallel: 1, time: 1000, warmup: 500}, jobs: []}
       |> Benchee.benchmark("noop", fn -> 0 end)
       |> Benchee.measure
     end
@@ -91,7 +104,7 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure never calls the function if warmup and time are 0" do
     output = capture_io fn ->
-      %{config: %{time: 0, warmup: 0}, jobs: [{"", fn -> IO.puts "called" end}]}
+      %{config: %{parallel: 1, time: 0, warmup: 0}, jobs: [{"", fn -> IO.puts "called" end}]}
       |> Benchmark.measure
     end
 
