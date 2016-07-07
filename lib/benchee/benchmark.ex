@@ -36,21 +36,15 @@ defmodule Benchee.Benchmark do
         run_warmup function, warmup
         measure_runtimes function, time
       end
-      {name, job_run_times}
+      {name, List.flatten(job_run_times)}
     end
     Map.put suite, :run_times, run_times
   end
 
   defp pmap(collection, func) do
-    # only run func through Task.async when >1 parallel is requiested
-    case collection do
-      1..1 ->
-        [func.(1)]
-      parallel ->
-        parallel
-        |> Enum.map(&Task.async(fn -> func.(&1) end))
-        |> Enum.map(&Task.await(&1, :infinity))
-    end
+    collection
+    |> Enum.map(&Task.async(fn -> func.(&1) end))
+    |> Enum.map(&Task.await(&1, :infinity))
   end
 
   defp run_warmup(function, time) do

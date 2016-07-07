@@ -26,29 +26,30 @@ defmodule Benchee.BenchmarkTest do
       assert new_suite.config == suite.config
       assert [{name, run_times}] = new_suite.run_times
       assert name == "Name"
-      assert length(run_times) == 1
       # should be 9 (10 minus one prewarm) but gotta give it a bit leeway
-      assert Enum.count(List.flatten(run_times)) >= 8
+      assert length(run_times) >= 8
     end
   end
 
   test ".measure can run multiple benchmarks in parallel" do
     capture_io fn ->
-      suite = %{config: %{parallel: 10, time: 50_000, warmup: 0}, jobs: [{"", fn -> :timer.sleep 10 end}]}
+      suite = %{
+        config: %{parallel: 6, time: 103_000, warmup: 20_000},
+        jobs: [{"", fn -> :timer.sleep 10 end}]
+      }
       new_suite = Benchee.measure suite
-      [result1 | _tail] = new_suite.run_times
-      {"", run_times} = result1
 
-      assert length(run_times) == 10
-      # (as above) should be 40 (50 minus one prewarm per parallel) but gotta give it a bit leeway (even more since parallel)
-      assert length(List.flatten(run_times)) >= 20 # is at least faster than on process in parallel
+      assert [{"", run_times}] = new_suite.run_times
+
+      # it does more work when working in parallel than it does alone
+      assert length(run_times) >= 20
     end
   end
 
   test ".measure doesn't take longer than advertised for very fast funs" do
     capture_io fn ->
       projected = 10_000
-      suite = %{config: %{time: projected, warmup: 0},
+      suite = %{config: %{parallel: 1, time: projected, warmup: 0},
                 jobs: [{"", fn -> 0 end}]}
       {time, _} = :timer.tc fn -> Benchee.measure(suite) end
 
