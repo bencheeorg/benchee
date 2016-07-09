@@ -1,4 +1,6 @@
-#! /bin/sh
+#! /bin/bash
+
+set -e
 
 for sample in samples/*
 do

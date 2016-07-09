@@ -3,16 +3,15 @@ range = 1..n
 list  = Enum.to_list range
 fun   = fn -> 0 end
 
-Benchee.run [{"Enum.each (range)",
-              fn -> Enum.each(range, fn(_) -> fun.() end) end},
-             {"List comprehension (range)",
-              fn -> for _ <- range, do: fun.() end},
-             {"Enum.each (list)",
-              fn -> Enum.each(list, fn(_) -> fun.() end) end},
-             {"List comprehension (list)", fn -> for _ <- list, do: fun.() end},
-             {"Recursion", fn -> Benchee.RepeatN.repeat_n(fun, n) end}]
+Benchee.run %{
+  "Enum.each (range)" => fn -> Enum.each(range, fn(_) -> fun.() end) end,
+  "List comprehension (range)" => fn -> for _ <- range, do: fun.() end,
+  "Enum.each (list)" => fn -> Enum.each(list, fn(_) -> fun.() end) end,
+  "List comprehension (list)" => fn -> for _ <- list, do: fun.() end,
+  "Recursion" => fn -> Benchee.RepeatN.repeat_n(fun, n) end
+}
 
-# tobi@happy ~/github/benchee $ mix run samples/repat_n.exs 
+# tobi@happy ~/github/benchee $ mix run samples/repat_n.exs
 # Benchmarking Enum.each (range)...
 # Benchmarking List comprehension (range)...
 # Benchmarking Enum.each (list)...
