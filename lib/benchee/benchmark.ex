@@ -31,12 +31,17 @@ defmodule Benchee.Benchmark do
   parallel.
   """
   def measure(suite = %{jobs: jobs, config: %{parallel: parallel, time: time, warmup: warmup}}) do
-    run_times = Enum.map jobs, fn({name, function}) ->
-      IO.puts "Benchmarking #{name}..."
-      job_run_times = parallel_benchmark parallel, function, warmup, time
-      {name, job_run_times}
-    end
+    run_times =
+      jobs
+      |> Enum.map(fn(job) -> measure_job(job, parallel, warmup, time) end)
+      |> Map.new
     Map.put suite, :run_times, run_times
+  end
+
+  defp measure_job({name, function}, parallel, warmup, time) do
+    IO.puts "Benchmarking #{name}..."
+    job_run_times = parallel_benchmark parallel, function, warmup, time
+    {name, job_run_times}
   end
 
   defp parallel_benchmark(parallel, function, warmup, time) do

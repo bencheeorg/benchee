@@ -24,10 +24,10 @@ defmodule Benchee.BenchmarkTest do
         |> Benchee.measure
 
       assert new_suite.config == suite.config
-      assert [{name, run_times}] = new_suite.run_times
-      assert name == "Name"
+      run_times_hash = new_suite.run_times
+
       # should be 9 (10 minus one prewarm) but gotta give it a bit leeway
-      assert length(run_times) >= 8
+      assert length(run_times_hash["Name"]) >= 8
     end
   end
 
@@ -39,7 +39,7 @@ defmodule Benchee.BenchmarkTest do
       }
       new_suite = Benchee.measure suite
 
-      assert [{"", run_times}] = new_suite.run_times
+      assert %{"" => run_times} = new_suite.run_times
 
       # it does more work when working in parallel than it does alone
       assert length(run_times) >= 20
