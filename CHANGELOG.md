@@ -1,5 +1,10 @@
 # 0.3.0 (unreleased)
 
+## Backwards Incompatible Changes
+
+* main data structure to hold benchmarks and results was changed from a list of 2-element tuples to a map (`"Name" => values`). That is for the jobs, the run times as well as the statistics. This also means that the job data structure handed to `Benchee.run` is a map now (`"Name" => benchmark_function`). However, the old list of tuples still works but may be removed in future releases.
+* The former change has the side effect that you **can not have benchmark jobs with the same names anymore**, the last one wins here. This was the reason why previously the data structure was a list of tuples. However, having benchmarks with the same name is nonsensical as you can't discern their results in the output any way.
+
 ## Features
 
 * Benchee now takes a `parallel: number` option and will then execute each job in parallel in as many parallel processes as specified in `number`. This way you can gather more samples in the same time and also simulate a system more under load. This is tricky, however. One of the use cases is also stress testing a system. Thanks @ldr
