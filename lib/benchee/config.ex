@@ -12,11 +12,13 @@ defmodule Benchee.Config do
 
   Possible options:
 
-    * parallel - the amount of parallel processes that are spawned to run the benchmark in
-    * time     - total run time in seconds of a single benchmark (determines how
-                 often it is executed). Defaults to 5.
-    * warmup   - the time in seconds for which the benchmarking function should be run
-                 without gathering results. Defaults to 2.
+    * time     - total run time in seconds of a single benchmark (determines
+    how often it is executed). Defaults to 5.
+    * warmup   - the time in seconds for which the benchmarking function should
+    be run without gathering results. Defaults to 2.
+    * parallel - each job will be executed in `parallel` number processes. Gives
+    you more data in the same time, but also puts a load on the system
+    interfering with benchmark results. Defaults to 1.
 
   ## Examples
 
@@ -25,6 +27,9 @@ defmodule Benchee.Config do
 
       iex> Benchee.init %{time: 1, warmup: 0.2}
       %{config: %{parallel: 1, time: 1_000_000, warmup: 200_000.0}, jobs: []}
+
+      iex> Benchee.init %{parallel: 2, time: 1, warmup: 0.2}
+      %{config: %{parallel: 2, time: 1_000_000, warmup: 200_000.0}, jobs: []}
 
   """
   @default_config %{parallel: 1, time: 5, warmup: 2}
