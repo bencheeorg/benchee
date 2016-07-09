@@ -93,10 +93,8 @@ defmodule Benchee.Statistics do
 
   ## Examples
 
-      iex> second = {"Second", %{average: 200.0}}
-      iex> third  = {"Third",  %{average: 400.0}}
-      iex> first  = {"First",  %{average: 100.0}}
-      iex> Benchee.Statistics.sort([second, third, first])
+      iex> jobs = %{"Second" => %{average: 200.0}, "Third"  => %{average: 400.0}, "First"  => %{average: 100.0}}
+      iex> Benchee.Statistics.sort(jobs)
       [{"First",  %{average: 100.0}},
        {"Second", %{average: 200.0}},
        {"Third",  %{average: 400.0}}]

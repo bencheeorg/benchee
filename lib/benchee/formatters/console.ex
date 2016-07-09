@@ -18,7 +18,7 @@ defmodule Benchee.Formatters.Console do
   ## Examples
 
   ```
-  iex> jobs = [{"My Job", %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1, median: 190.0}}]
+  iex> jobs = %{"My Job" => %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1, median: 190.0}}
   iex> Benchee.Formatters.Console.format(jobs)
   ["\nName             ips        average    deviation         median\n",
   "My Job       5000.00       200.00μs    (±10.00%)       190.00μs"]
