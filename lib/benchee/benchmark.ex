@@ -13,7 +13,12 @@ defmodule Benchee.Benchmark do
   under the `:jobs` key.
   """
   def benchmark(suite = %{jobs: jobs}, name, function) do
-    %{suite | jobs: Map.put(jobs, name, function)}
+    if Map.has_key?(jobs, name) do
+      IO.puts "You already have job defined with #{name}, you can't add two jobs with the same name!"
+      suite
+    else
+      %{suite | jobs: Map.put(jobs, name, function)}
+    end
   end
 
 

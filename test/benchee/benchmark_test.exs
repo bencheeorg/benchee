@@ -15,6 +15,18 @@ defmodule Benchee.BenchmarkTest do
     assert new_suite == %{jobs: %{"two" => two_fun, "one" => one_fun}}
   end
 
+  test ".benchmark warns if adding a job with the same name again" do
+    output = capture_io fn ->
+      one_fun = fn -> 1 end
+      suite = %{jobs: %{"one" => one_fun}}
+      new_suite = Benchee.benchmark(suite, "one", fn -> 42 end)
+
+      assert new_suite == %{jobs: %{"one" => one_fun}}
+    end
+    
+    assert output =~ ~r/same name/
+  end
+
   test ".measure runs a benchmark suite and enriches it with results" do
     capture_io fn ->
       suite = %{config: %{parallel: 1, time: 103_000, warmup: 20_000}, jobs: %{}}
