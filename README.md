@@ -4,14 +4,19 @@ Library for easy and nice (micro) benchmarking in Elixir. It allows you to compa
 
 Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) from the ruby world, but of course it is a more functional spin as it fully lives in the Elixir world.
 
+General features:
+
+* first runs the functions for a given warmup time without recording the results, to simulate a _"warm"_ running system
+* execute benchmark jobs in parallel to gather more results in the same time, or simulate a system under load
+* plugin/extensible friendly architecture
+* nicely formatted console output
+
 Provides you with the following statistical data:
 
-* average   - average execution time (the lower the better)
-* ips       - iterations per second, how often can the given function be executed within one second (the higher the better)
-* deviation - standard deviation (how much do the results vary), given as a percentage of the average (raw absolute values also available)
-* median    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of samples is even). More stable than the average and somewhat more likely to be a typical value you see.
-
-Benchee also first runs the functions for a given warmup time without recording the results, to simulate a _"warm"_ running system. 
+* **average**   - average execution time (the lower the better)
+* **ips**       - iterations per second, how often can the given function be executed within one second (the higher the better)
+* **deviation** - standard deviation (how much do the results vary), given as a percentage of the average (raw absolute values also available)
+* **median**    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of samples is even). More stable than the average and somewhat more likely to be a typical value you see.
 
 Benchee does not:
 
@@ -51,6 +56,7 @@ First configuration options are passed, the only options available so far are:
 
 * `warmup` - the time in seconds for which a benchmark should be run without measuring times before real measurements start. This simulates a _"warm"_ running system. Defaults to 2.
 * `time`   - the time in seconds for how long each individual benchmark should be run and measured. Defaults to 5.
+* `parallel` - each job will be executed in `parallel` number processes. Gives you more data in the same time, but also puts a load on the system interfering with benchmark results. Defaults to 1.
 
 
 Running this script produces an output like:
@@ -128,4 +134,3 @@ A couple of (hopefully) helpful points:
 * `mix deps.get` to install dependencies
 * `mix test` to run tests or `mix test.watch` to run them continuously while you change files
 * `mix credo` or `mix credo --strict` to find code style problems (no too strict with the 80 width limit for sample output in the docs)
-
