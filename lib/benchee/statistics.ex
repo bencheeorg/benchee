@@ -32,7 +32,7 @@ defmodule Benchee.Statistics do
 
   ## Examples
 
-      iex> run_times = [[200, 400, 400, 400, 500, 500, 700, 900]]
+      iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
       iex> suite = %{run_times: [{"My Job", run_times}]}
       iex> Benchee.Statistics.statistics(suite)
       [{"My Job",
@@ -56,7 +56,7 @@ defmodule Benchee.Statistics do
 
   ## Examples
 
-      iex> run_times = [[200, 400, 400, 400, 500, 500, 700, 900]]
+      iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
       iex> Benchee.Statistics.job_statistics(run_times)
       %{average:       500.0,
         ips:           2000.0,
