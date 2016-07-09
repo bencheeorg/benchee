@@ -3,6 +3,10 @@
 ## Features
 
 * Benchee now takes a `parallel: number` option and will then execute each job in parallel in as many parallel processes as specified in `number`. This way you can gather more samples in the same time and also simulate a system more under load. This is tricky, however. One of the use cases is also stress testing a system. Thanks @ldr
+* the name column width is now determined based on the longest name. Thanks @alvinlindstam
+
+## Bugfixes
+* name columns are no longer truncated after 30 characters. Thanks @alvinlindstam
 
 # 0.2.0 (June 11, 2016)
 
