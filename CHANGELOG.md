@@ -1,3 +1,9 @@
+# 0.3.0 (unreleased)
+
+## Features
+
+* Benchee now takes a `parallel: number` option and will then execute each job in parallel in as many parallel processes as specified in `number`. This way you can gather more samples in the same time and also simulate a system more under load. This is tricky, however. One of the use cases is also stress testing a system. Thanks @ldr
+
 # 0.2.0 (June 11, 2016)
 
 This release introduces warmup for benchmarks, nicer console output and the new `Benchee.measure` that runs the benchmarks previously defined instead of running them instantly.
