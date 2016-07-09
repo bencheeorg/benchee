@@ -73,19 +73,6 @@ defmodule Benchee do
   Convenience access to `Benchee.Statistics.statistics/1` to generate
   statistics.
 
-  ## Examples
-
-      iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
-      iex> suite = %{run_times: [{"My Job", run_times}]}
-      iex> Benchee.Statistics.statistics(suite)
-      [{"My Job",
-        %{average:       500.0,
-          ips:           2000.0,
-          std_dev:       200.0,
-          std_dev_ratio: 0.4,
-          std_dev_ips:   800.0,
-          median:        450.0}}]
-
   """
   def statistics(suite) do
     Statistics.statistics(suite)
