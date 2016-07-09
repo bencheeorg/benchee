@@ -26,15 +26,31 @@ defmodule Benchee.Benchmark do
 
   Warmup is usually important for run times with JIT but it seems to have some
   effect on the BEAM as well.
+
+  There will be `parallel` processes spawned exeuting the benchmark job in
+  parallel.
   """
-  def measure(suite = %{jobs: jobs, config: %{time: time, warmup: warmup}}) do
+  def measure(suite = %{jobs: jobs, config: %{parallel: parallel, time: time, warmup: warmup}}) do
     run_times = Enum.map jobs, fn({name, function}) ->
-                  IO.puts "Benchmarking #{name}..."
-                  run_warmup function, warmup
-                  job_run_times = measure_runtimes function, time
-                  {name, job_run_times}
-                end
+      IO.puts "Benchmarking #{name}..."
+      job_run_times = parallel_benchmark parallel, function, warmup, time
+      {name, job_run_times}
+    end
     Map.put suite, :run_times, run_times
+  end
+
+  defp parallel_benchmark(parallel, function, warmup, time) do
+    pmap 1..parallel, fn ->
+      run_warmup function, warmup
+      measure_runtimes function, time
+    end
+  end
+
+  defp pmap(collection, func) do
+    collection
+    |> Enum.map(fn(_) -> Task.async(func) end)
+    |> Enum.map(&Task.await(&1, :infinity))
+    |> List.flatten
   end
 
   defp run_warmup(function, time) do

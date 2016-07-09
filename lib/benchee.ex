@@ -40,9 +40,13 @@ defmodule Benchee do
 
   Possible options:
 
-    * time   - total run time in seconds of a single benchmark (determines how
-      often it is executed). Defaults to 5.
-    * warmup - the time in seconds for which the benchmarking function should be run without gathering results. Defaults to 2.
+    * time     - total run time in seconds of a single benchmark (determines
+    how often it is executed). Defaults to 5.
+    * warmup   - the time in seconds for which the benchmarking function should
+    be run without gathering results. Defaults to 2.
+    * parallel - each job will be executed in `parallel` number processes. Gives
+    you more data in the same time, but also puts a load on the system
+    interfering with benchmark results. Defaults to 1.
   """
   def init(config \\ %{}) do
     Config.init(config)

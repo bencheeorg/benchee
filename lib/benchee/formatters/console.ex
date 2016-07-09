@@ -6,7 +6,7 @@ defmodule Benchee.Formatters.Console do
 
   alias Benchee.Statistics
 
-  @label_width 30
+  @default_label_width 4 # Length of column header
   @ips_width 13
   @average_width 15
   @deviation_width 13
@@ -20,36 +20,47 @@ defmodule Benchee.Formatters.Console do
   ```
   iex> jobs = [{"My Job", %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1, median: 190.0}}]
   iex> Benchee.Formatters.Console.format(jobs)
-  ["\nName                                    ips        average    deviation         median\n",
-  "My Job                              5000.00       200.00μs    (±10.00%)       190.00μs"]
+  ["\nName             ips        average    deviation         median\n",
+  "My Job       5000.00       200.00μs    (±10.00%)       190.00μs"]
 
   ```
 
   """
   def format(jobs) do
     sorted = Statistics.sort(jobs)
-    [column_descriptors | job_reports(sorted) ++ comparison_report(sorted)]
+    label_width = label_width jobs
+    [column_descriptors(label_width) | job_reports(sorted, label_width)
+      ++ comparison_report(sorted, label_width)]
     |> remove_last_blank_line
   end
 
-  defp column_descriptors do
+  defp column_descriptors(label_width) do
     "\n~*s~*s~*s~*s~*s\n"
-    |> :io_lib.format([-@label_width, "Name", @ips_width, "ips",
+    |> :io_lib.format([-label_width, "Name", @ips_width, "ips",
                        @average_width, "average",
                        @deviation_width, "deviation", @median_width, "median"])
     |> to_string
   end
 
-  defp job_reports(jobs) do
-    Enum.map(jobs, &format_job/1)
+  defp label_width(jobs) do
+    max_label_width = jobs
+      |> Enum.map(fn({job_name, _}) -> String.length(job_name) end)
+      |> Stream.concat([@default_label_width])
+      |> Enum.max
+    max_label_width + 1
+  end
+
+  defp job_reports(jobs, label_width) do
+    Enum.map(jobs, fn(job) -> format_job job, label_width end)
   end
 
   defp format_job({name, %{average:       average,
                            ips:           ips,
                            std_dev_ratio: std_dev_ratio,
-                           median:        median}}) do
+                           median:        median}
+                         }, label_width) do
     "~*s~*.2f~*ts~*ts~*ts\n"
-    |> :io_lib.format([-@label_width, name, @ips_width, ips,
+    |> :io_lib.format([-label_width, name, @ips_width, ips,
                        @average_width, average_out(average),
                        @deviation_width, deviation_out(std_dev_ratio),
                        @median_width, median_out(median)])
@@ -79,29 +90,32 @@ defmodule Benchee.Formatters.Console do
     |> to_string
   end
 
-  defp comparison_report([_reference]) do
+  defp comparison_report([_reference], _) do
     [] # No need for a comparison when only one benchmark was run
   end
-  defp comparison_report([reference | other_jobs]) do
-    report = [reference_report(reference) | comparisons(reference, other_jobs)]
-    [comparison_descriptor | report]
+  defp comparison_report([reference | other_jobs], label_width) do
+    [
+      comparison_descriptor,
+      reference_report(reference, label_width) |
+      comparisons(reference, label_width, other_jobs)
+    ]
   end
 
-  defp reference_report({name, %{ips: ips}}) do
+  defp reference_report({name, %{ips: ips}}, label_width) do
     "~*s~*.2f\n"
-    |> :io_lib.format([-@label_width, name, @ips_width, ips])
+    |> :io_lib.format([-label_width, name, @ips_width, ips])
     |> to_string
   end
 
-  defp comparisons({_, reference_stats}, jobs_to_compare) do
+  defp comparisons({_, reference_stats}, label_width, jobs_to_compare) do
     Enum.map jobs_to_compare, fn(job = {_, job_stats}) ->
-      format_comparison(job, (reference_stats.ips / job_stats.ips))
+      format_comparison(job, label_width, (reference_stats.ips / job_stats.ips))
     end
   end
 
-  defp format_comparison({name, %{ips: ips}}, times_slower) do
+  defp format_comparison({name, %{ips: ips}}, label_width, times_slower) do
     "~*s~*.2f - ~.2fx slower\n"
-    |> :io_lib.format([-@label_width, name, @ips_width, ips, times_slower])
+    |> :io_lib.format([-label_width, name, @ips_width, ips, times_slower])
     |> to_string
   end
 

@@ -70,7 +70,7 @@ defmodule Benchee.Statistics do
     total_time          = Enum.sum(run_times)
     iterations          = Enum.count(run_times)
     average             = total_time / iterations
-    ips                 = iterations_per_second(iterations, total_time)
+    ips                 = iterations_per_second(average)
     deviation           = standard_deviation(run_times, average, iterations)
     standard_dev_ratio  = deviation / average
     standard_dev_ips    = ips * standard_dev_ratio
@@ -103,8 +103,8 @@ defmodule Benchee.Statistics do
     Enum.sort_by jobs, fn({_, %{average: average}}) -> average end
   end
 
-  defp iterations_per_second(iterations, time_microseconds) do
-    iterations / (Time.microseconds_to_seconds(time_microseconds))
+  defp iterations_per_second(average_microseconds) do
+    Time.seconds_to_microseconds(1) / average_microseconds
   end
 
   defp standard_deviation(samples, average, iterations) do
