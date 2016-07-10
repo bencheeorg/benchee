@@ -110,7 +110,7 @@ defmodule BencheeTest do
 
   test "integration super fast function warning is printed once per job" do
     output = capture_io fn ->
-      Benchee.run(%{time: 0.01, warmup: 0.01}, %{"Sleeps" => fn -> 0 end})
+      Benchee.run(%{time: 0.01, warmup: 0.01}, %{"Fast" => fn -> 0 end})
     end
 
     warnings = output
@@ -118,6 +118,44 @@ defmodule BencheeTest do
                |> Enum.filter(fn(line) -> line =~ ~r/fast/ end)
 
     assert Enum.count(warnings) == 1
+  end
+
+  test "multiple formatters can be configured and are all called" do
+    output = capture_io fn ->
+      Benchee.run(%{
+        time:       0.01,
+        warmup:     0.01,
+        formatters: [fn(_) -> IO.puts "Formatter one" end,
+                     fn(_) -> IO.puts "Formatter two" end]
+      }, %{"Sleeps" => fn -> :timer.sleep(10) end})
+    end
+
+    assert output =~ "Formatter one"
+    assert output =~ "Formatter two"
+  end
+
+  @rough_10_milli_s "(9\\d{3}|10\\d{3}|11\\d{3})"
+  test "formatters have full access to the suite data" do
+    output = capture_io fn ->
+      Benchee.run(%{
+        time:       0.1,
+        warmup:     0.01,
+        custom:     "Custom value",
+        formatters: [
+          fn(suite) ->
+            IO.puts "Run time: #{List.last suite.run_times["Sleeps"]}"
+          end,
+          fn(suite) ->
+            IO.puts "Average: #{suite.statistics["Sleeps"].average}"
+          end,
+          fn(suite) -> IO.puts suite.config.custom end
+        ]
+      }, %{"Sleeps" => fn -> :timer.sleep(10) end})
+    end
+
+    assert output =~ ~r/Run time: #{@rough_10_milli_s}$/m
+    assert output =~ ~r/Average: #{@rough_10_milli_s}\.\d+$/m
+    assert output =~ "Custom value"
   end
 
   defp readme_sample_asserts(output) do

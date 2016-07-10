@@ -4,7 +4,7 @@ defmodule Benchee do
   as the very high level `Benchee.run` API.
   """
 
-  alias Benchee.{Statistics, Formatters, Config, Benchmark}
+  alias Benchee.{Statistics, Config, Benchmark}
 
   @doc """
   High level interface that runs the given benchmarks and prints the results on
@@ -26,27 +26,26 @@ defmodule Benchee do
     run(config, map_jobs)
   end
   def run(config, jobs) do
+    suite = run_benchmarks config, jobs
+    output_results suite
+  end
+
+  defp run_benchmarks(config, jobs) do
     config
     |> Benchee.init
     |> Map.put(:jobs, jobs)
     |> Benchee.measure
     |> Statistics.statistics
-    |> Formatters.Console.format
-    |> IO.puts
+  end
+
+  defp output_results(suite = %{config: %{formatters: formatters}}) do
+    Enum.each formatters, fn(output_function) ->
+      output_function.(suite)
+    end
   end
 
   @doc """
   Convenience access to `Benchee.Config.init/1` to initialize the configuration.
-
-  Possible options:
-
-    * time     - total run time in seconds of a single benchmark (determines
-    how often it is executed). Defaults to 5.
-    * warmup   - the time in seconds for which the benchmarking function should
-    be run without gathering results. Defaults to 2.
-    * parallel - each job will be executed in `parallel` number processes. Gives
-    you more data in the same time, but also puts a load on the system
-    interfering with benchmark results. Defaults to 1.
   """
   def init(config \\ %{}) do
     Config.init(config)
@@ -72,7 +71,6 @@ defmodule Benchee do
   @doc """
   Convenience access to `Benchee.Statistics.statistics/1` to generate
   statistics.
-
   """
   def statistics(suite) do
     Statistics.statistics(suite)
