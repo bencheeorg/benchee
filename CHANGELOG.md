@@ -1,9 +1,11 @@
 # 0.3.0 (unreleased)
 
-## Backwards Incompatible Changes
+## Breaking Changes (User Facing)
+* The recommended data structure handed to `Benchee.run` was changed from a list of 2-element tuples to a map (`"Name" => benchmark_function`). However, **the old list of tuples still works but may be removed in future releases** (so it's not "breaking" _strictly_ speaking).
+* You **can not have benchmark jobs with the same names anymore**, the last one wins here. This was the reason why previously the data structure was a list of tuples. However, having benchmarks with the same name is nonsensical as you can't discern their results in the output any way.
 
-* main data structure to hold benchmarks and results was changed from a list of 2-element tuples to a map (`"Name" => values`). That is for the jobs, the run times as well as the statistics. This also means that the job data structure handed to `Benchee.run` is a map now (`"Name" => benchmark_function`). However, the old list of tuples still works but may be removed in future releases.
-* The former change has the side effect that you **can not have benchmark jobs with the same names anymore**, the last one wins here. This was the reason why previously the data structure was a list of tuples. However, having benchmarks with the same name is nonsensical as you can't discern their results in the output any way.
+## Breaking Changes (Plugins)
+* main data structure to hold benchmarks and results was changed from a list of 2-element tuples to a map (`"Name" => values`). That is for the jobs, the run times as well as the statistics. However, if you used something like `Enum.each(data, fn({name, value}) -> .. end)` you are still fine though, cause Elixir is awesome :)
 
 ## Features
 
@@ -17,9 +19,10 @@
 
 This release introduces warmup for benchmarks, nicer console output and the new `Benchee.measure` that runs the benchmarks previously defined instead of running them instantly.
 
-## Backwards Incompatible Changes
+## Breaking Changes (User Facing)
+* `Benchee.benchmark/3` now doesn't run the benchmark anymore but simply adds it to `:jobs` in the config. The whole benchmark suite is then run via `Benchee.measure/1`. This only affects you if you used the more verbose way of defining benchmarks, `Benchee.run/2` still work as before.
 
-* `Benchee.benchmark/3` now doesn't run the benchmark anymore but simply adds it to `:jobs` in the config. The whole benchmark suite is then run via `Benchee.measure/1`. This only affects you if you used the more verbose way of defining benchmarks, `Benchee.run/2` should still work as expected.
+## Breaking Changes (Plugins)
 * the defined benchmarking are now preserved after running the benchmark under the `:jobs` key of the suite. Run times are added to the `:run_times` key of the suite (important for alternative statistics implementations)
 
 ## Features
