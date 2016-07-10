@@ -6,6 +6,7 @@ defmodule Benchee.Benchmark do
   """
 
   alias Benchee.RepeatN
+  alias Benchee.Time
 
   @doc """
   Adds the given function and its associated name to the benchmarking jobs to
@@ -36,11 +37,32 @@ defmodule Benchee.Benchmark do
   parallel.
   """
   def measure(suite = %{jobs: jobs, config: %{parallel: parallel, time: time, warmup: warmup}}) do
+    print_suite_information(jobs, warmup, time, parallel)
     run_times =
       jobs
       |> Enum.map(fn(job) -> measure_job(job, parallel, warmup, time) end)
       |> Map.new
     Map.put suite, :run_times, run_times
+  end
+
+
+  defp print_suite_information(jobs, time, warmup, parallel) do
+    warmup_seconds = time_precision Time.microseconds_to_seconds(warmup)
+    time_seconds   = time_precision Time.microseconds_to_seconds(time)
+    job_count      = map_size jobs
+    total_time     = time_precision(job_count * (warmup_seconds + time_seconds))
+
+    IO.puts "Benchmark suite executing with the following configuration:"
+    IO.puts "warmup: #{warmup_seconds}s"
+    IO.puts "time: #{time_seconds}s"
+    IO.puts "parallel: #{parallel}"
+    IO.puts "Estimated total run time: #{total_time}s"
+    IO.puts ""
+  end
+
+  @round_precision 2
+  defp time_precision(float) do
+    Float.round(float, @round_precision)
   end
 
   defp measure_job({name, function}, parallel, warmup, time) do

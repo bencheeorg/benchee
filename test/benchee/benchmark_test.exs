@@ -113,7 +113,7 @@ defmodule Benchee.BenchmarkTest do
       |> Benchee.measure
     end
 
-    refute output =~ ~r/warmup/i
+    refute output =~ ~r/running.+warmup/i
   end
 
   test ".measure never calls the function if warmup and time are 0" do
@@ -123,5 +123,20 @@ defmodule Benchee.BenchmarkTest do
     end
 
     refute output =~ ~r/called/i
+  end
+
+  test ".measure prints configuration information about the suite" do
+    output = capture_io fn ->
+      %{config: %{parallel: 2, time: 100_000, warmup: 50_000}, jobs: %{}}
+      |> Benchee.benchmark("noop", fn -> 0 end)
+      |> Benchee.benchmark("dontcare", fn -> 0 end)
+      |> Benchee.measure
+    end
+
+    assert output =~ ~r/following configuration/i
+    assert output =~ "warmup: 0.1s"
+    assert output =~ "time: 0.05s"
+    assert output =~ "parallel: 2"
+    assert output =~ "Estimated total run time: 0.3s"
   end
 end
