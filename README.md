@@ -90,8 +90,7 @@ Benchee.init(%{time: 3})
                      fn -> list |> Enum.map(map_fun) |> List.flatten end)
 |> Benchee.measure
 |> Benchee.statistics
-|> Benchee.Formatters.Console.format
-|> IO.puts
+|> Benchee.Formatters.Console.output
 ```
 
 This is a take on the _functional transformation_ of data applied to benchmarks here:

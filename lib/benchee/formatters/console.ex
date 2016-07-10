@@ -13,6 +13,16 @@ defmodule Benchee.Formatters.Console do
   @median_width 15
 
   @doc """
+  Formats the benchmark statistis using `Benchee.Formatters.Console.format/1`
+  and then prints it out directly to the console using `IO.puts/2`
+  """
+  def output(suite) do
+    suite
+    |> format
+    |> IO.puts
+  end
+
+  @doc """
   Formats the benchmark statistics to a report suitable for output on the CLI.
 
   ## Examples

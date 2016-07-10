@@ -11,6 +11,7 @@
 * Benchee now takes a `parallel: number` option and will then execute each job in parallel in as many parallel processes as specified in `number`. This way you can gather more samples in the same time and also simulate a system more under load. This is tricky, however. One of the use cases is also stress testing a system. Thanks @ldr
 * the name column width is now determined based on the longest name. Thanks @alvinlindstam
 * Print general configuration information at the start of the benchmark, including warmup, time, parallel and an estimated total run time
+* New method `Benchee.Formatters.Console.output/1` that immediately prints to the console
 
 ## Features (Plugins)
 * All previous configuration options are preserved after `Benchee.Statistics.sort/1`, meaning there is access to raw run times as well as custom options etc. E.g. you could grab custom options like `%{csv: %{file: "my_file_name.csv"}}` to use.
