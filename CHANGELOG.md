@@ -7,10 +7,12 @@
 ## Breaking Changes (Plugins)
 * main data structure to hold benchmarks and results was changed from a list of 2-element tuples to a map (`"Name" => values`). That is for the jobs, the run times as well as the statistics. However, if you used something like `Enum.each(data, fn({name, value}) -> .. end)` you are still fine though, cause Elixir is awesome :)
 
-## Features
-
+## Features (User Facing)
 * Benchee now takes a `parallel: number` option and will then execute each job in parallel in as many parallel processes as specified in `number`. This way you can gather more samples in the same time and also simulate a system more under load. This is tricky, however. One of the use cases is also stress testing a system. Thanks @ldr
 * the name column width is now determined based on the longest name. Thanks @alvinlindstam
+
+## Features (Plugins)
+* All previous configuration options are preserved after `Benchee.Statistics.sort/1`, meaning there is access to raw run times as well as custom options etc. E.g. you could grab custom options like `%{csv: %{file: "my_file_name.csv"}}` to use.
 
 ## Bugfixes
 * name columns are no longer truncated after 30 characters. Thanks @alvinlindstam
@@ -25,12 +27,15 @@ This release introduces warmup for benchmarks, nicer console output and the new 
 ## Breaking Changes (Plugins)
 * the defined benchmarking are now preserved after running the benchmark under the `:jobs` key of the suite. Run times are added to the `:run_times` key of the suite (important for alternative statistics implementations)
 
-## Features
+## Features (User Facing)
 
 * configuring a warmup time to run functions before measurements are taken can be configured via the `warmup` key in the config defaulting to 2 (seconds)
-* additionally supply the total standard deviation of iterations per second as `std_dev_ips` after `Benchee.Statistics.statistics`
+
 * statistics in console output are aligned right now for better comparisons
 * last blank line of console output removed
+
+## Features (Plugins)
+* additionally supply the total standard deviation of iterations per second as `std_dev_ips` after `Benchee.Statistics.statistics`
 
 ## Bugfixes
 
