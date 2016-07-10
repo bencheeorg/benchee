@@ -23,7 +23,7 @@ defmodule Benchee.BenchmarkTest do
 
       assert new_suite == %{jobs: %{"one" => one_fun}}
     end
-    
+
     assert output =~ ~r/same name/
   end
 
@@ -97,6 +97,7 @@ defmodule Benchee.BenchmarkTest do
                    end)
                 |> Benchee.measure
                 |> Statistics.statistics
+                |> Map.get(:statistics)
 
         Enum.each stats, fn({_, %{std_dev_ratio: std_dev_ratio}}) ->
           assert std_dev_ratio < 2.0

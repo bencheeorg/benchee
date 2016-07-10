@@ -19,18 +19,18 @@ defmodule Benchee.Formatters.Console do
 
   ```
   iex> jobs = %{"My Job" => %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1, median: 190.0}}
-  iex> Benchee.Formatters.Console.format(jobs)
+  iex> Benchee.Formatters.Console.format(%{statistics: jobs})
   ["\nName             ips        average    deviation         median\n",
   "My Job       5000.00       200.00μs    (±10.00%)       190.00μs"]
 
   ```
 
   """
-  def format(jobs) do
-    sorted = Statistics.sort(jobs)
-    label_width = label_width jobs
-    [column_descriptors(label_width) | job_reports(sorted, label_width)
-      ++ comparison_report(sorted, label_width)]
+  def format(%{statistics: job_stats}) do
+    sorted_stats = Statistics.sort(job_stats)
+    label_width = label_width job_stats
+    [column_descriptors(label_width) | job_reports(sorted_stats, label_width)
+      ++ comparison_report(sorted_stats, label_width)]
     |> remove_last_blank_line
   end
 

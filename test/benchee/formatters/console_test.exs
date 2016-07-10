@@ -18,7 +18,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     }
 
     [_header, result_1, result_2, result_3 | _dont_care ] =
-      Console.format(jobs)
+      Console.format(%{statistics: jobs})
 
     assert Regex.match?(~r/First/,  result_1)
     assert Regex.match?(~r/Second/, result_2)
@@ -36,7 +36,8 @@ defmodule Benchee.Formatters.ConsoleTest do
     }
 
     expected_width = String.length "Second"
-    [header, result_1, result_2 | _dont_care ] = Console.format(jobs)
+    [header, result_1, result_2 | _dont_care ] =
+      Console.format(%{statistics: jobs})
 
     assert_column_width "Name", header, expected_width
     assert_column_width "First", result_1, expected_width
@@ -50,7 +51,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     # Include extra long name, expect width of 40 characters
     expected_width_wide = String.length third_name
     [header, result_1, result_2, result_3 | _dont_care ] =
-      Console.format(longer_jobs)
+      Console.format(%{statistics: longer_jobs})
 
     assert_column_width "Name", header, expected_width_wide
     assert_column_width "First", result_1, expected_width_wide
@@ -68,7 +69,8 @@ defmodule Benchee.Formatters.ConsoleTest do
       }
     }
 
-    [_, _, _, comp_header, reference, slower] = Console.format(jobs)
+    [_, _, _, comp_header, reference, slower] =
+      Console.format(%{statistics: jobs})
 
     assert Regex.match? ~r/Comparison/, comp_header
     assert Regex.match? ~r/^First\s+10000.00$/m, reference
@@ -87,7 +89,8 @@ defmodule Benchee.Formatters.ConsoleTest do
     }
 
     expected_width = String.length second_name
-    [_, _, _, _comp_header, reference, slower] = Console.format(jobs)
+    [_, _, _, _comp_header, reference, slower] =
+      Console.format(%{statistics: jobs})
 
     assert_column_width "First", reference, expected_width
     assert_column_width second_name, slower, expected_width
@@ -97,7 +100,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     jobs  = %{"First" => %{average: 100.0, ips: 10_000.0,
                            std_dev_ratio: 0.1, median: 90.0}}
 
-    assert [header, result] = Console.format jobs
+    assert [header, result] = Console.format %{statistics: jobs}
     refute Regex.match? ~r/(Comparison|x slower)/, Enum.join([header, result])
   end
 
@@ -105,7 +108,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     fast = %{"First" => %{average: 0.15, ips: 10_000.0,
                           std_dev_ratio: 0.1, median: 0.0125}}
 
-    assert [_, result] = Console.format fast
+    assert [_, result] = Console.format %{statistics: fast}
     assert Regex.match? ~r/0.150μs/, result
     assert Regex.match? ~r/0.0125μs/, result
   end
@@ -114,7 +117,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     fast = %{"First" => %{average: 0.15, ips: 10_000.0,
                           std_dev_ratio: 0.1, median: 0.0125}}
 
-    assert [_, result] = Console.format fast
+    assert [_, result] = Console.format %{statistics: fast}
 
     assert String.last(result) != "\n"
   end
@@ -129,7 +132,8 @@ defmodule Benchee.Formatters.ConsoleTest do
       }
     }
 
-    [_, _, _, _comp_header, _reference, slower] = Console.format(jobs)
+    [_, _, _, _comp_header, _reference, slower] =
+      Console.format(%{statistics: jobs})
     assert String.last(slower) != "\n"
   end
 

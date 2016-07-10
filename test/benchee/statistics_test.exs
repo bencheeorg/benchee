@@ -10,8 +10,9 @@ defmodule Benchee.StatistcsTest do
       }
     }
 
-    %{"Job 1" => stats_1,
-      "Job 2" => stats_2} = Benchee.Statistics.statistics suite
+    %{statistics:
+      %{"Job 1" => stats_1,
+        "Job 2" => stats_2}} = Benchee.Statistics.statistics suite
 
     assert stats_1.average == 394.0
     assert_in_delta stats_1.std_dev, 147.32, 0.01
