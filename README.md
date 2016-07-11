@@ -61,22 +61,31 @@ First configuration options are passed, the only options available so far are:
 * `warmup` - the time in seconds for which a benchmark should be run without measuring times before real measurements start. This simulates a _"warm"_ running system. Defaults to 2.
 * `time`   - the time in seconds for how long each individual benchmark should be run and measured. Defaults to 5.
 * `parallel` - each job will be executed in `parallel` number processes. Gives you more data in the same time, but also puts a load on the system interfering with benchmark results. Defaults to 1.
+* formatters - list of formatter function you'd like to run to output the benchmarking results of the suite when using `Benchee.run/2`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter calling `Benche.Formatters.Console.output/1`.
 
 
 Running this script produces an output like:
 
 ```
 tobi@happy ~/github/benchee $ mix run samples/run.exs
+Compiling 1 file (.ex)
+Benchmark suite executing with the following configuration:
+warmup: 2.0s
+time: 3.0s
+parallel: 1
+Estimated total run time: 10.0s
+
 Benchmarking flat_map...
 Benchmarking map.flatten...
 
-Name                          ips            average        deviation      median
-map.flatten                   1311.84        762.29μs       (±13.77%)      747.0μs
-flat_map                      896.17         1115.86μs      (±9.54%)       1136.0μs
+Name                  ips        average    deviation         median
+map.flatten       1265.01       790.51μs    (±14.00%)       756.00μs
+flat_map           861.26      1161.09μs     (±5.43%)      1191.00μs
 
 Comparison:
-map.flatten                   1311.84
-flat_map                      896.17          - 1.46x slower
+map.flatten       1265.01
+flat_map           861.26 - 1.47x slower
+
 ```
 
 See the general description for the meaning of the different statistics.
@@ -111,6 +120,30 @@ This way Benchee should be flexible enough to suit your needs and be extended at
 
 For more example usages and benchmarks have a look at the [`samples`](https://github.com/PragTob/benchee/tree/master/samples) directory!
 
+## Formatters
+
+Among all the configuration options, one that you probably want to use are the formatters. Formatters are functions that take one argument (the benchmarking suite with all its results) and then generate some output. You can specify multiple formatters to run for the benchmarking run.
+
+So if you are using the [CSV plugin](https://github.com/PragTob/benchee_csv) and you want to run both the console formatter and the CSV formatter this looks like this:
+
+```elixir
+list = Enum.to_list(1..10_000)
+map_fun = fn(i) -> [i, i * i] end
+
+Benchee.run(
+  %{
+    formatters: [
+      &Benchee.Formatters.CSV.output/1,
+      &Benchee.Formatters.Console.output/1
+    ],
+    csv: %{file: "my.csv"}
+  },
+  %{
+    "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
+    "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
+  })
+```
+
 ## Plugins
 
 Packages that work with Benchee to provide additional functionality.
@@ -136,4 +169,4 @@ A couple of (hopefully) helpful points:
 
 * `mix deps.get` to install dependencies
 * `mix test` to run tests or `mix test.watch` to run them continuously while you change files
-* `mix credo` or `mix credo --strict` to find code style problems (no too strict with the 80 width limit for sample output in the docs)
+* `mix credo` or `mix credo --strict` to find code style problems (not too strict with the 80 width limit for sample output in the docs)
