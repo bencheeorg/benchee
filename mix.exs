@@ -1,15 +1,18 @@
 defmodule Benchee.Mixfile do
   use Mix.Project
 
+  @version "0.3.0"
+
   def project do
     [
       app: :benchee,
-      version: "0.2.0",
+      version: @version,
       elixir: "~> 1.2",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps,
+      docs: [source_ref: @version],
       package: package,
       name: "Benchee",
       source_url: "https://github.com/PragTob/benchee",

@@ -1,4 +1,4 @@
-# 0.3.0 (unreleased)
+# 0.3.0 (July 11, 2016)
 
 ## Breaking Changes (User Facing)
 * The recommended data structure handed to `Benchee.run` was changed from a list of 2-element tuples to a map (`"Name" => benchmark_function`). However, **the old list of tuples still works but may be removed in future releases** (so it's not "breaking" _strictly_ speaking).
