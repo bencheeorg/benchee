@@ -9,9 +9,12 @@ Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) f
 General features:
 
 * first runs the functions for a given warmup time without recording the results, to simulate a _"warm"_ running system
+* plugin/extensible friendly architecture so you can use different formatters to generate CSV or whatever
+* well tested
+* well documented
 * execute benchmark jobs in parallel to gather more results in the same time, or simulate a system under load
-* plugin/extensible friendly architecture
 * nicely formatted console output
+* provides you with **lots of statistics** - check the next list
 
 Provides you with the following statistical data:
 
