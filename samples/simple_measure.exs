@@ -6,7 +6,13 @@ Benchee.init
 |> IO.puts
 
 # tobi@happy ~/github/benchee $ mix run samples/simple_measure.exs
+# Benchmark suite executing with the following configuration:
+# warmup: 2.0s
+# time: 5.0s
+# parallel: 1
+# Estimated total run time: 7.0s
+#
 # Benchmarking map...
 #
-# Name                          ips            average        deviation      median
-# map                           18197.42       54.95μs        (±11.32%)      54.00μs
+# Name           ips        average    deviation         median
+# map       20294.59        49.27μs     (±7.48%)        49.00μs

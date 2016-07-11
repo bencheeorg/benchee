@@ -11,8 +11,12 @@ Benchee.run(%{time: 3},
     "noop"                      => fn -> 0 end,
     "Enum.map(10)"              => fn -> Enum.map(range, fn(i) -> i end) end})
 
+#
+# Before  adding running fast functions multiple times, these where just too
+# damn fast and unstable, take a look at these consecutive runs with integer
+# addition going first or last and super high deviations.
+#
 # tobi@happy ~/github/benchee $ mix run samples/fast_functions.exs
-# samples/fast_functions.exs:11: warning: an expression is always required on the right side of ->. Please provide a value after ->
 #
 # ** lots of complains about too fast function execution **
 #
@@ -31,10 +35,8 @@ Benchee.run(%{time: 3},
 # Integer addition              81872809.30     - 1.01x slower
 # noop                          81112598.69     - 1.02x slower
 # Enum.map (10)                 1423971.66      - 58.27x slower
-##
-# Before  adding running fast functions multiple times, these where just too
-# damn fast and unstable, take a look at these consecutive runs with integer
-# addition going first or last and super high deviations.
+#
+# ---------------------------------
 #
 # Name                          ips            average        deviation      median
 # Integer addition              18907117533.72 0.00μs         (±42193.83%)   0.0μs

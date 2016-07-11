@@ -1,3 +1,5 @@
+# This is the old data structure (pre 0.3.0), but it still works!
+
 list = Enum.to_list(1..10_000)
 map_fun = fn(i) -> [i, i * i] end
 
@@ -6,14 +8,20 @@ Benchee.run(%{time: 3},
               {"map.flatten",
               fn -> list |> Enum.map(map_fun) |> List.flatten end}])
 
-# tobi@happy ~/github/benchee $ mix run samples/run.exs
+# tobi@happy ~/github/benchee $ mix run samples/run_legacy_format.exs
+# Benchmark suite executing with the following configuration:
+# warmup: 2.0s
+# time: 3.0s
+# parallel: 1
+# Estimated total run time: 10.0s
+#
 # Benchmarking flat_map...
 # Benchmarking map.flatten...
 #
-# Name                          ips            average        deviation      median
-# map.flatten                   1283.12        779.35μs       (±16.34%)      748.00μs
-# flat_map                      882.38         1133.30μs      (±6.87%)       1158.00μs
+# Name                  ips        average    deviation         median
+# map.flatten       1309.73       763.52μs    (±12.04%)       752.00μs
+# flat_map           865.17      1155.85μs    (±11.39%)      1187.00μs
 #
 # Comparison:
-# map.flatten                   1283.12
-# flat_map                      882.38          - 1.45x slower
+# map.flatten       1309.73
+# flat_map           865.17 - 1.51x slower

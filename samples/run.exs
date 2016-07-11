@@ -7,13 +7,19 @@ Benchee.run(%{time: 3}, %{
 })
 
 # tobi@happy ~/github/benchee $ mix run samples/run.exs
+# Benchmark suite executing with the following configuration:
+# warmup: 2.0s
+# time: 3.0s
+# parallel: 1
+# Estimated total run time: 10.0s
+#
 # Benchmarking flat_map...
 # Benchmarking map.flatten...
 #
-# Name                          ips            average        deviation      median
-# map.flatten                   1283.12        779.35μs       (±16.34%)      748.00μs
-# flat_map                      882.38         1133.30μs      (±6.87%)       1158.00μs
+# Name                  ips        average    deviation         median
+# map.flatten       1231.39       812.09μs    (±12.24%)       805.00μs
+# flat_map           863.08      1158.64μs     (±6.14%)      1189.00μs
 #
 # Comparison:
-# map.flatten                   1283.12
-# flat_map                      882.38          - 1.45x slower
+# map.flatten       1231.39
+# flat_map           863.08 - 1.43x slower

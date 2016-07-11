@@ -53,22 +53,28 @@ Benchee.init
 
 
 # tobi@happy ~/github/benchee $ mix run samples/multiple_map.exs
-# Benchmarking stdlib map...
-# Benchmarking map with TCO and reverse...
-# Benchmarking map with TCO and ++...
+# Benchmark suite executing with the following configuration:
+# warmup: 2.0s
+# time: 5.0s
+# parallel: 1
+# Estimated total run time: 35.0s
+#
 # Benchmarking bodyrecusrive map...
 # Benchmarking map tco no reverse...
+# Benchmarking map with TCO and ++...
+# Benchmarking map with TCO and reverse...
+# Benchmarking stdlib map...
 #
-# Name                          ips            average        deviation      median
-# bodyrecusrive map             65854.74       15.18μs        (±31.83%)      15.00μs
-# stdlib map                    65594.56       15.25μs        (±30.44%)      15.00μs
-# map tco no reverse            58534.15       17.08μs        (±39.71%)      17.00μs
-# map with TCO and reverse      55066.15       18.16μs        (±39.89%)      18.00μs
-# map with TCO and ++           739.36         1352.52μs      (±2.60%)       1351.00μs
+# Name                               ips        average    deviation         median
+# stdlib map                    65621.82        15.24μs    (±14.74%)        15.00μs
+# bodyrecusrive map             64979.38        15.39μs    (±20.95%)        15.00μs
+# map tco no reverse            64727.63        15.45μs    (±12.59%)        15.00μs
+# map with TCO and reverse      57646.09        17.35μs    (±24.10%)        17.00μs
+# map with TCO and ++             897.18      1114.60μs     (±6.49%)      1086.00μs
 #
 # Comparison:
-# bodyrecusrive map             65854.74
-# stdlib map                    65594.56        - 1.00x slower
-# map tco no reverse            58534.15        - 1.13x slower
-# map with TCO and reverse      55066.15        - 1.20x slower
-# map with TCO and ++           739.36          - 89.07x slower
+# stdlib map                    65621.82
+# bodyrecusrive map             64979.38 - 1.01x slower
+# map tco no reverse            64727.63 - 1.01x slower
+# map with TCO and reverse      57646.09 - 1.14x slower
+# map with TCO and ++             897.18 - 73.14x slower
