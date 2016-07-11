@@ -4,7 +4,7 @@
 
 Library for easy and nice (micro) benchmarking in Elixir. It allows you to compare the performance of different pieces of code and functions at a glance. Benchee is also versatile and extensible, relying only on functions - no macros!
 
-Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) from the ruby world, but of course it is a more functional spin as it fully lives in the Elixir world.
+Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) from the ruby world, but a very different interface and a functional spin.
 
 General features:
 
