@@ -68,7 +68,6 @@ Running this script produces an output like:
 
 ```
 tobi@happy ~/github/benchee $ mix run samples/run.exs
-Compiling 1 file (.ex)
 Benchmark suite executing with the following configuration:
 warmup: 2.0s
 time: 3.0s
