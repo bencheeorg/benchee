@@ -134,8 +134,8 @@ defmodule Benchee.BenchmarkTest do
     end
 
     assert output =~ ~r/following configuration/i
-    assert output =~ "warmup: 0.1s"
-    assert output =~ "time: 0.05s"
+    assert output =~ "warmup: 0.05s"
+    assert output =~ "time: 0.1s"
     assert output =~ "parallel: 2"
     assert output =~ "Estimated total run time: 0.3s"
   end

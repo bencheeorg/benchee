@@ -46,7 +46,7 @@ defmodule Benchee.Benchmark do
   end
 
 
-  defp print_suite_information(jobs, time, warmup, parallel) do
+  defp print_suite_information(jobs, warmup, time, parallel) do
     warmup_seconds = time_precision Time.microseconds_to_seconds(warmup)
     time_seconds   = time_precision Time.microseconds_to_seconds(time)
     job_count      = map_size jobs
