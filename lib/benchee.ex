@@ -53,7 +53,7 @@ defmodule Benchee do
 
   @doc """
   Convenience access to `Benchee.Benchmark.benchmark/3` to define the benchmarks
-  to run in this benchmarking suite.`
+  to run in this benchmarking suite.
   """
   def benchmark(suite, name, function) do
     Benchmark.benchmark(suite, name, function)

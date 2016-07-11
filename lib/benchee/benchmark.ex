@@ -10,7 +10,7 @@ defmodule Benchee.Benchmark do
 
   @doc """
   Adds the given function and its associated name to the benchmarking jobs to
-  be run in this benchmarking suite as a tuple {name, function} to the list
+  be run in this benchmarking suite as a tuple `{name, function}` to the list
   under the `:jobs` key.
   """
   def benchmark(suite = %{jobs: jobs}, name, function) do
