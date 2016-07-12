@@ -15,7 +15,7 @@
 * now takes a `formatters: [&My.Format.function/1, &Benchee.Formatters.console.output/1]` configuration option with which multiple formatters for the same benchmarking run can be configured when using `Benchee.run/2`. E.g. you can print results to the console and create a csv from that same run. Defaults to the builtin Console formatter.
 
 ## Features (Plugins)
-* All previous configuration options are preserved after `Benchee.Statistics.sort/1`, meaning there is access to raw run times as well as custom options etc. E.g. you could grab custom options like `%{csv: %{file: "my_file_name.csv"}}` to use.
+* All previous configuration options are preserved after `Benchee.Statistics.statistics/1`, meaning there is access to raw run times as well as custom options etc. E.g. you could grab custom options like `%{csv: %{file: "my_file_name.csv"}}` to use.
 
 ## Bugfixes
 * name columns are no longer truncated after 30 characters. Thanks @alvinlindstam
