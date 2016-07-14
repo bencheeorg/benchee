@@ -44,7 +44,10 @@ defmodule Benchee.Mixfile do
     [
       maintainers: ["Tobias Pfeiffer"],
       licenses: ["MIT"],
-      links: %{github: "https://github.com/PragTob/benchee"}
+      links: %{
+        "github"     => "https://github.com/PragTob/benchee",
+        "Blog posts" => "https://pragtob.wordpress.com/tag/benchee/"
+      }
     ]
   end
 end
