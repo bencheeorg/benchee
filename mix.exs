@@ -9,6 +9,7 @@ defmodule Benchee.Mixfile do
       version: @version,
       elixir: "~> 1.2",
       elixirc_paths: elixirc_paths(Mix.env),
+      consolidate_protocols: true,
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps,
