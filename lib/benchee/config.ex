@@ -24,6 +24,10 @@ defmodule Benchee.Config do
     to accept one argument (which is the benchmarking suite with all data) and
     then use that to produce output. Used for plugins. Defaults to the builtin
     console formatter calling `Benche.Formatters.Console.output/1`.
+    * print      - a map from atoms to `true` or `false` to configure if this
+    one should be printed. Only option so far is `:fast_warning` to configure
+    whether or not the fast warning for functions that execute too fast should
+    be printed. Defaults to all of them enabled (true).
 
   ## Examples
 
@@ -34,7 +38,8 @@ defmodule Benchee.Config do
             parallel: 1,
             time: 5_000_000,
             warmup: 2_000_000,
-            formatters: [&Benchee.Formatters.Console.output/1]
+            formatters: [&Benchee.Formatters.Console.output/1],
+            print: %{fast_warning: true}
           },
         jobs: %{}
       }
@@ -46,19 +51,21 @@ defmodule Benchee.Config do
             parallel: 1,
             time: 1_000_000,
             warmup: 200_000.0,
-            formatters: [&Benchee.Formatters.Console.output/1]
+            formatters: [&Benchee.Formatters.Console.output/1],
+            print: %{fast_warning: true}
           },
         jobs: %{}
       }
 
-      iex> Benchee.init %{parallel: 2, time: 1, warmup: 0.2, formatters: [&IO.puts/2]}
+      iex> Benchee.init %{parallel: 2, time: 1, warmup: 0.2, formatters: [&IO.puts/2], print: %{fast_warning: false}}
       %{
         config:
           %{
             parallel: 2,
             time: 1_000_000,
             warmup: 200_000.0,
-            formatters: [&IO.puts/2]
+            formatters: [&IO.puts/2],
+            print: %{fast_warning: false}
           },
         jobs: %{}
       }
@@ -67,7 +74,8 @@ defmodule Benchee.Config do
     parallel:   1,
     time:       5,
     warmup:     2,
-    formatters: [&Benchee.Formatters.Console.output/1]
+    formatters: [&Benchee.Formatters.Console.output/1],
+    print:      %{fast_warning: true}
   }
   @time_keys [:time, :warmup]
   def init(config \\ %{}) do

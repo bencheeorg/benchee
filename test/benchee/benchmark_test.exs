@@ -15,7 +15,7 @@ defmodule Benchee.BenchmarkTest do
     assert new_suite == %{jobs: %{"two" => two_fun, "one" => one_fun}}
   end
 
-  test ".benchmark warns if adding a job with the same name again" do
+  test ".benchmark warns when adding a job with the same name again" do
     output = capture_io fn ->
       one_fun = fn -> 1 end
       suite = %{jobs: %{"one" => one_fun}}
@@ -27,9 +27,14 @@ defmodule Benchee.BenchmarkTest do
     assert output =~ ~r/same name/
   end
 
+  @config %{parallel: 1,
+            time: 40_000,
+            warmup: 20_000,
+            print: %{fast_warning: false}}
   test ".measure runs a benchmark suite and enriches it with results" do
     capture_io fn ->
-      suite = %{config: %{parallel: 1, time: 103_000, warmup: 20_000}, jobs: %{}}
+      config = Map.merge @config, %{time: 103_000, warmup: 20_000}
+      suite = %{config: config, jobs: %{}}
       new_suite =
         suite
         |> Benchee.benchmark("Name", fn -> :timer.sleep(10) end)
@@ -45,8 +50,9 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure can run multiple benchmarks in parallel" do
     capture_io fn ->
+      config = Map.merge @config, %{parallel: 6, time: 103_000}
       suite = %{
-        config: %{parallel: 6, time: 103_000, warmup: 20_000},
+        config: config,
         jobs: %{"" => fn -> :timer.sleep 10 end}
       }
       new_suite = Benchee.measure suite
@@ -61,8 +67,9 @@ defmodule Benchee.BenchmarkTest do
   test ".measure doesn't take longer than advertised for very fast funs" do
     capture_io fn ->
       projected = 10_000
-      suite = %{config: %{parallel: 1, time: projected, warmup: 0},
-                jobs: %{"" => fn -> 0 end}}
+      config = Map.merge @config, %{time: projected, warmup: 0}
+      suite = %{config: config,
+                jobs:   %{"" => fn -> 0 end}}
       {time, _} = :timer.tc fn -> Benchee.measure(suite) end
 
       assert_in_delta projected, time, 500,
@@ -76,7 +83,8 @@ defmodule Benchee.BenchmarkTest do
         time      = 20_000
         warmup    = 10_000
         projected = time + warmup
-        suite = %{config: %{parallel: 1, time: time, warmup: warmup},
+        config = Map.merge @config, %{time: time, warmup: warmup}
+        suite = %{config: config,
                   jobs: %{"" => fn -> 0 end}}
         {time, _} = :timer.tc fn -> Benchee.measure(suite) end
 
@@ -90,7 +98,8 @@ defmodule Benchee.BenchmarkTest do
     retrying fn ->
       capture_io fn ->
         range = 0..10
-        stats = %{config: %{parallel: 1,time: 20_000, warmup: 10_000}, jobs: %{}}
+        config = Map.merge @config, %{time: 20_000, warmup: 10_000}
+        stats = %{config: config, jobs: %{}}
                 |> Benchee.benchmark("noop", fn -> 0 end)
                 |> Benchee.benchmark("map", fn ->
                      Enum.map(range, fn(i) -> i end)
@@ -108,7 +117,8 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure doesn't print out information about warmup (annoying)" do
     output = capture_io fn ->
-      %{config: %{parallel: 1, time: 1000, warmup: 500}, jobs: %{}}
+      config = Map.merge @config, %{time: 1000, warmup: 500}
+      %{config: config, jobs: %{}}
       |> Benchee.benchmark("noop", fn -> 0 end)
       |> Benchee.measure
     end
@@ -118,7 +128,8 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure never calls the function if warmup and time are 0" do
     output = capture_io fn ->
-      %{config: %{parallel: 1, time: 0, warmup: 0}, jobs: %{"" => fn -> IO.puts "called" end}}
+      config = Map.merge @config, %{time: 0, warmup: 0}
+      %{config: config, jobs: %{"" => fn -> IO.puts "called" end}}
       |> Benchmark.measure
     end
 
@@ -127,7 +138,8 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure prints configuration information about the suite" do
     output = capture_io fn ->
-      %{config: %{parallel: 2, time: 100_000, warmup: 50_000}, jobs: %{}}
+      config = Map.merge @config, %{parallel: 2, time: 100_000, warmup: 50_000}
+      %{config: config, jobs: %{}}
       |> Benchee.benchmark("noop", fn -> 0 end)
       |> Benchee.benchmark("dontcare", fn -> 0 end)
       |> Benchee.measure
