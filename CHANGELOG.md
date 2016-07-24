@@ -5,6 +5,8 @@
 
 # 0.3.0 (July 11, 2016)
 
+This release switches internal data structures from lists of tuples to maps, allows the configuration of formatters, aggregates all values and hands them down so formatters can access the whole configuration, prints general configuration information and much more great stuff :)
+
 ## Breaking Changes (User Facing)
 * The recommended data structure handed to `Benchee.run` was changed from a list of 2-element tuples to a map (`"Name" => benchmark_function`). However, **the old list of tuples still works but may be removed in future releases** (so it's not "breaking" _strictly_ speaking).
 * You **can not have benchmark jobs with the same names anymore**, the last one wins here. This was the reason why previously the data structure was a list of tuples. However, having benchmarks with the same name is nonsensical as you can't discern their results in the output any way.
