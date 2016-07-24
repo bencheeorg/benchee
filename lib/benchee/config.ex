@@ -24,6 +24,10 @@ defmodule Benchee.Config do
     to accept one argument (which is the benchmarking suite with all data) and
     then use that to produce output. Used for plugins. Defaults to the builtin
     console formatter calling `Benche.Formatters.Console.output/1`.
+    * print      - a map from atoms to `true` or `false` to configure if this
+    one should be printed. Only option so far is `:fast_warning` to configure
+    whether or not the fast warning for functions that execute too fast should
+    be printed. Defaults to all of them enabled (true).
 
   ## Examples
 
