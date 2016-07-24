@@ -36,17 +36,19 @@ defmodule Benchee.Benchmark do
   There will be `parallel` processes spawned exeuting the benchmark job in
   parallel.
   """
-  def measure(suite = %{jobs: jobs, config: %{parallel: parallel, time: time, warmup: warmup}}) do
-    print_suite_information(jobs, warmup, time, parallel)
+  def measure(suite = %{jobs: jobs, config: config}) do
+    print_suite_information(jobs, config)
     run_times =
       jobs
-      |> Enum.map(fn(job) -> measure_job(job, parallel, warmup, time) end)
+      |> Enum.map(fn(job) -> measure_job(job, config) end)
       |> Map.new
     Map.put suite, :run_times, run_times
   end
 
 
-  defp print_suite_information(jobs, warmup, time, parallel) do
+  defp print_suite_information(jobs, %{parallel: parallel,
+                                       time:     time,
+                                       warmup:   warmup}) do
     warmup_seconds = time_precision Time.microseconds_to_seconds(warmup)
     time_seconds   = time_precision Time.microseconds_to_seconds(time)
     job_count      = map_size jobs
@@ -65,16 +67,20 @@ defmodule Benchee.Benchmark do
     Float.round(float, @round_precision)
   end
 
-  defp measure_job({name, function}, parallel, warmup, time) do
+  defp measure_job({name, function}, config) do
     IO.puts "Benchmarking #{name}..."
-    job_run_times = parallel_benchmark parallel, function, warmup, time
+    job_run_times = parallel_benchmark function, config
     {name, job_run_times}
   end
 
-  defp parallel_benchmark(parallel, function, warmup, time) do
+  defp parallel_benchmark(function,
+                          %{parallel: parallel,
+                            time:     time,
+                            warmup:   warmup,
+                            print:    %{fast_warning: fast_warning}}) do
     pmap 1..parallel, fn ->
       run_warmup function, warmup
-      measure_runtimes function, time
+      measure_runtimes function, time, fast_warning
     end
   end
 
@@ -89,15 +95,15 @@ defmodule Benchee.Benchmark do
     measure_runtimes(function, time, false)
   end
 
-  defp measure_runtimes(function, time, display_repeat_notice \\ true)
+  defp measure_runtimes(function, time, display_fast_warning)
   defp measure_runtimes(_function, 0, _) do
     []
   end
 
-  defp measure_runtimes(function, time, display_repeat_notice) do
+  defp measure_runtimes(function, time, display_fast_warning) do
     finish_time = current_time + time
     :erlang.garbage_collect
-    {n, initial_run_time} = determine_n_times(function, display_repeat_notice)
+    {n, initial_run_time} = determine_n_times(function, display_fast_warning)
     do_benchmark(finish_time, function, [initial_run_time], n)
   end
 
@@ -116,13 +122,13 @@ defmodule Benchee.Benchmark do
   # executed in the measurement cycle.
   @minimum_execution_time 10
   @times_multiplicator 10
-  defp determine_n_times(function, display_repeat_notice) do
+  defp determine_n_times(function, display_fast_warning) do
     prewarm function
     run_time = measure_call function
     if run_time >= @minimum_execution_time do
       {1, run_time}
     else
-      if display_repeat_notice, do: repeat_notice
+      if display_fast_warning, do: fast_warning
       try_n_times(function, @times_multiplicator)
     end
   end
@@ -137,12 +143,12 @@ defmodule Benchee.Benchmark do
     end
   end
 
-  @repeat_notice """
+  @fast_warning """
   Warning: The function you are trying to benchmark is super fast, making time measures unreliable!
   Benchee won't measure individual runs but rather run it a couple of times and report the average back. Measures will still be correct, but the overhead of running it n times goes into the measurement. Also statistical results aren't as good, as they are based on averages now. If possible, increase the input size so that an individual run takes more than #{@minimum_execution_time}μs
   """
-  defp repeat_notice do
-    IO.puts @repeat_notice
+  defp fast_warning do
+    IO.puts @fast_warning
   end
 
   defp do_benchmark(finish_time, function, run_times, n, now \\ 0)

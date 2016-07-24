@@ -34,7 +34,8 @@ defmodule Benchee.Config do
             parallel: 1,
             time: 5_000_000,
             warmup: 2_000_000,
-            formatters: [&Benchee.Formatters.Console.output/1]
+            formatters: [&Benchee.Formatters.Console.output/1],
+            print: %{fast_warning: true}
           },
         jobs: %{}
       }
@@ -46,19 +47,21 @@ defmodule Benchee.Config do
             parallel: 1,
             time: 1_000_000,
             warmup: 200_000.0,
-            formatters: [&Benchee.Formatters.Console.output/1]
+            formatters: [&Benchee.Formatters.Console.output/1],
+            print: %{fast_warning: true}
           },
         jobs: %{}
       }
 
-      iex> Benchee.init %{parallel: 2, time: 1, warmup: 0.2, formatters: [&IO.puts/2]}
+      iex> Benchee.init %{parallel: 2, time: 1, warmup: 0.2, formatters: [&IO.puts/2], print: %{fast_warning: false}}
       %{
         config:
           %{
             parallel: 2,
             time: 1_000_000,
             warmup: 200_000.0,
-            formatters: [&IO.puts/2]
+            formatters: [&IO.puts/2],
+            print: %{fast_warning: false}
           },
         jobs: %{}
       }
@@ -67,7 +70,8 @@ defmodule Benchee.Config do
     parallel:   1,
     time:       5,
     warmup:     2,
-    formatters: [&Benchee.Formatters.Console.output/1]
+    formatters: [&Benchee.Formatters.Console.output/1],
+    print:      %{fast_warning: true}
   }
   @time_keys [:time, :warmup]
   def init(config \\ %{}) do

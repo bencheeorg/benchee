@@ -120,6 +120,15 @@ defmodule BencheeTest do
     assert Enum.count(warnings) == 1
   end
 
+  test "integration super fast function warnings can be deactivated" do
+    output = capture_io fn ->
+      Benchee.run(%{time: 0.01, warmup: 0, print: %{fast_warning: false}},
+                  %{"Sleeps" => fn -> 0 end})
+    end
+
+    refute Regex.match? ~r/fast/, output
+  end
+
   test "multiple formatters can be configured and are all called" do
     output = capture_io fn ->
       Benchee.run(%{
