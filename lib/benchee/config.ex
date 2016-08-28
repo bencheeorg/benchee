@@ -25,10 +25,14 @@ defmodule Benchee.Config do
     then use that to produce output. Used for plugins. Defaults to the builtin
     console formatter calling `Benche.Formatters.Console.output/1`.
     * print      - a map from atoms to `true` or `false` to configure if the
-    output identified by the atom will be printed.Only option so far is
-    `:fast_warning` to configure whether or not the fast warning for functions
-    that execute too fast should be printed. Defaults to all of them enabled
-    (true).
+    output identified by the atom will be printed. All options are enabled by
+    default (true). Options are:
+      * `:fast_warning` - warnings are displayed if functions are executed too
+        fast leading to inaccurate measures
+      * `:comparison` - the comparison of the different benchmarking jobs (x
+        times slower than)
+
+
 
   ## Examples
 
