@@ -29,18 +29,18 @@ defmodule Benchee.Formatters.Console do
 
   ```
   iex> jobs = %{"My Job" => %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1, median: 190.0}}
-  iex> Benchee.Formatters.Console.format(%{statistics: jobs})
+  iex> Benchee.Formatters.Console.format(%{statistics: jobs, config: %{print: %{comparison: false}}})
   ["\nName             ips        average    deviation         median\n",
   "My Job       5000.00       200.00μs    (±10.00%)       190.00μs"]
 
   ```
 
   """
-  def format(%{statistics: job_stats}) do
+  def format(%{statistics: job_stats, config: config}) do
     sorted_stats = Statistics.sort(job_stats)
     label_width = label_width job_stats
     [column_descriptors(label_width) | job_reports(sorted_stats, label_width)
-      ++ comparison_report(sorted_stats, label_width)]
+      ++ comparison_report(sorted_stats, label_width, config)]
     |> remove_last_blank_line
   end
 
@@ -100,10 +100,13 @@ defmodule Benchee.Formatters.Console do
     |> to_string
   end
 
-  defp comparison_report([_reference], _) do
+  defp comparison_report([_reference], _, _config) do
     [] # No need for a comparison when only one benchmark was run
   end
-  defp comparison_report([reference | other_jobs], label_width) do
+  defp comparison_report(_, _, %{print: %{comparison: false}}) do
+    []
+  end
+  defp comparison_report([reference | other_jobs], label_width, _config) do
     [
       comparison_descriptor,
       reference_report(reference, label_width) |

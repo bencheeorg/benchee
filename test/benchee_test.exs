@@ -123,10 +123,22 @@ defmodule BencheeTest do
   test "integration super fast function warnings can be deactivated" do
     output = capture_io fn ->
       Benchee.run(%{time: 0.01, warmup: 0, print: %{fast_warning: false}},
-                  %{"Sleeps" => fn -> 0 end})
+                  %{"Blitz" => fn -> 0 end})
     end
 
     refute Regex.match? ~r/fast/, output
+  end
+
+  test "integration comparison report can be deactivated" do
+    output = capture_io fn ->
+      Benchee.run(%{time: 0.01,
+                    warmup: 0,
+                    print: %{comparison: false}},
+                  %{"Sleeps"   => fn -> :timer.sleep(10) end,
+                    "Sleeps 2" => fn -> :timer.sleep(20) end})
+    end
+
+    refute output =~ ~r/compar/i
   end
 
   test "multiple formatters can be configured and are all called" do

@@ -24,10 +24,11 @@ defmodule Benchee.Config do
     to accept one argument (which is the benchmarking suite with all data) and
     then use that to produce output. Used for plugins. Defaults to the builtin
     console formatter calling `Benche.Formatters.Console.output/1`.
-    * print      - a map from atoms to `true` or `false` to configure if this
-    one should be printed. Only option so far is `:fast_warning` to configure
-    whether or not the fast warning for functions that execute too fast should
-    be printed. Defaults to all of them enabled (true).
+    * print      - a map from atoms to `true` or `false` to configure if the
+    output identified by the atom will be printed.Only option so far is
+    `:fast_warning` to configure whether or not the fast warning for functions
+    that execute too fast should be printed. Defaults to all of them enabled
+    (true).
 
   ## Examples
 
@@ -39,7 +40,7 @@ defmodule Benchee.Config do
             time: 5_000_000,
             warmup: 2_000_000,
             formatters: [&Benchee.Formatters.Console.output/1],
-            print: %{fast_warning: true}
+            print: %{fast_warning: true, comparison: true}
           },
         jobs: %{}
       }
@@ -52,7 +53,7 @@ defmodule Benchee.Config do
             time: 1_000_000,
             warmup: 200_000.0,
             formatters: [&Benchee.Formatters.Console.output/1],
-            print: %{fast_warning: true}
+            print: %{fast_warning: true, comparison: true}
           },
         jobs: %{}
       }
@@ -65,7 +66,7 @@ defmodule Benchee.Config do
             time: 1_000_000,
             warmup: 200_000.0,
             formatters: [&IO.puts/2],
-            print: %{fast_warning: false}
+            print: %{fast_warning: false, comparison: true}
           },
         jobs: %{}
       }
@@ -75,11 +76,13 @@ defmodule Benchee.Config do
     time:       5,
     warmup:     2,
     formatters: [&Benchee.Formatters.Console.output/1],
-    print:      %{fast_warning: true}
+    print:      %{fast_warning: true, comparison: true}
   }
   @time_keys [:time, :warmup]
   def init(config \\ %{}) do
+    print = print_config config
     config = convert_time_to_micro_s(Map.merge(@default_config, config))
+    config = %{config | print: print}
     :ok = :timer.start
     %{config: config, jobs: %{}}
   end
@@ -91,5 +94,12 @@ defmodule Benchee.Config do
       end
       new_config
     end
+  end
+
+  defp print_config(%{print: config}) do
+    Map.merge @default_config.print, config
+  end
+  defp print_config(_no_print_config) do
+    @default_config.print
   end
 end
