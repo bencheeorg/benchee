@@ -37,7 +37,7 @@ defmodule Benchee.Benchmark do
   parallel.
   """
   def measure(suite = %{jobs: jobs, config: config}) do
-    print_suite_information(jobs, config)
+    print_configuration_information(jobs, config)
     run_times =
       jobs
       |> Enum.map(fn(job) -> measure_job(job, config) end)
@@ -45,9 +45,19 @@ defmodule Benchee.Benchmark do
     Map.put suite, :run_times, run_times
   end
 
-  defp print_suite_information(_jobs, %{print: %{configuration: false}}) do
+  defp print_configuration_information(_, %{print: %{configuration: false}}) do
     nil
   end
+  defp print_configuration_information(jobs, config) do
+    print_system_information
+    print_suite_information(jobs, config)
+  end
+
+  def print_system_information do
+    IO.write :erlang.system_info(:system_version)
+    IO.puts "Elixir #{System.version}"
+  end
+
   defp print_suite_information(jobs, %{parallel: parallel,
                                        time:     time,
                                        warmup:   warmup}) do
@@ -70,7 +80,7 @@ defmodule Benchee.Benchmark do
   end
 
   defp measure_job({name, function}, config) do
-    print_benchmarking name, config 
+    print_benchmarking name, config
     job_run_times = parallel_benchmark function, config
     {name, job_run_times}
   end

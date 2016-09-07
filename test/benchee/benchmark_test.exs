@@ -145,6 +145,8 @@ defmodule Benchee.BenchmarkTest do
       |> Benchee.measure
     end
 
+    assert output =~ "Erlang/OTP"
+    assert output =~ "Elixir #{System.version}"
     assert output =~ ~r/following configuration/i
     assert output =~ "warmup: 0.05s"
     assert output =~ "time: 0.1s"
@@ -167,6 +169,8 @@ defmodule Benchee.BenchmarkTest do
       |> Benchee.measure
     end
 
+    refute output =~ "Erlang"
+    refute output =~ "Elxir"
     refute output =~ ~r/following configuration/i
     refute output =~ "warmup:"
     refute output =~ "time:"

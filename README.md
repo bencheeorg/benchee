@@ -71,6 +71,8 @@ Running this script produces an output like:
 
 ```
 tobi@happy ~/github/benchee $ mix run samples/run.exs
+Erlang/OTP 19 [erts-8.0] [source] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
+Elixir 1.3.2
 Benchmark suite executing with the following configuration:
 warmup: 2.0s
 time: 3.0s
@@ -81,13 +83,12 @@ Benchmarking flat_map...
 Benchmarking map.flatten...
 
 Name                  ips        average    deviation         median
-map.flatten       1265.01       790.51μs    (±14.00%)       756.00μs
-flat_map           861.26      1161.09μs     (±5.43%)      1191.00μs
+map.flatten        989.80      1010.31μs    (±12.63%)       998.00μs
+flat_map           647.35      1544.75μs    (±10.54%)      1556.00μs
 
 Comparison:
-map.flatten       1265.01
-flat_map           861.26 - 1.47x slower
-
+map.flatten        989.80
+flat_map           647.35 - 1.53x slower
 ```
 
 See the general description for the meaning of the different statistics.
