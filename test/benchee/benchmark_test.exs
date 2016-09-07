@@ -173,4 +173,25 @@ defmodule Benchee.BenchmarkTest do
     refute output =~ "parallel:"
     refute output =~ "Estimated total run time"
   end
+
+  test ".measure prints out information what is currently benchmarking" do
+    output = capture_io fn ->
+      %{config: @config, jobs: %{}}
+      |> Benchee.benchmark("Something", fn -> :timer.sleep 10 end)
+      |> Benchee.measure
+    end
+
+    assert output =~ "Benchmarking Something"
+  end
+
+  test ".measure doesn't print out currently benchmarking info if disabled" do
+    output = capture_io fn ->
+      config = update_in @config, [:print, :benchmarking], fn(_) -> false end
+      %{config: config, jobs: %{}}
+      |> Benchee.benchmark("Something", fn -> :timer.sleep 10 end)
+      |> Benchee.measure
+    end
+
+    refute output =~ "Benchmarking Something"
+  end
 end

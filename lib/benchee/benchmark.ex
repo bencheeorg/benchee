@@ -70,9 +70,16 @@ defmodule Benchee.Benchmark do
   end
 
   defp measure_job({name, function}, config) do
-    IO.puts "Benchmarking #{name}..."
+    print_benchmarking name, config 
     job_run_times = parallel_benchmark function, config
     {name, job_run_times}
+  end
+
+  defp print_benchmarking(_, %{print: %{benchmarking: false}}) do
+    nil
+  end
+  defp print_benchmarking(name, _config) do
+    IO.puts "Benchmarking #{name}..."
   end
 
   defp parallel_benchmark(function,
