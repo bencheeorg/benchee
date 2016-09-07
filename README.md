@@ -61,8 +61,9 @@ First configuration options are passed, the only options available so far are:
 * `parallel` - each job will be executed in `parallel` number processes. Gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking). Defaults to 1.
 * `formatters` - list of formatter function you'd like to run to output the benchmarking results of the suite when using `Benchee.run/2`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter calling `Benche.Formatters.Console.output/1`.
 * print      - a map from atoms to `true` or `false` to configure if the output identified by the atom will be printed. All options are enabled by default (true). Options are:
-  * `:fast_warning` - warnings are displayed if functions are executed too     fast leading to inaccurate measures
-  * `:comparison` - the comparison of the different benchmarking jobs (x     times slower than) 
+  * `:comparison` - the comparison of the different benchmarking jobs (x times slower than)
+  * `:configuration` - a summary of configured benchmarking options including estimated total run time is printed before benchmarking starts
+  * `:fast_warning` - warnings are displayed if functions are executed too    fast leading to inaccurate measures
 
 
 Running this script produces an output like:

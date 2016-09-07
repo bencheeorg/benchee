@@ -30,7 +30,7 @@ defmodule Benchee.BenchmarkTest do
   @config %{parallel: 1,
             time: 40_000,
             warmup: 20_000,
-            print: %{fast_warning: false}}
+            print: %{fast_warning: false, configuration: true}}
   test ".measure runs a benchmark suite and enriches it with results" do
     capture_io fn ->
       config = Map.merge @config, %{time: 103_000, warmup: 20_000}
@@ -150,5 +150,27 @@ defmodule Benchee.BenchmarkTest do
     assert output =~ "time: 0.1s"
     assert output =~ "parallel: 2"
     assert output =~ "Estimated total run time: 0.3s"
+  end
+
+  test ".measure does not print configuration information when disabled" do
+    output = capture_io fn ->
+      custom = %{
+                  parallel: 2,
+                  time: 100_000,
+                  warmup: 50_000
+                 }
+      config = Map.merge @config, custom
+      config = update_in(config, [:print, :configuration], fn(_) -> false end)
+      %{config: config, jobs: %{}}
+      |> Benchee.benchmark("noop", fn -> 0 end)
+      |> Benchee.benchmark("dontcare", fn -> 0 end)
+      |> Benchee.measure
+    end
+
+    refute output =~ ~r/following configuration/i
+    refute output =~ "warmup:"
+    refute output =~ "time:"
+    refute output =~ "parallel:"
+    refute output =~ "Estimated total run time"
   end
 end

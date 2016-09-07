@@ -45,7 +45,9 @@ defmodule Benchee.Benchmark do
     Map.put suite, :run_times, run_times
   end
 
-
+  defp print_suite_information(_jobs, %{print: %{configuration: false}}) do
+    nil
+  end
   defp print_suite_information(jobs, %{parallel: parallel,
                                        time:     time,
                                        warmup:   warmup}) do

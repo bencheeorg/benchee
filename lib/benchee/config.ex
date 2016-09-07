@@ -27,12 +27,12 @@ defmodule Benchee.Config do
     * print      - a map from atoms to `true` or `false` to configure if the
     output identified by the atom will be printed. All options are enabled by
     default (true). Options are:
+      * `:comparison` - the comparison of the different benchmarking jobs (x
+      times slower than)
+      * `:configuration` - a summary of configured benchmarking options
+      including estimated total run time is printed before benchmarking starts
       * `:fast_warning` - warnings are displayed if functions are executed too
         fast leading to inaccurate measures
-      * `:comparison` - the comparison of the different benchmarking jobs (x
-        times slower than)
-
-
 
   ## Examples
 
@@ -44,7 +44,7 @@ defmodule Benchee.Config do
             time: 5_000_000,
             warmup: 2_000_000,
             formatters: [&Benchee.Formatters.Console.output/1],
-            print: %{fast_warning: true, comparison: true}
+            print: %{fast_warning: true, comparison: true, configuration: true}
           },
         jobs: %{}
       }
@@ -57,7 +57,7 @@ defmodule Benchee.Config do
             time: 1_000_000,
             warmup: 200_000.0,
             formatters: [&Benchee.Formatters.Console.output/1],
-            print: %{fast_warning: true, comparison: true}
+            print: %{fast_warning: true, comparison: true, configuration: true}
           },
         jobs: %{}
       }
@@ -70,7 +70,7 @@ defmodule Benchee.Config do
             time: 1_000_000,
             warmup: 200_000.0,
             formatters: [&IO.puts/2],
-            print: %{fast_warning: false, comparison: true}
+            print: %{fast_warning: false, comparison: true, configuration: true}
           },
         jobs: %{}
       }
@@ -80,7 +80,11 @@ defmodule Benchee.Config do
     time:       5,
     warmup:     2,
     formatters: [&Benchee.Formatters.Console.output/1],
-    print:      %{fast_warning: true, comparison: true}
+    print:      %{
+                  fast_warning: true,
+                  comparison: true,
+                  configuration: true
+                }
   }
   @time_keys [:time, :warmup]
   def init(config \\ %{}) do
