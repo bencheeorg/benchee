@@ -1,7 +1,11 @@
 # 0.4.0 (unreleased)
 
+Focusses on making what benchee print out configurable to make it fit to your preferences
+
 ## Features (User Facing)
-* the configuration now has a `:print` key where it is possible to configure in map what benchee prints out during benchmarking. So far only accepts `fast_warning` to configure whether the too fast function execution warnings are printed. Defaults to true.
+* the configuration now has a `:print` key where it is possible to configure in a map what benchee prints out during benchmarking. It supports the following values:
+  * `:fast_warning` - warnings are displayed if functions are executed too fast leading to inaccurate measures
+  * `:comparison` - the comparison of the different benchmarking jobs (x times slower than) 
 
 # 0.3.0 (July 11, 2016)
 
