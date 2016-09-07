@@ -15,7 +15,7 @@ defmodule Benchee.Benchmark do
   """
   def benchmark(suite = %{jobs: jobs}, name, function) do
     if Map.has_key?(jobs, name) do
-      IO.puts "You already have job defined with #{name}, you can't add two jobs with the same name!"
+      IO.puts "You already have a job defined with the name \"#{name}\", you can't add two jobs with the same name!"
       suite
     else
       %{suite | jobs: Map.put(jobs, name, function)}
