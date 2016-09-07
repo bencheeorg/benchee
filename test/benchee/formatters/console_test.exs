@@ -165,6 +165,25 @@ defmodule Benchee.Formatters.ConsoleTest do
     assert String.last(result) != "\n"
   end
 
+  test "it doesn't output weird 'e' formats" do
+    jobs = %{
+      "Job" => %{
+        average: 11000.0,
+        ips: 12000.0,
+        std_dev_ratio: 13000.0,
+        median: 140000.0
+      }
+    }
+
+    assert [_, result] = Console.format %{statistics: jobs, config: @config}
+
+    refute result =~ ~r/\de\d/
+    assert result =~ "11000"
+    assert result =~ "12000"
+    assert result =~ "13000"
+    assert result =~ "14000"
+  end
+
   test ".format doesn't end in an empty line with multiple results" do
     jobs = %{
       "Second" => %{
