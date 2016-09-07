@@ -3,7 +3,7 @@
 Focusses on making what benchee print out configurable to make it fit to your preferences
 
 ## Features (User Facing)
-* the configuration now has a `:print` key where it is possible to configure in a map what benchee prints out during benchmarking. It supports the following values:
+* the configuration now has a `:print` key where it is possible to configure in a map what benchee prints out during benchmarking. All options are enabled by default (true). Options are:
   * `:comparison` - the comparison of the different benchmarking jobs (x times slower than)
   * `:configuration` - a summary of configured benchmarking options including estimated total run time is printed before benchmarking starts
   * `:fast_warning` - warnings are displayed if functions are executed too    fast leading to inaccurate measures
