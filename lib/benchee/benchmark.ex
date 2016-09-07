@@ -130,7 +130,7 @@ defmodule Benchee.Benchmark do
     if run_time >= @minimum_execution_time do
       {1, run_time}
     else
-      if display_fast_warning, do: fast_warning
+      if display_fast_warning, do: print_fast_warning
       try_n_times(function, @times_multiplicator)
     end
   end
@@ -149,7 +149,7 @@ defmodule Benchee.Benchmark do
   Warning: The function you are trying to benchmark is super fast, making time measures unreliable!
   Benchee won't measure individual runs but rather run it a couple of times and report the average back. Measures will still be correct, but the overhead of running it n times goes into the measurement. Also statistical results aren't as good, as they are based on averages now. If possible, increase the input size so that an individual run takes more than #{@minimum_execution_time}μs
   """
-  defp fast_warning do
+  defp print_fast_warning do
     IO.puts @fast_warning
   end
 
