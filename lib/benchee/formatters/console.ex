@@ -71,13 +71,13 @@ defmodule Benchee.Formatters.Console do
                          }, label_width) do
     "~*s~*.2f~*ts~*ts~*ts\n"
     |> :io_lib.format([-label_width, name, @ips_width, ips,
-                       @average_width, average_out(average),
+                       @average_width, run_time_out(average),
                        @deviation_width, deviation_out(std_dev_ratio),
-                       @median_width, median_out(median)])
+                       @median_width, run_time_out(median)])
     |> to_string
   end
 
-  defp average_out(average) do
+  defp run_time_out(average) do
     "~.#{float_precision(average)}f~ts"
     |> :io_lib.format([average, "μs"])
     |> to_string
@@ -87,12 +87,6 @@ defmodule Benchee.Formatters.Console do
   defp float_precision(float) when float < 0.1, do: 4
   defp float_precision(float) when float < 0.2, do: 3
   defp float_precision(_float), do: 2
-
-  defp median_out(median) do
-    "~.#{float_precision(median)}f~ts"
-    |> :io_lib.format([median, "μs"])
-    |> to_string
-  end
 
   defp deviation_out(std_dev_ratio) do
     "(~ts~.2f%)"
