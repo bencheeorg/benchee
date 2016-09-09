@@ -152,8 +152,8 @@ defmodule Benchee.Formatters.ConsoleTest do
                           std_dev_ratio: 0.1, median: 0.0125}}
 
     assert [_, result] = Console.format %{statistics: fast, config: @config}
-    assert Regex.match? ~r/0.150μs/, result
-    assert Regex.match? ~r/0.0125μs/, result
+    assert Regex.match? ~r/0.150\s?μs/, result
+    assert Regex.match? ~r/0.0125\s?μs/, result
   end
 
   test ".format doesn't end in an empty line when there's only on result" do

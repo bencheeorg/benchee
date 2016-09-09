@@ -31,7 +31,7 @@ defmodule Benchee.Formatters.Console do
   iex> jobs = %{"My Job" => %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1, median: 190.0}}
   iex> Benchee.Formatters.Console.format(%{statistics: jobs, config: %{print: %{comparison: false}}})
   ["\nName             ips        average    deviation         median\n",
-  "My Job       5000.00       200.00μs    (±10.00%)       190.00μs"]
+  "My Job       5000.00      200.00 μs    (±10.00%)      190.00 μs"]
 
   ```
 
@@ -79,7 +79,7 @@ defmodule Benchee.Formatters.Console do
 
   defp run_time_out(average) do
     "~.#{float_precision(average)}f~ts"
-    |> :io_lib.format([average, "μs"])
+    |> :io_lib.format([average, " μs"])
     |> to_string
   end
 
