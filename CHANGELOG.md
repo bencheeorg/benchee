@@ -8,7 +8,7 @@ Focusses on making what benchee print out configurable to make it fit to your pr
   * `:comparison` - the comparison of the different benchmarking jobs (x times slower than)
   * `:configuration` - a summary of configured benchmarking options including estimated total run time is printed before benchmarking starts
   * `:fast_warning` - warnings are displayed if functions are executed too    fast leading to inaccurate measures
-* The pre benchmarking configuration now also prints the currently used Erlang and Elixir versions (similar to `elixir -v`) 
+* The pre-benchmarking output of the configuration now also prints the currently used Erlang and Elixir versions (similar to `elixir -v`)
 
 # 0.3.0 (July 11, 2016)
 
