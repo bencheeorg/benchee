@@ -53,7 +53,7 @@ defmodule Benchee.Benchmark do
     print_suite_information(jobs, config)
   end
 
-  def print_system_information do
+  defp print_system_information do
     IO.write :erlang.system_info(:system_version)
     IO.puts "Elixir #{System.version}"
   end
