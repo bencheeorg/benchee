@@ -97,7 +97,7 @@ defmodule Benchee.Formatters.Console do
   defp comparison_report([_reference], _, _config) do
     [] # No need for a comparison when only one benchmark was run
   end
-  defp comparison_report(_, _, %{print: %{comparison: false}}) do
+  defp comparison_report(_, _, %{console: %{comparison: false}}) do
     []
   end
   defp comparison_report([reference | other_jobs], label_width, _config) do

@@ -5,7 +5,7 @@ defmodule Benchee.Formatters.ConsoleTest do
 
   alias Benchee.Formatters.Console
 
-  @config %{print: %{comparison: true}}
+  @config %{console: %{comparison: true}}
   test ".output formats and prints the results right to the console" do
     jobs = %{
       "Second" => %{
@@ -112,7 +112,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     }
 
     output = Enum.join Console.format(%{statistics: jobs,
-                                        config: %{print: %{comparison: false}}})
+                                        config: %{console: %{comparison: false}}})
 
     refute Regex.match? ~r/Comparison/i, output
     refute Regex.match? ~r/^First\s+10000.00$/m, output

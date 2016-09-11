@@ -12,29 +12,31 @@ defmodule Benchee.Config do
 
   Possible options:
 
-    * time       - total run time in seconds of a single benchmark (determines
+    * `time`       - total run time in seconds of a single benchmark (determines
     how often it is executed). Defaults to 5.
-    * warmup     - the time in seconds for which the benchmarking function
+    * `warmup`     - the time in seconds for which the benchmarking function
     should be run without gathering results. Defaults to 2.
-    * parallel   - each job will be executed in `parallel` number processes.
+    * `parallel`   - each job will be executed in `parallel` number processes.
     Gives you more data in the same time, but also puts a load on the system
     interfering with benchmark results. Defaults to 1.
-    * formatters - list of formatter function you'd like to run to output the
+    * `formatters` - list of formatter function you'd like to run to output the
     benchmarking results of the suite when using `Benchee.run/2`. Functions need
     to accept one argument (which is the benchmarking suite with all data) and
     then use that to produce output. Used for plugins. Defaults to the builtin
     console formatter calling `Benche.Formatters.Console.output/1`.
-    * print      - a map from atoms to `true` or `false` to configure if the
+    * `print`      - a map from atoms to `true` or `false` to configure if the
     output identified by the atom will be printed. All options are enabled by
     default (true). Options are:
       * `:benchmarking`  - print when Benchee starts benchmarking a new job
       (Benchmarking name ..)
-      * `:comparison`    - the comparison of the different benchmarking jobs (x
-      times slower than)
       * `:configuration` - a summary of configured benchmarking options
       including estimated total run time is printed before benchmarking starts
       * `:fast_warning`   - warnings are displayed if functions are executed
       too fast leading to inaccurate measures
+    * `console` - options for the built-in console formatter. Like the
+    `print` options they are also enabled by default:
+      * `:comparison` - if the comparison of the different benchmarking jobs
+      (x times slower than) is shown
 
   ## Examples
 
@@ -49,9 +51,9 @@ defmodule Benchee.Config do
             print: %{
               benchmarking: true,
               fast_warning: true,
-              comparison: true,
               configuration: true
-            }
+            },
+            console: %{ comparison: true }
           },
         jobs: %{}
       }
@@ -67,9 +69,9 @@ defmodule Benchee.Config do
             print: %{
               benchmarking: true,
               fast_warning: true,
-              comparison: true,
               configuration: true
-            }
+            },
+            console: %{ comparison: true }
           },
         jobs: %{}
       }
@@ -85,9 +87,9 @@ defmodule Benchee.Config do
             print: %{
               benchmarking: true,
               fast_warning: false,
-              comparison: true,
               configuration: true
-            }
+            },
+            console: %{ comparison: true }
           },
         jobs: %{}
       }
@@ -99,9 +101,11 @@ defmodule Benchee.Config do
     formatters: [&Benchee.Formatters.Console.output/1],
     print:      %{
                   benchmarking:  true,
-                  comparison:    true,
                   configuration: true,
                   fast_warning:  true
+                },
+  console:      %{
+                  comparison: true
                 }
   }
   @time_keys [:time, :warmup]

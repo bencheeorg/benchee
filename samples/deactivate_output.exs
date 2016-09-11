@@ -4,9 +4,11 @@ Benchee.run(%{
                 time: 1,
                 print: %{
                   benchmarking:  false,
-                  comparison:    false,
                   configuration: false,
                   fast_warning:  false
+                },
+                console: %{
+                  comparison: false
                 }
               },
             %{"fast" => fn -> 1 + 1 end,

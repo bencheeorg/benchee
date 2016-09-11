@@ -133,7 +133,7 @@ defmodule BencheeTest do
     output = capture_io fn ->
       Benchee.run(%{time: 0.01,
                     warmup: 0,
-                    print: %{comparison: false}},
+                    console: %{comparison: false}},
                   %{"Sleeps"   => fn -> :timer.sleep(10) end,
                     "Sleeps 2" => fn -> :timer.sleep(20) end})
     end
