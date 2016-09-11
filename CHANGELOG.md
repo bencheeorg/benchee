@@ -1,6 +1,6 @@
-# 0.4.0 (unreleased)
+# 0.4.0 (September 11, 2016)
 
-Focusses on making what benchee print out configurable to make it fit to your preferences
+Focuses on making what benchee print out configurable to make it fit to your preferences :)
 
 ## Features (User Facing)
 * The configuration now has a `:print` key where it is possible to configure in a map what benchee prints out during benchmarking. All options are enabled by default (true). Options are:
@@ -10,7 +10,7 @@ Focusses on making what benchee print out configurable to make it fit to your pr
 * There is also a new configuration option for the built-in console formatter. Which is also enabled by default:
   * `:comparison` - if the comparison of the different benchmarking jobs (x times slower than) is shown
 * The pre-benchmarking output of the configuration now also prints the currently used Erlang and Elixir versions (similar to `elixir -v`)
-* Add a space between the benchmarked time and the unit
+* Add a space between the benchmarked time and the unit (microseconds)
 
 # 0.3.0 (July 11, 2016)
 
