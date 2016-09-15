@@ -8,12 +8,14 @@ defmodule Benchee.Units do
   def scale_count(count) when count >= @one_thousand, do: {count / @one_thousand, :thousand}
   def scale_count(count), do: {count, :one}
 
-  def format_count(count) when is_number(count) do
+  @spec format_count(number) :: String.t
+  def format_count(count) do
     count
     |> scale_count
-    |> format_count
+    |> do_format_count
   end
-  def format_count({count, unit}) do
+
+  defp do_format_count({count, unit}) do
     "~.#{float_precision(count)}f~ts"
     |> :io_lib.format([count, unit_label(unit)])
     |> to_string
