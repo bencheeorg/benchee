@@ -43,33 +43,93 @@ defmodule Benchee.Units do
     |> do_format
   end
 
+  def best_for_counts(list, opts \\ [strategy: :best])
+  def best_for_counts(list, opts) do
+    case Keyword.get(opts, :strategy, :best) do
+      :best -> best_unit(list)
+      :largest -> largest_unit(list)
+      :smallest -> smallest_unit(list)
+    end
+  end
+
+  def best_unit(list) do
+    list
+    |> Enum.map(&scaled_unit/1)
+    |> Enum.reduce(%{}, &totals_by_unit/2)
+    |> Enum.into([])
+    |> Enum.sort(&sort_by_total_and_magnitude/2)
+    |> hd
+    |> elem(0)
+  end
+
+  defp smallest_unit(list) do
+    list
+    |> Enum.map(&scaled_unit/1)
+    |> Enum.sort(&sort_by_magnitude/2)
+    |> Enum.reverse
+    |> hd
+  end
+
+  defp largest_unit(list) do
+    list
+    |> Enum.map(&scaled_unit/1)
+    |> Enum.sort(&sort_by_magnitude/2)
+    |> hd
+  end
+
+  defp scaled_unit(count) do
+    {_, unit} = scale_count(count)
+    unit
+  end
+
+  defp totals_by_unit(unit, acc) do
+    count = Map.get(acc, unit, 0)
+    Map.put(acc, unit, count + 1)
+  end
+
+  defp sort_by_total_and_magnitude({units_a, total}, {units_b, total}) do
+    sort_by_magnitude(units_a, units_b)
+  end
+  defp sort_by_total_and_magnitude({_, total_a}, {_, total_b}) do
+    total_a > total_b
+  end
+
+  defp sort_by_magnitude(a, b) do
+    magnitude(a) > magnitude(b)
+  end
+
   defp do_format({count, unit}) do
     "~.#{float_precision(count)}f~ts"
     |> :io_lib.format([count, unit_label(unit)])
     |> to_string
   end
 
-
   def float_precision(float) when float < 0.01, do: 5
   def float_precision(float) when float < 0.1, do: 4
   def float_precision(float) when float < 0.2, do: 3
   def float_precision(_float), do: 2
 
-  @unit_labels %{
-    billion:  %{ short: "B", long: "Billion"},
-    million:  %{ short: "M", long: "Million"},
-    thousand: %{ short: "K", long: "Thousand"},
-    one:      %{ short: "", long: ""},
+  @units %{
+    billion:  %{ magnitude: @one_billion, short: "B", long: "Billion"},
+    million:  %{ magnitude: @one_million, short: "M", long: "Million"},
+    thousand: %{ magnitude: @one_thousand, short: "K", long: "Thousand"},
+    one:      %{ magnitude: 1, short: "", long: ""},
 
-    hour:        %{ short: "h",  long: "Hours"},
-    minute:      %{ short: "m",  long: "Minutes"},
-    second:      %{ short: "s",  long: "Seconds"},
-    millisecond: %{ short: "ms", long: "Milliseconds"},
-    microsecond: %{ short: "μs", long: "Microseconds"}
+    hour:        %{ magnitude: @microseconds_per_hour, short: "h",  long: "Hours"},
+    minute:      %{ magnitude: @microseconds_per_minute, short: "m",  long: "Minutes"},
+    second:      %{ magnitude: @microseconds_per_second, short: "s",  long: "Seconds"},
+    millisecond: %{ magnitude: @microseconds_per_millisecond, short: "ms", long: "Milliseconds"},
+    microsecond: %{ magnitude: 1, short: "μs", long: "Microseconds"}
   }
 
+  defp magnitude(unit) do
+    @units
+    |> Map.fetch!(unit)
+    |> Map.fetch!(:magnitude)
+  end
+
   def unit_label(unit) do
-    @unit_labels
+    @units
     |> Map.fetch!(unit)
     |> Map.fetch!(:short)
   end

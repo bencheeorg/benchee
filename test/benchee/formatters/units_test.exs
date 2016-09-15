@@ -105,4 +105,58 @@ defmodule Benchee.Formatters.UnitsTest do
   test ".format_duration(9_876_543_219.8765)" do
     assert format_duration(9_876_543_219.8765) == "2.74h"
   end
+
+  describe "Best unit for counts [1, 100, 1_000]" do
+    setup do
+      {:ok, list: [1, 100, 1_000]}
+    end
+
+    test ".best_for_counts", %{list: list} do
+      assert best_for_counts(list) == :one
+    end
+
+    test ".best_for_counts, strategy: :smallest", %{list: list} do
+      assert best_for_counts(list, strategy: :smallest) == :one
+    end
+
+    test ".best_for_counts, strategy: :largest", %{list: list} do
+      assert best_for_counts(list, strategy: :largest) == :thousand
+    end
+  end
+
+  describe "Best unit for counts [1, 1_000, 100_000, 1_000_000, 10_000_000, 1_000_000_000]" do
+    setup do
+      {:ok, list: [0.0001, 1, 1_000, 100_000, 1_000_000, 10_000_000, 1_000_000_000]}
+    end
+
+    test ".best_for_counts", %{list: list} do
+      assert best_for_counts(list) == :million
+    end
+
+    test ".best_for_counts, strategy: :smallest", %{list: list} do
+      assert best_for_counts(list, strategy: :smallest) == :one
+    end
+
+    test ".best_for_counts, strategy: :largest", %{list: list} do
+      assert best_for_counts(list, strategy: :largest) == :billion
+    end
+  end
+
+  describe "Best unit for counts [1_000, 2_000, 30_000]" do
+    setup do
+      {:ok, list: [1_000, 2_000, 30_000, 999]}
+    end
+
+    test ".best_for_counts", %{list: list} do
+      assert best_for_counts(list) == :thousand
+    end
+
+    test ".best_for_counts, strategy: :smallest", %{list: list} do
+      assert best_for_counts(list, strategy: :smallest) == :one
+    end
+
+    test ".best_for_counts, strategy: :largest", %{list: list} do
+      assert best_for_counts(list, strategy: :largest) == :thousand
+    end
+  end
 end
