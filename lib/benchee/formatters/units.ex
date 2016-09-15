@@ -1,4 +1,11 @@
 defmodule Benchee.Units do
+  @moduledoc """
+  Provides scaling and labeling functions for numbers. Use "count" functions
+  for numbers that represent countable things, such as iterations per second.
+  Use "duration" functions for numbers that represent durations, such as run
+  times.
+  """
+
   @one_billion 1_000_000_000
   @one_million 1_000_000
   @one_thousand 1_000
