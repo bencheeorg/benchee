@@ -53,4 +53,8 @@ defmodule Benchee.Formatters.UnitsTest do
   test ".format 0.001234567 scales to :one" do
     assert scale_count(0.001234567) == {0.001234567, :one}
   end
+
+  test ".format_count(1_234_567)" do
+    assert format_count(1_000_000) == "1.00M"
+  end
 end

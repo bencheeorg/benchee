@@ -7,4 +7,25 @@ defmodule Benchee.Units do
   def scale_count(count) when count >= @one_million,  do: {count / @one_million, :million}
   def scale_count(count) when count >= @one_thousand, do: {count / @one_thousand, :thousand}
   def scale_count(count), do: {count, :one}
+
+  def format_count(count) when is_number(count) do
+    count
+    |> scale_count
+    |> format_count
+  end
+  def format_count({count, unit}) do
+    "~.#{float_precision(count)}f~ts"
+    |> :io_lib.format([count, unit_label(unit)])
+    |> to_string
+  end
+
+  def float_precision(float) when float < 0.01, do: 5
+  def float_precision(float) when float < 0.1, do: 4
+  def float_precision(float) when float < 0.2, do: 3
+  def float_precision(_float), do: 2
+
+  def unit_label(:billion), do: "B"
+  def unit_label(:million), do: "M"
+  def unit_label(:thousand), do: "K"
+  def unit_label(_), do: ""
 end
