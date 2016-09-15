@@ -2,6 +2,18 @@ defmodule Benchee.Formatters.UnitsTest do
   use ExUnit.Case
   import Benchee.Units
 
+  test ".format 123_456_789_012 scales to :billion" do
+    assert scale_count(123_456_789_012) == {123.456789012, :billion}
+  end
+
+  test ".format 12_345_678_901 scales to :billion" do
+    assert scale_count(12_345_678_901) == {12.345678901, :billion}
+  end
+
+  test ".format 1_234_567_890 scales to :billion" do
+    assert scale_count(1_234_567_890) == {1.23456789, :billion}
+  end
+
   test ".format 123_456_789 scales to :million" do
     assert scale_count(123_456_789) == {123.456789, :million}
   end
