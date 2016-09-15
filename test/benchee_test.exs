@@ -155,7 +155,7 @@ defmodule BencheeTest do
     assert output =~ "Formatter two"
   end
 
-  @rough_10_milli_s "(9\\d{3}|10\\d{3}|11\\d{3})"
+  @rough_10_milli_s "((9|10|11|12)\\d{3})"
   test "formatters have full access to the suite data" do
     output = capture_io fn ->
       Benchee.run(%{
