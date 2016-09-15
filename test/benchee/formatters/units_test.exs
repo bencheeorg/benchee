@@ -69,4 +69,40 @@ defmodule Benchee.Formatters.UnitsTest do
   test ".format_count(1.234)" do
     assert format_count(1.234) == "1.23"
   end
+
+  test ".format_duration(98.7654321)" do
+    assert format_duration(98.7654321) == "98.77μs"
+  end
+
+  test ".format_duration(987.654321)" do
+    assert format_duration(987.654321) == "987.65μs"
+  end
+
+  test ".format_duration(9_876.54321)" do
+    assert format_duration(9_876.54321) == "9.88ms"
+  end
+
+  test ".format_duration(98_765.4321)" do
+    assert format_duration(98_765.4321) == "98.77ms"
+  end
+
+  test ".format_duration(987_654.321)" do
+    assert format_duration(987_654.321) == "987.65ms"
+  end
+
+  test ".format_duration(9_876_543.21)" do
+    assert format_duration(9_876_543.21) == "9.88s"
+  end
+
+  test ".format_duration(98_765_432.19)" do
+    assert format_duration(98_765_432.19) == "1.65m"
+  end
+
+  test ".format_duration(987_654_321.9876)" do
+    assert format_duration(987_654_321.9876) == "16.46m"
+  end
+
+  test ".format_duration(9_876_543_219.8765)" do
+    assert format_duration(9_876_543_219.8765) == "2.74h"
+  end
 end
