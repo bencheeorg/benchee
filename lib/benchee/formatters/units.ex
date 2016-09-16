@@ -7,7 +7,7 @@ defmodule Benchee.Units do
   """
 
   defmodule Count do
-    alias Benchee.Units.{Format, Best}
+    alias Benchee.Units.Best
 
     @one_billion 1_000_000_000
     @one_million 1_000_000
@@ -27,30 +27,25 @@ defmodule Benchee.Units do
 
     @spec format(number) :: String.t
     def format(count) do
-      Benchee.Units.format(count, __MODULE__)
+      Benchee.Units.Common.format(count, __MODULE__)
     end
 
     def best(list, opts \\ [strategy: :best])
     def best(list, opts) do
-      Best.unit(list, Keyword.get(opts, :strategy, :best), __MODULE__)
+      Best.unit(list, __MODULE__, opts)
     end
 
     def magnitude(unit) do
-      Benchee.Units.magnitude(@units, unit)
+      Benchee.Units.Common.magnitude(@units, unit)
     end
 
     def label(unit) do
-      Benchee.Units.label(@units, unit)
-    end
-
-    def scale_unit(count) do
-      {_, unit} = scale(count)
-      unit
+      Benchee.Units.Common.label(@units, unit)
     end
   end
 
   defmodule Duration do
-    alias Benchee.Units.{Format, Best}
+    alias Benchee.Units.Best
 
     @microseconds_per_millisecond 1000
     @milliseconds_per_second 1000
@@ -76,32 +71,28 @@ defmodule Benchee.Units do
 
     @spec format(number) :: String.t
     def format(count) do
-      Benchee.Units.format(count, __MODULE__)
+      Benchee.Units.Common.format(count, __MODULE__)
     end
 
     def best(list, opts \\ [strategy: :best])
     def best(list, opts) do
-      Best.unit(list, Keyword.get(opts, :strategy, :best), __MODULE__)
-    end
-
-    def scale_unit(duration) do
-      {_, unit} = scale(duration)
-      unit
+      Best.unit(list, __MODULE__, opts)
     end
 
     def label(unit) do
-      Benchee.Units.label(@units, unit)
+      Benchee.Units.Common.label(@units, unit)
     end
 
     def magnitude(unit) do
-      Benchee.Units.magnitude(@units, unit)
+      Benchee.Units.Common.magnitude(@units, unit)
     end
-
   end
 
   defmodule Best do
-    def unit(list, strategy, module)do
-      case strategy do
+    @moduledoc false
+
+    def unit(list, module, opts)do
+      case Keyword.get(opts, :strategy, :best) do
         :best -> best_unit(list, module)
         :largest -> largest_unit(list, module)
         :smallest -> smallest_unit(list, module)
@@ -110,7 +101,7 @@ defmodule Benchee.Units do
 
     defp best_unit(list, module) do
       list
-      |> Enum.map(&(module.scale_unit(&1)))
+      |> Enum.map(&(scale_unit(&1, module)))
       |> Enum.reduce(%{}, &totals_by_unit/2)
       |> Enum.into([])
       |> Enum.sort(&(sort_by_total_and_magnitude(&1, &2, module)))
@@ -120,7 +111,7 @@ defmodule Benchee.Units do
 
     defp smallest_unit(list, module) do
       list
-      |> Enum.map(&(module.scale_unit(&1)))
+      |> Enum.map(&(scale_unit(&1, module)))
       |> Enum.sort(&(sort_by_magnitude(&1, &2, module)))
       |> Enum.reverse
       |> hd
@@ -128,9 +119,14 @@ defmodule Benchee.Units do
 
     defp largest_unit(list, module) do
       list
-      |> Enum.map(&(module.scale_unit(&1)))
+      |> Enum.map(&(scale_unit(&1, module)))
       |> Enum.sort(&(sort_by_magnitude(&1, &2, module)))
       |> hd
+    end
+
+    defp scale_unit(count, module) do
+      {_, unit} = module.scale(count)
+      unit
     end
 
     defp totals_by_unit(unit, acc) do
@@ -150,33 +146,36 @@ defmodule Benchee.Units do
     end
   end
 
-  def format({count, unit}, module) do
-    "~.#{float_precision(count)}f~ts"
-    |> :io_lib.format([count, module.label(unit)])
-    |> to_string
-  end
+  defmodule Common do
+    @moduledoc false
 
-  def format(number, module) do
-    number
-    |> module.scale
-    |> format(module)
-  end
+    def format({count, unit}, module) do
+      "~.#{Benchee.Units.float_precision(count)}f~ts"
+      |> :io_lib.format([count, module.label(unit)])
+      |> to_string
+    end
 
-  def magnitude(units, unit) do
-    units
-    |> Map.fetch!(unit)
-    |> Map.fetch!(:magnitude)
-  end
+    def format(number, module) do
+      number
+      |> module.scale
+      |> format(module)
+    end
 
-  def label(units, unit) do
-    units
-    |> Map.fetch!(unit)
-    |> Map.fetch!(:short)
+    def magnitude(units, unit) do
+      units
+      |> Map.fetch!(unit)
+      |> Map.fetch!(:magnitude)
+    end
+
+    def label(units, unit) do
+      units
+      |> Map.fetch!(unit)
+      |> Map.fetch!(:short)
+    end
   end
 
   def float_precision(float) when float < 0.01, do: 5
   def float_precision(float) when float < 0.1, do: 4
   def float_precision(float) when float < 0.2, do: 3
   def float_precision(_float), do: 2
-
 end
