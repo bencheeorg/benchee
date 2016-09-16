@@ -19,6 +19,21 @@ defmodule Benchee.Unit.Duration do
     microsecond: %{ magnitude: 1, short: "μs", long: "Microseconds"}
   }
 
+  @doc """
+  Scales a duration value in microseconds into a larger unit if appropriate
+
+  ## Examples
+
+      iex(3)> Benchee.Unit.Duration.scale(1)
+      {1, :microsecond}
+
+      iex(5)> Benchee.Unit.Duration.scale(1_234)
+      {1.234, :millisecond}
+
+      iex(8)> Benchee.Unit.Duration.scale(11_234_567_890.123)
+      {3.1207133028119443, :hour}
+
+  """
   def scale(duration) when duration >= @microseconds_per_hour, do: {duration / @microseconds_per_hour, :hour}
   def scale(duration) when duration >= @microseconds_per_minute, do: {duration / @microseconds_per_minute, :minute}
   def scale(duration) when duration >= @microseconds_per_second, do: {duration / @microseconds_per_second, :second}

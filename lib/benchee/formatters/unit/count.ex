@@ -14,6 +14,18 @@ defmodule Benchee.Unit.Count do
     one:      %{ magnitude: 1, short: "", long: ""},
   }
 
+  @doc """
+  Scales a value representing a count in ones into a larger unit if appropriate
+
+  ## Examples
+
+      iex> Benchee.Unit.Count.scale(4_321.09)
+      {4.32109, :thousand}
+
+      iex> Benchee.Unit.Count.scale(0.0045)
+      {0.0045, :one}
+
+  """
   def scale(count) when count >= @one_billion,  do: {count / @one_billion, :billion}
   def scale(count) when count >= @one_million,  do: {count / @one_million, :million}
   def scale(count) when count >= @one_thousand, do: {count / @one_thousand, :thousand}

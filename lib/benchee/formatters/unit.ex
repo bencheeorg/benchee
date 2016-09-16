@@ -9,6 +9,11 @@ defmodule Benchee.Unit do
   @type unit :: atom
   @type scaled_number :: {number, unit}
 
+  @doc """
+  Scales a number in a domain's base unit to an equivalent value in the best
+  fit unit. Results are a `{number, unit}` tuple. See `Benchee.Unit.Count` and
+  `Benchee.Unit.Duration` for examples
+  """
   @callback scale(number) :: scaled_number
 
   @callback format(number) :: String.t
