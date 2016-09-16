@@ -6,7 +6,7 @@ defmodule Benchee.Formatters.Console do
 
   alias Benchee.Statistics
 
-  import Benchee.Units, only: [float_precision: 1]
+  import Benchee.Unit, only: [float_precision: 1]
 
   @default_label_width 4 # Length of column header
   @ips_width 13
