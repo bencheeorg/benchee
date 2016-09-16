@@ -6,117 +6,172 @@ defmodule Benchee.Units do
   times.
   """
 
-  @one_billion 1_000_000_000
-  @one_million 1_000_000
-  @one_thousand 1_000
+  defmodule Count do
+    alias Benchee.Units.{Format, Best}
 
-  def scale_count(count) when count >= @one_billion,  do: {count / @one_billion, :billion}
-  def scale_count(count) when count >= @one_million,  do: {count / @one_million, :million}
-  def scale_count(count) when count >= @one_thousand, do: {count / @one_thousand, :thousand}
-  def scale_count(count), do: {count, :one}
+    @one_billion 1_000_000_000
+    @one_million 1_000_000
+    @one_thousand 1_000
 
-  @spec format_count(number) :: String.t
-  def format_count(count) do
-    count
-    |> scale_count
-    |> do_format
-  end
+    @units %{
+      billion:  %{ magnitude: @one_billion, short: "B", long: "Billion"},
+      million:  %{ magnitude: @one_million, short: "M", long: "Million"},
+      thousand: %{ magnitude: @one_thousand, short: "K", long: "Thousand"},
+      one:      %{ magnitude: 1, short: "", long: ""},
+    }
 
-  @microseconds_per_millisecond 1000
-  @milliseconds_per_second 1000
-  @seconds_per_minute 60
-  @minutes_per_hour 60
-  @microseconds_per_second @microseconds_per_millisecond * @milliseconds_per_second
-  @microseconds_per_minute @microseconds_per_second * @seconds_per_minute
-  @microseconds_per_hour @microseconds_per_minute * @minutes_per_hour
+    def scale(count) when count >= @one_billion,  do: {count / @one_billion, :billion}
+    def scale(count) when count >= @one_million,  do: {count / @one_million, :million}
+    def scale(count) when count >= @one_thousand, do: {count / @one_thousand, :thousand}
+    def scale(count), do: {count, :one}
 
-  def scale_duration(duration) when duration >= @microseconds_per_hour, do: {duration / @microseconds_per_hour, :hour}
-  def scale_duration(duration) when duration >= @microseconds_per_minute, do: {duration / @microseconds_per_minute, :minute}
-  def scale_duration(duration) when duration >= @microseconds_per_second, do: {duration / @microseconds_per_second, :second}
-  def scale_duration(duration) when duration >= @microseconds_per_millisecond, do: {duration / @microseconds_per_millisecond, :millisecond}
-  def scale_duration(duration), do: {duration, :microsecond}
+    @spec format(number) :: String.t
+    def format(count) do
+      Benchee.Units.format(count, __MODULE__)
+    end
 
-  @spec format_duration(number) :: String.t
-  def format_duration(duration) do
-    duration
-    |> scale_duration
-    |> do_format
-  end
+    def best(list, opts \\ [strategy: :best])
+    def best(list, opts) do
+      Best.unit(list, Keyword.get(opts, :strategy, :best), __MODULE__)
+    end
 
-  def best_for_counts(list, opts \\ [strategy: :best])
-  def best_for_counts(list, opts) do
-    best_unit(list, Keyword.get(opts, :strategy, :best), &scale_count_unit/1)
-  end
+    def magnitude(unit) do
+      Benchee.Units.magnitude(@units, unit)
+    end
 
-  def best_for_durations(list, opts \\ [strategy: :best])
-  def best_for_durations(list, opts) do
-    strategy = Keyword.get(opts, :strategy, :best)
-    best_unit(list, strategy, &scale_duration_unit/1)
-  end
+    def label(unit) do
+      Benchee.Units.label(@units, unit)
+    end
 
-  defp best_unit(list, strategy, scale_function) do
-    case strategy do
-      :best -> best_unit(list, scale_function)
-      :largest -> largest_unit(list, scale_function)
-      :smallest -> smallest_unit(list, scale_function)
+    def scale_unit(count) do
+      {_, unit} = scale(count)
+      unit
     end
   end
 
-  defp best_unit(list, scale) do
-    list
-    |> Enum.map(scale)
-    |> Enum.reduce(%{}, &totals_by_unit/2)
-    |> Enum.into([])
-    |> Enum.sort(&sort_by_total_and_magnitude/2)
-    |> hd
-    |> elem(0)
+  defmodule Duration do
+    alias Benchee.Units.{Format, Best}
+
+    @microseconds_per_millisecond 1000
+    @milliseconds_per_second 1000
+    @seconds_per_minute 60
+    @minutes_per_hour 60
+    @microseconds_per_second @microseconds_per_millisecond * @milliseconds_per_second
+    @microseconds_per_minute @microseconds_per_second * @seconds_per_minute
+    @microseconds_per_hour @microseconds_per_minute * @minutes_per_hour
+
+    @units %{
+      hour:        %{ magnitude: @microseconds_per_hour, short: "h",  long: "Hours"},
+      minute:      %{ magnitude: @microseconds_per_minute, short: "m",  long: "Minutes"},
+      second:      %{ magnitude: @microseconds_per_second, short: "s",  long: "Seconds"},
+      millisecond: %{ magnitude: @microseconds_per_millisecond, short: "ms", long: "Milliseconds"},
+      microsecond: %{ magnitude: 1, short: "μs", long: "Microseconds"}
+    }
+
+    def scale(duration) when duration >= @microseconds_per_hour, do: {duration / @microseconds_per_hour, :hour}
+    def scale(duration) when duration >= @microseconds_per_minute, do: {duration / @microseconds_per_minute, :minute}
+    def scale(duration) when duration >= @microseconds_per_second, do: {duration / @microseconds_per_second, :second}
+    def scale(duration) when duration >= @microseconds_per_millisecond, do: {duration / @microseconds_per_millisecond, :millisecond}
+    def scale(duration), do: {duration, :microsecond}
+
+    @spec format(number) :: String.t
+    def format(count) do
+      Benchee.Units.format(count, __MODULE__)
+    end
+
+    def best(list, opts \\ [strategy: :best])
+    def best(list, opts) do
+      Best.unit(list, Keyword.get(opts, :strategy, :best), __MODULE__)
+    end
+
+    def scale_unit(duration) do
+      {_, unit} = scale(duration)
+      unit
+    end
+
+    def label(unit) do
+      Benchee.Units.label(@units, unit)
+    end
+
+    def magnitude(unit) do
+      Benchee.Units.magnitude(@units, unit)
+    end
+
   end
 
-  defp smallest_unit(list, scale) do
-    list
-    |> Enum.map(scale)
-    |> Enum.sort(&sort_by_magnitude/2)
-    |> Enum.reverse
-    |> hd
+  defmodule Best do
+    def unit(list, strategy, module)do
+      case strategy do
+        :best -> best_unit(list, module)
+        :largest -> largest_unit(list, module)
+        :smallest -> smallest_unit(list, module)
+      end
+    end
+
+    defp best_unit(list, module) do
+      list
+      |> Enum.map(&(module.scale_unit(&1)))
+      |> Enum.reduce(%{}, &totals_by_unit/2)
+      |> Enum.into([])
+      |> Enum.sort(&(sort_by_total_and_magnitude(&1, &2, module)))
+      |> hd
+      |> elem(0)
+    end
+
+    defp smallest_unit(list, module) do
+      list
+      |> Enum.map(&(module.scale_unit(&1)))
+      |> Enum.sort(&(sort_by_magnitude(&1, &2, module)))
+      |> Enum.reverse
+      |> hd
+    end
+
+    defp largest_unit(list, module) do
+      list
+      |> Enum.map(&(module.scale_unit(&1)))
+      |> Enum.sort(&(sort_by_magnitude(&1, &2, module)))
+      |> hd
+    end
+
+    defp totals_by_unit(unit, acc) do
+      count = Map.get(acc, unit, 0)
+      Map.put(acc, unit, count + 1)
+    end
+
+    defp sort_by_total_and_magnitude({units_a, total}, {units_b, total}, module) do
+      sort_by_magnitude(units_a, units_b, module)
+    end
+    defp sort_by_total_and_magnitude({_, total_a}, {_, total_b}, _module) do
+      total_a > total_b
+    end
+
+    defp sort_by_magnitude(a, b, module) do
+      module.magnitude(a) > module.magnitude(b)
+    end
   end
 
-  defp largest_unit(list, scale) do
-    list
-    |> Enum.map(scale)
-    |> Enum.sort(&sort_by_magnitude/2)
-    |> hd
-  end
-
-  defp scale_count_unit(count) do
-    {_, unit} = scale_count(count)
-    unit
-  end
-
-  defp scale_duration_unit(duration) do
-    {_, unit} = scale_duration(duration)
-    unit
-  end
-
-  defp totals_by_unit(unit, acc) do
-    count = Map.get(acc, unit, 0)
-    Map.put(acc, unit, count + 1)
-  end
-
-  defp sort_by_total_and_magnitude({units_a, total}, {units_b, total}) do
-    sort_by_magnitude(units_a, units_b)
-  end
-  defp sort_by_total_and_magnitude({_, total_a}, {_, total_b}) do
-    total_a > total_b
-  end
-
-  defp sort_by_magnitude(a, b) do
-    magnitude(a) > magnitude(b)
-  end
-
-  defp do_format({count, unit}) do
+  def format({count, unit}, module) do
     "~.#{float_precision(count)}f~ts"
-    |> :io_lib.format([count, unit_label(unit)])
+    |> :io_lib.format([count, module.label(unit)])
     |> to_string
+  end
+
+  def format(number, module) do
+    number
+    |> module.scale
+    |> format(module)
+  end
+
+  def magnitude(units, unit) do
+    units
+    |> Map.fetch!(unit)
+    |> Map.fetch!(:magnitude)
+  end
+
+  def label(units, unit) do
+    units
+    |> Map.fetch!(unit)
+    |> Map.fetch!(:short)
   end
 
   def float_precision(float) when float < 0.01, do: 5
@@ -124,28 +179,4 @@ defmodule Benchee.Units do
   def float_precision(float) when float < 0.2, do: 3
   def float_precision(_float), do: 2
 
-  @units %{
-    billion:  %{ magnitude: @one_billion, short: "B", long: "Billion"},
-    million:  %{ magnitude: @one_million, short: "M", long: "Million"},
-    thousand: %{ magnitude: @one_thousand, short: "K", long: "Thousand"},
-    one:      %{ magnitude: 1, short: "", long: ""},
-
-    hour:        %{ magnitude: @microseconds_per_hour, short: "h",  long: "Hours"},
-    minute:      %{ magnitude: @microseconds_per_minute, short: "m",  long: "Minutes"},
-    second:      %{ magnitude: @microseconds_per_second, short: "s",  long: "Seconds"},
-    millisecond: %{ magnitude: @microseconds_per_millisecond, short: "ms", long: "Milliseconds"},
-    microsecond: %{ magnitude: 1, short: "μs", long: "Microseconds"}
-  }
-
-  defp magnitude(unit) do
-    @units
-    |> Map.fetch!(unit)
-    |> Map.fetch!(:magnitude)
-  end
-
-  def unit_label(unit) do
-    @units
-    |> Map.fetch!(unit)
-    |> Map.fetch!(:short)
-  end
 end
