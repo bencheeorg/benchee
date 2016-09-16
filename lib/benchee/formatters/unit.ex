@@ -9,6 +9,10 @@ defmodule Benchee.Unit do
   @type unit :: atom
   @type scaled_number :: {number, unit}
 
+  # In 1.3, this could be declared as `keyword`, but use a custom type so it
+  # will also compile in 1.2
+  @type options ::[{atom, atom}]
+
   @doc """
   Scales a number in a domain's base unit to an equivalent value in the best
   fit unit. Results are a `{number, unit}` tuple. See `Benchee.Unit.Count` and
@@ -18,7 +22,7 @@ defmodule Benchee.Unit do
 
   @callback format(number) :: String.t
 
-  @callback best(list, keyword) :: unit
+  @callback best(list, options) :: unit
 
   @callback label(unit) :: String.t
 
