@@ -159,4 +159,22 @@ defmodule Benchee.Formatters.UnitsTest do
       assert best_for_counts(list, strategy: :largest) == :thousand
     end
   end
+
+  describe "Best unit for durations [1, 200, 3_000, 4_000_000, 55_000_000_000]" do
+    setup do
+      {:ok, list: [1, 200, 3_000, 4_000, 500_000, 6_000_000, 77_000_000_000]}
+    end
+
+    test ".best_for_durations", %{list: list} do
+      assert best_for_durations(list) == :millisecond
+    end
+
+    test ".best_for_durations, strategy: :smallest", %{list: list} do
+      assert best_for_durations(list, strategy: :smallest) == :microsecond
+    end
+
+    test ".best_for_durations, strategy: :largest", %{list: list} do
+      assert best_for_durations(list, strategy: :largest) == :hour
+    end
+  end
 end

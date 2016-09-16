@@ -45,16 +45,26 @@ defmodule Benchee.Units do
 
   def best_for_counts(list, opts \\ [strategy: :best])
   def best_for_counts(list, opts) do
-    case Keyword.get(opts, :strategy, :best) do
-      :best -> best_unit(list)
-      :largest -> largest_unit(list)
-      :smallest -> smallest_unit(list)
+    best_unit(list, Keyword.get(opts, :strategy, :best), &scale_count_unit/1)
+  end
+
+  def best_for_durations(list, opts \\ [strategy: :best])
+  def best_for_durations(list, opts) do
+    strategy = Keyword.get(opts, :strategy, :best)
+    best_unit(list, strategy, &scale_duration_unit/1)
+  end
+
+  defp best_unit(list, strategy, scale_function) do
+    case strategy do
+      :best -> best_unit(list, scale_function)
+      :largest -> largest_unit(list, scale_function)
+      :smallest -> smallest_unit(list, scale_function)
     end
   end
 
-  def best_unit(list) do
+  defp best_unit(list, scale) do
     list
-    |> Enum.map(&scaled_unit/1)
+    |> Enum.map(scale)
     |> Enum.reduce(%{}, &totals_by_unit/2)
     |> Enum.into([])
     |> Enum.sort(&sort_by_total_and_magnitude/2)
@@ -62,23 +72,28 @@ defmodule Benchee.Units do
     |> elem(0)
   end
 
-  defp smallest_unit(list) do
+  defp smallest_unit(list, scale) do
     list
-    |> Enum.map(&scaled_unit/1)
+    |> Enum.map(scale)
     |> Enum.sort(&sort_by_magnitude/2)
     |> Enum.reverse
     |> hd
   end
 
-  defp largest_unit(list) do
+  defp largest_unit(list, scale) do
     list
-    |> Enum.map(&scaled_unit/1)
+    |> Enum.map(scale)
     |> Enum.sort(&sort_by_magnitude/2)
     |> hd
   end
 
-  defp scaled_unit(count) do
+  defp scale_count_unit(count) do
     {_, unit} = scale_count(count)
+    unit
+  end
+
+  defp scale_duration_unit(duration) do
+    {_, unit} = scale_duration(duration)
     unit
   end
 
