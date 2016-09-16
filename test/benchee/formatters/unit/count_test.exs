@@ -71,57 +71,45 @@ defmodule Benchee.Unit.CountTest do
     assert format(1.234) == "1.23"
   end
 
-  describe "Best unit for counts [1, 100, 1_000]" do
-    setup do
-      {:ok, list: [1, 100, 1_000]}
-    end
+  @list_with_mostly_ones [1, 100, 1_000]
 
-    test ".best", %{list: list} do
-      assert best(list) == :one
-    end
-
-    test ".best, strategy: :smallest", %{list: list} do
-      assert best(list, strategy: :smallest) == :one
-    end
-
-    test ".best, strategy: :largest", %{list: list} do
-      assert best(list, strategy: :largest) == :thousand
-    end
+  test ".best when list is mostly ones" do
+    assert best(@list_with_mostly_ones) == :one
   end
 
-  describe "Best unit for counts [1, 1_000, 100_000, 1_000_000, 10_000_000, 1_000_000_000]" do
-    setup do
-      {:ok, list: [0.0001, 1, 1_000, 100_000, 1_000_000, 10_000_000, 1_000_000_000]}
-    end
-
-    test ".best", %{list: list} do
-      assert best(list) == :million
-    end
-
-    test ".best, strategy: :smallest", %{list: list} do
-      assert best(list, strategy: :smallest) == :one
-    end
-
-    test ".best, strategy: :largest", %{list: list} do
-      assert best(list, strategy: :largest) == :billion
-    end
+  test ".best when list is mostly ones, strategy: :smallest" do
+    assert best(@list_with_mostly_ones, strategy: :smallest) == :one
   end
 
-  describe "Best unit for counts [1_000, 2_000, 30_000]" do
-    setup do
-      {:ok, list: [1_000, 2_000, 30_000, 999]}
-    end
+  test ".best when list is mostly ones, strategy: :largest" do
+    assert best(@list_with_mostly_ones, strategy: :largest) == :thousand
+  end
 
-    test ".best", %{list: list} do
-      assert best(list) == :thousand
-    end
+  @list_with_thousands_and_millions_tied_for_most [0.0001, 1, 1_000, 100_000, 1_000_000, 10_000_000, 1_000_000_000]
 
-    test ".best, strategy: :smallest", %{list: list} do
-      assert best(list, strategy: :smallest) == :one
-    end
+  test ".best when list has thousands and millions tied for most, billions highest" do
+    assert best(@list_with_thousands_and_millions_tied_for_most) == :million
+  end
 
-    test ".best, strategy: :largest", %{list: list} do
-      assert best(list, strategy: :largest) == :thousand
-    end
+  test ".best when list has thousands and millions tied for most, billions highest, strategy: :smallest" do
+    assert best(@list_with_thousands_and_millions_tied_for_most, strategy: :smallest) == :one
+  end
+
+  test ".best when list has thousands and millions tied for most, billions highest, strategy: :largest" do
+    assert best(@list_with_thousands_and_millions_tied_for_most, strategy: :largest) == :billion
+  end
+
+  @list_with_mostly_thousands [1_000, 2_000, 30_000, 999]
+
+  test ".best when list is mostly thousands" do
+    assert best(@list_with_mostly_thousands) == :thousand
+  end
+
+  test ".best when list is mostly thousands, strategy: :smallest" do
+    assert best(@list_with_mostly_thousands, strategy: :smallest) == :one
+  end
+
+  test ".best when list is mostly thousands, strategy: :largest" do
+    assert best(@list_with_mostly_thousands, strategy: :largest) == :thousand
   end
 end

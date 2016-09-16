@@ -39,21 +39,17 @@ defmodule Benchee.Unit.DurationTest do
     assert format(9_876_543_219.8765) == "2.74h"
   end
 
-  describe "Best unit for durations [1, 200, 3_000, 4_000_000, 55_000_000_000]" do
-    setup do
-      {:ok, list: [1, 200, 3_000, 4_000, 500_000, 6_000_000, 77_000_000_000]}
-    end
+  @list_with_mostly_milliseconds [1, 200, 3_000, 4_000, 500_000, 6_000_000, 77_000_000_000]
 
-    test ".best", %{list: list} do
-      assert best(list) == :millisecond
-    end
+  test ".best when list is mostly milliseconds" do
+    assert best(@list_with_mostly_milliseconds) == :millisecond
+  end
 
-    test ".best, strategy: :smallest", %{list: list} do
-      assert best(list, strategy: :smallest) == :microsecond
-    end
+  test ".best when list is mostly milliseconds, strategy: :smallest" do
+    assert best(@list_with_mostly_milliseconds, strategy: :smallest) == :microsecond
+  end
 
-    test ".best, strategy: :largest", %{list: list} do
-      assert best(list, strategy: :largest) == :hour
-    end
+  test ".best when list is mostly milliseconds, strategy: :largest" do
+    assert best(@list_with_mostly_milliseconds, strategy: :largest) == :hour
   end
 end
