@@ -8,10 +8,10 @@ defmodule Benchee.Unit.Count do
   @one_thousand 1_000
 
   @units %{
-    billion:  %{ magnitude: @one_billion, short: "B", long: "Billion"},
-    million:  %{ magnitude: @one_million, short: "M", long: "Million"},
-    thousand: %{ magnitude: @one_thousand, short: "K", long: "Thousand"},
-    one:      %{ magnitude: 1, short: "", long: ""},
+    billion:  %{magnitude: @one_billion, short: "B", long: "Billion"},
+    million:  %{magnitude: @one_million, short: "M", long: "Million"},
+    thousand: %{magnitude: @one_thousand, short: "K", long: "Thousand"},
+    one:      %{magnitude: 1, short: "", long: ""},
   }
 
   @doc """

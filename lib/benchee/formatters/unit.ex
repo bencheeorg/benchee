@@ -63,12 +63,14 @@ defmodule Benchee.Unit do
 
     def best_unit(list, module, opts) do
       case Keyword.get(opts, :strategy, :best) do
-        :best -> best_unit(list, module)
-        :largest -> largest_unit(list, module)
+        :best     -> best_unit(list, module)
+        :largest  -> largest_unit(list, module)
         :smallest -> smallest_unit(list, module)
       end
     end
 
+    # Finds the most common unit in the list. In case of tie, chooses the
+    # largest of the most common
     defp best_unit(list, module) do
       list
       |> Enum.map(&(scale_unit(&1, module)))
@@ -79,19 +81,18 @@ defmodule Benchee.Unit do
       |> elem(0)
     end
 
+    # Finds the smallest unit in the list
     defp smallest_unit(list, module) do
       list
       |> Enum.map(&(scale_unit(&1, module)))
-      |> Enum.sort(&(sort_by_magnitude(&1, &2, module)))
-      |> Enum.reverse
-      |> hd
+      |> Enum.min_by(&module.magnitude/1)
     end
 
+    # Finds the largest unit in the list
     defp largest_unit(list, module) do
       list
       |> Enum.map(&(scale_unit(&1, module)))
-      |> Enum.sort(&(sort_by_magnitude(&1, &2, module)))
-      |> hd
+      |> Enum.max_by(&module.magnitude/1)
     end
 
     defp scale_unit(count, module) do
@@ -104,15 +105,13 @@ defmodule Benchee.Unit do
       Map.put(acc, unit, count + 1)
     end
 
+    # Sorts two elements first by total, then by magnitude of the unit in case
+    # of tie
     defp sort_by_total_and_magnitude({units_a, total}, {units_b, total}, module) do
-      sort_by_magnitude(units_a, units_b, module)
+      module.magnitude(units_a) > module.magnitude(units_b)
     end
     defp sort_by_total_and_magnitude({_, total_a}, {_, total_b}, _module) do
       total_a > total_b
-    end
-
-    defp sort_by_magnitude(a, b, module) do
-      module.magnitude(a) > module.magnitude(b)
     end
   end
 end

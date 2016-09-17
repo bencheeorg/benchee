@@ -12,11 +12,11 @@ defmodule Benchee.Unit.Duration do
   @microseconds_per_hour @microseconds_per_minute * @minutes_per_hour
 
   @units %{
-    hour:        %{ magnitude: @microseconds_per_hour, short: "h",  long: "Hours"},
-    minute:      %{ magnitude: @microseconds_per_minute, short: "m",  long: "Minutes"},
-    second:      %{ magnitude: @microseconds_per_second, short: "s",  long: "Seconds"},
-    millisecond: %{ magnitude: @microseconds_per_millisecond, short: "ms", long: "Milliseconds"},
-    microsecond: %{ magnitude: 1, short: "μs", long: "Microseconds"}
+    hour:        %{magnitude: @microseconds_per_hour, short: "h",  long: "Hours"},
+    minute:      %{magnitude: @microseconds_per_minute, short: "m",  long: "Minutes"},
+    second:      %{magnitude: @microseconds_per_second, short: "s",  long: "Seconds"},
+    millisecond: %{magnitude: @microseconds_per_millisecond, short: "ms", long: "Milliseconds"},
+    microsecond: %{magnitude: 1, short: "μs", long: "Microseconds"}
   }
 
   @doc """
