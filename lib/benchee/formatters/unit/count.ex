@@ -90,4 +90,6 @@ defmodule Benchee.Unit.Count do
   def label(unit) do
     Common.label(@units, unit)
   end
+
+  def separator, do: " "
 end

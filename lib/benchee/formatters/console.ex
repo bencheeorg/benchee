@@ -100,11 +100,8 @@ defmodule Benchee.Formatters.Console do
     Count.format(Count.scale(ips, unit))
   end
 
-  defp run_time_out(average, _unit) do
-    # scaled_average = Duration.scale(average, unit)
-    "~.#{float_precision(average)}f~ts"
-    |> :io_lib.format([average, " μs"])
-    |> to_string
+  defp run_time_out(average, unit) do
+    Duration.format(Duration.scale(average, unit))
   end
 
   defp deviation_out(std_dev_ratio) do

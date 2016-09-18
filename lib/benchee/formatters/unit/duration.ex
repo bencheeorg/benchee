@@ -121,4 +121,6 @@ defmodule Benchee.Unit.Duration do
   def magnitude(unit) do
     Common.magnitude(@units, unit)
   end
+
+  def separator, do: " "
 end

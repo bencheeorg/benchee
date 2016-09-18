@@ -56,11 +56,11 @@ defmodule Benchee.Unit.CountTest do
   end
 
   test ".format(1_000_000)" do
-    assert format(1_000_000) == "1.00M"
+    assert format(1_000_000) == "1.00 M"
   end
 
   test ".format(1_000.1234)" do
-    assert format(1_000.1234) == "1.00K"
+    assert format(1_000.1234) == "1.00 K"
   end
 
   test ".format(123.4)" do
