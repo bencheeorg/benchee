@@ -176,7 +176,8 @@ defmodule Benchee.Benchmark do
   end
   defp do_benchmark(finish_time, function, run_times, n, _now) do
     run_time = measure_call(function, n)
-    do_benchmark(finish_time, function, [run_time | run_times], n, current_time())
+    updated_run_times = [run_time | run_times]
+    do_benchmark(finish_time, function, updated_run_times, n, current_time())
   end
 
   defp measure_call(function, n \\ 1)

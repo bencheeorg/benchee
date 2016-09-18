@@ -16,11 +16,31 @@ defmodule Benchee.Unit.Duration do
   @microseconds_per_hour @microseconds_per_minute * @minutes_per_hour
 
   @units %{
-    hour:        %{magnitude: @microseconds_per_hour, short: "h",  long: "Hours"},
-    minute:      %{magnitude: @microseconds_per_minute, short: "m",  long: "Minutes"},
-    second:      %{magnitude: @microseconds_per_second, short: "s",  long: "Seconds"},
-    millisecond: %{magnitude: @microseconds_per_millisecond, short: "ms", long: "Milliseconds"},
-    microsecond: %{magnitude: 1, short: "μs", long: "Microseconds"}
+    hour:        %{
+                    magnitude: @microseconds_per_hour,
+                    short:     "h",
+                    long:      "Hours"
+                  },
+    minute:      %{
+                    magnitude: @microseconds_per_minute,
+                    short:     "m",
+                    long: "Minutes"
+                  },
+    second:      %{
+                    magnitude: @microseconds_per_second,
+                    short:     "s",
+                    long:      "Seconds"
+                  },
+    millisecond: %{
+                    magnitude: @microseconds_per_millisecond,
+                    short:     "ms",
+                    long:      "Milliseconds"
+                  },
+    microsecond: %{
+                    magnitude: 1,
+                    short:     "μs",
+                    long: "Microseconds"
+                  }
   }
 
   @doc """
@@ -38,10 +58,18 @@ defmodule Benchee.Unit.Duration do
       {3.1207133028119443, :hour}
 
   """
-  def scale(duration) when duration >= @microseconds_per_hour, do: {duration / @microseconds_per_hour, :hour}
-  def scale(duration) when duration >= @microseconds_per_minute, do: {duration / @microseconds_per_minute, :minute}
-  def scale(duration) when duration >= @microseconds_per_second, do: {duration / @microseconds_per_second, :second}
-  def scale(duration) when duration >= @microseconds_per_millisecond, do: {duration / @microseconds_per_millisecond, :millisecond}
+  def scale(duration) when duration >= @microseconds_per_hour do
+    {duration / @microseconds_per_hour, :hour}
+  end
+  def scale(duration) when duration >= @microseconds_per_minute do
+    {duration / @microseconds_per_minute, :minute}
+  end
+  def scale(duration) when duration >= @microseconds_per_second do
+    {duration / @microseconds_per_second, :second}
+  end
+  def scale(duration) when duration >= @microseconds_per_millisecond do
+    {duration / @microseconds_per_millisecond, :millisecond}
+  end
   def scale(duration), do: {duration, :microsecond}
 
   def format(count) do
