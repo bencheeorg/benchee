@@ -1,6 +1,10 @@
 defmodule Benchee.Unit.Duration do
   alias Benchee.Unit.Common
 
+  @moduledoc """
+  Unit scaling for duration converting from microseconds to minutes and others.
+  """
+
   @behaviour Benchee.Unit
 
   @microseconds_per_millisecond 1000

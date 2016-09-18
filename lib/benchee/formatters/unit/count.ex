@@ -1,6 +1,10 @@
 defmodule Benchee.Unit.Count do
   alias Benchee.Unit.Common
 
+  @moduledoc """
+  Unit scaling for counts, such that 1000000 can be converted to 1 Million.
+  """
+
   @behaviour Benchee.Unit
 
   @one_billion 1_000_000_000
