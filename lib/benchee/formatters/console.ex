@@ -6,6 +6,8 @@ defmodule Benchee.Formatters.Console do
 
   alias Benchee.Statistics
 
+  import Benchee.Unit, only: [float_precision: 1]
+
   @default_label_width 4 # Length of column header
   @ips_width 13
   @average_width 15
@@ -82,11 +84,6 @@ defmodule Benchee.Formatters.Console do
     |> :io_lib.format([average, " μs"])
     |> to_string
   end
-
-  defp float_precision(float) when float < 0.01, do: 5
-  defp float_precision(float) when float < 0.1, do: 4
-  defp float_precision(float) when float < 0.2, do: 3
-  defp float_precision(_float), do: 2
 
   defp deviation_out(std_dev_ratio) do
     "(~ts~.2f%)"
