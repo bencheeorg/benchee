@@ -179,13 +179,15 @@ defmodule BencheeTest do
     assert output =~ "Custom value"
   end
 
+  @slower_regex "\\s+- \\d\\.\\d+x slower"
   defp readme_sample_asserts(output) do
-    assert Regex.match?(@header_regex, output)
-    assert Regex.match?(body_regex("flat_map"), output)
-    assert Regex.match?(body_regex("map.flatten"), output)
-    assert Regex.match?(~r/Comparison/, output)
-    assert Regex.match?(~r/^map.flatten\s+\d+\.\d+$/m, output)
-    assert Regex.match?(~r/^flat_map\s+\d+\.\d+\s+- \d\.\d+x slower$/m, output)
+    assert output =~ @header_regex
+    assert output =~ body_regex("flat_map")
+    assert output =~ body_regex("map.flatten")
+    assert output =~ ~r/Comparison/, output
+    assert output =~ ~r/^map.flatten\s+\d+\.\d+(#{@slower_regex})?$/m
+    assert output =~ ~r/^flat_map\s+\d+\.\d+(#{@slower_regex})?$/m
+    assert output =~ ~r/#{@slower_regex}/m
 
     refute Regex.match?(~r/fast/i, output)
   end
