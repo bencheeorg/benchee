@@ -181,7 +181,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     assert result =~ "11.00 ms"
     assert result =~ "12.00 K"
     assert result =~ "13000"
-    assert result =~ "140.00 ms"
+    assert result =~ "140.00"
   end
 
   test ".format doesn't end in an empty line with multiple results" do
@@ -203,10 +203,15 @@ defmodule Benchee.Formatters.ConsoleTest do
     # add 13 characters for the ips column, and an extra space between the columns
     expected_width = expected_width + 14
     n = Regex.escape name
-    regex = Regex.compile! "(#{n} +([0-9\.]+|ips))( |$)"
+    regex = Regex.compile! "(#{n} +([0-9\.]+( [[:alpha:]]+)?|ips))( |$)"
     assert Regex.match? regex, string
-    assert expected_width == Regex.run(regex, string, capture: :all_but_first)
-                             |> hd
-                             |> String.length
+    [column | _] = Regex.run(regex, string, capture: :all_but_first)
+    column_width = String.length(column)
+
+    assert expected_width == column_width, """
+Expected column width of #{expected_width}, got #{column_width}
+line:   #{inspect String.trim(string)}
+column: #{inspect column}
+"""
   end
 end
