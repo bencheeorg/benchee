@@ -73,10 +73,10 @@ defmodule Benchee.Unit do
     # largest of the most common
     defp best_unit(list, module) do
       list
-      |> Enum.map(&(scale_unit(&1, module)))
-      |> Enum.reduce(%{}, &totals_by_unit/2)
-      |> Enum.into([])
-      |> Enum.sort(&(sort_by_total_and_magnitude(&1, &2, module)))
+      |> Enum.map(fn n -> scale_unit(n, module) end)
+      |> Enum.group_by(fn unit -> unit end)
+      |> Enum.map(fn {unit, occurrences} -> {unit, length(occurrences)} end)
+      |> Enum.sort(fn unit, freq -> by_frequency_and_magnitude(unit, freq, module) end)
       |> hd
       |> elem(0)
     end
@@ -84,14 +84,14 @@ defmodule Benchee.Unit do
     # Finds the smallest unit in the list
     defp smallest_unit(list, module) do
       list
-      |> Enum.map(&(scale_unit(&1, module)))
+      |> Enum.map(fn n -> scale_unit(n, module) end)
       |> Enum.min_by(&module.magnitude/1)
     end
 
     # Finds the largest unit in the list
     defp largest_unit(list, module) do
       list
-      |> Enum.map(&(scale_unit(&1, module)))
+      |> Enum.map(fn n -> scale_unit(n, module) end)
       |> Enum.max_by(&module.magnitude/1)
     end
 
@@ -100,18 +100,13 @@ defmodule Benchee.Unit do
       unit
     end
 
-    defp totals_by_unit(unit, acc) do
-      count = Map.get(acc, unit, 0)
-      Map.put(acc, unit, count + 1)
-    end
-
     # Sorts two elements first by total, then by magnitude of the unit in case
     # of tie
-    defp sort_by_total_and_magnitude({units_a, total}, {units_b, total}, module) do
-      module.magnitude(units_a) > module.magnitude(units_b)
+    defp by_frequency_and_magnitude({unit_a, frequency}, {unit_b, frequency}, module) do
+      module.magnitude(unit_a) > module.magnitude(unit_b)
     end
-    defp sort_by_total_and_magnitude({_, total_a}, {_, total_b}, _module) do
-      total_a > total_b
+    defp by_frequency_and_magnitude({_, frequency_a}, {_, frequency_b}, _module) do
+      frequency_a > frequency_b
     end
   end
 end
