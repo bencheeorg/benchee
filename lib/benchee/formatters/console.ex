@@ -5,6 +5,7 @@ defmodule Benchee.Formatters.Console do
   """
 
   alias Benchee.Statistics
+  alias Benchee.Unit.{Count, Duration}
 
   import Benchee.Unit, only: [float_precision: 1]
 
@@ -33,7 +34,7 @@ defmodule Benchee.Formatters.Console do
   iex> jobs = %{"My Job" => %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1, median: 190.0}}
   iex> Benchee.Formatters.Console.format(%{statistics: jobs, config: %{print: %{comparison: false}}})
   ["\nName             ips        average    deviation         median\n",
-  "My Job       5000.00      200.00 μs    (±10.00%)      190.00 μs"]
+  "My Job       5.00K      200.00 μs    (±10.00%)      190.00 μs"]
 
   ```
 
@@ -63,23 +64,44 @@ defmodule Benchee.Formatters.Console do
   end
 
   defp job_reports(jobs, label_width) do
-    Enum.map(jobs, fn(job) -> format_job job, label_width end)
+    units = units(jobs)
+    Enum.map(jobs, fn(job) -> format_job job, units, label_width end)
   end
+
+  defp units(jobs) do
+    collected_values = jobs
+    |> Enum.flat_map(fn({_name, job}) -> Map.to_list(job) end)
+    |> Enum.group_by(fn({key, _value}) -> key end, fn({_key, value}) -> value end)
+
+    %{
+      run_time: Duration.best(collected_values.average),
+      ips:      Count.best(collected_values.ips),
+    }
+  end
+
 
   defp format_job({name, %{average:       average,
                            ips:           ips,
                            std_dev_ratio: std_dev_ratio,
                            median:        median}
+                         },
+                         %{run_time:      run_time_unit,
+                           ips:           ips_unit,
                          }, label_width) do
-    "~*s~*.2f~*ts~*ts~*ts\n"
-    |> :io_lib.format([-label_width, name, @ips_width, ips,
-                       @average_width, run_time_out(average),
+    "~*s~*ts~*ts~*ts~*ts\n"
+    |> :io_lib.format([-label_width, name, @ips_width, ips_out(ips, ips_unit),
+                       @average_width, run_time_out(average, run_time_unit),
                        @deviation_width, deviation_out(std_dev_ratio),
-                       @median_width, run_time_out(median)])
+                       @median_width, run_time_out(median, run_time_unit)])
     |> to_string
   end
 
-  defp run_time_out(average) do
+  defp ips_out(ips, unit) do
+    Count.format(Count.scale(ips, unit))
+  end
+
+  defp run_time_out(average, _unit) do
+    # scaled_average = Duration.scale(average, unit)
     "~.#{float_precision(average)}f~ts"
     |> :io_lib.format([average, " μs"])
     |> to_string

@@ -48,29 +48,62 @@ defmodule Benchee.Unit.Duration do
 
   ## Examples
 
-      iex(3)> Benchee.Unit.Duration.scale(1)
+      iex> Benchee.Unit.Duration.scale(1)
       {1, :microsecond}
 
-      iex(5)> Benchee.Unit.Duration.scale(1_234)
+      iex> Benchee.Unit.Duration.scale(1_234)
       {1.234, :millisecond}
 
-      iex(8)> Benchee.Unit.Duration.scale(11_234_567_890.123)
+      iex> Benchee.Unit.Duration.scale(11_234_567_890.123)
       {3.1207133028119443, :hour}
 
   """
   def scale(duration) when duration >= @microseconds_per_hour do
-    {duration / @microseconds_per_hour, :hour}
+    scale(duration, :hour)
   end
   def scale(duration) when duration >= @microseconds_per_minute do
-    {duration / @microseconds_per_minute, :minute}
+    scale(duration, :minute)
   end
   def scale(duration) when duration >= @microseconds_per_second do
-    {duration / @microseconds_per_second, :second}
+    scale(duration, :second)
   end
   def scale(duration) when duration >= @microseconds_per_millisecond do
+    scale(duration, :millisecond)
+  end
+  def scale(duration) do
+    scale(duration, :microsecond)
+  end
+
+  @doc """
+  Scales a duration value in microseconds into a specified unit
+
+  ## Examples
+
+    iex(3)> Benchee.Unit.Duration.scale(12345, :microsecond)
+    {12345, :microsecond}
+
+    iex(4)> Benchee.Unit.Duration.scale(12345, :millisecond)
+    {12.345, :millisecond}
+
+    iex(5)> Benchee.Unit.Duration.scale(12345, :minute)
+    {2.0575e-4, :minute}
+
+  """
+  def scale(duration, :hour) do
+    {duration / @microseconds_per_hour, :hour}
+  end
+  def scale(duration, :minute) do
+    {duration / @microseconds_per_minute, :minute}
+  end
+  def scale(duration, :second) do
+    {duration / @microseconds_per_second, :second}
+  end
+  def scale(duration, :millisecond) do
     {duration / @microseconds_per_millisecond, :millisecond}
   end
-  def scale(duration), do: {duration, :microsecond}
+  def scale(duration, :microsecond) do
+    {duration, :microsecond}
+  end
 
   def format(count) do
     Common.format(count, __MODULE__)

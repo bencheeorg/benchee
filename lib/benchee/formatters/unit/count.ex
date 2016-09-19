@@ -30,10 +30,49 @@ defmodule Benchee.Unit.Count do
       {0.0045, :one}
 
   """
-  def scale(count) when count >= @one_billion,  do: {count / @one_billion, :billion}
-  def scale(count) when count >= @one_million,  do: {count / @one_million, :million}
-  def scale(count) when count >= @one_thousand, do: {count / @one_thousand, :thousand}
-  def scale(count), do: {count, :one}
+  def scale(count) when count >= @one_billion do
+    scale(count, :billion)
+  end
+  def scale(count) when count >= @one_million do
+    scale(count, :million)
+  end
+  def scale(count) when count >= @one_thousand do
+    scale(count, :thousand)
+  end
+  def scale(count) do
+    scale(count, :one)
+  end
+
+  @doc """
+  Scales a value representing a count in ones into a specified unit
+
+  ## Examples
+
+    iex> Benchee.Unit.Count.scale(12345, :one)
+    {12345, :one}
+
+    iex> Benchee.Unit.Count.scale(12345, :thousand)
+    {12.345, :thousand}
+
+    iex> Benchee.Unit.Count.scale(12345, :billion)
+    {1.2345e-5, :billion}
+
+    iex> Benchee.Unit.Count.scale(12345, :million)
+    {0.012345, :million}
+
+  """
+  def scale(count, :billion) do
+    {count / @one_billion, :billion}
+  end
+  def scale(count, :million) do
+    {count / @one_million, :million}
+  end
+  def scale(count, :thousand) do
+    {count / @one_thousand, :thousand}
+  end
+  def scale(count, :one) do
+    {count, :one}
+  end
 
   def format(count) do
     Common.format(count, __MODULE__)
