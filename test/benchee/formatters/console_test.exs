@@ -210,7 +210,7 @@ defmodule Benchee.Formatters.ConsoleTest do
 
     assert expected_width == column_width, """
 Expected column width of #{expected_width}, got #{column_width}
-line:   #{inspect String.trim(string)}
+line:   #{inspect String.strip(string)}
 column: #{inspect column}
 """
   end
