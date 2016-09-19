@@ -20,6 +20,13 @@ defmodule Benchee.Unit do
   """
   @callback scale(number) :: scaled_number
 
+  @doc """
+  Scales a number in a domain's base unit to an equivalent value in the
+  specified unit. Results are a `{number, unit}` tuple. See
+  `Benchee.Unit.Count` and `Benchee.Unit.Duration` for examples
+  """
+  @callback scale(number, unit) :: scaled_number
+
   @callback format(number) :: String.t
 
   @callback best(list, options) :: unit
