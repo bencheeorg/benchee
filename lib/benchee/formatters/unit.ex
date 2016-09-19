@@ -41,18 +41,13 @@ defmodule Benchee.Unit do
   """
   @callback separator :: String.t
 
-  def float_precision(float) when float < 0.01, do: 5
-  def float_precision(float) when float < 0.1, do: 4
-  def float_precision(float) when float < 0.2, do: 3
-  def float_precision(_float), do: 2
-
   # Common functions used by unit types
   defmodule Common do
     @moduledoc false
 
     def format({count, unit}, label, separator) do
       separator = separator(label, separator)
-      "~.#{Benchee.Unit.float_precision(count)}f~ts~ts"
+      "~.#{float_precision(count)}f~ts~ts"
       |> :io_lib.format([count, separator, label])
       |> to_string
     end
@@ -134,5 +129,10 @@ defmodule Benchee.Unit do
         _  -> separator
       end
     end
+
+    defp float_precision(float) when float < 0.01, do: 5
+    defp float_precision(float) when float < 0.1, do: 4
+    defp float_precision(float) when float < 0.2, do: 3
+    defp float_precision(_float), do: 2
   end
 end
