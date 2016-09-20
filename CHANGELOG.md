@@ -1,3 +1,11 @@
+# Unreleased
+
+## Features (User Facing)
+
+* Console output now scales units to be more friendly. Examples:
+    * instead of "44556677" ips, you would see "44.56 M"
+    * instead of "44556.77 μs" run time, you would see "44.56 ms"
+
 # 0.4.0 (September 11, 2016)
 
 Focuses on making what benchee print out configurable to make it fit to your preferences :)
