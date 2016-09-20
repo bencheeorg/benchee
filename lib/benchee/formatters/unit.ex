@@ -1,9 +1,9 @@
 defmodule Benchee.Unit do
   @moduledoc """
-  Provides scaling and labeling functions for numbers. Use "count" functions
-  for numbers that represent countable things, such as iterations per second.
-  Use "duration" functions for numbers that represent durations, such as run
-  times.
+  The specification for a `Benchee.Unit`, which describes how to format
+  values in a given domain, for example durations or counts.
+
+  See `Benchee.Unit.Count` and `Benchee.Unit.Duration` for examples
   """
 
   @type unit :: atom
@@ -27,17 +27,34 @@ defmodule Benchee.Unit do
   """
   @callback scale(number, unit) :: scaled_number
 
+  @doc """
+  Formats a number as a string, with a unit label. See `Benchee.Unit.Count`
+  and `Benchee.Unit.Duration` for examples
+  """
   @callback format(number) :: String.t
 
+  @doc """
+  Finds the best fit unit for a list of numbers in a domain's base unit.
+  "Best fit" is the most common unit, or (in case of tie) the largest of the
+  most common units.
+  """
   @callback best(list, options) :: unit
 
+  @doc """
+  The label for a given unit, as a String.  See `Benchee.Unit.Count`
+  and `Benchee.Unit.Duration` for examples
+  """
   @callback label(unit) :: String.t
 
+  @doc """
+  The magnitude of a unit, as a number.  See `Benchee.Unit.Count`
+  and `Benchee.Unit.Duration` for examples
+  """
   @callback magnitude(unit) :: number
 
   @doc """
-  A separator that should appear between a value and a unit label. For example,
-  a space: `5.67 M` or an empty string: `5.67M`
+  A string that appears between a value and a unit label when formatted as a
+  String. For example, a space: `5.67 M` or an empty string: `5.67M`
   """
   @callback separator :: String.t
 
@@ -45,6 +62,9 @@ defmodule Benchee.Unit do
   defmodule Common do
     @moduledoc false
 
+    @doc """
+    Formats a unit value with specified label and separator
+    """
     def format({count, unit}, label, separator) do
       separator = separator(label, separator)
       "~.#{float_precision(count)}f~ts~ts"
@@ -52,6 +72,10 @@ defmodule Benchee.Unit do
       |> to_string
     end
 
+    @doc """
+    Formats a unit value with the label and separator supplied by `module`. The
+    specified module should provide `label/1` and `separator/1` functions
+    """
     def format({count, unit}, module) do
       format({count, unit}, module.label(unit), module.separator)
     end

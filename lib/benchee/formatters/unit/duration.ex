@@ -79,14 +79,14 @@ defmodule Benchee.Unit.Duration do
 
   ## Examples
 
-    iex> Benchee.Unit.Duration.scale(12345, :microsecond)
-    {12345, :microsecond}
+      iex> Benchee.Unit.Duration.scale(12345, :microsecond)
+      {12345, :microsecond}
 
-    iex> Benchee.Unit.Duration.scale(12345, :millisecond)
-    {12.345, :millisecond}
+      iex> Benchee.Unit.Duration.scale(12345, :millisecond)
+      {12.345, :millisecond}
 
-    iex> Benchee.Unit.Duration.scale(12345, :minute)
-    {2.0575e-4, :minute}
+      iex> Benchee.Unit.Duration.scale(12345, :minute)
+      {2.0575e-4, :minute}
 
   """
   def scale(duration, :hour) do
@@ -105,22 +105,80 @@ defmodule Benchee.Unit.Duration do
     {duration, :microsecond}
   end
 
+  @doc """
+  Formats a number as a string, with a unit label
+
+  ## Examples
+
+      iex> Benchee.Unit.Duration.format(45_678.9)
+      "45.68 ms"
+
+      iex> Benchee.Unit.Duration.format(45.6789)
+      "45.68 μs"
+  """
   def format(count) do
     Common.format(count, __MODULE__)
   end
 
+  @doc """
+  Finds the best unit for a list of durations. By default, chooses the most common
+  unit. In case of tie, chooses the largest of the most common units.
+
+  Pass `[strategy: :smallest]` to always return the smallest unit in the list.
+  Pass `[strategy: :largest]` to always return the largest unit in the list.
+
+  ## Examples
+
+      iex> Benchee.Unit.Duration.best([23, 23_000, 34_000, 2_340_000])
+      :millisecond
+
+      iex> Benchee.Unit.Duration.best([23, 23_000, 34_000, 2_340_000, 3_450_000])
+      :second
+
+      iex> Benchee.Unit.Duration.best([23, 23_000, 34_000, 2_340_000], strategy: :smallest)
+      :microsecond
+
+      iex> Benchee.Unit.Duration.best([23, 23_000, 34_000, 2_340_000], strategy: :largest)
+      :second
+  """
   def best(list, opts \\ [strategy: :best])
   def best(list, opts) do
     Common.best_unit(list, __MODULE__, opts)
   end
 
+  @doc """
+  The label for the specified unit, as a string
+
+  ## Examples
+
+      iex> Benchee.Unit.Duration.label(:millisecond)
+      "ms"
+
+      iex> Benchee.Unit.Duration.label(:microsecond)
+      "μs"
+  """
   def label(unit) do
     Common.label(@units, unit)
   end
 
+  @doc """
+  The magnitude of the specified unit, as a number
+
+  ## Examples
+
+      iex> Benchee.Unit.Duration.magnitude(:millisecond)
+      1000
+
+      iex> Benchee.Unit.Duration.magnitude(:microsecond)
+      1
+  """
   def magnitude(unit) do
     Common.magnitude(@units, unit)
   end
 
+  @doc """
+  A string that appears between a value and unit label when formatted. For
+  this module, a space
+  """
   def separator, do: " "
 end
