@@ -181,7 +181,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     assert result =~ "11.00 ms"
     assert result =~ "12.00 K"
     assert result =~ "13000"
-    assert result =~ "140.00"
+    assert result =~ "140.00 ms"
   end
 
   test ".format doesn't end in an empty line with multiple results" do
