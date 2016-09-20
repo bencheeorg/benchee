@@ -23,8 +23,8 @@ defmodule Benchee.Formatters.ConsoleTest do
     assert output =~ ~r/First/
     assert output =~ ~r/Second/
     assert output =~ ~r/200/
-    assert output =~ ~r/5000/
-    assert output =~ ~r/10.+%/
+    assert output =~ ~r/5.00 K/
+    assert output =~ ~r/10.00%/
     assert output =~ ~r/195.5/
   end
 
@@ -97,8 +97,8 @@ defmodule Benchee.Formatters.ConsoleTest do
       Console.format(%{statistics: jobs, config: @config})
 
     assert Regex.match? ~r/Comparison/, comp_header
-    assert Regex.match? ~r/^First\s+10000.00$/m, reference
-    assert Regex.match? ~r/^Second\s+5000.00\s+- 2.00x slower/, slower
+    assert Regex.match? ~r/^First\s+10.00 K$/m, reference
+    assert Regex.match? ~r/^Second\s+5.00 K\s+- 2.00x slower/, slower
   end
 
   test ".format can omit the comparisons" do
@@ -115,8 +115,8 @@ defmodule Benchee.Formatters.ConsoleTest do
                                         config: %{console: %{comparison: false}}})
 
     refute Regex.match? ~r/Comparison/i, output
-    refute Regex.match? ~r/^First\s+10000.00$/m, output
-    refute Regex.match? ~r/^Second\s+5000.00\s+- 2.00x slower/, output
+    refute Regex.match? ~r/^First\s+10.00 K$/m, output
+    refute Regex.match? ~r/^Second\s+5.00 K\s+- 2.00x slower/, output
   end
 
   test ".format adjusts the label width to longest name for comparisons" do
@@ -178,10 +178,10 @@ defmodule Benchee.Formatters.ConsoleTest do
     assert [_, result] = Console.format %{statistics: jobs, config: @config}
 
     refute result =~ ~r/\de\d/
-    assert result =~ "11000"
-    assert result =~ "12000"
+    assert result =~ "11.00 ms"
+    assert result =~ "12.00 K"
     assert result =~ "13000"
-    assert result =~ "14000"
+    assert result =~ "140.00 ms"
   end
 
   test ".format doesn't end in an empty line with multiple results" do
@@ -203,10 +203,15 @@ defmodule Benchee.Formatters.ConsoleTest do
     # add 13 characters for the ips column, and an extra space between the columns
     expected_width = expected_width + 14
     n = Regex.escape name
-    regex = Regex.compile! "(#{n} +([0-9\.]+|ips))( |$)"
+    regex = Regex.compile! "(#{n} +([0-9\.]+( [[:alpha:]]+)?|ips))( |$)"
     assert Regex.match? regex, string
-    assert expected_width == Regex.run(regex, string, capture: :all_but_first)
-                             |> hd
-                             |> String.length
+    [column | _] = Regex.run(regex, string, capture: :all_but_first)
+    column_width = String.length(column)
+
+    assert expected_width == column_width, """
+Expected column width of #{expected_width}, got #{column_width}
+line:   #{inspect String.strip(string)}
+column: #{inspect column}
+"""
   end
 end

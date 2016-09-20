@@ -20,6 +20,13 @@ defmodule Benchee.Unit do
   """
   @callback scale(number) :: scaled_number
 
+  @doc """
+  Scales a number in a domain's base unit to an equivalent value in the
+  specified unit. Results are a `{number, unit}` tuple. See
+  `Benchee.Unit.Count` and `Benchee.Unit.Duration` for examples
+  """
+  @callback scale(number, unit) :: scaled_number
+
   @callback format(number) :: String.t
 
   @callback best(list, options) :: unit
@@ -28,19 +35,25 @@ defmodule Benchee.Unit do
 
   @callback magnitude(unit) :: number
 
-  def float_precision(float) when float < 0.01, do: 5
-  def float_precision(float) when float < 0.1, do: 4
-  def float_precision(float) when float < 0.2, do: 3
-  def float_precision(_float), do: 2
+  @doc """
+  A separator that should appear between a value and a unit label. For example,
+  a space: `5.67 M` or an empty string: `5.67M`
+  """
+  @callback separator :: String.t
 
   # Common functions used by unit types
   defmodule Common do
     @moduledoc false
 
-    def format({count, unit}, module) do
-      "~.#{Benchee.Unit.float_precision(count)}f~ts"
-      |> :io_lib.format([count, module.label(unit)])
+    def format({count, unit}, label, separator) do
+      separator = separator(label, separator)
+      "~.#{float_precision(count)}f~ts~ts"
+      |> :io_lib.format([count, separator, label])
       |> to_string
+    end
+
+    def format({count, unit}, module) do
+      format({count, unit}, module.label(unit), module.separator)
     end
 
     def format(number, module) do
@@ -108,5 +121,18 @@ defmodule Benchee.Unit do
     defp by_frequency_and_magnitude({_, frequency_a}, {_, frequency_b}, _module) do
       frequency_a > frequency_b
     end
+
+    # Returns the separator, or an empty string if there isn't a label
+    defp separator(label, separator) do
+      case label do
+        "" -> ""
+        _  -> separator
+      end
+    end
+
+    defp float_precision(float) when float < 0.01, do: 5
+    defp float_precision(float) when float < 0.1, do: 4
+    defp float_precision(float) when float < 0.2, do: 3
+    defp float_precision(_float), do: 2
   end
 end

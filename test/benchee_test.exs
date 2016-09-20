@@ -155,7 +155,7 @@ defmodule BencheeTest do
     assert output =~ "Formatter two"
   end
 
-  @rough_10_milli_s "((9|10|11|12)\\d{3})"
+  @rough_10_milli_s "((9|10|11|12|13)\\.\\d{2} ms)"
   test "formatters have full access to the suite data" do
     output = capture_io fn ->
       Benchee.run(%{
@@ -164,10 +164,10 @@ defmodule BencheeTest do
         custom:     "Custom value",
         formatters: [
           fn(suite) ->
-            IO.puts "Run time: #{List.last suite.run_times["Sleeps"]}"
+            IO.puts "Run time: #{List.last(suite.run_times["Sleeps"]) |> Benchee.Unit.Duration.format}"
           end,
           fn(suite) ->
-            IO.puts "Average: #{suite.statistics["Sleeps"].average}"
+            IO.puts "Average: #{suite.statistics["Sleeps"].average |> Benchee.Unit.Duration.format}"
           end,
           fn(suite) -> IO.puts suite.config.custom end
         ]
@@ -175,7 +175,7 @@ defmodule BencheeTest do
     end
 
     assert output =~ ~r/Run time: #{@rough_10_milli_s}$/m
-    assert output =~ ~r/Average: #{@rough_10_milli_s}\.\d+$/m
+    assert output =~ ~r/Average: #{@rough_10_milli_s}$/m
     assert output =~ "Custom value"
   end
 
