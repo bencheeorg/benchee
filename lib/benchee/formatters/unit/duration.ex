@@ -79,13 +79,13 @@ defmodule Benchee.Unit.Duration do
 
   ## Examples
 
-    iex(3)> Benchee.Unit.Duration.scale(12345, :microsecond)
+    iex> Benchee.Unit.Duration.scale(12345, :microsecond)
     {12345, :microsecond}
 
-    iex(4)> Benchee.Unit.Duration.scale(12345, :millisecond)
+    iex> Benchee.Unit.Duration.scale(12345, :millisecond)
     {12.345, :millisecond}
 
-    iex(5)> Benchee.Unit.Duration.scale(12345, :minute)
+    iex> Benchee.Unit.Duration.scale(12345, :minute)
     {2.0575e-4, :minute}
 
   """
