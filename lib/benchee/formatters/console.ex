@@ -69,16 +69,17 @@ defmodule Benchee.Formatters.Console do
   defp units(jobs) do
     # Produces a map like
     #   %{run_time: [12345, 15431, 13222], ips: [1, 2, 3]}
-    collected_values = jobs
-    |> Enum.flat_map(fn({_name, job}) -> Map.to_list(job) end)
-    # TODO: Simplify when dropping support for 1.2
-    # For compatibility with Elixir 1.2. In 1.3, the following group-reduce-map
-    # can b replaced by a single call to `group_by/3`
-    #   Enum.group_by(fn({measurement, _}) -> measurement end, fn({_, value}) -> value end)
-    |> Enum.group_by(fn({measurement, _unit}) -> measurement end)
-    |> Enum.reduce(%{}, fn({measurement, occurrences}, acc) ->
-      Map.put(acc, measurement, Enum.map(occurrences, fn({_meas, value}) -> value end))
-    end)
+    collected_values =
+      jobs
+      |> Enum.flat_map(fn({_name, job}) -> Map.to_list(job) end)
+      # TODO: Simplify when dropping support for 1.2
+      # For compatibility with Elixir 1.2. In 1.3, the following group-reduce-map
+      # can b replaced by a single call to `group_by/3`
+      #   Enum.group_by(fn({stat_name, _}) -> stat_name end, fn({_, value}) -> value end)
+      |> Enum.group_by(fn({stat_name, _value}) -> stat_name end)
+      |> Enum.reduce(%{}, fn({stat_name, occurrences}, acc) ->
+        Map.put(acc, stat_name, Enum.map(occurrences, fn({_stat_name, value}) -> value end))
+      end)
 
     %{
       run_time: Duration.best(collected_values.average),
