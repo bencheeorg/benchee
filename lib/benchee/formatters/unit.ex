@@ -58,6 +58,12 @@ defmodule Benchee.Unit do
   """
   @callback separator :: String.t
 
+  @doc """
+  Returns the base_unit in which Benchee takes its measurements, which in
+  general is the smallest supported unit.
+  """
+  @callback base_unit :: unit
+
   # Common functions used by unit types
   defmodule Common do
     @moduledoc false
@@ -103,6 +109,7 @@ defmodule Benchee.Unit do
         :best     -> best_unit(list, module)
         :largest  -> largest_unit(list, module)
         :smallest -> smallest_unit(list, module)
+        :base     -> module.base_unit
       end
     end
 
