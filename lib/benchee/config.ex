@@ -53,7 +53,7 @@ defmodule Benchee.Config do
               fast_warning: true,
               configuration: true
             },
-            console: %{ comparison: true }
+            console: %{ comparison: true, unit_scaling: :best }
           },
         jobs: %{}
       }
@@ -71,12 +71,12 @@ defmodule Benchee.Config do
               fast_warning: true,
               configuration: true
             },
-            console: %{ comparison: true }
+            console: %{ comparison: true, unit_scaling: :best }
           },
         jobs: %{}
       }
 
-      iex> Benchee.init %{parallel: 2, time: 1, warmup: 0.2, formatters: [&IO.puts/2], print: %{fast_warning: false}}
+      iex> Benchee.init %{parallel: 2, time: 1, warmup: 0.2, formatters: [&IO.puts/2], print: %{fast_warning: false}, console: %{unit_scaling: :smallest}}
       %{
         config:
           %{
@@ -89,7 +89,7 @@ defmodule Benchee.Config do
               fast_warning: false,
               configuration: true
             },
-            console: %{ comparison: true }
+            console: %{ comparison: true, unit_scaling: :smallest }
           },
         jobs: %{}
       }
@@ -104,16 +104,18 @@ defmodule Benchee.Config do
                   configuration: true,
                   fast_warning:  true
                 },
-  console:      %{
-                  comparison: true
+    console:    %{
+                  comparison:   true,
+                  unit_scaling: :best
                 }
   }
   @time_keys [:time, :warmup]
   def init(config \\ %{}) do
-    print = print_config config
-    config = convert_time_to_micro_s(Map.merge(@default_config, config))
-    config = %{config | print: print}
-    :ok = :timer.start
+    print   = print_config config
+    console = console_config config
+    config  = convert_time_to_micro_s(Map.merge(@default_config, config))
+    config  = %{config | print: print, console: console}
+    :ok     = :timer.start
     %{config: config, jobs: %{}}
   end
 
@@ -131,5 +133,12 @@ defmodule Benchee.Config do
   end
   defp print_config(_no_print_config) do
     @default_config.print
+  end
+
+  defp console_config(%{console: config}) do
+    Map.merge @default_config.console, config
+  end
+  defp console_config(_no_console_config) do
+    @default_config.console
   end
 end

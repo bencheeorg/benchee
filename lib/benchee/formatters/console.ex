@@ -30,7 +30,7 @@ defmodule Benchee.Formatters.Console do
 
   ```
   iex> jobs = %{ "My Job" =>%{average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0}, "Job 2" => %{average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0}}
-  iex> Benchee.Formatters.Console.format(%{statistics: jobs, config: %{console: %{comparison: false}}})
+  iex> Benchee.Formatters.Console.format(%{statistics: jobs, config: %{console: %{comparison: false, unit_scaling: :best}}})
   ["\nName             ips        average    deviation         median\n",
   "My Job        5.00 K      200.00 μs    ±10.00%      190.00 μs\n",
   "Job 2         2.50 K      400.00 μs    ±20.00%      390.00 μs"]
@@ -40,7 +40,7 @@ defmodule Benchee.Formatters.Console do
   """
   def format(%{statistics: job_stats, config: %{console: config}}) do
     sorted_stats = Statistics.sort(job_stats)
-    units = units(sorted_stats)
+    units = units(sorted_stats, config)
     label_width = label_width job_stats
     [column_descriptors(label_width) | job_reports(sorted_stats, units, label_width)
       ++ comparison_report(sorted_stats, units, label_width, config)]
@@ -67,10 +67,10 @@ defmodule Benchee.Formatters.Console do
     Enum.map(jobs, fn(job) -> format_job job, units, label_width end)
   end
 
-  defp units(jobs) do
+  defp units(jobs, %{unit_scaling: scaling_strategy}) do
     # Produces a map like
     #   %{run_time: [12345, 15431, 13222], ips: [1, 2, 3]}
-    collected_values =
+    measurements =
       jobs
       |> Enum.flat_map(fn({_name, job}) -> Map.to_list(job) end)
       # TODO: Simplify when dropping support for 1.2
@@ -83,8 +83,8 @@ defmodule Benchee.Formatters.Console do
       end)
 
     %{
-      run_time: Duration.best(collected_values.average),
-      ips:      Count.best(collected_values.ips),
+      run_time: Duration.best(measurements.average, strategy: scaling_strategy),
+      ips:      Count.best(measurements.ips, strategy: scaling_strategy),
     }
   end
 
