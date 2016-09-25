@@ -185,8 +185,8 @@ defmodule BencheeTest do
     assert output =~ body_regex("flat_map")
     assert output =~ body_regex("map.flatten")
     assert output =~ ~r/Comparison/, output
-    assert output =~ ~r/^map.flatten\s+\d+\.\d+(#{@slower_regex})?$/m
-    assert output =~ ~r/^flat_map\s+\d+\.\d+(#{@slower_regex})?$/m
+    assert output =~ ~r/^map.flatten\s+\d+\.\d+\s*.?(#{@slower_regex})?$/m
+    assert output =~ ~r/^flat_map\s+\d+\.\d+\s*.?(#{@slower_regex})?$/m
     assert output =~ ~r/#{@slower_regex}/m
 
     refute Regex.match?(~r/fast/i, output)
