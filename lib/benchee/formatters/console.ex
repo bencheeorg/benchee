@@ -29,15 +29,16 @@ defmodule Benchee.Formatters.Console do
   ## Examples
 
   ```
-  iex> jobs = %{"My Job" => %{average: 200.0, ips: 5000.0, std_dev_ratio: 0.1, median: 190.0}}
-  iex> Benchee.Formatters.Console.format(%{statistics: jobs, config: %{print: %{comparison: false}}})
-  ["\nName             ips        average  deviation         median\n",
-  "My Job        5.00 K      200.00 μs    ±10.00%      190.00 μs"]
+  iex> jobs = %{ "My Job" =>%{average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0}, "Job 2" => %{average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0}}
+  iex> Benchee.Formatters.Console.format(%{statistics: jobs, config: %{console: %{comparison: false}}})
+  ["\nName             ips        average    deviation         median\n",
+  "My Job        5.00 K      200.00 μs    ±10.00%      190.00 μs\n",
+  "Job 2         2.50 K      400.00 μs    ±20.00%      390.00 μs"]
 
   ```
 
   """
-  def format(%{statistics: job_stats, config: config}) do
+  def format(%{statistics: job_stats, config: %{console: config}}) do
     sorted_stats = Statistics.sort(job_stats)
     units = units(sorted_stats)
     label_width = label_width job_stats
@@ -120,7 +121,7 @@ defmodule Benchee.Formatters.Console do
   defp comparison_report([_reference], _, _, _config) do
     [] # No need for a comparison when only one benchmark was run
   end
-  defp comparison_report(_, _, _, %{console: %{comparison: false}}) do
+  defp comparison_report(_, _, _, %{comparison: false}) do
     []
   end
   defp comparison_report([reference | other_jobs], units, label_width, _config) do
