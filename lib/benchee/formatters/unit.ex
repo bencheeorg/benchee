@@ -109,7 +109,7 @@ defmodule Benchee.Unit do
         :best     -> best_unit(list, module)
         :largest  -> largest_unit(list, module)
         :smallest -> smallest_unit(list, module)
-        :base     -> module.base_unit
+        :none     -> module.base_unit
       end
     end
 

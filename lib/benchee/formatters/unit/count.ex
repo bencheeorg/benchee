@@ -153,13 +153,13 @@ defmodule Benchee.Unit.Count do
   def separator, do: " "
 
   @doc """
-  Most basically we count unscaled.
+  The raw count, unscaled.
 
   ## Examples
 
       iex> Benchee.Unit.Count.base_unit
       :one
-      
+
   """
   def base_unit, do: :one
 end

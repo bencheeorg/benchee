@@ -5,7 +5,7 @@ list_10k  = 1..10_000    |> Enum.to_list |> Enum.shuffle
 list_100k = 1..100_000   |> Enum.to_list |> Enum.shuffle
 list_1M   = 1..1_000_000 |> Enum.to_list |> Enum.shuffle
 
-# options document in README
+# options documented in README
 Benchee.run %{console: %{unit_scaling: :largest}}, %{
   "10"   => fn -> Enum.sort(list_10) end,
   "100"  => fn -> Enum.sort(list_100) end,
@@ -68,7 +68,7 @@ Benchee.run %{console: %{unit_scaling: :largest}}, %{
 # 1M            3.27 - 1039033.93x slower
 
 
-# With :base scaling
+# With :none scaling
 # Name           ips        average    deviation         median
 # 10      3587943.97        0.28 μs    (±21.22%)        0.27 μs
 # 100      201976.59        4.95 μs    (±14.42%)        4.80 μs
