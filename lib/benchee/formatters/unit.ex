@@ -71,7 +71,7 @@ defmodule Benchee.Unit do
     @doc """
     Formats a unit value with specified label and separator
     """
-    def format({count, unit}, label, separator) do
+    def format({count, _unit}, label, separator) do
       separator = separator(label, separator)
       "~.#{float_precision(count)}f~ts~ts"
       |> :io_lib.format([count, separator, label])
