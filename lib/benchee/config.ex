@@ -34,9 +34,27 @@ defmodule Benchee.Config do
       * `:fast_warning`   - warnings are displayed if functions are executed
       too fast leading to inaccurate measures
     * `console` - options for the built-in console formatter. Like the
-    `print` options they are also enabled by default:
-      * `:comparison` - if the comparison of the different benchmarking jobs
-      (x times slower than) is shown
+    `print` options the boolean options are also enabled by default:
+      * `:comparison`   - if the comparison of the different benchmarking jobs
+      (x times slower than) is shown (true/false)
+      * `:unit_scaling` - which strategy should be used to scale the units in
+      the output. When the documentation says "best fit unit" what is meant is
+      the unit in which the duration/count can be represented so that it is the
+      largest unit that can represent teh value and be at least 1. E.g.
+      1_200_000 will be scalled to `1.2 M` while `800_000` is scaled to
+      `800 K`. Which of all those "best fit" units will be selected to scale
+      all results to that unit is a matter of the strategy. There are four
+      different strategies defaulting to `:best`:
+          * `:best`    - the most frequent best fit unit will be used, a tie
+          will result in the larger unit being selected.
+          * `largest`  - the largest best fit unit will be used (i.e. Thousand
+          and seconds if values are large enough).
+          * `smallest` - the smallest best fit unit will be used (i.e.
+          millisecond and one)
+          * `none`     - no unit scaling will occur, e.g. the units will be the
+          base units microseconds and one (this is equivalent to the behaviour
+          benchee had pre 0.5.0)
+
 
   ## Examples
 
