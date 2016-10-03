@@ -4,7 +4,7 @@ defmodule Benchee.Statistics do
   times and then compute statistics like the average and the standard devaition.
   """
 
-  alias Benchee.{Time, Statistics}
+  alias Benchee.{Statistics, Unit.Duration}
   require Integer
 
   @doc """
@@ -127,7 +127,7 @@ defmodule Benchee.Statistics do
   end
 
   defp iterations_per_second(average_microseconds) do
-    Time.seconds_to_microseconds(1) / average_microseconds
+    Duration.microseconds({1, :second}) / average_microseconds
   end
 
   defp standard_deviation(samples, average, iterations) do

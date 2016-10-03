@@ -105,11 +105,11 @@ defmodule Benchee.Formatters.Console do
   end
 
   defp ips_out(ips, unit) do
-    Count.format(Count.scale(ips, unit))
+    Count.format({Count.scale(ips, unit), unit})
   end
 
   defp run_time_out(average, unit) do
-    Duration.format(Duration.scale(average, unit))
+    Duration.format({Duration.scale(average, unit), unit})
   end
 
   defp deviation_out(std_dev_ratio) do

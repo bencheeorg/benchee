@@ -31,16 +31,21 @@ defmodule Benchee.Unit.Count do
 
   """
   def scale(count) when count >= @one_billion do
-    scale(count, :billion)
+    scale_with_unit(count, :billion)
   end
   def scale(count) when count >= @one_million do
-    scale(count, :million)
+    scale_with_unit(count, :million)
   end
   def scale(count) when count >= @one_thousand do
-    scale(count, :thousand)
+    scale_with_unit(count, :thousand)
   end
   def scale(count) do
-    scale(count, :one)
+    scale_with_unit(count, :one)
+  end
+
+  # Helper function for returning a tuple of {value, unit}
+  defp scale_with_unit(count, unit) do
+    {scale(count, unit), unit}
   end
 
   @doc """
@@ -49,33 +54,34 @@ defmodule Benchee.Unit.Count do
   ## Examples
 
       iex> Benchee.Unit.Count.scale(12345, :one)
-      {12345, :one}
+      12345
 
       iex> Benchee.Unit.Count.scale(12345, :thousand)
-      {12.345, :thousand}
+      12.345
 
       iex> Benchee.Unit.Count.scale(12345, :billion)
-      {1.2345e-5, :billion}
+      1.2345e-5
 
       iex> Benchee.Unit.Count.scale(12345, :million)
-      {0.012345, :million}
+      0.012345
 
   """
   def scale(count, :billion) do
-    {count / @one_billion, :billion}
+    count / @one_billion
   end
   def scale(count, :million) do
-    {count / @one_million, :million}
+    count / @one_million
   end
   def scale(count, :thousand) do
-    {count / @one_thousand, :thousand}
+    count / @one_thousand
   end
   def scale(count, :one) do
-    {count, :one}
+    count
   end
 
   @doc """
-  Formats a number as a string, with a unit label
+  Formats a number as a string, with a unit label. To specify the unit, pass
+  a tuple of `{value, unit_atom}` like `{1_234, :million}`
 
   ## Examples
 
@@ -84,6 +90,9 @@ defmodule Benchee.Unit.Count do
 
       iex> Benchee.Unit.Count.format(45.6789)
       "45.68"
+
+      iex> Benchee.Unit.Count.format({45.6789, :thousand})
+      "45.68 K"
   """
   def format(count) do
     Common.format(count, __MODULE__)

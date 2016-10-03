@@ -6,7 +6,7 @@ defmodule Benchee.Benchmark do
   """
 
   alias Benchee.RepeatN
-  alias Benchee.Time
+  alias Benchee.Unit.Duration
 
   @doc """
   Adds the given function and its associated name to the benchmarking jobs to
@@ -61,8 +61,8 @@ defmodule Benchee.Benchmark do
   defp print_suite_information(jobs, %{parallel: parallel,
                                        time:     time,
                                        warmup:   warmup}) do
-    warmup_seconds = time_precision Time.microseconds_to_seconds(warmup)
-    time_seconds   = time_precision Time.microseconds_to_seconds(time)
+    warmup_seconds = time_precision Duration.scale(warmup, :second)
+    time_seconds   = time_precision Duration.scale(time, :second)
     job_count      = map_size jobs
     total_time     = time_precision(job_count * (warmup_seconds + time_seconds))
 

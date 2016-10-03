@@ -3,7 +3,7 @@ defmodule Benchee.Config do
   Functions to handle the configuration of Benchee, exposes `init` function.
   """
 
-  alias Benchee.Time
+  alias Benchee.Unit.Duration
 
   @doc """
   Returns the initial benchmark configuration for Benchee, composed of defauls
@@ -140,7 +140,7 @@ defmodule Benchee.Config do
   defp convert_time_to_micro_s(config) do
     Enum.reduce @time_keys, config, fn(key, new_config) ->
       {_, new_config} = Map.get_and_update! new_config, key, fn(seconds) ->
-        {seconds, Time.seconds_to_microseconds(seconds)}
+        {seconds, Duration.microseconds({seconds, :second})}
       end
       new_config
     end
