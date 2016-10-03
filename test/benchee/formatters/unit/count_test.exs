@@ -112,4 +112,8 @@ defmodule Benchee.Unit.CountTest do
   test ".best when list is mostly thousands, strategy: :largest" do
     assert best(@list_with_mostly_thousands, strategy: :largest) == :thousand
   end
+
+  test ".best when list is mostly thousands, strategy: :none" do
+    assert best(@list_with_mostly_thousands, strategy: :none) == :one
+  end
 end

@@ -151,4 +151,15 @@ defmodule Benchee.Unit.Count do
   this module, a space
   """
   def separator, do: " "
+
+  @doc """
+  The raw count, unscaled.
+
+  ## Examples
+
+      iex> Benchee.Unit.Count.base_unit
+      :one
+
+  """
+  def base_unit, do: :one
 end

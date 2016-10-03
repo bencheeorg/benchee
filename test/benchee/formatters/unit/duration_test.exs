@@ -52,4 +52,8 @@ defmodule Benchee.Unit.DurationTest do
   test ".best when list is mostly milliseconds, strategy: :largest" do
     assert best(@list_with_mostly_milliseconds, strategy: :largest) == :hour
   end
+
+  test ".best when list is mostly milliseconds, strategy: :none" do
+    assert best(@list_with_mostly_milliseconds, strategy: :none) == :microsecond
+  end
 end

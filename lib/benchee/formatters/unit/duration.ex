@@ -181,4 +181,15 @@ defmodule Benchee.Unit.Duration do
   this module, a space
   """
   def separator, do: " "
+
+  @doc """
+  The most basic unit in which measurements occur, microseconds.
+
+  ## Examples
+
+      iex> Benchee.Unit.Duration.base_unit
+      :microsecond
+
+  """
+  def base_unit, do: :microsecond
 end
