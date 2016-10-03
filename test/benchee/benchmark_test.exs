@@ -72,7 +72,7 @@ defmodule Benchee.BenchmarkTest do
                 jobs:   %{"" => fn -> 0 end}}
       {time, _} = :timer.tc fn -> Benchee.measure(suite) end
 
-      assert_in_delta projected, time, 500,
+      assert_in_delta projected, time, 2_500,
                       "excution took too long #{time} vs. #{projected}"
     end
   end
