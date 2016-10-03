@@ -12,6 +12,10 @@
 
 * The statistics module now computes the `minimum`, `maximum` and `sample_size` (not yet shown in the console formatter)
 
+## Breaking Changes (Plugins)
+
+* The `Benchee.Time`module is gone, if you relied on it for one reason or another it's succeeded by the more powerful `Benchee.Unit.Duration`
+
 # 0.4.0 (September 11, 2016)
 
 Focuses on making what benchee print out configurable to make it fit to your preferences :)
