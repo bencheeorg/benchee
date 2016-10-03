@@ -61,8 +61,8 @@ defmodule Benchee.Benchmark do
   defp print_suite_information(jobs, %{parallel: parallel,
                                        time:     time,
                                        warmup:   warmup}) do
-    warmup_seconds = time_precision(Duration.scale(warmup, :second) |> elem(0))
-    time_seconds   = time_precision(Duration.scale(time, :second) |> elem(0))
+    warmup_seconds = time_precision Duration.scale(warmup, :second)
+    time_seconds   = time_precision Duration.scale(time, :second)
     job_count      = map_size jobs
     total_time     = time_precision(job_count * (warmup_seconds + time_seconds))
 
