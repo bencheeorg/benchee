@@ -20,12 +20,18 @@ defmodule Benchee.StatistcsTest do
     assert_in_delta stats_1.std_dev_ratio, 0.37, 0.01
     assert_in_delta stats_1.ips, 2538, 1
     assert stats_1.median == 430.0
+    assert stats_1.minimum == 170
+    assert stats_1.maximum == 600
+    assert stats_1.sample_size == 5
 
     assert stats_2.average == 14.0
     assert_in_delta stats_2.std_dev, 5.25, 0.01
     assert_in_delta stats_2.std_dev_ratio, 0.37, 0.01
     assert_in_delta stats_2.ips, 71428, 1
     assert stats_2.median == 14.0
+    assert stats_2.minimum == 7
+    assert stats_2.maximum == 23
+    assert stats_2.sample_size == 6
   end
 
   test ".statistics preserves all other keys in the map handed to it" do

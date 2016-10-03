@@ -8,6 +8,10 @@
 * Console output for standard deviation omits the parentheses
 * Scaling of console output can be configured with the 4 different strategies `:best`, `:largest`, `:smallest` and `:none`. Refer to the documentation for their different properties.
 
+## Features (Plugins)
+
+* The statistics module now computes the `minimum`, `maximum` and `sample_size` (not yet shown in the console formatter)
+
 # 0.4.0 (September 11, 2016)
 
 Focuses on making what benchee print out configurable to make it fit to your preferences :)

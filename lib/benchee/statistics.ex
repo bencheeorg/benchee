@@ -24,6 +24,9 @@ defmodule Benchee.Statistics do
       value (or average of the two middle values when the number of times is
       even). More stable than the average and somewhat more likely to be a
       typical you see.
+    * minimum       - the smallest (fastest) run time measured for the job
+    * maximum       - the biggest (slowest) run time measured for the job
+    * sample_size   - the number of run time measurements taken
 
   ## Parameters
 
@@ -43,7 +46,10 @@ defmodule Benchee.Statistics do
             std_dev:       200.0,
             std_dev_ratio: 0.4,
             std_dev_ips:   800.0,
-            median:        450.0
+            median:        450.0,
+            minimum:       200,
+            maximum:       900,
+            sample_size:   8
           }
         },
         run_times: %{"My Job" => [200, 400, 400, 400, 500, 500, 700, 900]}
@@ -74,7 +80,10 @@ defmodule Benchee.Statistics do
         std_dev:       200.0,
         std_dev_ratio: 0.4,
         std_dev_ips:   800.0,
-        median:        450.0}
+        median:        450.0,
+        minimum:       200,
+        maximum:       900,
+        sample_size:   8}
 
   """
   def job_statistics(run_times) do
@@ -86,6 +95,8 @@ defmodule Benchee.Statistics do
     standard_dev_ratio  = deviation / average
     standard_dev_ips    = ips * standard_dev_ratio
     median              = compute_median(run_times, iterations)
+    minimum             = Enum.min run_times
+    maximum             = Enum.max run_times
 
     %{
       average:       average,
@@ -94,6 +105,9 @@ defmodule Benchee.Statistics do
       std_dev_ratio: standard_dev_ratio,
       std_dev_ips:   standard_dev_ips,
       median:        median,
+      minimum:       minimum,
+      maximum:       maximum,
+      sample_size:   iterations
     }
   end
 
