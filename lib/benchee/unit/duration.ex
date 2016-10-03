@@ -106,6 +106,37 @@ defmodule Benchee.Unit.Duration do
   end
 
   @doc """
+  Converts a value of the given unit into microseconds
+
+  ## Examples
+
+      iex> Benchee.Unit.Duration.microseconds({1.234, :second})
+      1_234_000.0
+
+      iex> Benchee.Unit.Duration.microseconds({1.234, :minute})
+      7.404e7
+
+      iex> Benchee.Unit.Duration.microseconds({1.234, :minute}) |> Benchee.Unit.Duration.scale(:minute)
+      {1.234, :minute}
+
+  """
+  def microseconds({duration, :hour}) do
+    duration * @microseconds_per_hour
+  end
+  def microseconds({duration, :minute}) do
+    duration * @microseconds_per_minute
+  end
+  def microseconds({duration, :second}) do
+    duration * @microseconds_per_second
+  end
+  def microseconds({duration, :millisecond}) do
+    duration * @microseconds_per_millisecond
+  end
+  def microseconds({duration, :microsecond}) do
+    duration
+  end
+
+  @doc """
   Formats a number as a string, with a unit label
 
   ## Examples
