@@ -54,19 +54,19 @@ Benchee.run(%{time: 3}, %{
   "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end})
 ```
 
-First configuration options are passed, the only options available so far are:
+First configuration options are passed:
 
 * `warmup` - the time in seconds for which a benchmark should be run without measuring times before real measurements start. This simulates a _"warm"_ running system. Defaults to 2.
 * `time` - the time in seconds for how long each individual benchmark should be run and measured. Defaults to 5.
 * `parallel` - each job will be executed in `parallel` number processes. Gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking). Defaults to 1.
-* `formatters` - list of formatter function you'd like to run to output the benchmarking results of the suite when using `Benchee.run/2`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter calling `Benche.Formatters.Console.output/1`.
+* `formatters` - list of formatter function you'd like to run to output the benchmarking results of the suite when using `Benchee.run/2`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter calling `Benchee.Formatters.Console.output/1`.
 * `print`      - a map from atoms to `true` or `false` to configure if the output identified by the atom will be printed during the standard benchee benchmarking process. All options are enabled by default (true). Options are:
   * `:benchmarking`  - print when Benchee starts benchmarking a new job (Benchmarking name ..)
   * `:configuration` - a summary of configured benchmarking options including estimated total run time is printed before benchmarking starts
-  * `:fast_warning` - warnings are displayed if functions are executed too    fast leading to inaccurate measures
+  * `:fast_warning` - warnings are displayed if functions are executed too fast leading to inaccurate measures
 * `console` - options for the built-in console formatter. Like the `print` options they are also enabled by default:
   * `:comparison` - if the comparison of the different benchmarking jobs (x times slower than) is shown
-
+  * `:unit_scaling` - how to scale the units of formatted values. One of `:best` (default), `:largest`, `:smallest`, `:none`)
 
 
 Running this script produces an output like:
@@ -85,8 +85,8 @@ Benchmarking flat_map...
 Benchmarking map.flatten...
 
 Name                  ips        average    deviation         median
-map.flatten        989.80      1010.31μs    (±12.63%)       998.00μs
-flat_map           647.35      1544.75μs    (±10.54%)      1556.00μs
+map.flatten        989.80      1010.31ms    (±12.63%)       998.00ms
+flat_map           647.35      1544.75ms    (±10.54%)      1556.00ms
 
 Comparison:
 map.flatten        989.80
