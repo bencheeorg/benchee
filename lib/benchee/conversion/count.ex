@@ -1,11 +1,12 @@
-defmodule Benchee.Unit.Count do
-  alias Benchee.Unit.Common
-
+defmodule Benchee.Conversion.Count do
   @moduledoc """
   Unit scaling for counts, such that 1000000 can be converted to 1 Million.
   """
 
-  @behaviour Benchee.Unit
+  alias Benchee.Conversion.{Format, Scale}
+
+  @behaviour Scale
+  @behaviour Format
 
   @one_billion 1_000_000_000
   @one_million 1_000_000
@@ -23,10 +24,10 @@ defmodule Benchee.Unit.Count do
 
   ## Examples
 
-      iex> Benchee.Unit.Count.scale(4_321.09)
+      iex> Benchee.Conversion.Count.scale(4_321.09)
       {4.32109, :thousand}
 
-      iex> Benchee.Unit.Count.scale(0.0045)
+      iex> Benchee.Conversion.Count.scale(0.0045)
       {0.0045, :one}
 
   """
@@ -53,17 +54,17 @@ defmodule Benchee.Unit.Count do
 
   ## Examples
 
-      iex> Benchee.Unit.Count.scale(12345, :one)
-      12345
+      iex> Benchee.Conversion.Count.scale(12345, :one)
+      {12345, :one}
 
-      iex> Benchee.Unit.Count.scale(12345, :thousand)
-      12.345
+      iex> Benchee.Conversion.Count.scale(12345, :thousand)
+      {12.345, :thousand}
 
-      iex> Benchee.Unit.Count.scale(12345, :billion)
-      1.2345e-5
+      iex> Benchee.Conversion.Count.scale(12345, :billion)
+      {1.2345e-5, :billion}
 
-      iex> Benchee.Unit.Count.scale(12345, :million)
-      0.012345
+      iex> Benchee.Conversion.Count.scale(12345, :million)
+      {0.012345, :million}
 
   """
   def scale(count, :billion) do
@@ -85,10 +86,10 @@ defmodule Benchee.Unit.Count do
 
   ## Examples
 
-      iex> Benchee.Unit.Count.format(45_678.9)
+      iex> Benchee.Conversion.Count.format(45_678.9)
       "45.68 K"
 
-      iex> Benchee.Unit.Count.format(45.6789)
+      iex> Benchee.Conversion.Count.format(45.6789)
       "45.68"
 
       iex> Benchee.Unit.Count.format({45.6789, :thousand})
@@ -107,16 +108,16 @@ defmodule Benchee.Unit.Count do
 
   ## Examples
 
-      iex> Benchee.Unit.Count.best([23, 23_000, 34_000, 2_340_000])
+      iex> Benchee.Conversion.Count.best([23, 23_000, 34_000, 2_340_000])
       :thousand
 
-      iex> Benchee.Unit.Count.best([23, 23_000, 34_000, 2_340_000, 3_450_000])
+      iex> Benchee.Conversion.Count.best([23, 23_000, 34_000, 2_340_000, 3_450_000])
       :million
 
-      iex> Benchee.Unit.Count.best([23, 23_000, 34_000, 2_340_000], strategy: :smallest)
+      iex> Benchee.Conversion.Count.best([23, 23_000, 34_000, 2_340_000], strategy: :smallest)
       :one
 
-      iex> Benchee.Unit.Count.best([23, 23_000, 34_000, 2_340_000], strategy: :largest)
+      iex> Benchee.Conversion.Count.best([23, 23_000, 34_000, 2_340_000], strategy: :largest)
       :million
 
   """
@@ -130,10 +131,10 @@ defmodule Benchee.Unit.Count do
 
   ## Examples
 
-      iex> Benchee.Unit.Count.label(:million)
+      iex> Benchee.Conversion.Count.label(:million)
       "M"
 
-      iex> Benchee.Unit.Count.label(:one)
+      iex> Benchee.Conversion.Count.label(:one)
       ""
   """
   def label(unit) do
@@ -145,10 +146,10 @@ defmodule Benchee.Unit.Count do
 
   ## Examples
 
-      iex> Benchee.Unit.Count.magnitude(:million)
+      iex> Benchee.Conversion.Count.magnitude(:million)
       1000000
 
-      iex> Benchee.Unit.Count.magnitude(:one)
+      iex> Benchee.Conversion.Count.magnitude(:one)
       1
   """
   def magnitude(unit) do
@@ -166,7 +167,7 @@ defmodule Benchee.Unit.Count do
 
   ## Examples
 
-      iex> Benchee.Unit.Count.base_unit
+      iex> Benchee.Conversion.Count.base_unit
       :one
 
   """

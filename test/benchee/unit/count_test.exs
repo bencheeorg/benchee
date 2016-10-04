@@ -1,7 +1,7 @@
-defmodule Benchee.Unit.CountTest do
+defmodule Benchee.Conversion.CountTest do
   use ExUnit.Case
-  import Benchee.Unit.Count
-  doctest Benchee.Unit.Count
+  import Benchee.Conversion.Count
+  doctest Benchee.Conversion.Count
 
   test ".scale 123_456_789_012 scales to :billion" do
     assert scale(123_456_789_012) == {123.456789012, :billion}
