@@ -55,16 +55,16 @@ defmodule Benchee.Conversion.Count do
   ## Examples
 
       iex> Benchee.Conversion.Count.scale(12345, :one)
-      {12345, :one}
+      12345
 
       iex> Benchee.Conversion.Count.scale(12345, :thousand)
-      {12.345, :thousand}
+      12.345
 
       iex> Benchee.Conversion.Count.scale(12345, :billion)
-      {1.2345e-5, :billion}
+      1.2345e-5
 
       iex> Benchee.Conversion.Count.scale(12345, :million)
-      {0.012345, :million}
+      0.012345
 
   """
   def scale(count, :billion) do
@@ -92,11 +92,11 @@ defmodule Benchee.Conversion.Count do
       iex> Benchee.Conversion.Count.format(45.6789)
       "45.68"
 
-      iex> Benchee.Unit.Count.format({45.6789, :thousand})
+      iex> Benchee.Conversion.Count.format({45.6789, :thousand})
       "45.68 K"
   """
   def format(count) do
-    Common.format(count, __MODULE__)
+    Format.format(count, __MODULE__)
   end
 
   @doc """
@@ -123,7 +123,7 @@ defmodule Benchee.Conversion.Count do
   """
   def best(list, opts \\ [strategy: :best])
   def best(list, opts) do
-    Common.best_unit(list, __MODULE__, opts)
+    Scale.best_unit(list, __MODULE__, opts)
   end
 
   @doc """
@@ -138,7 +138,7 @@ defmodule Benchee.Conversion.Count do
       ""
   """
   def label(unit) do
-    Common.label(@units, unit)
+    Format.label(@units, unit)
   end
 
   @doc """
@@ -153,7 +153,7 @@ defmodule Benchee.Conversion.Count do
       1
   """
   def magnitude(unit) do
-    Common.magnitude(@units, unit)
+    Scale.magnitude(@units, unit)
   end
 
   @doc """

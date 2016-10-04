@@ -45,4 +45,61 @@ defmodule Benchee.Conversion.Scale do
   general is the smallest supported unit.
   """
   @callback base_unit :: unit
+
+  # Generic scaling functions
+
+  def magnitude(units, unit) do
+    units
+    |> Map.fetch!(unit)
+    |> Map.fetch!(:magnitude)
+  end
+
+  def best_unit(list, module, opts) do
+    case Keyword.get(opts, :strategy, :best) do
+      :best     -> best_unit(list, module)
+      :largest  -> largest_unit(list, module)
+      :smallest -> smallest_unit(list, module)
+      :none     -> module.base_unit
+    end
+  end
+
+  # Finds the most common unit in the list. In case of tie, chooses the
+  # largest of the most common
+  defp best_unit(list, module) do
+    list
+    |> Enum.map(fn n -> scale_unit(n, module) end)
+    |> Enum.group_by(fn unit -> unit end)
+    |> Enum.map(fn {unit, occurrences} -> {unit, length(occurrences)} end)
+    |> Enum.sort(fn unit, freq -> by_frequency_and_magnitude(unit, freq, module) end)
+    |> hd
+    |> elem(0)
+  end
+
+  # Finds the smallest unit in the list
+  defp smallest_unit(list, module) do
+    list
+    |> Enum.map(fn n -> scale_unit(n, module) end)
+    |> Enum.min_by(&module.magnitude/1)
+  end
+
+  # Finds the largest unit in the list
+  defp largest_unit(list, module) do
+    list
+    |> Enum.map(fn n -> scale_unit(n, module) end)
+    |> Enum.max_by(&module.magnitude/1)
+  end
+
+  defp scale_unit(count, module) do
+    {_, unit} = module.scale(count)
+    unit
+  end
+
+  # Sorts two elements first by total, then by magnitude of the unit in case
+  # of tie
+  defp by_frequency_and_magnitude({unit_a, frequency}, {unit_b, frequency}, module) do
+    module.magnitude(unit_a) > module.magnitude(unit_b)
+  end
+  defp by_frequency_and_magnitude({_, frequency_a}, {_, frequency_b}, _module) do
+    frequency_a > frequency_b
+  end
 end

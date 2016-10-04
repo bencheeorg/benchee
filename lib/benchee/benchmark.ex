@@ -6,7 +6,7 @@ defmodule Benchee.Benchmark do
   """
 
   alias Benchee.RepeatN
-  alias Benchee.Unit.Duration
+  alias Benchee.Conversion.Duration
 
   @doc """
   Adds the given function and its associated name to the benchmarking jobs to

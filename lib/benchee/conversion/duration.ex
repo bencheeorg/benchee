@@ -116,13 +116,13 @@ defmodule Benchee.Conversion.Duration do
 
   ## Examples
 
-      iex> Benchee.Duration.Duration.microseconds({1.234, :second})
+      iex> Benchee.Conversion.Duration.microseconds({1.234, :second})
       1_234_000.0
 
-      iex> Benchee.Duration.Duration.microseconds({1.234, :minute})
+      iex> Benchee.Conversion.Duration.microseconds({1.234, :minute})
       7.404e7
 
-      iex> Benchee.Duration.Duration.microseconds({1.234, :minute}) |> Benchee.Duration.Duration.scale(:minute)
+      iex> Benchee.Conversion.Duration.microseconds({1.234, :minute}) |> Benchee.Conversion.Duration.scale(:minute)
       1.234
 
   """
@@ -159,7 +159,7 @@ defmodule Benchee.Conversion.Duration do
 
   """
   def format(count) do
-    Common.format(count, __MODULE__)
+    Format.format(count, __MODULE__)
   end
 
   @doc """
@@ -185,7 +185,7 @@ defmodule Benchee.Conversion.Duration do
   """
   def best(list, opts \\ [strategy: :best])
   def best(list, opts) do
-    Common.best_unit(list, __MODULE__, opts)
+    Scale.best_unit(list, __MODULE__, opts)
   end
 
   @doc """
@@ -200,7 +200,7 @@ defmodule Benchee.Conversion.Duration do
       "μs"
   """
   def label(unit) do
-    Common.label(@units, unit)
+    Format.label(@units, unit)
   end
 
   @doc """
@@ -215,7 +215,7 @@ defmodule Benchee.Conversion.Duration do
       1
   """
   def magnitude(unit) do
-    Common.magnitude(@units, unit)
+    Scale.magnitude(@units, unit)
   end
 
   @doc """
