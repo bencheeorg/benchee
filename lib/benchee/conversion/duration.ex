@@ -143,26 +143,6 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
-  Formats a number as a string, with a unit label. To specify the unit, pass
-  a tuple of `{value, unit_atom}` like `{1_234, :second}`
-
-  ## Examples
-
-      iex> Benchee.Conversion.Duration.format(45_678.9)
-      "45.68 ms"
-
-      iex> Benchee.Conversion.Duration.format(45.6789)
-      "45.68 μs"
-
-      iex> Benchee.Conversion.Duration.format({45.6789, :millisecond})
-      "45.68 ms"
-
-  """
-  def format(count) do
-    Format.format(count, __MODULE__)
-  end
-
-  @doc """
   Finds the best unit for a list of durations. By default, chooses the most common
   unit. In case of tie, chooses the largest of the most common units.
 
@@ -189,21 +169,6 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
-  The label for the specified unit, as a string
-
-  ## Examples
-
-      iex> Benchee.Conversion.Duration.label(:millisecond)
-      "ms"
-
-      iex> Benchee.Conversion.Duration.label(:microsecond)
-      "μs"
-  """
-  def label(unit) do
-    Format.label(@units, unit)
-  end
-
-  @doc """
   The magnitude of the specified unit, as a number
 
   ## Examples
@@ -219,12 +184,6 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
-  A string that appears between a value and unit label when formatted. For
-  this module, a space
-  """
-  def separator, do: " "
-
-  @doc """
   The most basic unit in which measurements occur, microseconds.
 
   ## Examples
@@ -234,4 +193,45 @@ defmodule Benchee.Conversion.Duration do
 
   """
   def base_unit, do: :microsecond
+
+  @doc """
+  Formats a number as a string, with a unit label. To specify the unit, pass
+  a tuple of `{value, unit_atom}` like `{1_234, :second}`
+
+  ## Examples
+
+      iex> Benchee.Conversion.Duration.format(45_678.9)
+      "45.68 ms"
+
+      iex> Benchee.Conversion.Duration.format(45.6789)
+      "45.68 μs"
+
+      iex> Benchee.Conversion.Duration.format({45.6789, :millisecond})
+      "45.68 ms"
+
+  """
+  def format(count) do
+    Format.format(count, __MODULE__)
+  end
+
+  @doc """
+  The label for the specified unit, as a string
+
+  ## Examples
+
+      iex> Benchee.Conversion.Duration.label(:millisecond)
+      "ms"
+
+      iex> Benchee.Conversion.Duration.label(:microsecond)
+      "μs"
+  """
+  def label(unit) do
+    Format.label(@units, unit)
+  end
+
+  @doc """
+  A string that appears between a value and unit label when formatted. For
+  this module, a space
+  """
+  def separator, do: " "
 end
