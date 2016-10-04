@@ -44,9 +44,7 @@ defmodule Benchee.Config do
       scales to `1.2 M`, while `800_000` scales to `800 K`. The `unit_scaling`
       strategy determines how Benchee chooses the best fit unit for an entire
       list of values, when the individual values in the list may have different
-      best fit units.
-
-      There are four strategies, defaulting to `:best`:
+      best fit units. There are four strategies, defaulting to `:best`:
           * `:best`     - the most frequent best fit unit will be used, a tie
           will result in the larger unit being selected.
           * `:largest`  - the largest best fit unit will be used (i.e. thousand
