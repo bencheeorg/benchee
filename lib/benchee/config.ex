@@ -55,7 +55,7 @@ defmodule Benchee.Config do
           millisecond and one)
           * `none`     - no unit scaling will occur. Durations will be displayed
           in microseconds, and counts will be displayed in ones (this is
-          equivalent to the behaviour benchee had pre 0.5.0)
+          equivalent to the behaviour Benchee had pre 0.5.0)
 
   ## Examples
 
