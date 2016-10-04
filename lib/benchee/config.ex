@@ -46,14 +46,14 @@ defmodule Benchee.Config do
       list of values, when the individual values in the list may have different
       best fit units.
 
-      There are four strategies, defaulting to `best`:
-          * `:best`    - the most frequent best fit unit will be used, a tie
+      There are four strategies, defaulting to `:best`:
+          * `:best`     - the most frequent best fit unit will be used, a tie
           will result in the larger unit being selected.
-          * `largest`  - the largest best fit unit will be used (i.e. thousand
+          * `:largest`  - the largest best fit unit will be used (i.e. thousand
           and seconds if values are large enough).
-          * `smallest` - the smallest best fit unit will be used (i.e.
+          * `:smallest` - the smallest best fit unit will be used (i.e.
           millisecond and one)
-          * `none`     - no unit scaling will occur. Durations will be displayed
+          * `:none`     - no unit scaling will occur. Durations will be displayed
           in microseconds, and counts will be displayed in ones (this is
           equivalent to the behaviour Benchee had pre 0.5.0)
 
