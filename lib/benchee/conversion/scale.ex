@@ -69,11 +69,26 @@ defmodule Benchee.Conversion.Scale do
   The best fit unit for the list as a whole depends on the `:strategy` passed
   in `opts`:
 
-  * `:best` - (default) the most frequent best fit unit. In case of tie, the
+  * `:best` - the most frequent best fit unit. In case of tie, the
   largest of the most frequent units
   * `:largest` - the largest best fit unit
   * `:smallest` - the smallest best fit unit
   * `:none` - the domain's base (unscaled) unit
+
+  ## Examples
+
+      iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
+      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :best)
+      :thousand
+
+      iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
+      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :smallest)
+      :one
+
+      iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
+      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :largest)
+      :million
+  """
   def best_unit(list, module, opts) do
     case Keyword.get(opts, :strategy, :best) do
       :best     -> best_unit(list, module)
