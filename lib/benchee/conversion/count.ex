@@ -36,6 +36,11 @@ defmodule Benchee.Conversion.Count do
   }
 
   @doc """
+  Units of count, in powers of 1_000: :one, :thousand, :million, :billion
+  """
+  def units, do: @units
+
+  @doc """
   Scales a value representing a count in ones into a larger unit if appropriate
 
   ## Examples
@@ -124,21 +129,6 @@ defmodule Benchee.Conversion.Count do
   end
 
   @doc """
-  The magnitude of the specified unit, as a number
-
-  ## Examples
-
-      iex> Benchee.Conversion.Count.magnitude(:million)
-      1000000
-
-      iex> Benchee.Conversion.Count.magnitude(:one)
-      1
-  """
-  def magnitude(unit) do
-    Unit.magnitude(@units, unit)
-  end
-
-  @doc """
   The raw count, unscaled.
 
   ## Examples
@@ -166,21 +156,6 @@ defmodule Benchee.Conversion.Count do
   """
   def format(count) do
     Format.format(count, __MODULE__)
-  end
-
-  @doc """
-  The label for the specified unit, as a string
-
-  ## Examples
-
-      iex> Benchee.Conversion.Count.label(:million)
-      "M"
-
-      iex> Benchee.Conversion.Count.label(:one)
-      ""
-  """
-  def label(unit) do
-    Format.label(@units, unit)
   end
 
   @doc """

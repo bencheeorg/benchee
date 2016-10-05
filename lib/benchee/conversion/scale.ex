@@ -6,6 +6,8 @@ defmodule Benchee.Conversion.Scale do
   See `Benchee.Conversion.Count` and `Benchee.Conversion.Duration` for examples
   """
 
+  alias Benchee.Conversion.Unit
+
   @type unit :: atom
   @type scaled_number :: {number, unit}
 
@@ -33,12 +35,6 @@ defmodule Benchee.Conversion.Scale do
   most common units.
   """
   @callback best(list, options) :: unit
-
-  @doc """
-  The magnitude of a unit, as a number.  See `Benchee.Conversion.Count`
-  and `Benchee.Conversion.Duration` for examples
-  """
-  @callback magnitude(unit) :: number
 
   @doc """
   Returns the base_unit in which Benchee takes its measurements, which in
@@ -105,14 +101,14 @@ defmodule Benchee.Conversion.Scale do
   defp smallest_unit(list, module) do
     list
     |> Enum.map(fn n -> scale_unit(n, module) end)
-    |> Enum.min_by(&module.magnitude/1)
+    |> Enum.min_by(fn unit -> magnitude(module, unit) end)
   end
 
   # Finds the largest unit in the list
   defp largest_unit(list, module) do
     list
     |> Enum.map(fn n -> scale_unit(n, module) end)
-    |> Enum.max_by(&module.magnitude/1)
+    |> Enum.max_by(fn unit -> magnitude(module, unit) end)
   end
 
   defp scale_unit(count, module) do
@@ -120,10 +116,15 @@ defmodule Benchee.Conversion.Scale do
     unit
   end
 
+  # Fetches the magnitude for the given unit
+  defp magnitude(module, unit) do
+    Unit.magnitude(module, unit)
+  end
+
   # Sorts two elements first by total, then by magnitude of the unit in case
   # of tie
   defp by_frequency_and_magnitude({unit_a, frequency}, {unit_b, frequency}, module) do
-    module.magnitude(unit_a) > module.magnitude(unit_b)
+    magnitude(module, unit_a) > magnitude(module, unit_b)
   end
   defp by_frequency_and_magnitude({_, frequency_a}, {_, frequency_b}, _module) do
     frequency_a > frequency_b

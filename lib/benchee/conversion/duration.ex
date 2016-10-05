@@ -21,28 +21,33 @@ defmodule Benchee.Conversion.Duration do
                     magnitude: @microseconds_per_hour,
                     short:     "h",
                     long:      "Hours"
-                  },
+                 },
     minute:      %Unit{
                     magnitude: @microseconds_per_minute,
                     short:     "m",
                     long: "Minutes"
-                  },
+                 },
     second:      %Unit{
                     magnitude: @microseconds_per_second,
                     short:     "s",
                     long:      "Seconds"
-                  },
+                 },
     millisecond: %Unit{
                     magnitude: @microseconds_per_millisecond,
                     short:     "ms",
                     long:      "Milliseconds"
-                  },
+                 },
     microsecond: %Unit{
                     magnitude: 1,
                     short:     "μs",
                     long: "Microseconds"
-                  }
+                 }
   }
+
+  @doc """
+  Units of duration: :microsecond, :millisecond, :second, :minute, :hour
+  """
+  def units(), do: @units
 
   @doc """
   Scales a duration value in microseconds into a larger unit if appropriate
@@ -169,21 +174,6 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
-  The magnitude of the specified unit, as a number
-
-  ## Examples
-
-      iex> Benchee.Conversion.Duration.magnitude(:millisecond)
-      1000
-
-      iex> Benchee.Conversion.Duration.magnitude(:microsecond)
-      1
-  """
-  def magnitude(unit) do
-    Unit.magnitude(@units, unit)
-  end
-
-  @doc """
   The most basic unit in which measurements occur, microseconds.
 
   ## Examples
@@ -212,21 +202,6 @@ defmodule Benchee.Conversion.Duration do
   """
   def format(count) do
     Format.format(count, __MODULE__)
-  end
-
-  @doc """
-  The label for the specified unit, as a string
-
-  ## Examples
-
-      iex> Benchee.Conversion.Duration.label(:millisecond)
-      "ms"
-
-      iex> Benchee.Conversion.Duration.label(:microsecond)
-      "μs"
-  """
-  def label(unit) do
-    Format.label(@units, unit)
   end
 
   @doc """

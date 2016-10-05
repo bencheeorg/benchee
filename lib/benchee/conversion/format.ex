@@ -6,17 +6,13 @@ defmodule Benchee.Conversion.Format do
   See `Benchee.Conversion.Count` and `Benchee.Conversion.Duration` for examples
   """
 
+  alias Benchee.Conversion.Unit
+
   @doc """
   Formats a number as a string, with a unit label. See `Benchee.Conversion.Count`
   and `Benchee.Conversion.Duration` for examples
   """
   @callback format(number) :: String.t
-
-  @doc """
-  The label for a given unit, as a String.  See `Benchee.Conversion.Count`
-  and `Benchee.Conversion.Duration` for examples
-  """
-  @callback label(Benchee.Conversion.Scale.unit) :: String.t
 
   @doc """
   A string that appears between a value and a unit label when formatted as a
@@ -41,7 +37,7 @@ defmodule Benchee.Conversion.Format do
   specified module should provide `label/1` and `separator/0` functions
   """
   def format({count, unit}, module) do
-    format({count, unit}, module.label(unit), module.separator)
+    format({count, unit}, label(module, unit), module.separator)
   end
 
   @doc """
@@ -55,18 +51,14 @@ defmodule Benchee.Conversion.Format do
     |> format(module)
   end
 
-  @doc """
-  Fetches a label from a map of units
-  """
-  def label(units, unit) do
-    units
-    |> Map.fetch!(unit)
-    |> Map.fetch!(:short)
-  end
-
   # Returns the separator, or an empty string if there isn't a label
   defp separator(label, _separator) when label == "" or label == nil, do: ""
   defp separator(_label, separator), do: separator
+
+  # Fetches the label for the given unit
+  defp label(module, unit) do
+    Unit.label(module, unit)
+  end
 
   defp float_precision(float) when float < 0.01, do: 5
   defp float_precision(float) when float < 0.1, do: 4
