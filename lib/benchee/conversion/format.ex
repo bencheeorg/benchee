@@ -27,22 +27,26 @@ defmodule Benchee.Conversion.Format do
   end
 
   @doc """
-  Formats a unit value in the domain described by `module`. The specified module
-  should provide a `units/0` function that returns a Map of
-  { :unit_name => `Benchee.Conversion.Unit` }. Additionally, `module` may
-  specify a `separator/0` function, which provides a custom separator string
-  that will appear between the value and label in the formatted output. If no
-  `separator/0` function exists, the default separator (a single space) will
-  be used.
-    """
+  Formats a unit value in the domain described by `module`. The module should
+  provide a `units/0` function that returns a Map like
+
+      %{ :unit_name => %Benchee.Conversion.Unit{ ... } }
+
+  Additionally, `module` may specify a `separator/0` function, which provides a
+  custom separator string that will appear between the value and label in the
+  formatted output. If no `separator/0` function exists, the default separator
+  (a single space) will be used.
+  """
   def format({count, unit}, module) do
     format({count, unit}, label(module, unit), separator(module))
   end
 
   @doc """
-  Scales a number to the most appropriate unit, and formats the scaled value
-  with the label and separator supplied by `module`. The
-  specified module should provide `label/1` and `separator/0` functions
+  Scales a number to the most appropriate unit as defined in `module`, and
+  formats the scaled value with a label. The module should provide a `units/0`
+  function that returns a Map like
+
+      %{ :unit_name => %Benchee.Conversion.Unit{ ... } }
   """
   def format(number, module) do
     number
@@ -50,7 +54,7 @@ defmodule Benchee.Conversion.Format do
     |> format(module)
   end
 
-  # Returns the separator defined in `module`, or the default, a space
+  # Returns the separator defined in `module.separator/0`, or the default, a space
   defp separator(module) do
     case function_exported?(module, :separator, 0) do
       true  -> module.separator()
