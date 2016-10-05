@@ -157,10 +157,4 @@ defmodule Benchee.Conversion.Count do
   def format(count) do
     Format.format(count, __MODULE__)
   end
-
-  @doc """
-  A string that appears between a value and unit label when formatted. For
-  this module, a space
-  """
-  def separator, do: " "
 end

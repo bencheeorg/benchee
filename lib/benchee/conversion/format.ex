@@ -14,12 +14,6 @@ defmodule Benchee.Conversion.Format do
   """
   @callback format(number) :: String.t
 
-  @doc """
-  A string that appears between a value and a unit label when formatted as a
-  String. For example, a space: `5.67 M` or an empty string: `5.67M`
-  """
-  @callback separator :: String.t
-
   # Generic formatting functions
 
   @doc """
@@ -33,11 +27,16 @@ defmodule Benchee.Conversion.Format do
   end
 
   @doc """
-  Formats a unit value with the label and separator supplied by `module`. The
-  specified module should provide `label/1` and `separator/0` functions
-  """
+  Formats a unit value in the domain described by `module`. The specified module
+  should provide a `units/0` function that returns a Map of
+  { :unit_name => `Benchee.Conversion.Unit` }. Additionally, `module` may
+  specify a `separator/0` function, which provides a custom separator string
+  that will appear between the value and label in the formatted output. If no
+  `separator/0` function exists, the default separator (a single space) will
+  be used.
+    """
   def format({count, unit}, module) do
-    format({count, unit}, label(module, unit), module.separator)
+    format({count, unit}, label(module, unit), separator(module))
   end
 
   @doc """
@@ -49,6 +48,14 @@ defmodule Benchee.Conversion.Format do
     number
     |> module.scale
     |> format(module)
+  end
+
+  # Returns the separator defined in `module`, or the default, a space
+  defp separator(module) do
+    case function_exported?(module, :separator, 0) do
+      true  -> module.separator()
+      false -> " "
+    end
   end
 
   # Returns the separator, or an empty string if there isn't a label
@@ -64,5 +71,4 @@ defmodule Benchee.Conversion.Format do
   defp float_precision(float) when float < 0.1, do: 4
   defp float_precision(float) when float < 0.2, do: 3
   defp float_precision(_float), do: 2
-
 end
