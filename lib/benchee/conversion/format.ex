@@ -38,7 +38,7 @@ defmodule Benchee.Conversion.Format do
 
   @doc """
   Formats a unit value with the label and separator supplied by `module`. The
-  specified module should provide `label/1` and `separator/1` functions
+  specified module should provide `label/1` and `separator/0` functions
   """
   def format({count, unit}, module) do
     format({count, unit}, module.label(unit), module.separator)
