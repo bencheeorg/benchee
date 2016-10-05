@@ -49,15 +49,6 @@ defmodule Benchee.Conversion.Scale do
   # Generic scaling functions
 
   @doc """
-  Fetches a unit's magnitude from a map of units
-  """
-  def magnitude(units, unit) do
-    units
-    |> Map.fetch!(unit)
-    |> Map.fetch!(:magnitude)
-  end
-
-  @doc """
   Given a `list` of number values and a `module` describing the domain of the
   values (e.g. Duration, Count), finds the "best fit" unit for the list as a
   whole.

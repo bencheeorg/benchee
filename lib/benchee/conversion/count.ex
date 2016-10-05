@@ -3,7 +3,7 @@ defmodule Benchee.Conversion.Count do
   Unit scaling for counts, such that 1000000 can be converted to 1 Million.
   """
 
-  alias Benchee.Conversion.{Format, Scale}
+  alias Benchee.Conversion.{Format, Scale, Unit}
 
   @behaviour Scale
   @behaviour Format
@@ -13,10 +13,26 @@ defmodule Benchee.Conversion.Count do
   @one_thousand 1_000
 
   @units %{
-    billion:  %{magnitude: @one_billion, short: "B", long: "Billion"},
-    million:  %{magnitude: @one_million, short: "M", long: "Million"},
-    thousand: %{magnitude: @one_thousand, short: "K", long: "Thousand"},
-    one:      %{magnitude: 1, short: "", long: ""},
+    billion:  %Unit{
+                magnitude: @one_billion,
+                short: "B",
+                long: "Billion"
+              },
+    million:  %Unit{
+                magnitude: @one_million,
+                short: "M",
+                long: "Million"
+              },
+    thousand: %Unit{
+                magnitude: @one_thousand,
+                short: "K",
+                long: "Thousand"
+              },
+    one:      %Unit{
+                magnitude: 1,
+                short: "",
+                long: ""
+              },
   }
 
   @doc """
@@ -119,7 +135,7 @@ defmodule Benchee.Conversion.Count do
       1
   """
   def magnitude(unit) do
-    Scale.magnitude(@units, unit)
+    Unit.magnitude(@units, unit)
   end
 
   @doc """

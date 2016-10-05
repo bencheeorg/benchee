@@ -3,7 +3,7 @@ defmodule Benchee.Conversion.Duration do
   Unit scaling for duration converting from microseconds to minutes and others.
   """
 
-  alias Benchee.Conversion.{Format, Scale}
+  alias Benchee.Conversion.{Format, Scale, Unit}
 
   @behaviour Scale
   @behaviour Format
@@ -17,27 +17,27 @@ defmodule Benchee.Conversion.Duration do
   @microseconds_per_hour @microseconds_per_minute * @minutes_per_hour
 
   @units %{
-    hour:        %{
+    hour:        %Unit{
                     magnitude: @microseconds_per_hour,
                     short:     "h",
                     long:      "Hours"
                   },
-    minute:      %{
+    minute:      %Unit{
                     magnitude: @microseconds_per_minute,
                     short:     "m",
                     long: "Minutes"
                   },
-    second:      %{
+    second:      %Unit{
                     magnitude: @microseconds_per_second,
                     short:     "s",
                     long:      "Seconds"
                   },
-    millisecond: %{
+    millisecond: %Unit{
                     magnitude: @microseconds_per_millisecond,
                     short:     "ms",
                     long:      "Milliseconds"
                   },
-    microsecond: %{
+    microsecond: %Unit{
                     magnitude: 1,
                     short:     "μs",
                     long: "Microseconds"
@@ -180,7 +180,7 @@ defmodule Benchee.Conversion.Duration do
       1
   """
   def magnitude(unit) do
-    Scale.magnitude(@units, unit)
+    Unit.magnitude(@units, unit)
   end
 
   @doc """
