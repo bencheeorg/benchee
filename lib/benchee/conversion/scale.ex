@@ -69,11 +69,11 @@ defmodule Benchee.Conversion.Scale do
   The best fit unit for the list as a whole depends on the `:strategy` passed
   in `opts`:
 
-  * `:best` - the most frequent best fit unit. In case of tie, the
+  * `:best`     - the most frequent best fit unit. In case of tie, the
   largest of the most frequent units
-  * `:largest` - the largest best fit unit
+  * `:largest`  - the largest best fit unit
   * `:smallest` - the smallest best fit unit
-  * `:none` - the domain's base (unscaled) unit
+  * `:none`     - the domain's base (unscaled) unit
 
   ## Examples
 
