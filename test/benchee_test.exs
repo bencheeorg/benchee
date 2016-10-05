@@ -164,10 +164,10 @@ defmodule BencheeTest do
         custom:     "Custom value",
         formatters: [
           fn(suite) ->
-            IO.puts "Run time: #{List.last(suite.run_times["Sleeps"]) |> Benchee.Unit.Duration.format}"
+            IO.puts "Run time: #{List.last(suite.run_times["Sleeps"]) |> Benchee.Conversion.Duration.format}"
           end,
           fn(suite) ->
-            IO.puts "Average: #{suite.statistics["Sleeps"].average |> Benchee.Unit.Duration.format}"
+            IO.puts "Average: #{suite.statistics["Sleeps"].average |> Benchee.Conversion.Duration.format}"
           end,
           fn(suite) -> IO.puts suite.config.custom end
         ]

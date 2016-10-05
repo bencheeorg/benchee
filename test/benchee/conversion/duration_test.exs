@@ -1,7 +1,7 @@
-defmodule Benchee.Unit.DurationTest do
+defmodule Benchee.Conversion.DurationTest do
   use ExUnit.Case
-  import Benchee.Unit.Duration
-  doctest Benchee.Unit.Duration
+  import Benchee.Conversion.Duration
+  doctest Benchee.Conversion.Duration
 
   test ".format(98.7654321)" do
     assert format(98.7654321) == "98.77 μs"

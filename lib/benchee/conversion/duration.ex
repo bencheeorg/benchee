@@ -1,11 +1,12 @@
-defmodule Benchee.Unit.Duration do
-  alias Benchee.Unit.Common
-
+defmodule Benchee.Conversion.Duration do
   @moduledoc """
   Unit scaling for duration converting from microseconds to minutes and others.
   """
 
-  @behaviour Benchee.Unit
+  alias Benchee.Conversion.{Format, Scale}
+
+  @behaviour Scale
+  @behaviour Format
 
   @microseconds_per_millisecond 1000
   @milliseconds_per_second 1000
@@ -48,13 +49,13 @@ defmodule Benchee.Unit.Duration do
 
   ## Examples
 
-      iex> Benchee.Unit.Duration.scale(1)
+      iex> Benchee.Conversion.Duration.scale(1)
       {1, :microsecond}
 
-      iex> Benchee.Unit.Duration.scale(1_234)
+      iex> Benchee.Conversion.Duration.scale(1_234)
       {1.234, :millisecond}
 
-      iex> Benchee.Unit.Duration.scale(11_234_567_890.123)
+      iex> Benchee.Conversion.Duration.scale(11_234_567_890.123)
       {3.1207133028119443, :hour}
 
   """
@@ -84,13 +85,13 @@ defmodule Benchee.Unit.Duration do
 
   ## Examples
 
-      iex> Benchee.Unit.Duration.scale(12345, :microsecond)
+      iex> Benchee.Conversion.Duration.scale(12345, :microsecond)
       12345
 
-      iex> Benchee.Unit.Duration.scale(12345, :millisecond)
+      iex> Benchee.Conversion.Duration.scale(12345, :millisecond)
       12.345
 
-      iex> Benchee.Unit.Duration.scale(12345, :minute)
+      iex> Benchee.Conversion.Duration.scale(12345, :minute)
       2.0575e-4
 
   """
@@ -115,13 +116,13 @@ defmodule Benchee.Unit.Duration do
 
   ## Examples
 
-      iex> Benchee.Unit.Duration.microseconds({1.234, :second})
+      iex> Benchee.Conversion.Duration.microseconds({1.234, :second})
       1_234_000.0
 
-      iex> Benchee.Unit.Duration.microseconds({1.234, :minute})
+      iex> Benchee.Conversion.Duration.microseconds({1.234, :minute})
       7.404e7
 
-      iex> Benchee.Unit.Duration.microseconds({1.234, :minute}) |> Benchee.Unit.Duration.scale(:minute)
+      iex> Benchee.Conversion.Duration.microseconds({1.234, :minute}) |> Benchee.Conversion.Duration.scale(:minute)
       1.234
 
   """
@@ -142,26 +143,6 @@ defmodule Benchee.Unit.Duration do
   end
 
   @doc """
-  Formats a number as a string, with a unit label. To specify the unit, pass
-  a tuple of `{value, unit_atom}` like `{1_234, :second}`
-
-  ## Examples
-
-      iex> Benchee.Unit.Duration.format(45_678.9)
-      "45.68 ms"
-
-      iex> Benchee.Unit.Duration.format(45.6789)
-      "45.68 μs"
-
-      iex> Benchee.Unit.Duration.format({45.6789, :millisecond})
-      "45.68 ms"
-
-  """
-  def format(count) do
-    Common.format(count, __MODULE__)
-  end
-
-  @doc """
   Finds the best unit for a list of durations. By default, chooses the most common
   unit. In case of tie, chooses the largest of the most common units.
 
@@ -170,36 +151,21 @@ defmodule Benchee.Unit.Duration do
 
   ## Examples
 
-      iex> Benchee.Unit.Duration.best([23, 23_000, 34_000, 2_340_000])
+      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000])
       :millisecond
 
-      iex> Benchee.Unit.Duration.best([23, 23_000, 34_000, 2_340_000, 3_450_000])
+      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000, 3_450_000])
       :second
 
-      iex> Benchee.Unit.Duration.best([23, 23_000, 34_000, 2_340_000], strategy: :smallest)
+      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000], strategy: :smallest)
       :microsecond
 
-      iex> Benchee.Unit.Duration.best([23, 23_000, 34_000, 2_340_000], strategy: :largest)
+      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000], strategy: :largest)
       :second
   """
   def best(list, opts \\ [strategy: :best])
   def best(list, opts) do
-    Common.best_unit(list, __MODULE__, opts)
-  end
-
-  @doc """
-  The label for the specified unit, as a string
-
-  ## Examples
-
-      iex> Benchee.Unit.Duration.label(:millisecond)
-      "ms"
-
-      iex> Benchee.Unit.Duration.label(:microsecond)
-      "μs"
-  """
-  def label(unit) do
-    Common.label(@units, unit)
+    Scale.best_unit(list, __MODULE__, opts)
   end
 
   @doc """
@@ -207,14 +173,60 @@ defmodule Benchee.Unit.Duration do
 
   ## Examples
 
-      iex> Benchee.Unit.Duration.magnitude(:millisecond)
+      iex> Benchee.Conversion.Duration.magnitude(:millisecond)
       1000
 
-      iex> Benchee.Unit.Duration.magnitude(:microsecond)
+      iex> Benchee.Conversion.Duration.magnitude(:microsecond)
       1
   """
   def magnitude(unit) do
-    Common.magnitude(@units, unit)
+    Scale.magnitude(@units, unit)
+  end
+
+  @doc """
+  The most basic unit in which measurements occur, microseconds.
+
+  ## Examples
+
+      iex> Benchee.Conversion.Duration.base_unit
+      :microsecond
+
+  """
+  def base_unit, do: :microsecond
+
+  @doc """
+  Formats a number as a string, with a unit label. To specify the unit, pass
+  a tuple of `{value, unit_atom}` like `{1_234, :second}`
+
+  ## Examples
+
+      iex> Benchee.Conversion.Duration.format(45_678.9)
+      "45.68 ms"
+
+      iex> Benchee.Conversion.Duration.format(45.6789)
+      "45.68 μs"
+
+      iex> Benchee.Conversion.Duration.format({45.6789, :millisecond})
+      "45.68 ms"
+
+  """
+  def format(count) do
+    Format.format(count, __MODULE__)
+  end
+
+  @doc """
+  The label for the specified unit, as a string
+
+  ## Examples
+
+      iex> Benchee.Conversion.Duration.label(:millisecond)
+      "ms"
+
+      iex> Benchee.Conversion.Duration.label(:microsecond)
+      "μs"
+  """
+  def label(unit) do
+    Format.label(@units, unit)
   end
 
   @doc """
@@ -222,15 +234,4 @@ defmodule Benchee.Unit.Duration do
   this module, a space
   """
   def separator, do: " "
-
-  @doc """
-  The most basic unit in which measurements occur, microseconds.
-
-  ## Examples
-
-      iex> Benchee.Unit.Duration.base_unit
-      :microsecond
-
-  """
-  def base_unit, do: :microsecond
 end

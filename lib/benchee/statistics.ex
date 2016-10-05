@@ -4,7 +4,7 @@ defmodule Benchee.Statistics do
   times and then compute statistics like the average and the standard devaition.
   """
 
-  alias Benchee.{Statistics, Unit.Duration}
+  alias Benchee.{Statistics, Conversion.Duration}
   require Integer
 
   @doc """

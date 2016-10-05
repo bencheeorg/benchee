@@ -5,7 +5,7 @@ defmodule Benchee.Formatters.Console do
   """
 
   alias Benchee.Statistics
-  alias Benchee.Unit.{Count, Duration}
+  alias Benchee.Conversion.{Count, Duration}
 
   @default_label_width 4 # Length of column header
   @ips_width 13

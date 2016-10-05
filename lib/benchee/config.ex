@@ -3,7 +3,7 @@ defmodule Benchee.Config do
   Functions to handle the configuration of Benchee, exposes `init` function.
   """
 
-  alias Benchee.Unit.Duration
+  alias Benchee.Conversion.Duration
 
   @doc """
   Returns the initial benchmark configuration for Benchee, composed of defaults
