@@ -65,12 +65,8 @@ defmodule Benchee.Conversion.Format do
   end
 
   # Returns the separator, or an empty string if there isn't a label
-  defp separator(label, separator) do
-    case label do
-      "" -> ""
-      _  -> separator
-    end
-  end
+  defp separator(label, _separator) when label == "" or label == nil, do: ""
+  defp separator(_label, separator), do: separator
 
   defp float_precision(float) when float < 0.01, do: 5
   defp float_precision(float) when float < 0.1, do: 4
