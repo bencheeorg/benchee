@@ -44,12 +44,20 @@ defmodule Benchee.Conversion.Format do
     format({count, unit}, module.label(unit), module.separator)
   end
 
+  @doc """
+  Scales a number to the most appropriate unit, and formats the scaled value
+  with the label and separator supplied by `module`. The
+  specified module should provide `label/1` and `separator/0` functions
+  """
   def format(number, module) do
     number
     |> module.scale
     |> format(module)
   end
 
+  @doc """
+  Fetches a label from a map of units
+  """
   def label(units, unit) do
     units
     |> Map.fetch!(unit)
