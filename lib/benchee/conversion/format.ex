@@ -5,7 +5,6 @@ defmodule Benchee.Conversion.Format do
 
   See `Benchee.Conversion.Count` and `Benchee.Conversion.Duration` for examples
   """
-  @type unit :: atom
 
   @doc """
   Formats a number as a string, with a unit label. See `Benchee.Conversion.Count`
@@ -17,7 +16,7 @@ defmodule Benchee.Conversion.Format do
   The label for a given unit, as a String.  See `Benchee.Conversion.Count`
   and `Benchee.Conversion.Duration` for examples
   """
-  @callback label(unit) :: String.t
+  @callback label(Benchee.Conversion.Scale.unit) :: String.t
 
   @doc """
   A string that appears between a value and a unit label when formatted as a
