@@ -25,7 +25,7 @@ defmodule Benchee.Conversion.Scale do
   specified unit. Results are a `{number, unit}` tuple. See
   `Benchee.Conversion.Count` and `Benchee.Conversion.Duration` for examples
   """
-  @callback scale(number, unit) :: scaled_number
+  @callback scale(number, unit) :: number
 
   @doc """
   Finds the best fit unit for a list of numbers in a domain's base unit.
