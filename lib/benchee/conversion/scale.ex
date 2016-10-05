@@ -48,12 +48,32 @@ defmodule Benchee.Conversion.Scale do
 
   # Generic scaling functions
 
+  @doc """
+  Fetches a unit's magnitude from a map of units
+  """
   def magnitude(units, unit) do
     units
     |> Map.fetch!(unit)
     |> Map.fetch!(:magnitude)
   end
 
+  @doc """
+  Given a `list` of number values and a `module` describing the domain of the
+  values (e.g. Duration, Count), finds the "best fit" unit for the list as a
+  whole.
+
+  The best fit unit for a given value is the smallest unit in the domain for
+  which the scaled value is at least 1. For example, the best fit unit for a
+  count of 1_000_000 would be `:million`.
+
+  The best fit unit for the list as a whole depends on the `:strategy` passed
+  in `opts`:
+
+  * `:best` - (default) the most frequent best fit unit. In case of tie, the
+  largest of the most frequent units
+  * `:largest` - the largest best fit unit
+  * `:smallest` - the smallest best fit unit
+  * `:none` - the domain's base (unscaled) unit
   def best_unit(list, module, opts) do
     case Keyword.get(opts, :strategy, :best) do
       :best     -> best_unit(list, module)
