@@ -117,8 +117,8 @@ defmodule Benchee.Conversion.Scale do
   end
 
   # Fetches the magnitude for the given unit
-  defp magnitude(module, unit) do
-    Unit.magnitude(module, unit)
+  defp magnitude(_module, unit) do
+    unit.magnitude
   end
 
   # Sorts two elements first by total, then by magnitude of the unit in case

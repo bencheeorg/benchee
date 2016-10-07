@@ -67,7 +67,7 @@ defmodule Benchee.Conversion.Count do
 
   # Helper function for returning a tuple of {value, unit}
   defp scale_with_unit(count, unit) do
-    {scale(count, unit), unit}
+    {scale(count, unit), Map.fetch!(@units, unit)}
   end
 
   @doc """
@@ -88,6 +88,9 @@ defmodule Benchee.Conversion.Count do
       0.012345
 
   """
+  def scale(count, unit = %Unit{}) do
+    Unit.scale count, unit
+  end
   def scale(count, :billion) do
     count / @one_billion
   end
