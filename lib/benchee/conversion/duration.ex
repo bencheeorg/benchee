@@ -82,7 +82,11 @@ defmodule Benchee.Conversion.Duration do
 
   # Helper function for returning a tuple of {value, unit}
   defp scale_with_unit(duration, unit) do
-    {scale(duration, unit), Map.fetch!(@units, unit)}
+    {scale(duration, unit), unit_for(unit)}
+  end
+
+  defp unit_for(unit) do
+    Map.fetch! @units, unit
   end
 
   @doc """
@@ -103,20 +107,8 @@ defmodule Benchee.Conversion.Duration do
   def scale(duration, unit = %Unit{}) do
     Unit.scale duration, unit
   end
-  def scale(duration, :hour) do
-    duration / @microseconds_per_hour
-  end
-  def scale(duration, :minute) do
-    duration / @microseconds_per_minute
-  end
-  def scale(duration, :second) do
-    duration / @microseconds_per_second
-  end
-  def scale(duration, :millisecond) do
-    duration / @microseconds_per_millisecond
-  end
-  def scale(duration, :microsecond) do
-    duration
+  def scale(duration, unit_atom) do
+    scale duration, unit_for(unit_atom)
   end
 
   @doc """
