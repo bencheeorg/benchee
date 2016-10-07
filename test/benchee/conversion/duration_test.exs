@@ -3,6 +3,10 @@ defmodule Benchee.Conversion.DurationTest do
   import Benchee.Conversion.Duration
   doctest Benchee.Conversion.Duration
 
+  defp unit_for(unit_atom) do
+    Map.fetch! Benchee.Conversion.Duration.units, unit_atom
+  end
+
   test ".format(98.7654321)" do
     assert format(98.7654321) == "98.77 μs"
   end
@@ -42,18 +46,18 @@ defmodule Benchee.Conversion.DurationTest do
   @list_with_mostly_milliseconds [1, 200, 3_000, 4_000, 500_000, 6_000_000, 77_000_000_000]
 
   test ".best when list is mostly milliseconds" do
-    assert best(@list_with_mostly_milliseconds) == :millisecond
+    assert best(@list_with_mostly_milliseconds) == unit_for(:millisecond)
   end
 
   test ".best when list is mostly milliseconds, strategy: :smallest" do
-    assert best(@list_with_mostly_milliseconds, strategy: :smallest) == :microsecond
+    assert best(@list_with_mostly_milliseconds, strategy: :smallest) == unit_for(:microsecond)
   end
 
   test ".best when list is mostly milliseconds, strategy: :largest" do
-    assert best(@list_with_mostly_milliseconds, strategy: :largest) == :hour
+    assert best(@list_with_mostly_milliseconds, strategy: :largest) == unit_for(:hour)
   end
 
   test ".best when list is mostly milliseconds, strategy: :none" do
-    assert best(@list_with_mostly_milliseconds, strategy: :none) == :microsecond
+    assert best(@list_with_mostly_milliseconds, strategy: :none) == unit_for(:microsecond)
   end
 end
