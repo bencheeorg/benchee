@@ -46,10 +46,14 @@ defmodule Benchee.Conversion.Count do
   ## Examples
 
       iex> Benchee.Conversion.Count.scale(4_321.09)
-      {4.32109, :thousand}
+      {4.32109, %Benchee.Conversion.Unit{long:      "Thousand",
+                                         magnitude: 1000,
+                                         short:     "K"}}
 
       iex> Benchee.Conversion.Count.scale(0.0045)
-      {0.0045, :one}
+      {0.0045, %Benchee.Conversion.Unit{long:      "",
+                                         magnitude: 1,
+                                         short:     ""}}
 
   """
   def scale(count) when count >= @one_billion do
@@ -80,7 +84,7 @@ defmodule Benchee.Conversion.Count do
   ## Examples
 
       iex> Benchee.Conversion.Count.scale(12345, :one)
-      12345
+      12345.0
 
       iex> Benchee.Conversion.Count.scale(12345, :thousand)
       12.345
@@ -109,16 +113,24 @@ defmodule Benchee.Conversion.Count do
   ## Examples
 
       iex> Benchee.Conversion.Count.best([23, 23_000, 34_000, 2_340_000])
-      :thousand
+      %Benchee.Conversion.Unit{long:      "Thousand",
+                               magnitude: 1000,
+                               short:     "K"}
 
       iex> Benchee.Conversion.Count.best([23, 23_000, 34_000, 2_340_000, 3_450_000])
-      :million
+      %Benchee.Conversion.Unit{long:      "Million",
+                               magnitude: 1_000_000,
+                               short:     "M"}
 
       iex> Benchee.Conversion.Count.best([23, 23_000, 34_000, 2_340_000], strategy: :smallest)
-      :one
+      %Benchee.Conversion.Unit{long:      "",
+                               magnitude: 1,
+                               short:     ""}
 
       iex> Benchee.Conversion.Count.best([23, 23_000, 34_000, 2_340_000], strategy: :largest)
-      :million
+      %Benchee.Conversion.Unit{long:      "Million",
+                               magnitude: 1_000_000,
+                               short:     "M"}
 
   """
   def best(list, opts \\ [strategy: :best])
@@ -132,10 +144,10 @@ defmodule Benchee.Conversion.Count do
   ## Examples
 
       iex> Benchee.Conversion.Count.base_unit
-      :one
+      %Benchee.Conversion.Unit{long: "", magnitude: 1, short: ""}
 
   """
-  def base_unit, do: :one
+  def base_unit, do: unit_for(:one)
 
   @doc """
   Formats a number as a string, with a unit label. To specify the unit, pass
@@ -149,7 +161,7 @@ defmodule Benchee.Conversion.Count do
       iex> Benchee.Conversion.Count.format(45.6789)
       "45.68"
 
-      iex> Benchee.Conversion.Count.format({45.6789, :thousand})
+      iex> Benchee.Conversion.Count.format({45.6789, %Benchee.Conversion.Unit{long: "Thousand", magnitude: "1_000", short: "K"}})
       "45.68 K"
   """
   def format(count) do

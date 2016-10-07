@@ -67,7 +67,7 @@ defmodule Benchee.Conversion.Format do
   defp separator(_label, separator), do: separator
 
   # Fetches the label for the given unit
-  defp label(module, unit) do
+  defp label(module, unit = %Unit{}) do
     unit.short
   end
 
