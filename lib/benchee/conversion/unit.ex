@@ -1,5 +1,5 @@
 defmodule Benchee.Conversion.Unit do
-  defstruct [:magnitude, :short, :long]
+  defstruct [:name, :magnitude, :label, :long]
 
   alias Benchee.Conversion.Unit
 

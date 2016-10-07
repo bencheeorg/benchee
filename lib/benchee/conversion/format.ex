@@ -68,7 +68,7 @@ defmodule Benchee.Conversion.Format do
 
   # Fetches the label for the given unit
   defp label(module, unit = %Unit{}) do
-    unit.short
+    unit.label
   end
 
   defp float_precision(float) when float < 0.01, do: 5

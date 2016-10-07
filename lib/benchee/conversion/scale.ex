@@ -6,8 +6,6 @@ defmodule Benchee.Conversion.Scale do
   See `Benchee.Conversion.Count` and `Benchee.Conversion.Duration` for examples
   """
 
-  alias Benchee.Conversion.Unit
-
   @type unit :: atom
   @type scaled_number :: {number, unit}
 
@@ -65,20 +63,16 @@ defmodule Benchee.Conversion.Scale do
   ## Examples
 
       iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
-      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :best)
-      %Benchee.Conversion.Unit{long:      "Thousand",
-                               magnitude: 1_000,
-                               short:     "K"}
+      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :best).name
+      :thousand
 
       iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
-      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :smallest)
-      %Benchee.Conversion.Unit{long: "", magnitude: 1, short: ""}
+      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :smallest).name
+      :one
 
       iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
-      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :largest)
-      %Benchee.Conversion.Unit{long:      "Million",
-                               magnitude: 1_000_000,
-                               short:     "M"}
+      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :largest).name
+      :million
   """
   def best_unit(list, module, opts) do
     case Keyword.get(opts, :strategy, :best) do
