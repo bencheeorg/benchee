@@ -66,15 +66,19 @@ defmodule Benchee.Conversion.Scale do
 
       iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
       iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :best)
-      :thousand
+      %Benchee.Conversion.Unit{long:      "Thousand",
+                               magnitude: 1_000,
+                               short:     "K"}
 
       iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
       iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :smallest)
-      :one
+      %Benchee.Conversion.Unit{long: "", magnitude: 1, short: ""}
 
       iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
       iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :largest)
-      :million
+      %Benchee.Conversion.Unit{long:      "Million",
+                               magnitude: 1_000_000,
+                               short:     "M"}
   """
   def best_unit(list, module, opts) do
     case Keyword.get(opts, :strategy, :best) do
