@@ -38,7 +38,7 @@ defmodule Benchee.Conversion.Format do
   (a single space) will be used.
   """
   def format({count, unit}, module) do
-    format(count, label(module, unit), separator(module))
+    format(count, label(unit), separator(module))
   end
 
   @doc """
@@ -67,7 +67,7 @@ defmodule Benchee.Conversion.Format do
   defp separator(_label, separator), do: separator
 
   # Fetches the label for the given unit
-  defp label(module, unit = %Unit{}) do
+  defp label(unit = %Unit{}) do
     unit.label
   end
 
