@@ -112,7 +112,7 @@ defmodule Benchee.Conversion.Duration do
       }
   """
   def unit_for(unit) do
-    Map.fetch! @units, unit
+    Scale.unit_for @units, unit
   end
 
   @doc """

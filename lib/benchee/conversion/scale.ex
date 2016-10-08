@@ -73,6 +73,13 @@ defmodule Benchee.Conversion.Scale do
     value / magnitude
   end
 
+  @doc """
+  Lookup a unit by its `atom` presentation for the representation of supported
+  units. Used by `Benchee.Conversion.Duration` and `Benchee.Conversion.Count`.
+  """
+  def unit_for(units, unit) do
+    Map.fetch! units, unit
+  end
 
   @doc """
   Given a `list` of number values and a `module` describing the domain of the

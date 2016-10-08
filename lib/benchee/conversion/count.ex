@@ -94,7 +94,7 @@ defmodule Benchee.Conversion.Count do
       }
   """
   def unit_for(unit) do
-    Map.fetch! @units, unit
+    Scale.unit_for @units, unit
   end
 
   @doc """
