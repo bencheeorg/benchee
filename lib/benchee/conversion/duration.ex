@@ -50,11 +50,6 @@ defmodule Benchee.Conversion.Duration do
   }
 
   @doc """
-  Units of duration: :microsecond, :millisecond, :second, :minute, :hour
-  """
-  def units, do: @units
-
-  @doc """
   Scales a duration value in microseconds into a larger unit if appropriate
 
   ## Examples

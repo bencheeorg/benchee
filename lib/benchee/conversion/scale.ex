@@ -8,7 +8,9 @@ defmodule Benchee.Conversion.Scale do
 
   alias Benchee.Conversion.Unit
 
-  @type unit :: atom
+  @type unit :: Unit.t
+  @type unit_atom :: atom
+  @type any_unit :: unit | unit_atom
   @type scaled_number :: {number, unit}
 
   # In 1.3, this could be declared as `keyword`, but use a custom type so it
@@ -27,7 +29,7 @@ defmodule Benchee.Conversion.Scale do
   specified unit. Results are a `{number, unit}` tuple. See
   `Benchee.Conversion.Count` and `Benchee.Conversion.Duration` for examples
   """
-  @callback scale(number, unit) :: number
+  @callback scale(number, any_unit) :: number
 
   @doc """
   Finds the best fit unit for a list of numbers in a domain's base unit.
@@ -41,6 +43,12 @@ defmodule Benchee.Conversion.Scale do
   general is the smallest supported unit.
   """
   @callback base_unit :: unit
+
+  @doc """
+  Given the atom representation of a unit (`:hour`) return the appropriate
+  `Benchee.Conversion.Unit` struct.
+  """
+  @callback unit_for(unit_atom) :: unit
 
   # Generic scaling functions
 

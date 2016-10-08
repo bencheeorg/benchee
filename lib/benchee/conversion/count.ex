@@ -40,11 +40,6 @@ defmodule Benchee.Conversion.Count do
   }
 
   @doc """
-  Units of count, in powers of 1_000: :one, :thousand, :million, :billion
-  """
-  def units, do: @units
-
-  @doc """
   Scales a value representing a count in ones into a larger unit if appropriate
 
   ## Examples
