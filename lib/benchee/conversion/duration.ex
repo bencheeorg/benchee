@@ -59,24 +59,23 @@ defmodule Benchee.Conversion.Duration do
 
   ## Examples
 
-      iex> Benchee.Conversion.Duration.scale(1)
-      {1.0, %Benchee.Conversion.Unit{name:      :microsecond,
-                                     long:      "Microseconds",
-                                     magnitude: 1,
-                                     label:     "μs"}}
+      iex> {value, unit} = Benchee.Conversion.Duration.scale(1)
+      iex> value
+      1.0
+      iex> unit.name
+      :microsecond
 
-      iex> Benchee.Conversion.Duration.scale(1_234)
-      {1.234, %Benchee.Conversion.Unit{name:      :millisecond,
-                                       long:      "Milliseconds",
-                                       magnitude: 1000,
-                                       label:     "ms"}}
+      iex> {value, unit} = Benchee.Conversion.Duration.scale(1_234)
+      iex> value
+      1.234
+      iex> unit.name
+      :millisecond
 
-      iex> Benchee.Conversion.Duration.scale(11_234_567_890.123)
-      {3.1207133028119443, %Benchee.Conversion.Unit{name:      :hour,
-                                                    long: "Hours",
-                                                    magnitude: 3600000000,
-                                                    label: "h"}}
-
+      iex> {value, unit} = Benchee.Conversion.Duration.scale(11_234_567_890.123)
+      iex> value
+      3.1207133028119443
+      iex> unit.name
+      :hour
   """
   def scale(duration) when duration >= @microseconds_per_hour do
     scale_with_unit duration, :hour

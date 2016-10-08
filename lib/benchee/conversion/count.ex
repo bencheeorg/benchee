@@ -49,18 +49,18 @@ defmodule Benchee.Conversion.Count do
 
   ## Examples
 
-      iex> Benchee.Conversion.Count.scale(4_321.09)
-      {4.32109, %Benchee.Conversion.Unit{name:      :thousand,
-                                         long:      "Thousand",
-                                         magnitude: 1000,
-                                         label:     "K"}}
+      iex> {value, unit} = Benchee.Conversion.Count.scale(4_321.09)
+      iex> value
+      4.32109
+      iex> unit.name
+      :thousand
 
-      iex> Benchee.Conversion.Count.scale(0.0045)
-      {0.0045, %Benchee.Conversion.Unit{name:      :one,
-                                        long:      "",
-                                        magnitude: 1,
-                                        label:     ""}}
-
+      iex> {value, unit} = Benchee.Conversion.Count.scale(0.0045)
+      iex> value
+      0.0045
+      iex> unit.name
+      :one
+      
   """
   def scale(count) when count >= @one_billion do
     scale_with_unit(count, :billion)
