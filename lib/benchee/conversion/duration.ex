@@ -139,20 +139,11 @@ defmodule Benchee.Conversion.Duration do
       1.234
 
   """
-  def microseconds({duration, :hour}) do
-    duration * @microseconds_per_hour
+  def microseconds({duration, unit = %Unit{}}) do
+    duration * unit.magnitude
   end
-  def microseconds({duration, :minute}) do
-    duration * @microseconds_per_minute
-  end
-  def microseconds({duration, :second}) do
-    duration * @microseconds_per_second
-  end
-  def microseconds({duration, :millisecond}) do
-    duration * @microseconds_per_millisecond
-  end
-  def microseconds({duration, :microsecond}) do
-    duration
+  def microseconds({duration, unit_atom}) do
+    microseconds {duration, unit_for(unit_atom)}
   end
 
   @doc """
