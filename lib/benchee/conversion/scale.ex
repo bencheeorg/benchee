@@ -6,6 +6,8 @@ defmodule Benchee.Conversion.Scale do
   See `Benchee.Conversion.Count` and `Benchee.Conversion.Duration` for examples
   """
 
+  alias Benchee.Conversion.Unit
+
   @type unit :: atom
   @type scaled_number :: {number, unit}
 
@@ -41,6 +43,36 @@ defmodule Benchee.Conversion.Scale do
   @callback base_unit :: unit
 
   # Generic scaling functions
+
+  @doc """
+  Used internally by implemented units to handle their scaling with units and
+  without.
+
+  ## Examples
+
+      iex> Benchee.Conversion.Scale.scale(12345, :thousand, Benchee.Conversion.Count)
+      12.345
+  """
+  def scale(value, unit = %Unit{}, _module) do
+    scale(value, unit)
+  end
+  def scale(value, unit_atom, module) do
+    scale value, module.unit_for(unit_atom)
+  end
+
+  @doc """
+  Used internally for scaling but only supports scaling with actual units.
+
+  ## Examples
+
+      iex> unit = %Benchee.Conversion.Unit{magnitude: 1000}
+      iex> Benchee.Conversion.Scale.scale 12345, unit
+      12.345
+  """
+  def scale(value, %Unit{magnitude: magnitude}) do
+    value / magnitude
+  end
+
 
   @doc """
   Given a `list` of number values and a `module` describing the domain of the

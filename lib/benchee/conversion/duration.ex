@@ -98,7 +98,20 @@ defmodule Benchee.Conversion.Duration do
     {scale(duration, unit), unit_for(unit)}
   end
 
-  defp unit_for(unit) do
+  @doc """
+  Get a unit by its atom representation.
+
+  ## Examples
+
+      iex> Benchee.Conversion.Duration.unit_for :hour
+      %Benchee.Conversion.Unit{
+        name:      :hour,
+        magnitude: 3_600_000_000,
+        label:     "h",
+        long:      "Hours"
+      }
+  """
+  def unit_for(unit) do
     Map.fetch! @units, unit
   end
 
@@ -117,11 +130,8 @@ defmodule Benchee.Conversion.Duration do
       2.0575e-4
 
   """
-  def scale(duration, unit = %Unit{}) do
-    Unit.scale duration, unit
-  end
-  def scale(duration, unit_atom) do
-    scale duration, unit_for(unit_atom)
+  def scale(count, unit) do
+    Scale.scale count, unit, __MODULE__
   end
 
   @doc """

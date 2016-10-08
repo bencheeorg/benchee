@@ -1,12 +1,7 @@
 defmodule Benchee.Conversion.CountTest do
   use ExUnit.Case
-  alias Benchee.Conversion.Count
   import Benchee.Conversion.Count
   doctest Benchee.Conversion.Count
-
-  defp unit_for(unit_atom) do
-    Map.fetch! Count.units, unit_atom
-  end
 
   test ".scale 123_456_789_012 scales to :billion" do
     assert scale(123_456_789_012) == {123.456789012, unit_for(:billion)}

@@ -80,7 +80,20 @@ defmodule Benchee.Conversion.Count do
     {scale(count, unit), unit_for(unit)}
   end
 
-  defp unit_for(unit) do
+  @doc """
+  Get a unit by its atom representation.
+
+  ## Examples
+
+      iex> Benchee.Conversion.Count.unit_for :thousand
+      %Benchee.Conversion.Unit{
+        name:      :thousand,
+        magnitude: 1_000,
+        label:     "K",
+        long:      "Thousand"
+      }
+  """
+  def unit_for(unit) do
     Map.fetch! @units, unit
   end
 
@@ -102,11 +115,8 @@ defmodule Benchee.Conversion.Count do
       0.012345
 
   """
-  def scale(count, unit = %Unit{}) do
-    Unit.scale count, unit
-  end
-  def scale(count, unit_atom) do
-    scale count, unit_for(unit_atom)
+  def scale(count, unit) do
+    Scale.scale count, unit, __MODULE__
   end
 
   @doc """

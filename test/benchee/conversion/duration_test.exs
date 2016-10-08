@@ -3,10 +3,6 @@ defmodule Benchee.Conversion.DurationTest do
   import Benchee.Conversion.Duration
   doctest Benchee.Conversion.Duration
 
-  defp unit_for(unit_atom) do
-    Map.fetch! Benchee.Conversion.Duration.units, unit_atom
-  end
-
   test ".format(98.7654321)" do
     assert format(98.7654321) == "98.77 μs"
   end
