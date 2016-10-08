@@ -212,13 +212,7 @@ defmodule Benchee.Conversion.Duration do
       "45.68 ms"
 
   """
-  def format({count, unit = %Unit{}}) do
-    Format.format {count, unit}, __MODULE__
-  end
-  def format({count, unit_atom}) do
-    format {count, unit_for(unit_atom)}
-  end
-  def format(count) do
-    Format.format(count, __MODULE__)
+  def format(duration) do
+    Format.format(duration, __MODULE__)
   end
 end

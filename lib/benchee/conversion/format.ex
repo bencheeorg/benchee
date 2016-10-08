@@ -37,8 +37,11 @@ defmodule Benchee.Conversion.Format do
   formatted output. If no `separator/0` function exists, the default separator
   (a single space) will be used.
   """
-  def format({count, unit}, module) do
+  def format({count, unit = %Unit{}}, module) do
     format(count, label(unit), separator(module))
+  end
+  def format({count, unit_atom}, module) do
+    format({count, module.unit_for(unit_atom)}, module)
   end
 
   @doc """
