@@ -204,10 +204,19 @@ defmodule Benchee.Conversion.Duration do
       iex> Benchee.Conversion.Duration.format(45.6789)
       "45.68 μs"
 
+      iex> Benchee.Conversion.Duration.format({45.6789, :millisecond})
+      "45.68 ms"
+
       iex> Benchee.Conversion.Duration.format({45.6789, %Benchee.Conversion.Unit{long: "Milliseconds", magnitude: 1000, label: "ms"}})
       "45.68 ms"
 
   """
+  def format({count, unit = %Unit{}}) do
+    Format.format {count, unit}, __MODULE__
+  end
+  def format({count, unit_atom}) do
+    format {count, unit_for(unit_atom)}
+  end
   def format(count) do
     Format.format(count, __MODULE__)
   end

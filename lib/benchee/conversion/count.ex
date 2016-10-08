@@ -60,7 +60,7 @@ defmodule Benchee.Conversion.Count do
       0.0045
       iex> unit.name
       :one
-      
+
   """
   def scale(count) when count >= @one_billion do
     scale_with_unit(count, :billion)
@@ -159,9 +159,18 @@ defmodule Benchee.Conversion.Count do
       iex> Benchee.Conversion.Count.format(45.6789)
       "45.68"
 
+      iex> Benchee.Conversion.Count.format({45.6789, :thousand})
+      "45.68 K"
+
       iex> Benchee.Conversion.Count.format({45.6789, %Benchee.Conversion.Unit{long: "Thousand", magnitude: "1_000", label: "K"}})
       "45.68 K"
   """
+  def format({count, unit = %Unit{}}) do
+    Format.format {count, unit}, __MODULE__
+  end
+  def format({count, unit_atom}) do
+    format {count, unit_for(unit_atom)}
+  end
   def format(count) do
     Format.format(count, __MODULE__)
   end
