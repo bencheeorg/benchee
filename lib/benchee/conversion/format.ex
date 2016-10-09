@@ -70,8 +70,8 @@ defmodule Benchee.Conversion.Format do
   defp separator(_label, separator), do: separator
 
   # Fetches the label for the given unit
-  defp label(unit = %Unit{}) do
-    unit.label
+  defp label(%Unit{label: label}) do
+    label
   end
 
   defp float_precision(float) when float < 0.01, do: 5

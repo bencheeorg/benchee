@@ -137,7 +137,7 @@ defmodule Benchee.Conversion.Scale do
     |> Enum.map(fn n -> scale_unit(n, module) end)
     |> Enum.group_by(fn unit -> unit end)
     |> Enum.map(fn {unit, occurrences} -> {unit, length(occurrences)} end)
-    |> Enum.sort(fn unit, freq -> by_frequency_and_magnitude(unit, freq, module) end)
+    |> Enum.sort(fn unit, freq -> by_frequency_and_magnitude(unit, freq) end)
     |> hd
     |> elem(0)
   end
@@ -146,14 +146,14 @@ defmodule Benchee.Conversion.Scale do
   defp smallest_unit(list, module) do
     list
     |> Enum.map(fn n -> scale_unit(n, module) end)
-    |> Enum.min_by(fn unit -> magnitude(module, unit) end)
+    |> Enum.min_by(fn unit -> magnitude(unit) end)
   end
 
   # Finds the largest unit in the list
   defp largest_unit(list, module) do
     list
     |> Enum.map(fn n -> scale_unit(n, module) end)
-    |> Enum.max_by(fn unit -> magnitude(module, unit) end)
+    |> Enum.max_by(fn unit -> magnitude(unit) end)
   end
 
   defp scale_unit(count, module) do
@@ -162,16 +162,16 @@ defmodule Benchee.Conversion.Scale do
   end
 
   # Fetches the magnitude for the given unit
-  defp magnitude(_module, unit) do
-    unit.magnitude
+  defp magnitude(%Unit{magnitude: magnitude}) do
+    magnitude
   end
 
   # Sorts two elements first by total, then by magnitude of the unit in case
   # of tie
-  defp by_frequency_and_magnitude({unit_a, frequency}, {unit_b, frequency}, module) do
-    magnitude(module, unit_a) > magnitude(module, unit_b)
+  defp by_frequency_and_magnitude({unit_a, frequency}, {unit_b, frequency}) do
+    magnitude(unit_a) > magnitude(unit_b)
   end
-  defp by_frequency_and_magnitude({_, frequency_a}, {_, frequency_b}, _module) do
+  defp by_frequency_and_magnitude({_, frequency_a}, {_, frequency_b}) do
     frequency_a > frequency_b
   end
 end

@@ -144,8 +144,8 @@ defmodule Benchee.Conversion.Duration do
       1.234
 
   """
-  def microseconds({duration, unit = %Unit{}}) do
-    duration * unit.magnitude
+  def microseconds({duration, %Unit{magnitude: magnitude}}) do
+    duration * magnitude
   end
   def microseconds({duration, unit_atom}) do
     microseconds {duration, unit_for(unit_atom)}
