@@ -18,51 +18,59 @@ defmodule Benchee.Conversion.Duration do
 
   @units %{
     hour:        %Unit{
+                    name:      :hour,
                     magnitude: @microseconds_per_hour,
-                    short:     "h",
+                    label:     "h",
                     long:      "Hours"
                  },
     minute:      %Unit{
+                    name:      :minute,
                     magnitude: @microseconds_per_minute,
-                    short:     "m",
+                    label:     "m",
                     long: "Minutes"
                  },
     second:      %Unit{
+                    name:      :second,
                     magnitude: @microseconds_per_second,
-                    short:     "s",
+                    label:     "s",
                     long:      "Seconds"
                  },
     millisecond: %Unit{
+                    name:      :millisecond,
                     magnitude: @microseconds_per_millisecond,
-                    short:     "ms",
+                    label:     "ms",
                     long:      "Milliseconds"
                  },
     microsecond: %Unit{
+                    name:      :microsecond,
                     magnitude: 1,
-                    short:     "μs",
-                    long: "Microseconds"
+                    label:     "μs",
+                    long:     "Microseconds"
                  }
   }
-
-  @doc """
-  Units of duration: :microsecond, :millisecond, :second, :minute, :hour
-  """
-  def units, do: @units
 
   @doc """
   Scales a duration value in microseconds into a larger unit if appropriate
 
   ## Examples
 
-      iex> Benchee.Conversion.Duration.scale(1)
-      {1, :microsecond}
+      iex> {value, unit} = Benchee.Conversion.Duration.scale(1)
+      iex> value
+      1.0
+      iex> unit.name
+      :microsecond
 
-      iex> Benchee.Conversion.Duration.scale(1_234)
-      {1.234, :millisecond}
+      iex> {value, unit} = Benchee.Conversion.Duration.scale(1_234)
+      iex> value
+      1.234
+      iex> unit.name
+      :millisecond
 
-      iex> Benchee.Conversion.Duration.scale(11_234_567_890.123)
-      {3.1207133028119443, :hour}
-
+      iex> {value, unit} = Benchee.Conversion.Duration.scale(11_234_567_890.123)
+      iex> value
+      3.1207133028119443
+      iex> unit.name
+      :hour
   """
   def scale(duration) when duration >= @microseconds_per_hour do
     scale_with_unit duration, :hour
@@ -82,7 +90,24 @@ defmodule Benchee.Conversion.Duration do
 
   # Helper function for returning a tuple of {value, unit}
   defp scale_with_unit(duration, unit) do
-    {scale(duration, unit), unit}
+    {scale(duration, unit), unit_for(unit)}
+  end
+
+  @doc """
+  Get a unit by its atom representation.
+
+  ## Examples
+
+      iex> Benchee.Conversion.Duration.unit_for :hour
+      %Benchee.Conversion.Unit{
+        name:      :hour,
+        magnitude: 3_600_000_000,
+        label:     "h",
+        long:      "Hours"
+      }
+  """
+  def unit_for(unit) do
+    Scale.unit_for @units, unit
   end
 
   @doc """
@@ -91,7 +116,7 @@ defmodule Benchee.Conversion.Duration do
   ## Examples
 
       iex> Benchee.Conversion.Duration.scale(12345, :microsecond)
-      12345
+      12345.0
 
       iex> Benchee.Conversion.Duration.scale(12345, :millisecond)
       12.345
@@ -100,20 +125,8 @@ defmodule Benchee.Conversion.Duration do
       2.0575e-4
 
   """
-  def scale(duration, :hour) do
-    duration / @microseconds_per_hour
-  end
-  def scale(duration, :minute) do
-    duration / @microseconds_per_minute
-  end
-  def scale(duration, :second) do
-    duration / @microseconds_per_second
-  end
-  def scale(duration, :millisecond) do
-    duration / @microseconds_per_millisecond
-  end
-  def scale(duration, :microsecond) do
-    duration
+  def scale(count, unit) do
+    Scale.scale count, unit, __MODULE__
   end
 
   @doc """
@@ -131,20 +144,11 @@ defmodule Benchee.Conversion.Duration do
       1.234
 
   """
-  def microseconds({duration, :hour}) do
-    duration * @microseconds_per_hour
+  def microseconds({duration, %Unit{magnitude: magnitude}}) do
+    duration * magnitude
   end
-  def microseconds({duration, :minute}) do
-    duration * @microseconds_per_minute
-  end
-  def microseconds({duration, :second}) do
-    duration * @microseconds_per_second
-  end
-  def microseconds({duration, :millisecond}) do
-    duration * @microseconds_per_millisecond
-  end
-  def microseconds({duration, :microsecond}) do
-    duration
+  def microseconds({duration, unit_atom}) do
+    microseconds {duration, unit_for(unit_atom)}
   end
 
   @doc """
@@ -156,16 +160,16 @@ defmodule Benchee.Conversion.Duration do
 
   ## Examples
 
-      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000])
+      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000]).name
       :millisecond
 
-      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000, 3_450_000])
+      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000, 3_450_000]).name
       :second
 
-      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000], strategy: :smallest)
+      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000], strategy: :smallest).name
       :microsecond
 
-      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000], strategy: :largest)
+      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000], strategy: :largest).name
       :second
   """
   def best(list, opts \\ [strategy: :best])
@@ -178,11 +182,11 @@ defmodule Benchee.Conversion.Duration do
 
   ## Examples
 
-      iex> Benchee.Conversion.Duration.base_unit
+      iex> Benchee.Conversion.Duration.base_unit.name
       :microsecond
 
   """
-  def base_unit, do: :microsecond
+  def base_unit, do: unit_for(:microsecond)
 
   @doc """
   Formats a number as a string, with a unit label. To specify the unit, pass
@@ -199,8 +203,11 @@ defmodule Benchee.Conversion.Duration do
       iex> Benchee.Conversion.Duration.format({45.6789, :millisecond})
       "45.68 ms"
 
+      iex> Benchee.Conversion.Duration.format({45.6789, %Benchee.Conversion.Unit{long: "Milliseconds", magnitude: 1000, label: "ms"}})
+      "45.68 ms"
+
   """
-  def format(count) do
-    Format.format(count, __MODULE__)
+  def format(duration) do
+    Format.format(duration, __MODULE__)
   end
 end
