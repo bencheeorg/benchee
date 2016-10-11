@@ -7,6 +7,7 @@
     * instead of "44556.77 μs" run time, you would see "44.56 ms"
 * Console output for standard deviation omits the parentheses
 * Scaling of console output can be configured with the 4 different strategies `:best`, `:largest`, `:smallest` and `:none`. Refer to the documentation for their different properties.
+* Shortened the fast function warning and instead [linked to the wiki](https://github.com/PragTob/benchee/wiki/Benchee-Warnings#fast-execution-warning)
 
 ## Features (Plugins)
 
