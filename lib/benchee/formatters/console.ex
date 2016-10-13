@@ -5,7 +5,7 @@ defmodule Benchee.Formatters.Console do
   """
 
   alias Benchee.Statistics
-  alias Benchee.Conversion.{Count, Duration}
+  alias Benchee.Conversion.{Count, Duration, DeviationPercent}
 
   @default_label_width 4 # Length of column header
   @ips_width 13
@@ -113,9 +113,7 @@ defmodule Benchee.Formatters.Console do
   end
 
   defp deviation_out(std_dev_ratio) do
-    "~ts~.2f%"
-    |> :io_lib.format(["±", std_dev_ratio * 100.0])
-    |> to_string
+    DeviationPercent.format(std_dev_ratio)
   end
 
   defp comparison_report([_reference], _, _, _config) do
