@@ -12,8 +12,8 @@ Benchee.run %{
 }
 
 # tobi@happy ~/github/benchee $ mix run samples/repat_n.exs
-# Erlang/OTP 19 [erts-8.0] [source] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
-# Elixir 1.3.2
+# Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
+# Elixir 1.3.4
 # Benchmark suite executing with the following configuration:
 # warmup: 2.0s
 # time: 5.0s
@@ -26,16 +26,16 @@ Benchee.run %{
 # Benchmarking List comprehension (range)...
 # Benchmarking Recursion...
 #
-# Name                                 ips        average    deviation         median
-# Recursion                       68829.80       14.53 μs    (±15.57%)       14.00 μs
-# Enum.each (list)                40328.88       24.80 μs    (±25.80%)       24.00 μs
-# List comprehension (list)       34124.09       29.30 μs    (±16.76%)       28.00 μs
-# List comprehension (range)      16241.21       61.57 μs    (±11.46%)       60.00 μs
-# Enum.each (range)               15143.96       66.03 μs    (±11.82%)       64.00 μs
+# Name                                 ips        average  deviation         median
+# Recursion                        90.60 K       11.04 μs     ±8.72%       11.00 μs
+# Enum.each (list)                 50.41 K       19.84 μs    ±20.27%       20.00 μs
+# List comprehension (list)        44.60 K       22.42 μs    ±13.40%       22.00 μs
+# List comprehension (range)       20.73 K       48.24 μs     ±8.69%       47.00 μs
+# Enum.each (range)                19.94 K       50.14 μs     ±6.42%       50.00 μs
 #
 # Comparison:
-# Recursion                       68829.80
-# Enum.each (list)                40328.88 - 1.71x slower
-# List comprehension (list)       34124.09 - 2.02x slower
-# List comprehension (range)      16241.21 - 4.24x slower
-# Enum.each (range)               15143.96 - 4.55x slower
+# Recursion                        90.60 K
+# Enum.each (list)                 50.41 K - 1.80x slower
+# List comprehension (list)        44.60 K - 2.03x slower
+# List comprehension (range)       20.73 K - 4.37x slower
+# Enum.each (range)                19.94 K - 4.54x slower

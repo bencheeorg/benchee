@@ -53,6 +53,8 @@ Benchee.init
 
 
 # tobi@happy ~/github/benchee $ mix run samples/multiple_map.exs
+# Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
+# Elixir 1.3.4
 # Benchmark suite executing with the following configuration:
 # warmup: 2.0s
 # time: 5.0s
@@ -65,16 +67,16 @@ Benchee.init
 # Benchmarking map with TCO and reverse...
 # Benchmarking stdlib map...
 #
-# Name                               ips        average    deviation         median
-# stdlib map                    65621.82        15.24μs    (±14.74%)        15.00μs
-# bodyrecusrive map             64979.38        15.39μs    (±20.95%)        15.00μs
-# map tco no reverse            64727.63        15.45μs    (±12.59%)        15.00μs
-# map with TCO and reverse      57646.09        17.35μs    (±24.10%)        17.00μs
-# map with TCO and ++             897.18      1114.60μs     (±6.49%)      1086.00μs
+# Name                               ips        average  deviation         median
+# stdlib map                     65.83 K       15.19 μs    ±15.89%       15.00 μs
+# bodyrecusrive map              65.68 K       15.23 μs    ±18.47%       15.00 μs
+# map tco no reverse             61.45 K       16.27 μs    ±23.99%       16.00 μs
+# map with TCO and reverse       56.81 K       17.60 μs    ±24.37%       17.00 μs
+# map with TCO and ++             0.94 K     1063.33 μs     ±6.11%     1041.00 μs
 #
 # Comparison:
-# stdlib map                    65621.82
-# bodyrecusrive map             64979.38 - 1.01x slower
-# map tco no reverse            64727.63 - 1.01x slower
-# map with TCO and reverse      57646.09 - 1.14x slower
-# map with TCO and ++             897.18 - 73.14x slower
+# stdlib map                     65.83 K
+# bodyrecusrive map              65.68 K - 1.00x slower
+# map tco no reverse             61.45 K - 1.07x slower
+# map with TCO and reverse       56.81 K - 1.16x slower
+# map with TCO and ++             0.94 K - 70.00x slower

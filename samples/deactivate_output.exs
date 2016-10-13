@@ -17,6 +17,6 @@ Benchee.run(%{
 
 # tobi@airship ~/github/benchee $ mix run samples/deactivate_output.exs
 #
-# Name           ips        average    deviation         median
-# fast   67196569.41       0.0149μs    (±24.72%)       0.0140μs
-# also   66268711.31       0.0151μs    (±24.23%)       0.0140μs
+# Name           ips        average  deviation         median
+# also       90.27 M      0.0111 μs     ±7.60%      0.0110 μs
+# fast       90.17 M      0.0111 μs     ±7.94%      0.0110 μs

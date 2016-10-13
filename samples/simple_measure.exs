@@ -5,7 +5,8 @@ Benchee.init
 |> Benchee.Formatters.Console.format
 |> IO.puts
 
-# tobi@happy ~/github/benchee $ mix run samples/simple_measure.exs
+# Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
+# Elixir 1.3.4
 # Benchmark suite executing with the following configuration:
 # warmup: 2.0s
 # time: 5.0s
@@ -14,5 +15,5 @@ Benchee.init
 #
 # Benchmarking map...
 #
-# Name           ips        average    deviation         median
-# map       20294.59        49.27μs     (±7.48%)        49.00μs
+# Name           ips        average  deviation         median
+# map        20.10 K       49.75 μs     ±7.57%       49.00 μs

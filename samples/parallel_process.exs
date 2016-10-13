@@ -6,6 +6,8 @@ Benchee.run %{parallel: 3, time: 10}, %{"three" => fn -> :timer.sleep(1000) end}
 Benchee.run %{parallel: 5, time: 10}, %{"five" => fn -> :timer.sleep(1000) end}
 
 # tobi@happy ~/github/benchee $ mix run samples/parallel_process.exs
+# Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
+# Elixir 1.3.4
 # Benchmark suite executing with the following configuration:
 # warmup: 2.0s
 # time: 10.0s
@@ -14,8 +16,10 @@ Benchee.run %{parallel: 5, time: 10}, %{"five" => fn -> :timer.sleep(1000) end}
 #
 # Benchmarking one...
 #
-# Name           ips        average    deviation         median
-# one           1.00   1000994.78μs     (±0.00%)   1000994.00μs
+# Name           ips        average  deviation         median
+# one           1.00         1.00 s     ±0.00%         1.00 s
+# Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
+# Elixir 1.3.4
 # Benchmark suite executing with the following configuration:
 # warmup: 2.0s
 # time: 10.0s
@@ -24,8 +28,10 @@ Benchee.run %{parallel: 5, time: 10}, %{"five" => fn -> :timer.sleep(1000) end}
 #
 # Benchmarking three...
 #
-# Name            ips        average    deviation         median
-# three          1.00   1000999.00μs     (±0.00%)   1000999.00μs
+# Name            ips        average  deviation         median
+# three          1.00         1.00 s     ±0.00%         1.00 s
+# Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
+# Elixir 1.3.4
 # Benchmark suite executing with the following configuration:
 # warmup: 2.0s
 # time: 10.0s
@@ -34,5 +40,5 @@ Benchee.run %{parallel: 5, time: 10}, %{"five" => fn -> :timer.sleep(1000) end}
 #
 # Benchmarking five...
 #
-# Name           ips        average    deviation         median
-# five          1.00   1001000.18μs     (±0.00%)   1001000.00μs
+# Name           ips        average  deviation         median
+# five          1.00         1.00 s     ±0.00%         1.00 s

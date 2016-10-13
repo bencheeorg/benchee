@@ -21,7 +21,9 @@ Benchee.run(
     "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
   })
 
-# tobi@happy ~/github/benchee $ mix run samples/formatters.exs 
+# tobi@happy ~/github/benchee $ mix run samples/formatters.exs
+# Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
+# Elixir 1.3.4
 # Benchmark suite executing with the following configuration:
 # warmup: 2.0s
 # time: 5.0s
@@ -31,13 +33,13 @@ Benchee.run(
 # Benchmarking flat_map...
 # Benchmarking map.flatten...
 #
-# Benchee recorded 4378 run times for flat_map!
-# Benchee recorded 6673 run times for map.flatten!
+# Benchee recorded 4310 run times for flat_map!
+# Benchee recorded 6429 run times for map.flatten!
 #
-# Name                  ips        average    deviation         median
-# map.flatten       1336.48       748.23μs    (±11.27%)       752.00μs
-# flat_map           876.42      1141.00μs     (±6.66%)      1097.00μs
+# Name                  ips        average  deviation         median
+# map.flatten        1.29 K        0.78 ms    ±14.44%        0.75 ms
+# flat_map           0.86 K        1.16 ms     ±6.23%        1.17 ms
 #
 # Comparison:
-# map.flatten       1336.48
-# flat_map           876.42 - 1.52x slower
+# map.flatten        1.29 K
+# flat_map           0.86 K - 1.49x slower

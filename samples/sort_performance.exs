@@ -5,6 +5,8 @@ Benchee.run %{"10k"  => fn -> Enum.sort(list_10k) end,
               "100k" => fn -> Enum.sort(list_100k) end}
 
 # tobi@happy ~/github/benchee $ mix run samples/sort_performance.exs
+# Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
+# Elixir 1.3.4
 # Benchmark suite executing with the following configuration:
 # warmup: 2.0s
 # time: 5.0s
@@ -14,11 +16,10 @@ Benchee.run %{"10k"  => fn -> Enum.sort(list_10k) end,
 # Benchmarking 100k...
 # Benchmarking 10k...
 #
-# Name           ips        average    deviation         median
-# 10k         742.67      1346.50μs     (±5.44%)      1366.00μs
-# 100k         52.11     19190.23μs    (±18.45%)     17519.00μs
+# Name           ips        average  deviation         median
+# 10k         692.27        1.44 ms    ±11.44%        1.39 ms
+# 100k         55.82       17.92 ms     ±4.98%       17.78 ms
 #
 # Comparison:
-# 10k         742.67
-# 100k         52.11 - 14.25x slower
-#
+# 10k         692.27
+# 100k         55.82 - 12.40x slower
