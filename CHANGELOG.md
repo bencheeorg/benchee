@@ -1,4 +1,6 @@
-# 0.5.0 (unreleased)
+# 0.5.0 (October 13, 2016)
+
+This release focuses on scaling units to more appropriate sizes. Instead of always working with base one for counts and microseconds those values are scaled accordingly to thousands, milliseconds for better readability. This work was mostly done by new contributor @wasnotrice.
 
 ## Features (User Facing)
 
@@ -12,6 +14,7 @@
 ## Features (Plugins)
 
 * The statistics module now computes the `minimum`, `maximum` and `sample_size` (not yet shown in the console formatter)
+* you can rely on `Benchee.Conversion.Duration`, `Benchee.Conversion.Count` and `Benchee.Conversion.DeviationPercent` for help with formatting and scaling units
 
 ## Breaking Changes (Plugins)
 
