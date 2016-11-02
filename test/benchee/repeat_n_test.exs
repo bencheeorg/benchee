@@ -1,5 +1,5 @@
 defmodule Benchee.RepeatNTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   import Benchee.RepeatN
   import ExUnit.CaptureIO
 

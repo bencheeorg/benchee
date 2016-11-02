@@ -1,5 +1,5 @@
 defmodule Benchee.Formatters.ConsoleTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   import ExUnit.CaptureIO
   doctest Benchee.Formatters.Console
 

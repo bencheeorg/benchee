@@ -1,5 +1,5 @@
 defmodule Benchee.Conversion.DurationTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   import Benchee.Conversion.Duration
   doctest Benchee.Conversion.Duration
 

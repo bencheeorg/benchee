@@ -1,5 +1,5 @@
 defmodule Benchee.Conversion.CountTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   import Benchee.Conversion.Count
   doctest Benchee.Conversion.Count
 

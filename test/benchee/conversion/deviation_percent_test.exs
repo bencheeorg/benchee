@@ -1,4 +1,4 @@
 defmodule Benchee.Conversion.DeviationPercentTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Benchee.Conversion.DeviationPercent
 end

@@ -1,5 +1,5 @@
 defmodule Benchee.StatistcsTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   alias Benchee.Statistics
   doctest Benchee.Statistics
 
