@@ -4,7 +4,7 @@ defmodule BencheeTest do
   doctest Benchee
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median$/m
-  @test_times   %{time: 0.1, warmup: 0.02}
+  @test_times   %{time: 0.01, warmup: 0.005}
   test "integration step by step" do
     capture_io fn ->
       result =
@@ -101,7 +101,7 @@ defmodule BencheeTest do
 
   test "integration super fast function print warnings" do
     output = capture_io fn ->
-      Benchee.run(%{time: 0.01, warmup: 0}, %{"Sleeps" => fn -> 0 end})
+      Benchee.run(%{time: 0.001, warmup: 0}, %{"Sleeps" => fn -> 0 end})
     end
 
     assert Regex.match? ~r/fast/, output
@@ -110,7 +110,7 @@ defmodule BencheeTest do
 
   test "integration super fast function warning is printed once per job" do
     output = capture_io fn ->
-      Benchee.run(%{time: 0.01, warmup: 0.01}, %{"Fast" => fn -> 0 end})
+      Benchee.run(%{time: 0.001, warmup: 0.001}, %{"Fast" => fn -> 0 end})
     end
 
     warnings = output
@@ -122,7 +122,7 @@ defmodule BencheeTest do
 
   test "integration super fast function warnings can be deactivated" do
     output = capture_io fn ->
-      Benchee.run(%{time: 0.01, warmup: 0, print: %{fast_warning: false}},
+      Benchee.run(%{time: 0.001, warmup: 0, print: %{fast_warning: false}},
                   %{"Blitz" => fn -> 0 end})
     end
 
@@ -159,8 +159,8 @@ defmodule BencheeTest do
   test "formatters have full access to the suite data" do
     output = capture_io fn ->
       Benchee.run(%{
-        time:       0.1,
-        warmup:     0.01,
+        time:       0.01,
+        warmup:     0.005,
         custom:     "Custom value",
         formatters: [
           fn(suite) ->

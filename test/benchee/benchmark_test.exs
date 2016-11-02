@@ -33,7 +33,7 @@ defmodule Benchee.BenchmarkTest do
             print: %{fast_warning: false, configuration: true}}
   test ".measure runs a benchmark suite and enriches it with results" do
     capture_io fn ->
-      config = Map.merge @config, %{time: 103_000, warmup: 20_000}
+      config = Map.merge @config, %{time: 60_000, warmup: 10_000}
       suite = %{config: config, jobs: %{}}
       new_suite =
         suite
@@ -43,14 +43,14 @@ defmodule Benchee.BenchmarkTest do
       assert new_suite.config == suite.config
       run_times_hash = new_suite.run_times
 
-      # should be 9 (10 minus one prewarm) but gotta give it a bit leeway
-      assert length(run_times_hash["Name"]) >= 8
+      # should be 5 (6 minus one prewarm) but gotta give it a bit leeway
+      assert length(run_times_hash["Name"]) >= 4
     end
   end
 
   test ".measure can run multiple benchmarks in parallel" do
     capture_io fn ->
-      config = Map.merge @config, %{parallel: 6, time: 103_000}
+      config = Map.merge @config, %{parallel: 6, time: 60_000}
       suite = %{
         config: config,
         jobs: %{"" => fn -> :timer.sleep 10 end}
@@ -60,7 +60,7 @@ defmodule Benchee.BenchmarkTest do
       assert %{"" => run_times} = new_suite.run_times
 
       # it does more work when working in parallel than it does alone
-      assert length(run_times) >= 20
+      assert length(run_times) >= 12
     end
   end
 
@@ -117,7 +117,7 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure doesn't print out information about warmup (annoying)" do
     output = capture_io fn ->
-      config = Map.merge @config, %{time: 1000, warmup: 500}
+      config = Map.merge @config, %{time: 1_000, warmup: 500}
       %{config: config, jobs: %{}}
       |> Benchee.benchmark("noop", fn -> 0 end)
       |> Benchee.measure
@@ -138,7 +138,7 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure prints configuration information about the suite" do
     output = capture_io fn ->
-      config = Map.merge @config, %{parallel: 2, time: 100_000, warmup: 50_000}
+      config = Map.merge @config, %{parallel: 2, time: 10_000, warmup: 0}
       %{config: config, jobs: %{}}
       |> Benchee.benchmark("noop", fn -> 0 end)
       |> Benchee.benchmark("dontcare", fn -> 0 end)
@@ -148,18 +148,18 @@ defmodule Benchee.BenchmarkTest do
     assert output =~ "Erlang/OTP"
     assert output =~ "Elixir #{System.version}"
     assert output =~ ~r/following configuration/i
-    assert output =~ "warmup: 0.05s"
-    assert output =~ "time: 0.1s"
+    assert output =~ "warmup: 0.0s"
+    assert output =~ "time: 0.01s"
     assert output =~ "parallel: 2"
-    assert output =~ "Estimated total run time: 0.3s"
+    assert output =~ "Estimated total run time: 0.02s"
   end
 
   test ".measure does not print configuration information when disabled" do
     output = capture_io fn ->
       custom = %{
                   parallel: 2,
-                  time: 100_000,
-                  warmup: 50_000
+                  time: 1_000,
+                  warmup: 0
                  }
       config = Map.merge @config, custom
       config = update_in(config, [:print, :configuration], fn(_) -> false end)
