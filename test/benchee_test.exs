@@ -179,6 +179,49 @@ defmodule BencheeTest do
     assert output =~ "Custom value"
   end
 
+  test "inputs feature version of readme example" do
+    output = capture_io fn ->
+      map_fun = fn(i) -> [i, i * i] end
+
+      configuration = Map.merge @test_times,
+                                %{inputs: %{ "list" => Enum.to_list(1..10_000)}}
+
+      Benchee.run(configuration, %{
+        "flat_map"    => fn(input) -> Enum.flat_map(input, map_fun) end,
+        "map.flatten" =>
+          fn(input) -> input |> Enum.map(map_fun) |> List.flatten end
+      })
+    end
+
+    readme_sample_asserts(output)
+  end
+
+  test "multiple inputs" do
+    output = capture_io fn ->
+      map_fun = fn(i) -> [i, i * i] end
+      inputs = %{
+        inputs: %{
+          "small list"  => Enum.to_list(1..100),
+          "medium list" => Enum.to_list(1..10_000),
+          "big list"    => Enum.to_list(1..1_000_000),
+        }
+      }
+
+      configuration = Map.merge @test_times, inputs
+
+
+      Benchee.run(configuration, %{
+        "flat_map"    => fn(input) -> Enum.flat_map(input, map_fun) end,
+        "map.flatten" =>
+          fn(input) -> input |> Enum.map(map_fun) |> List.flatten end
+      })
+    end
+
+    # assert we get 3 outputs
+    # assert headlines and outputs for all 3 of them
+    # might have to rethink where configuration information is printed
+  end
+
   @slower_regex "\\s+- \\d\\.\\d+x slower"
   defp readme_sample_asserts(output) do
     assert output =~ @header_regex
