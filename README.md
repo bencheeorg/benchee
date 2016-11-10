@@ -25,7 +25,7 @@ Benchee does not:
 
 * Keep results of previous and compare them, if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark)
 
-Benchee has no runtime dependencies and is aimed at being the core benchmarking logic. Further functionality is provided through plugins that then pull in dependencies, such as CSV export. Check out the [available plugins](#plugins)!
+Benchee only has a small runtime dependency on `deep_merge` for merging configuration and is aimed at being the core benchmarking logic. Further functionality is provided through plugins that then pull in dependencies, such as CSV export. Check out the [available plugins](#plugins)!
 
 ## Installation
 

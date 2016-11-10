@@ -128,11 +128,10 @@ defmodule Benchee.Config do
   }
   @time_keys [:time, :warmup]
   def init(config \\ %{}) do
-    print   = print_config config
-    console = console_config config
-    config  = convert_time_to_micro_s(Map.merge(@default_config, config))
-    config  = %{config | print: print, console: console}
-    :ok     = :timer.start
+    config = @default_config
+             |> DeepMerge.deep_merge(config)
+             |> convert_time_to_micro_s
+    :ok    = :timer.start
     %{config: config, jobs: %{}}
   end
 
@@ -143,19 +142,5 @@ defmodule Benchee.Config do
       end
       new_config
     end
-  end
-
-  defp print_config(%{print: config}) do
-    Map.merge @default_config.print, config
-  end
-  defp print_config(_no_print_config) do
-    @default_config.print
-  end
-
-  defp console_config(%{console: config}) do
-    Map.merge @default_config.console, config
-  end
-  defp console_config(_no_console_config) do
-    @default_config.console
   end
 end
