@@ -39,9 +39,7 @@ defmodule Benchee.Benchmark do
   def measure(suite = %{jobs: jobs, config: config}) do
     print_configuration_information(jobs, config)
     run_times =
-      jobs
-      |> Enum.map(fn(job) -> measure_job(job, config) end)
-      |> Map.new
+
     Map.put suite, :run_times, run_times
   end
 
@@ -77,6 +75,23 @@ defmodule Benchee.Benchmark do
   @round_precision 2
   defp time_precision(float) do
     Float.round(float, @round_precision)
+  end
+
+  @no_inputs :no_inputs
+  defp record_runtimes(jobs, config = %{inputs: nil}) do
+    runtimes = runtimes_for_input(nil, jobs, config)
+    {@no_inputs => runtimes}
+  end
+  defp record_runtimes(jobs, config = %{inputs: inputs}) do
+    inputs
+    |> Enum.map(fn(input), runtimes_for_input(input, jobs, config))
+    |> Map.new
+  end
+
+  defp runtimes_for_input({input_name, input}, jobs, config) do
+    jobs
+    |> Enum.map(fn(job) -> {input_name, measure_job(input, job, config)} end)
+    |> Map.new
   end
 
   defp measure_job({name, function}, config) do

@@ -116,6 +116,7 @@ defmodule Benchee.Config do
     time:       5,
     warmup:     2,
     formatters: [&Benchee.Formatters.Console.output/1],
+    inputs:     nil,
     print:      %{
                   benchmarking:  true,
                   configuration: true,

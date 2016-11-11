@@ -217,9 +217,9 @@ defmodule BencheeTest do
       })
     end
 
-    # assert we get 3 outputs
-    # assert headlines and outputs for all 3 of them
-    # might have to rethink where configuration information is printed
+    assert String.contains? output, ["small list", "medium list", "big list"]
+    occurences = Regex.scan body_regex("flat_map"), output
+    assert length(occurences) == 3
   end
 
   @slower_regex "\\s+- \\d\\.\\d+x slower"
