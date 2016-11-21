@@ -38,7 +38,7 @@ defmodule Benchee.Benchmark do
   """
   def measure(suite = %{jobs: jobs, config: config}) do
     print_configuration_information(jobs, config)
-    run_times =
+    run_times = record_runtimes(jobs, config)
 
     Map.put suite, :run_times, run_times
   end
@@ -78,25 +78,27 @@ defmodule Benchee.Benchmark do
   end
 
   @no_inputs :no_inputs
+  @no_input :__no_input
+  @no_input_marker {@no_input, @no_input}
   defp record_runtimes(jobs, config = %{inputs: nil}) do
-    runtimes = runtimes_for_input(nil, jobs, config)
-    {@no_inputs => runtimes}
+    runtimes = runtimes_for_input(@no_input_marker, jobs, config)
+    %{@no_inputs => runtimes}
   end
   defp record_runtimes(jobs, config = %{inputs: inputs}) do
     inputs
-    |> Enum.map(fn(input), runtimes_for_input(input, jobs, config))
+    |> Enum.map(fn(input) -> runtimes_for_input(input, jobs, config) end)
     |> Map.new
   end
 
   defp runtimes_for_input({input_name, input}, jobs, config) do
     jobs
-    |> Enum.map(fn(job) -> {input_name, measure_job(input, job, config)} end)
+    |> Enum.map(fn(job) -> {input_name, measure_job(job, input, config)} end)
     |> Map.new
   end
 
-  defp measure_job({name, function}, config) do
+  defp measure_job({name, function}, input, config) do
     print_benchmarking name, config
-    job_run_times = parallel_benchmark function, config
+    job_run_times = parallel_benchmark function, input, config
     {name, job_run_times}
   end
 
@@ -108,13 +110,14 @@ defmodule Benchee.Benchmark do
   end
 
   defp parallel_benchmark(function,
+                          input,
                           %{parallel: parallel,
                             time:     time,
                             warmup:   warmup,
                             print:    %{fast_warning: fast_warning}}) do
     pmap 1..parallel, fn ->
-      run_warmup function, warmup
-      measure_runtimes function, time, fast_warning
+      run_warmup function, input, warmup
+      measure_runtimes function, input, time, fast_warning
     end
   end
 
@@ -125,20 +128,20 @@ defmodule Benchee.Benchmark do
     |> List.flatten
   end
 
-  defp run_warmup(function, time) do
-    measure_runtimes(function, time, false)
+  defp run_warmup(function, input, time) do
+    measure_runtimes(function, input, time, false)
   end
 
-  defp measure_runtimes(function, time, display_fast_warning)
-  defp measure_runtimes(_function, 0, _) do
+  defp measure_runtimes(function, input, time, display_fast_warning)
+  defp measure_runtimes(_function, _input, 0, _) do
     []
   end
 
-  defp measure_runtimes(function, time, display_fast_warning) do
+  defp measure_runtimes(function, input, time, display_fast_warning) do
     finish_time = current_time + time
     :erlang.garbage_collect
-    {n, initial_run_time} = determine_n_times(function, display_fast_warning)
-    do_benchmark(finish_time, function, [initial_run_time], n)
+    {n, initial_run_time} = determine_n_times(function, input, display_fast_warning)
+    do_benchmark(finish_time, function, input, [initial_run_time], n)
   end
 
   defp current_time do
@@ -147,8 +150,8 @@ defmodule Benchee.Benchmark do
 
   # testing has shown that sometimes the first call is significantly slower
   # than the second (like 2 vs 800) so prewarm one time.
-  defp prewarm(function, n \\ 1) do
-    measure_call(function, n)
+  defp prewarm(function, input, n \\ 1) do
+    measure_call(function, input, n)
   end
 
   # If a function executes way too fast measurements are too unreliable and
@@ -156,24 +159,24 @@ defmodule Benchee.Benchmark do
   # executed in the measurement cycle.
   @minimum_execution_time 10
   @times_multiplicator 10
-  defp determine_n_times(function, display_fast_warning) do
-    prewarm function
-    run_time = measure_call function
+  defp determine_n_times(function, input, display_fast_warning) do
+    prewarm function, input
+    run_time = measure_call function, input
     if run_time >= @minimum_execution_time do
       {1, run_time}
     else
       if display_fast_warning, do: print_fast_warning
-      try_n_times(function, @times_multiplicator)
+      try_n_times(function, input, @times_multiplicator)
     end
   end
 
-  defp try_n_times(function, n) do
-    prewarm function, n
-    run_time = measure_call_n_times function, n
+  defp try_n_times(function, input, n) do
+    prewarm function, input, n
+    run_time = measure_call_n_times function, input, n
     if run_time >= @minimum_execution_time do
       {n, run_time / n}
     else
-      try_n_times(function, n * @times_multiplicator)
+      try_n_times(function, input, n * @times_multiplicator)
     end
   end
 
@@ -184,28 +187,44 @@ defmodule Benchee.Benchmark do
     IO.puts @fast_warning
   end
 
-  defp do_benchmark(finish_time, function, run_times, n, now \\ 0)
-  defp do_benchmark(finish_time, _, run_times, _n, now) when now > finish_time do
+  defp do_benchmark(finish_time, function, input, run_times, n, now \\ 0)
+  defp do_benchmark(finish_time, _, _, run_times, _n, now)
+       when now > finish_time do
     run_times
   end
-  defp do_benchmark(finish_time, function, run_times, n, _now) do
-    run_time = measure_call(function, n)
+  defp do_benchmark(finish_time, function, input, run_times, n, _now) do
+    run_time = measure_call(function, input, n)
     updated_run_times = [run_time | run_times]
-    do_benchmark(finish_time, function, updated_run_times, n, current_time())
+    do_benchmark(finish_time, function, input,
+                 updated_run_times, n, current_time())
   end
 
-  defp measure_call(function, n \\ 1)
-  defp measure_call(function, 1) do
+  defp measure_call(function, input, n \\ 1)
+  defp measure_call(function, @no_input, 1) do
     {microseconds, _return_value} = :timer.tc function
     microseconds
   end
-  defp measure_call(function, n) do
-    measure_call_n_times(function, n) / n
+  defp measure_call(function, input, 1) do
+    {microseconds, _return_value} = :timer.tc function, input
+    microseconds
+  end
+  defp measure_call(function, input, n) do
+    measure_call_n_times(function, input, n) / n
   end
 
-  defp measure_call_n_times(function, n) do
+  defp measure_call_n_times(function, @no_input, n) do
     {microseconds, _return_value} = :timer.tc fn ->
       RepeatN.repeat_n(function, n)
+    end
+
+    microseconds
+  end
+  defp measure_call_n_times(function, input, n) do
+    call_with_arg = fn ->
+      function.(input)
+    end
+    {microseconds, _return_value} = :timer.tc fn ->
+      RepeatN.repeat_n(call_with_arg, n)
     end
 
     microseconds
