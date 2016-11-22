@@ -64,6 +64,7 @@ defmodule Benchee.Config do
             parallel: 1,
             time: 5_000_000,
             warmup: 2_000_000,
+            inputs: nil,
             formatters: [&Benchee.Formatters.Console.output/1],
             print: %{
               benchmarking: true,
@@ -82,6 +83,7 @@ defmodule Benchee.Config do
             parallel: 1,
             time: 1_000_000,
             warmup: 200_000.0,
+            inputs: nil,
             formatters: [&Benchee.Formatters.Console.output/1],
             print: %{
               benchmarking: true,
@@ -100,6 +102,26 @@ defmodule Benchee.Config do
             parallel: 2,
             time: 1_000_000,
             warmup: 200_000.0,
+            inputs: nil,
+            formatters: [&IO.puts/2],
+            print: %{
+              benchmarking: true,
+              fast_warning: false,
+              configuration: true
+            },
+            console: %{ comparison: true, unit_scaling: :smallest }
+          },
+        jobs: %{}
+      }
+
+      iex> Benchee.init %{parallel: 2, time: 1, warmup: 0.2, formatters: [&IO.puts/2], print: %{fast_warning: false}, console: %{unit_scaling: :smallest}, inputs: %{"Small" => 5, "Big" => 9999}}
+      %{
+        config:
+          %{
+            parallel: 2,
+            time: 1_000_000,
+            warmup: 200_000.0,
+            inputs: %{"Small" => 5, "Big" => 9999},
             formatters: [&IO.puts/2],
             print: %{
               benchmarking: true,
