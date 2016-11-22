@@ -82,7 +82,7 @@ defmodule Benchee.Benchmark do
   @no_input_marker {@no_input, @no_input}
   defp record_runtimes(jobs, config = %{inputs: nil}) do
     runtimes = runtimes_for_input(@no_input_marker, jobs, config)
-    %{@no_inputs => runtimes}
+    # %{@no_inputs => runtimes}
   end
   defp record_runtimes(jobs, config = %{inputs: inputs}) do
     inputs
@@ -99,7 +99,7 @@ defmodule Benchee.Benchmark do
   defp measure_job({name, function}, input, config) do
     print_benchmarking name, config
     job_run_times = parallel_benchmark function, input, config
-    {name, job_run_times}
+    %{name => job_run_times}
   end
 
   defp print_benchmarking(_, %{print: %{benchmarking: false}}) do

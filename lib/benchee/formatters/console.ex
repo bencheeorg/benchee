@@ -38,13 +38,36 @@ defmodule Benchee.Formatters.Console do
   ```
 
   """
-  def format(%{statistics: job_stats, config: %{console: config}}) do
+  def format(%{statistics: jobs_per_input, config: %{console: config}}) do
+    jobs_per_input
+    |> Enum.map(fn({_input, job_stats}) -> format_job(job_stats, config) end)
+    |> List.flatten
+    |> remove_last_blank_line
+  end
+
+  @doc """
+  Formats the job statistics to a report suitable for output on the CLI.
+
+  ## Examples
+
+  ```
+  iex> jobs = %{ "My Job" =>%{average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0}, "Job 2" => %{average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0}}
+  iex> Benchee.Formatters.Console.format(%{statistics: jobs, config: %{console: %{comparison: false, unit_scaling: :best}}})
+  ["\nName             ips        average  deviation         median\n",
+  "My Job        5.00 K      200.00 μs    ±10.00%      190.00 μs\n",
+  "Job 2         2.50 K      400.00 μs    ±20.00%      390.00 μs\n"]
+
+  ```
+
+  """
+  def format_job(job_stats, config) do
     sorted_stats = Statistics.sort(job_stats)
     units = units(sorted_stats, config)
     label_width = label_width job_stats
-    [column_descriptors(label_width) | job_reports(sorted_stats, units, label_width)
+
+    [column_descriptors(label_width) |
+      job_reports(sorted_stats, units, label_width)
       ++ comparison_report(sorted_stats, units, label_width, config)]
-    |> remove_last_blank_line
   end
 
   defp column_descriptors(label_width) do

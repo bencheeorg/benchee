@@ -5,6 +5,7 @@ defmodule Benchee.Statistics do
   """
 
   alias Benchee.{Statistics, Conversion.Duration}
+  import Benchee.Utility.MapValues
   require Integer
 
   @doc """
@@ -57,21 +58,10 @@ defmodule Benchee.Statistics do
 
   """
   def statistics(suite = %{run_times: run_times_per_input}) do
-    statistics =
-      run_times_per_input
-      |> Enum.map(fn({input_name, job_run_times}) ->
-           statistics_for_input(input_name, job_run_times)
-         end)
-      |> Map.new
+    statistics = run_times_per_input
+                 |> map_values(&Statistics.job_statistics/1)
 
     Map.put suite, :statistics, statistics
-  end
-
-  defp statistics_for_input(input_name, job_run_times) do
-    Enum.map(job_run_times, fn({name, run_times}) ->
-       {name, Statistics.job_statistics(run_times)}
-    end)
-    |> Map.new
   end
 
   @doc """
