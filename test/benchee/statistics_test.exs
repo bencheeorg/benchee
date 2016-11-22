@@ -6,14 +6,18 @@ defmodule Benchee.StatistcsTest do
   test ".statistics computes the statistics for all jobs correctly" do
     suite = %{
       run_times: %{
-        "Job 1" => [600, 470, 170, 430, 300],
-        "Job 2" => [17, 15, 23, 7, 9, 13]
+        "Input" => %{
+          "Job 1" => [600, 470, 170, 430, 300],
+          "Job 2" => [17, 15, 23, 7, 9, 13]
+        }
       }
     }
 
-    %{statistics:
-      %{"Job 1" => stats_1,
-        "Job 2" => stats_2}} = Statistics.statistics suite
+    %{
+      statistics: %{
+        "Input" => %{
+          "Job 1" => stats_1,
+          "Job 2" => stats_2}}} = Statistics.statistics suite
 
     assert stats_1.average == 394.0
     assert_in_delta stats_1.std_dev, 147.32, 0.01
@@ -37,8 +41,10 @@ defmodule Benchee.StatistcsTest do
   test ".statistics preserves all other keys in the map handed to it" do
     suite = %{
       run_times: %{
-        "Job 1" => [600, 470, 170, 430, 300],
-        "Job 2" => [17, 15, 23, 7, 9, 13]
+        "Input" => %{
+          "Job 1" => [600, 470, 170, 430, 300],
+          "Job 2" => [17, 15, 23, 7, 9, 13]
+        }
       },
       formatters: [],
       some_option: "value"

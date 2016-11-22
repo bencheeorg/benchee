@@ -37,23 +37,29 @@ defmodule Benchee.Statistics do
   ## Examples
 
       iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
-      iex> suite = %{run_times: %{"My Job" => run_times}}
+      iex> suite = %{run_times: %{"Input" => %{"My Job" => run_times}}}
       iex> Benchee.Statistics.statistics(suite)
       %{
         statistics: %{
-          "My Job" => %{
-            average:       500.0,
-            ips:           2000.0,
-            std_dev:       200.0,
-            std_dev_ratio: 0.4,
-            std_dev_ips:   800.0,
-            median:        450.0,
-            minimum:       200,
-            maximum:       900,
-            sample_size:   8
+          "Input" => %{
+            "My Job" => %{
+              average:       500.0,
+              ips:           2000.0,
+              std_dev:       200.0,
+              std_dev_ratio: 0.4,
+              std_dev_ips:   800.0,
+              median:        450.0,
+              minimum:       200,
+              maximum:       900,
+              sample_size:   8
+            }
           }
         },
-        run_times: %{"My Job" => [200, 400, 400, 400, 500, 500, 700, 900]}
+        run_times: %{
+          "Input" => %{
+            "My Job" => [200, 400, 400, 400, 500, 500, 700, 900]
+          }
+        }
       }
 
   """
