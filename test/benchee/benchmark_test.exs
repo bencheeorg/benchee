@@ -72,8 +72,6 @@ defmodule Benchee.BenchmarkTest do
     end
   end
 
-  defp no_input_access(map), do: map[Benchee.Benchmark.no_input]
-
   test ".measure can run multiple benchmarks in parallel" do
     capture_io fn ->
       config = Map.merge @config, %{parallel: 6, time: 60_000}

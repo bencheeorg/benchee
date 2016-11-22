@@ -1,6 +1,7 @@
 defmodule BencheeTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureIO
+  import Benchee.TestHelpers
   doctest Benchee
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median$/m
@@ -164,10 +165,21 @@ defmodule BencheeTest do
         custom:     "Custom value",
         formatters: [
           fn(suite) ->
-            IO.puts "Run time: #{List.last(suite.run_times["Sleeps"]) |> Benchee.Conversion.Duration.format}"
+            run_time = suite.run_times
+                       |> no_input_access
+                       |> Map.get("Sleeps")
+                       |> List.last
+                       |> Benchee.Conversion.Duration.format
+
+            IO.puts "Run time: #{run_time}"
           end,
           fn(suite) ->
-            IO.puts "Average: #{suite.statistics["Sleeps"].average |> Benchee.Conversion.Duration.format}"
+            average = suite.statistics
+                      |> no_input_access
+                      |> Map.get("Sleeps")
+                      |> Map.get(:average)
+                      |> Benchee.Conversion.Duration.format
+            IO.puts "Average: #{average}"
           end,
           fn(suite) -> IO.puts suite.config.custom end
         ]

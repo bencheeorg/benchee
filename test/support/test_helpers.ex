@@ -13,4 +13,6 @@ defmodule Benchee.TestHelpers do
         retrying(asserting_function, n - 1)
     end
   end
+
+  def no_input_access(map), do: map[Benchee.Benchmark.no_input]
 end
