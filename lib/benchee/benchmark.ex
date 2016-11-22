@@ -5,7 +5,7 @@ defmodule Benchee.Benchmark do
   Exposes `benchmark` function.
   """
 
-  alias Benchee.RepeatN
+  alias Benchee.Utility.RepeatN
   alias Benchee.Conversion.Duration
 
   @doc """

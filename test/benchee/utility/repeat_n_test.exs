@@ -1,6 +1,6 @@
-defmodule Benchee.RepeatNTest do
+defmodule Benchee.Utility.RepeatNTest do
   use ExUnit.Case, async: true
-  import Benchee.RepeatN
+  import Benchee.Utility.RepeatN
   import ExUnit.CaptureIO
 
   test "calls it n times" do

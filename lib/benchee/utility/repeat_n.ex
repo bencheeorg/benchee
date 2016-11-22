@@ -1,10 +1,5 @@
-defmodule Benchee.RepeatN do
-  @moduledoc """
-  Simple helper module that can easily make a function call repeat n times.
-  Which is significantly faster than Enum.each/list comprehension.
-
-  Check out the benchmark in `samples/repeat_n.exs`
-  """
+defmodule Benchee.Utility.RepeatN do
+  @moduledoc false
 
   @doc """
   Calls the given function n times.
