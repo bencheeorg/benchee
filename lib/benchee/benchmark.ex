@@ -77,12 +77,17 @@ defmodule Benchee.Benchmark do
     Float.round(float, @round_precision)
   end
 
-  @no_inputs :no_inputs
   @no_input :__no_input
   @no_input_marker {@no_input, @no_input}
+
+  @doc """
+  Key in the result for when there were no inputs given.
+  """
+  def no_input, do: @no_input
+
   defp record_runtimes(jobs, config = %{inputs: nil}) do
-    runtimes = runtimes_for_input(@no_input_marker, jobs, config)
-    # %{@no_inputs => runtimes}
+    [runtimes_for_input(@no_input_marker, jobs, config)]
+    |> Map.new
   end
   defp record_runtimes(jobs, config = %{inputs: inputs}) do
     inputs
@@ -91,15 +96,17 @@ defmodule Benchee.Benchmark do
   end
 
   defp runtimes_for_input({input_name, input}, jobs, config) do
-    jobs
-    |> Enum.map(fn(job) -> {input_name, measure_job(job, input, config)} end)
-    |> Map.new
+    results = jobs
+              |> Enum.map(fn(job) -> measure_job(job, input, config) end)
+              |> Map.new
+
+    {input_name, results}
   end
 
   defp measure_job({name, function}, input, config) do
     print_benchmarking name, config
     job_run_times = parallel_benchmark function, input, config
-    %{name => job_run_times}
+    {name, job_run_times}
   end
 
   defp print_benchmarking(_, %{print: %{benchmarking: false}}) do

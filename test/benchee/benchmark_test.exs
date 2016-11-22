@@ -30,8 +30,9 @@ defmodule Benchee.BenchmarkTest do
   @config %{parallel: 1,
             time: 40_000,
             warmup: 20_000,
+            inputs: nil,
             print: %{fast_warning: false, configuration: true}}
-  test ".measure runs a benchmark suite and enriches it with results" do
+  test ".measure runs a benchmark suite and enriches it with measurements" do
     retrying fn ->
       capture_io fn ->
         config = Map.merge @config, %{time: 60_000, warmup: 10_000}
@@ -42,13 +43,36 @@ defmodule Benchee.BenchmarkTest do
           |> Benchee.measure
 
         assert new_suite.config == suite.config
-        run_times_hash = new_suite.run_times
+        run_times_hash = new_suite.run_times |> no_input_access
 
         # should be 5 (6 minus one prewarm) but gotta give it a bit leeway
         assert length(run_times_hash["Name"]) >= 4
       end
     end
   end
+
+  test ".measure runs a suite with multiple jobs and gathers results" do
+    retrying fn ->
+      capture_io fn ->
+        config = Map.merge @config, %{time: 60_000, warmup: 10_000}
+        suite = %{config: config, jobs: %{}}
+        new_suite =
+          suite
+          |> Benchee.benchmark("Name", fn -> :timer.sleep(10) end)
+          |> Benchee.benchmark("Name 2", fn -> :timer.sleep(5) end)
+          |> Benchee.measure
+
+        run_times_hash = new_suite.run_times |> no_input_access
+
+        # should be 5 (6 minus one prewarm) but gotta give it a bit leeway
+        assert length(run_times_hash["Name"]) >= 4
+        # should be 11 (12 - 1 prewarm, but gotta give it some leeway)
+        assert length(run_times_hash["Name 2"]) >= 8
+      end
+    end
+  end
+
+  defp no_input_access(map), do: map[Benchee.Benchmark.no_input]
 
   test ".measure can run multiple benchmarks in parallel" do
     capture_io fn ->
@@ -59,7 +83,7 @@ defmodule Benchee.BenchmarkTest do
       }
       new_suite = Benchee.measure suite
 
-      assert %{"" => run_times} = new_suite.run_times
+      assert %{"" => run_times} = new_suite.run_times |> no_input_access
 
       # it does more work when working in parallel than it does alone
       assert length(run_times) >= 12
@@ -78,8 +102,6 @@ defmodule Benchee.BenchmarkTest do
         suite = %{config: config,
                   jobs:   %{"" => fn -> :timer.sleep(1) end}}
         {time, _} = :timer.tc fn -> Benchee.measure(suite) end
-
-        IO.puts time
 
         assert_in_delta projected, time, leeway,
                         "excution took too long #{time} vs. #{projected} +- #{leeway}"
@@ -100,6 +122,7 @@ defmodule Benchee.BenchmarkTest do
                 |> Benchee.measure
                 |> Statistics.statistics
                 |> Map.get(:statistics)
+                |> no_input_access
 
         Enum.each stats, fn({_, %{std_dev_ratio: std_dev_ratio}}) ->
           assert std_dev_ratio <= 2.0
