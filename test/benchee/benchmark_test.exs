@@ -212,4 +212,61 @@ defmodule Benchee.BenchmarkTest do
 
     refute output =~ "Benchmarking Something"
   end
+
+  @inputs %{"Arg 1" => "Argument 1", "Arg 2" => "Argument 2"}
+  test ".measure calls the functions with the different inputs arguments" do
+    output = capture_io fn ->
+      config = Map.merge @config, %{inputs: @inputs}
+      jobs = %{
+        "one" => fn(input) -> IO.puts "Called one with #{input}" end,
+        "two" => fn(input) -> IO.puts "Called two with #{input}" end
+      }
+      %{config: config, jobs: jobs}
+      |> Benchee.measure
+    end
+
+    Enum.each @inputs, fn({_name, value}) ->
+      assert output =~ "Called one with #{value}"
+      assert output =~ "Called two with #{value}"
+    end
+  end
+
+  test ".measure notifies which input is being benchmarked now" do
+    output = capture_io fn ->
+      config = Map.merge @config, %{inputs: @inputs}
+      jobs = %{
+        "one" => fn(input) -> IO.puts "Called one with #{input}" end,
+        "two" => fn(input) -> IO.puts "Called two with #{input}" end
+      }
+      %{config: config, jobs: jobs}
+      |> Benchee.measure
+    end
+
+    Enum.each @inputs, fn({name, _value}) ->
+      assert output =~ "with input #{name}"
+    end
+  end
+
+  test ".measure populates results for all inputs" do
+    retrying fn ->
+      capture_io fn ->
+        inputs = %{
+          "Short wait"  => 5,
+          "Longer wait" => 10
+        }
+        config = Map.merge @config, %{time: 60_000,
+                                      warmup: 10_000,
+                                      inputs: inputs}
+        jobs = %{
+          "sleep" => fn(input) -> :timer.sleep(input) end
+        }
+        results = Benchee.measure(%{config: config, jobs: jobs}).run_times
+
+        # should be 12 but the good old leeway
+        assert length(results["Short wait"]["sleep"]) >= 9
+        # should be 6 but the good old leeway
+        assert length(results["Longer wait"]["sleep"]) >= 5
+      end
+    end
+  end
 end
