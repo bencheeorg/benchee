@@ -164,19 +164,12 @@ defmodule Benchee.Benchmark do
     :erlang.system_time :micro_seconds
   end
 
-  # testing has shown that sometimes the first call is significantly slower
-  # than the second (like 2 vs 800) so prewarm one time.
-  defp prewarm(function, input, n \\ 1) do
-    measure_call(function, input, n)
-  end
-
   # If a function executes way too fast measurements are too unreliable and
   # with too high variance. Therefore determine an n how often it should be
   # executed in the measurement cycle.
   @minimum_execution_time 10
   @times_multiplicator 10
   defp determine_n_times(function, input, display_fast_warning) do
-    prewarm function, input
     run_time = measure_call function, input
     if run_time >= @minimum_execution_time do
       {1, run_time}
@@ -187,7 +180,6 @@ defmodule Benchee.Benchmark do
   end
 
   defp try_n_times(function, input, n) do
-    prewarm function, input, n
     run_time = measure_call_n_times function, input, n
     if run_time >= @minimum_execution_time do
       {n, run_time / n}

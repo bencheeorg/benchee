@@ -45,8 +45,8 @@ defmodule Benchee.BenchmarkTest do
         assert new_suite.config == suite.config
         run_times_hash = new_suite.run_times |> no_input_access
 
-        # should be 5 (6 minus one prewarm) but gotta give it a bit leeway
-        assert length(run_times_hash["Name"]) >= 4
+        # should be 6 but gotta give it a bit leeway
+        assert length(run_times_hash["Name"]) >= 5
       end
     end
   end
@@ -64,10 +64,10 @@ defmodule Benchee.BenchmarkTest do
 
         run_times_hash = new_suite.run_times |> no_input_access
 
-        # should be 5 (6 minus one prewarm) but gotta give it a bit leeway
-        assert length(run_times_hash["Name"]) >= 4
-        # should be 11 (12 - 1 prewarm, but gotta give it some leeway)
-        assert length(run_times_hash["Name 2"]) >= 8
+        # should be 6 but gotta give it a bit leeway
+        assert length(run_times_hash["Name"]) >= 5
+        # should be 12, but gotta give it some leeway
+        assert length(run_times_hash["Name 2"]) >= 9
       end
     end
   end
