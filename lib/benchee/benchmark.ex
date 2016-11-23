@@ -96,11 +96,20 @@ defmodule Benchee.Benchmark do
   end
 
   defp runtimes_for_input({input_name, input}, jobs, config) do
+    print_input_information(input_name)
+
     results = jobs
               |> Enum.map(fn(job) -> measure_job(job, input, config) end)
               |> Map.new
 
     {input_name, results}
+  end
+
+  defp print_input_information(@no_input) do
+    # noop
+  end
+  defp print_input_information(input_name) do
+    IO.puts "Benchmarking with input #{input_name}"
   end
 
   defp measure_job({name, function}, input, config) do
@@ -212,7 +221,7 @@ defmodule Benchee.Benchmark do
     microseconds
   end
   defp measure_call(function, input, 1) do
-    {microseconds, _return_value} = :timer.tc function, input
+    {microseconds, _return_value} = :timer.tc function, [input]
     microseconds
   end
   defp measure_call(function, input, n) do

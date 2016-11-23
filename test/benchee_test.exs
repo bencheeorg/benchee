@@ -196,7 +196,7 @@ defmodule BencheeTest do
       map_fun = fn(i) -> [i, i * i] end
 
       configuration = Map.merge @test_times,
-                                %{inputs: %{ "list" => Enum.to_list(1..10_000)}}
+                                %{inputs: %{"list" => Enum.to_list(1..10_000)}}
 
       Benchee.run(configuration, %{
         "flat_map"    => fn(input) -> Enum.flat_map(input, map_fun) end,
