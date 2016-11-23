@@ -214,8 +214,8 @@ defmodule BencheeTest do
       inputs = %{
         inputs: %{
           "small list"  => Enum.to_list(1..100),
-          "medium list" => Enum.to_list(1..10_000),
-          "big list"    => Enum.to_list(1..1_000_000),
+          "medium list" => Enum.to_list(1..1_000),
+          "bigger list" => Enum.to_list(1..10_000),
         }
       }
 
@@ -229,7 +229,7 @@ defmodule BencheeTest do
       })
     end
 
-    assert String.contains? output, ["small list", "medium list", "big list"]
+    assert String.contains? output, ["small list", "medium list", "bigger list"]
     occurences = Regex.scan body_regex("flat_map"), output
     assert length(occurences) == 3
   end
