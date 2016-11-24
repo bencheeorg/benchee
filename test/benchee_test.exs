@@ -15,7 +15,7 @@ defmodule BencheeTest do
         |> Benchee.Statistics.statistics
         |> Benchee.Formatters.Console.format
 
-      [header, benchmark_stats] = result
+      [[_input_name, header, benchmark_stats]] = result
       assert Regex.match?(@header_regex, header)
       assert Regex.match?(body_regex("Sleeps"), benchmark_stats)
     end
