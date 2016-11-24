@@ -168,6 +168,27 @@ defmodule Benchee.BenchmarkTest do
     assert output =~ "Estimated total run time: 0.02s"
   end
 
+  @inputs %{"Arg 1" => "Argument 1", "Arg 2" => "Argument 2"}
+  test ".measure respects multiple inputs in suite information" do
+    output = capture_io fn ->
+      config = Map.merge @config, %{
+                                    parallel: 2,
+                                    time: 10_000,
+                                    warmup: 0,
+                                    inputs: @inputs
+                                  }
+      %{config: config, jobs: %{}}
+      |> Benchee.benchmark("noop", fn(_) -> 0 end)
+      |> Benchee.benchmark("dontcare", fn(_) -> 0 end)
+      |> Benchee.measure
+    end
+
+    assert output =~ "time: 0.01s"
+    assert output =~ "parallel: 2"
+    assert output =~ "inputs: Arg 1, Arg 2"
+    assert output =~ "Estimated total run time: 0.04s"
+  end
+
   test ".measure does not print configuration information when disabled" do
     output = capture_io fn ->
       custom = %{
@@ -213,7 +234,6 @@ defmodule Benchee.BenchmarkTest do
     refute output =~ "Benchmarking Something"
   end
 
-  @inputs %{"Arg 1" => "Argument 1", "Arg 2" => "Argument 2"}
   test ".measure calls the functions with the different inputs arguments" do
     output = capture_io fn ->
       config = Map.merge @config, %{inputs: @inputs}

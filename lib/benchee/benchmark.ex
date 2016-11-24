@@ -58,18 +58,31 @@ defmodule Benchee.Benchmark do
 
   defp print_suite_information(jobs, %{parallel: parallel,
                                        time:     time,
-                                       warmup:   warmup}) do
+                                       warmup:   warmup,
+                                       inputs:   inputs}) do
     warmup_seconds = time_precision Duration.scale(warmup, :second)
     time_seconds   = time_precision Duration.scale(time, :second)
     job_count      = map_size jobs
-    total_time     = time_precision(job_count * (warmup_seconds + time_seconds))
+    exec_time      = warmup_seconds + time_seconds
+    total_time     = time_precision(job_count * inputs_count(inputs) * exec_time)
 
     IO.puts "Benchmark suite executing with the following configuration:"
     IO.puts "warmup: #{warmup_seconds}s"
     IO.puts "time: #{time_seconds}s"
     IO.puts "parallel: #{parallel}"
+    IO.puts "inputs: #{inputs_out(inputs)}"
     IO.puts "Estimated total run time: #{total_time}s"
     IO.puts ""
+  end
+
+  defp inputs_count(nil),    do: 1 # no input specified still executes
+  defp inputs_count(inputs), do: map_size(inputs)
+
+  defp inputs_out(nil), do: "none specified"
+  defp inputs_out(inputs) do
+    inputs
+    |> Map.keys
+    |> Enum.join(", ")
   end
 
   @round_precision 2
