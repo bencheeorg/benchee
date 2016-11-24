@@ -1,18 +1,22 @@
 defmodule Benchee.Formatters.ConsoleTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureIO
+  import Benchee.Benchmark, only: [no_input: 0]
   doctest Benchee.Formatters.Console
 
   alias Benchee.Formatters.Console
 
-  @config %{console: %{comparison: true, unit_scaling: :best}}
+  @console_config %{comparison: true, unit_scaling: :best}
+  @config %{console: @console_config}
   test ".output formats and prints the results right to the console" do
     jobs = %{
-      "Second" => %{
-        average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
-      },
-      "First"  => %{
-        average: 100.0, ips: 10_000.0, std_dev_ratio: 0.1, median: 90.0
+      no_input => %{
+        "Second" => %{
+          average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
+        },
+        "First"  => %{
+          average: 100.0, ips: 10_000.0, std_dev_ratio: 0.1, median: 90.0
+        }
       }
     }
 
@@ -28,7 +32,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     assert output =~ ~r/195.5/
   end
 
-  test ".format sorts the the given stats fastest to slowest" do
+  test ".format_jobs sorts the the given stats fastest to slowest" do
     jobs = %{
       "Second" => %{
         average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
@@ -42,14 +46,14 @@ defmodule Benchee.Formatters.ConsoleTest do
     }
 
     [_header, result_1, result_2, result_3 | _dont_care ] =
-      Console.format(%{statistics: jobs, config: @config})
+      Console.format_jobs(jobs, @console_config)
 
     assert Regex.match?(~r/First/,  result_1)
     assert Regex.match?(~r/Second/, result_2)
     assert Regex.match?(~r/Third/,  result_3)
   end
 
-  test ".format adjusts the label width to longest name" do
+  test ".format_jobs adjusts the label width to longest name" do
     jobs = %{
       "Second" => %{
         average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
@@ -61,7 +65,7 @@ defmodule Benchee.Formatters.ConsoleTest do
 
     expected_width = String.length "Second"
     [header, result_1, result_2 | _dont_care ] =
-      Console.format(%{statistics: jobs, config: @config})
+      Console.format_jobs(jobs, @console_config)
 
     assert_column_width "Name", header, expected_width
     assert_column_width "First", result_1, expected_width
@@ -75,7 +79,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     # Include extra long name, expect width of 40 characters
     expected_width_wide = String.length third_name
     [header, result_1, result_2, result_3 | _dont_care ] =
-      Console.format(%{statistics: longer_jobs, config: @config})
+      Console.format_jobs(longer_jobs, @console_config)
 
     assert_column_width "Name", header, expected_width_wide
     assert_column_width "First", result_1, expected_width_wide
@@ -83,7 +87,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     assert_column_width third_name, result_3, expected_width_wide
   end
 
-  test ".format creates comparisons" do
+  test ".format_jobs creates comparisons" do
     jobs = %{
       "Second" => %{
         average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
@@ -94,14 +98,14 @@ defmodule Benchee.Formatters.ConsoleTest do
     }
 
     [_, _, _, comp_header, reference, slower] =
-      Console.format(%{statistics: jobs, config: @config})
+      Console.format_jobs(jobs, @console_config)
 
     assert Regex.match? ~r/Comparison/, comp_header
     assert Regex.match? ~r/^First\s+10.00 K$/m, reference
     assert Regex.match? ~r/^Second\s+5.00 K\s+- 2.00x slower/, slower
   end
 
-  test ".format can omit the comparisons" do
+  test ".format_jobs can omit the comparisons" do
     jobs = %{
       "Second" => %{
         average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
@@ -111,22 +115,19 @@ defmodule Benchee.Formatters.ConsoleTest do
       }
     }
 
-    output =  Enum.join Console.format(%{
-                statistics: jobs,
-                config: %{
-                  console: %{
-                    comparison:   false,
-                    unit_scaling: :best
-                  }
-                }
-              })
+    output =  Enum.join Console.format_jobs(
+                jobs,
+                %{
+                  comparison:   false,
+                  unit_scaling: :best
+                })
 
     refute Regex.match? ~r/Comparison/i, output
     refute Regex.match? ~r/^First\s+10.00 K$/m, output
     refute Regex.match? ~r/^Second\s+5.00 K\s+- 2.00x slower/, output
   end
 
-  test ".format adjusts the label width to longest name for comparisons" do
+  test ".format_jobs adjusts the label width to longest name for comparisons" do
     second_name = String.duplicate("a", 40)
     jobs = %{
       second_name => %{
@@ -139,40 +140,30 @@ defmodule Benchee.Formatters.ConsoleTest do
 
     expected_width = String.length second_name
     [_, _, _, _comp_header, reference, slower] =
-      Console.format(%{statistics: jobs, config: @config})
+      Console.format_jobs(jobs, @console_config)
 
     assert_column_width "First", reference, expected_width
     assert_column_width second_name, slower, expected_width
   end
 
-  test ".format doesn't create comparisons with only one benchmark run" do
+  test ".format_jobs doesn't create comparisons with only one benchmark run" do
     jobs  = %{"First" => %{average: 100.0, ips: 10_000.0,
                            std_dev_ratio: 0.1, median: 90.0}}
 
-    assert [header, result] = Console.format %{statistics: jobs,
-                                               config: @config}
+    assert [header, result] = Console.format_jobs jobs, @console_config
     refute Regex.match? ~r/(Comparison|x slower)/, Enum.join([header, result])
   end
 
-  test ".format formats small averages and medians more precisely" do
+  test ".format_jobs formats small averages and medians more precisely" do
     fast = %{"First" => %{average: 0.15, ips: 10_000.0,
                           std_dev_ratio: 0.1, median: 0.0125}}
 
-    assert [_, result] = Console.format %{statistics: fast, config: @config}
+    assert [_, result] = Console.format_jobs fast, @console_config
     assert Regex.match? ~r/0.150\s?μs/, result
     assert Regex.match? ~r/0.0125\s?μs/, result
   end
 
-  test ".format doesn't end in an empty line when there's only on result" do
-    fast = %{"First" => %{average: 0.15, ips: 10_000.0,
-                          std_dev_ratio: 0.1, median: 0.0125}}
-
-    assert [_, result] = Console.format %{statistics: fast, config: @config}
-
-    assert String.last(result) != "\n"
-  end
-
-  test "it doesn't output weird 'e' formats" do
+  test ".format_jobs doesn't output weird 'e' formats" do
     jobs = %{
       "Job" => %{
         average: 11000.0,
@@ -182,7 +173,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       }
     }
 
-    assert [_, result] = Console.format %{statistics: jobs, config: @config}
+    assert [_, result] = Console.format_jobs jobs, @console_config
 
     refute result =~ ~r/\de\d/
     assert result =~ "11.00 ms"
@@ -191,19 +182,72 @@ defmodule Benchee.Formatters.ConsoleTest do
     assert result =~ "140.00 ms"
   end
 
-  test ".format doesn't end in an empty line with multiple results" do
-    jobs = %{
-      "Second" => %{
-        average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
+  @header_regex ~r/Name.+ips.+average.+deviation.+median.*/
+  test ".format with multiple inputs and just one job" do
+    statistics = %{
+      "My Arg" => %{
+        "Job" => %{
+          average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
+        }
       },
-      "First"  => %{
-        average: 100.0, ips: 10_000.0, std_dev_ratio: 0.1, median: 90.0
+      "Other Arg" => %{
+        "Job" => %{
+          average: 400.0, ips: 2_500.0, std_dev_ratio: 0.15, median: 395.0
+        }
       }
     }
 
-    [_, _, _, _comp_header, _reference, slower] =
-      Console.format(%{statistics: jobs, config: @config})
-    assert String.last(slower) != "\n"
+    [my_arg, other_arg] =
+      Console.format(%{statistics: statistics, config: @config})
+
+    [input_header, header, result] = my_arg
+    assert input_header =~ "My Arg"
+    assert header =~ @header_regex
+    assert result =~ ~r/Job.+5.+200.+10\.00%.+195\.5/
+
+    [input_header_2, header_2, result_2] = other_arg
+    assert input_header_2 =~ "Other Arg"
+    assert header_2 =~ @header_regex
+    assert result_2 =~ ~r/Job.+2\.5.+400.+15\.00%.+395/
+
+  end
+
+  test ".format with multiple inputs and two jobs" do
+    statistics = %{
+      "My Arg" => %{
+        "Job" => %{
+          average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
+        },
+        "Other Job" => %{
+          average: 100.0, ips: 10_000.0, std_dev_ratio: 0.3, median: 98.0
+        }
+      },
+      "Other Arg" => %{
+        "Job" => %{
+          average: 400.0, ips: 2_500.0, std_dev_ratio: 0.15, median: 395.0
+        },
+        "Other Job" => %{
+          average: 250.0, ips: 4_000.0, std_dev_ratio: 0.31, median: 225.5
+        }
+      }
+    }
+
+    [my_arg, other_arg] =
+      Console.format(%{statistics: statistics, config: @config})
+
+    [input_header, _header, other_job, job, _comp, ref, slower] = my_arg
+    assert input_header =~ "My Arg"
+    assert other_job =~ ~r/Other Job.+10.+100.+30\.00%.+98\.0/
+    assert job =~ ~r/Job.+5.+200.+10\.00%.+195\.5/
+    ref =~ ~r/Other Job/
+    slower =~ ~r/Job.+slower/
+
+    [input_header_2, _, other_job_2, job_2, _, ref_2, slower_2] = other_arg
+    assert input_header_2 =~ "Other Arg"
+    assert other_job_2 =~ ~r/Other Job.+4.+250.+31\.00%.+225\.5/
+    assert job_2 =~ ~r/Job.+2\.5.+400.+15\.00%.+395/
+    ref_2 =~ ~r/Other Job/
+    slower_2 =~ ~r/Job.+slower/
   end
 
   defp assert_column_width(name, string, expected_width) do

@@ -8,7 +8,7 @@ Benchee.run %{
   "List comprehension (range)" => fn -> for _ <- range, do: fun.() end,
   "Enum.each (list)" => fn -> Enum.each(list, fn(_) -> fun.() end) end,
   "List comprehension (list)" => fn -> for _ <- list, do: fun.() end,
-  "Recursion" => fn -> Benchee.RepeatN.repeat_n(fun, n) end
+  "Recursion" => fn -> Benchee.Utility.RepeatN.repeat_n(fun, n) end
 }
 
 # tobi@happy ~/github/benchee $ mix run samples/repat_n.exs

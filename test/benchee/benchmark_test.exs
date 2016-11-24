@@ -30,8 +30,9 @@ defmodule Benchee.BenchmarkTest do
   @config %{parallel: 1,
             time: 40_000,
             warmup: 20_000,
+            inputs: nil,
             print: %{fast_warning: false, configuration: true}}
-  test ".measure runs a benchmark suite and enriches it with results" do
+  test ".measure runs a benchmark suite and enriches it with measurements" do
     retrying fn ->
       capture_io fn ->
         config = Map.merge @config, %{time: 60_000, warmup: 10_000}
@@ -42,10 +43,31 @@ defmodule Benchee.BenchmarkTest do
           |> Benchee.measure
 
         assert new_suite.config == suite.config
-        run_times_hash = new_suite.run_times
+        run_times_hash = new_suite.run_times |> no_input_access
 
-        # should be 5 (6 minus one prewarm) but gotta give it a bit leeway
-        assert length(run_times_hash["Name"]) >= 4
+        # should be 6 but gotta give it a bit leeway
+        assert length(run_times_hash["Name"]) >= 5
+      end
+    end
+  end
+
+  test ".measure runs a suite with multiple jobs and gathers results" do
+    retrying fn ->
+      capture_io fn ->
+        config = Map.merge @config, %{time: 60_000, warmup: 10_000}
+        suite = %{config: config, jobs: %{}}
+        new_suite =
+          suite
+          |> Benchee.benchmark("Name", fn -> :timer.sleep(10) end)
+          |> Benchee.benchmark("Name 2", fn -> :timer.sleep(5) end)
+          |> Benchee.measure
+
+        run_times_hash = new_suite.run_times |> no_input_access
+
+        # should be 6 but gotta give it a bit leeway
+        assert length(run_times_hash["Name"]) >= 5
+        # should be 12, but gotta give it some leeway
+        assert length(run_times_hash["Name 2"]) >= 9
       end
     end
   end
@@ -59,7 +81,7 @@ defmodule Benchee.BenchmarkTest do
       }
       new_suite = Benchee.measure suite
 
-      assert %{"" => run_times} = new_suite.run_times
+      assert %{"" => run_times} = new_suite.run_times |> no_input_access
 
       # it does more work when working in parallel than it does alone
       assert length(run_times) >= 12
@@ -78,8 +100,6 @@ defmodule Benchee.BenchmarkTest do
         suite = %{config: config,
                   jobs:   %{"" => fn -> :timer.sleep(1) end}}
         {time, _} = :timer.tc fn -> Benchee.measure(suite) end
-
-        IO.puts time
 
         assert_in_delta projected, time, leeway,
                         "excution took too long #{time} vs. #{projected} +- #{leeway}"
@@ -100,6 +120,7 @@ defmodule Benchee.BenchmarkTest do
                 |> Benchee.measure
                 |> Statistics.statistics
                 |> Map.get(:statistics)
+                |> no_input_access
 
         Enum.each stats, fn({_, %{std_dev_ratio: std_dev_ratio}}) ->
           assert std_dev_ratio <= 2.0
@@ -147,6 +168,27 @@ defmodule Benchee.BenchmarkTest do
     assert output =~ "Estimated total run time: 0.02s"
   end
 
+  @inputs %{"Arg 1" => "Argument 1", "Arg 2" => "Argument 2"}
+  test ".measure respects multiple inputs in suite information" do
+    output = capture_io fn ->
+      config = Map.merge @config, %{
+                                    parallel: 2,
+                                    time: 10_000,
+                                    warmup: 0,
+                                    inputs: @inputs
+                                  }
+      %{config: config, jobs: %{}}
+      |> Benchee.benchmark("noop", fn(_) -> 0 end)
+      |> Benchee.benchmark("dontcare", fn(_) -> 0 end)
+      |> Benchee.measure
+    end
+
+    assert output =~ "time: 0.01s"
+    assert output =~ "parallel: 2"
+    assert output =~ "inputs: Arg 1, Arg 2"
+    assert output =~ "Estimated total run time: 0.04s"
+  end
+
   test ".measure does not print configuration information when disabled" do
     output = capture_io fn ->
       custom = %{
@@ -190,5 +232,61 @@ defmodule Benchee.BenchmarkTest do
     end
 
     refute output =~ "Benchmarking Something"
+  end
+
+  test ".measure calls the functions with the different inputs arguments" do
+    output = capture_io fn ->
+      config = Map.merge @config, %{inputs: @inputs}
+      jobs = %{
+        "one" => fn(input) -> IO.puts "Called one with #{input}" end,
+        "two" => fn(input) -> IO.puts "Called two with #{input}" end
+      }
+      %{config: config, jobs: jobs}
+      |> Benchee.measure
+    end
+
+    Enum.each @inputs, fn({_name, value}) ->
+      assert output =~ "Called one with #{value}"
+      assert output =~ "Called two with #{value}"
+    end
+  end
+
+  test ".measure notifies which input is being benchmarked now" do
+    output = capture_io fn ->
+      config = Map.merge @config, %{inputs: @inputs}
+      jobs = %{
+        "one" => fn(input) -> IO.puts "Called one with #{input}" end,
+        "two" => fn(input) -> IO.puts "Called two with #{input}" end
+      }
+      %{config: config, jobs: jobs}
+      |> Benchee.measure
+    end
+
+    Enum.each @inputs, fn({name, _value}) ->
+      assert output =~ "with input #{name}"
+    end
+  end
+
+  test ".measure populates results for all inputs" do
+    retrying fn ->
+      capture_io fn ->
+        inputs = %{
+          "Short wait"  => 5,
+          "Longer wait" => 10
+        }
+        config = Map.merge @config, %{time: 60_000,
+                                      warmup: 10_000,
+                                      inputs: inputs}
+        jobs = %{
+          "sleep" => fn(input) -> :timer.sleep(input) end
+        }
+        results = Benchee.measure(%{config: config, jobs: jobs}).run_times
+
+        # should be 12 but the good old leeway
+        assert length(results["Short wait"]["sleep"]) >= 9
+        # should be 6 but the good old leeway
+        assert length(results["Longer wait"]["sleep"]) >= 5
+      end
+    end
   end
 end

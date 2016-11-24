@@ -1,6 +1,7 @@
 defmodule BencheeTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureIO
+  import Benchee.TestHelpers
   doctest Benchee
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median$/m
@@ -14,7 +15,7 @@ defmodule BencheeTest do
         |> Benchee.Statistics.statistics
         |> Benchee.Formatters.Console.format
 
-      [header, benchmark_stats] = result
+      [[_input_name, header, benchmark_stats]] = result
       assert Regex.match?(@header_regex, header)
       assert Regex.match?(body_regex("Sleeps"), benchmark_stats)
     end
@@ -164,10 +165,21 @@ defmodule BencheeTest do
         custom:     "Custom value",
         formatters: [
           fn(suite) ->
-            IO.puts "Run time: #{List.last(suite.run_times["Sleeps"]) |> Benchee.Conversion.Duration.format}"
+            run_time = suite.run_times
+                       |> no_input_access
+                       |> Map.get("Sleeps")
+                       |> List.last
+                       |> Benchee.Conversion.Duration.format
+
+            IO.puts "Run time: #{run_time}"
           end,
           fn(suite) ->
-            IO.puts "Average: #{suite.statistics["Sleeps"].average |> Benchee.Conversion.Duration.format}"
+            average = suite.statistics
+                      |> no_input_access
+                      |> Map.get("Sleeps")
+                      |> Map.get(:average)
+                      |> Benchee.Conversion.Duration.format
+            IO.puts "Average: #{average}"
           end,
           fn(suite) -> IO.puts suite.config.custom end
         ]
@@ -177,6 +189,49 @@ defmodule BencheeTest do
     assert output =~ ~r/Run time: #{@rough_10_milli_s}$/m
     assert output =~ ~r/Average: #{@rough_10_milli_s}$/m
     assert output =~ "Custom value"
+  end
+
+  test "inputs feature version of readme example" do
+    output = capture_io fn ->
+      map_fun = fn(i) -> [i, i * i] end
+
+      configuration = Map.merge @test_times,
+                                %{inputs: %{"list" => Enum.to_list(1..10_000)}}
+
+      Benchee.run(configuration, %{
+        "flat_map"    => fn(input) -> Enum.flat_map(input, map_fun) end,
+        "map.flatten" =>
+          fn(input) -> input |> Enum.map(map_fun) |> List.flatten end
+      })
+    end
+
+    readme_sample_asserts(output)
+  end
+
+  test "multiple inputs" do
+    output = capture_io fn ->
+      map_fun = fn(i) -> [i, i * i] end
+      inputs = %{
+        inputs: %{
+          "small list"  => Enum.to_list(1..100),
+          "medium list" => Enum.to_list(1..1_000),
+          "bigger list" => Enum.to_list(1..10_000),
+        }
+      }
+
+      configuration = Map.merge @test_times, inputs
+
+
+      Benchee.run(configuration, %{
+        "flat_map"    => fn(input) -> Enum.flat_map(input, map_fun) end,
+        "map.flatten" =>
+          fn(input) -> input |> Enum.map(map_fun) |> List.flatten end
+      })
+    end
+
+    assert String.contains? output, ["small list", "medium list", "bigger list"]
+    occurences = Regex.scan body_regex("flat_map"), output
+    assert length(occurences) == 3
   end
 
   @slower_regex "\\s+- \\d\\.\\d+x slower"

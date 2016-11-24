@@ -1,3 +1,13 @@
+# 0.6.0 (unreleased)
+
+## Features (User Facing)
+
+* New `:inputs` configuration key that allows you to specify a map from input name to input value so that each defined benchmarking job is then executed with this input. For this to work the benchmarking function is called with the appropriate `input` as an argument. See `samples/multiple_inputs.exs` for an example.
+
+## Bugs
+
+* prewarming (discarding the first result due to some timer issues) during run time was removed, as it should already happen during the warmup period and would discard actual useful results especially for longer running macro benchmarks.
+
 # 0.5.0 (October 13, 2016)
 
 This release focuses on scaling units to more appropriate sizes. Instead of always working with base one for counts and microseconds those values are scaled accordingly to thousands, milliseconds for better readability. This work was mostly done by new contributor @wasnotrice.
