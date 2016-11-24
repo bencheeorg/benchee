@@ -4,6 +4,7 @@ defmodule Benchee.Config do
   """
 
   alias Benchee.Conversion.Duration
+  alias Benchee.Utility.DeepConvert
 
   @doc """
   Returns the initial benchmark configuration for Benchee, composed of defaults
@@ -76,6 +77,25 @@ defmodule Benchee.Config do
         jobs: %{}
       }
 
+      iex> Benchee.init time: 1, warmup: 0.2
+      %{
+        config:
+          %{
+            parallel: 1,
+            time: 1_000_000,
+            warmup: 200_000.0,
+            inputs: nil,
+            formatters: [&Benchee.Formatters.Console.output/1],
+            print: %{
+              benchmarking: true,
+              fast_warning: true,
+              configuration: true
+            },
+            console: %{ comparison: true, unit_scaling: :best }
+          },
+        jobs: %{}
+      }
+
       iex> Benchee.init %{time: 1, warmup: 0.2}
       %{
         config:
@@ -114,7 +134,40 @@ defmodule Benchee.Config do
         jobs: %{}
       }
 
-      iex> Benchee.init %{parallel: 2, time: 1, warmup: 0.2, formatters: [&IO.puts/2], print: %{fast_warning: false}, console: %{unit_scaling: :smallest}, inputs: %{"Small" => 5, "Big" => 9999}}
+      iex> Benchee.init(
+      ...>   parallel: 2,
+      ...>   time: 1,
+      ...>   warmup: 0.2,
+      ...>   formatters: [&IO.puts/2],
+      ...>   print: [fast_warning: false],
+      ...>   console: [unit_scaling: :smallest],
+      ...>   inputs: %{"Small" => 5, "Big" => 9999})
+      %{
+        config:
+          %{
+            parallel: 2,
+            time: 1_000_000,
+            warmup: 200_000.0,
+            inputs: %{"Small" => 5, "Big" => 9999},
+            formatters: [&IO.puts/2],
+            print: %{
+              benchmarking: true,
+              fast_warning: false,
+              configuration: true
+            },
+            console: %{ comparison: true, unit_scaling: :smallest }
+          },
+        jobs: %{}
+      }
+
+      iex> Benchee.init %{
+      ...>   parallel: 2,
+      ...>   time: 1,
+      ...>   warmup: 0.2,
+      ...>   formatters: [&IO.puts/2],
+      ...>   print: %{fast_warning: false},
+      ...>   console: %{unit_scaling: :smallest},
+      ...>   inputs: %{"Small" => 5, "Big" => 9999}}
       %{
         config:
           %{
@@ -151,8 +204,9 @@ defmodule Benchee.Config do
   }
   @time_keys [:time, :warmup]
   def init(config \\ %{}) do
+    map_config = DeepConvert.to_map(config)
     config = @default_config
-             |> DeepMerge.deep_merge(config)
+             |> DeepMerge.deep_merge(map_config)
              |> convert_time_to_micro_s
     :ok    = :timer.start
     %{config: config, jobs: %{}}

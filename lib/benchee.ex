@@ -20,17 +20,21 @@ defmodule Benchee do
       # Prints a summary of the benchmark to the console
 
   """
-  def run(config \\ %{}, jobs)
-  def run(config, jobs) when is_list(jobs) do
-    map_jobs = Enum.into jobs, %{}
-    run(config, map_jobs)
+  def run(jobs, config \\ [])
+  def run(jobs, config) when is_list(config) do
+    do_run(jobs, config)
   end
-  def run(config, jobs) do
-    suite = run_benchmarks config, jobs
+  def run(config, jobs) when is_map(jobs) do
+    # pre 0.6.0 way of passing in the config first and as a map
+    do_run(jobs, config)
+  end
+
+  defp do_run(jobs, config) do
+    suite = run_benchmarks jobs, config
     output_results suite
   end
 
-  defp run_benchmarks(config, jobs) do
+  defp run_benchmarks(jobs, config) do
     config
     |> Benchee.init
     |> Map.put(:jobs, jobs)
