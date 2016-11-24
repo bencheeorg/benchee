@@ -109,7 +109,7 @@ defmodule Benchee.Benchmark do
     # noop
   end
   defp print_input_information(input_name) do
-    IO.puts "Benchmarking with input #{input_name}"
+    IO.puts "\nBenchmarking with input #{input_name}:"
   end
 
   defp measure_job({name, function}, input, config) do

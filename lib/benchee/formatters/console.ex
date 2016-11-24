@@ -36,7 +36,7 @@ defmodule Benchee.Formatters.Console do
   iex> jobs = %{ "My Job" =>%{average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0}, "Job 2" => %{average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0}}
   iex> inputs = %{"My input" => jobs}
   iex> Benchee.Formatters.Console.format(%{statistics: inputs, config: %{console: %{comparison: false, unit_scaling: :best}}})
-  [["With input My input\n", "\nName             ips        average  deviation         median\n",
+  [["\n##### With input My input #####", "\nName             ips        average  deviation         median\n",
   "My Job        5.00 K      200.00 μs    ±10.00%      190.00 μs\n",
   "Job 2         2.50 K      400.00 μs    ±20.00%      390.00 μs\n"]]
 
@@ -54,7 +54,7 @@ defmodule Benchee.Formatters.Console do
     no_input_marker = Benchee.Benchmark.no_input
     case input do
       ^no_input_marker -> ""
-      _                -> "With input #{input}\n"
+      _                -> "\n##### With input #{input} #####"
     end
   end
 
