@@ -9,6 +9,10 @@
 
 * The old way of providing the jobs as a list of tuples now removed, please switch to using a map from string to functions
 
+## Breaking Changes (Plugins)
+
+* The structure of the output from `Benchee.Benchmark.measure/1` to `Benchee.Statistics.statistics/1` has changed to accommodate the new inputs feature there is now an additional level where in a map the input name then points to the appropriate results of the jobs. When there were no inputs the key is the value returned by `Benchee.Benchmark.no_input/0`. 
+
 ## Bugfixes
 
 * prewarming (discarding the first result due to some timer issues) during run time was removed, as it should already happen during the warmup period and would discard actual useful results especially for longer running macro benchmarks.
