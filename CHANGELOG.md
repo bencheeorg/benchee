@@ -2,8 +2,8 @@
 
 ## Features (User Facing)
 
-* New `:inputs` configuration key that allows you to specify a map from input name to input value so that each defined benchmarking job is then executed with this input. For this to work the benchmarking function is called with the appropriate `input` as an argument. See `samples/multiple_inputs.exs` for an example.
-* The highlevel `Benchee.run/2` is now more idiomatic elixir and takes the map of jobs as the first argument and a keywordlist of options as the second (and last) argument. The old way of passing config as a map as the first argument and the jobs as the second argument still works, **but might be deprecated later on**.
+* New `:inputs` configuration key that allows you to specify a map from input name to input value so that each defined benchmarking job is then executed with this input. For this to work the benchmarking function is called with the appropriate `input` as an argument. See [`samples/multiple_inputs.exs`](https://github.com/PragTob/benchee/blob/master/samples/multiple_inputs.exs) for an example. [#21]( https://github.com/PragTob/benchee/issues/21)
+* The highlevel `Benchee.run/2` is now more idiomatic elixir and takes the map of jobs as the first argument and a keywordlist of options as the second (and last) argument. The old way of passing config as a map as the first argument and the jobs as the second argument still works, **but might be deprecated later on** [#47](https://github.com/PragTob/benchee/issues/47)
 
 ## Breaking Changes (User Facing)
 
@@ -16,7 +16,7 @@
 ## Bugfixes
 
 * prewarming (discarding the first result due to some timer issues) during run time was removed, as it should already happen during the warmup period and would discard actual useful results especially for longer running macro benchmarks.
-* when the execution time of the benchmarking job exceeds the given `:time` it will now execute exactly once (used to be 2) #49
+* when the execution time of the benchmarking job exceeds the given `:time` it will now execute exactly once (used to be 2) [#49](https://github.com/PragTob/benchee/issues/49)
 
 # 0.5.0 (October 13, 2016)
 
