@@ -5,7 +5,7 @@ defmodule BencheeTest do
   doctest Benchee
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median$/m
-  @test_times   %{time: 0.01, warmup: 0.005}
+  @test_times   [time: 0.01, warmup: 0.005]
   test "integration step by step" do
     capture_io fn ->
       result =
@@ -23,7 +23,7 @@ defmodule BencheeTest do
 
   test "integration high level interface .run" do
     output = capture_io fn ->
-      Benchee.run(@test_times, %{"Sleeps" => fn -> :timer.sleep(10) end})
+      Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end}, @test_times)
     end
 
     assert Regex.match?(@header_regex, output)
@@ -34,9 +34,9 @@ defmodule BencheeTest do
 
   test "integration multiple funs in .run" do
     output = capture_io fn ->
-      Benchee.run(@test_times,
-                  %{"Sleeps" => fn -> :timer.sleep(10) end,
-                    "Magic"  => fn -> Enum.to_list(1..100)  end})
+      Benchee.run(%{
+        "Sleeps" => fn -> :timer.sleep(10) end,
+        "Magic"  => fn -> Enum.to_list(1..100) end}, @test_times)
     end
 
     assert Regex.match?(@header_regex, output)
@@ -44,12 +44,13 @@ defmodule BencheeTest do
     assert Regex.match?(body_regex("Magic"), output)
   end
 
-  test "integration high level README example" do
+  test "integration high level README example old school map config" do
     output = capture_io fn ->
       list = Enum.to_list(1..10_000)
       map_fun = fn(i) -> [i, i * i] end
 
-      Benchee.run(@test_times, %{
+      map_config = Enum.into(@test_times, %{})
+      Benchee.run(map_config, %{
         "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
         "map.flatten" =>
           fn -> list |> Enum.map(map_fun) |> List.flatten end
@@ -94,7 +95,7 @@ defmodule BencheeTest do
 
   test "integration super fast function print warnings" do
     output = capture_io fn ->
-      Benchee.run(%{time: 0.001, warmup: 0}, %{"Sleeps" => fn -> 0 end})
+      Benchee.run(%{"Sleeps" => fn -> 0 end}, time: 0.001, warmup: 0)
     end
 
     assert Regex.match? ~r/fast/, output
@@ -103,7 +104,7 @@ defmodule BencheeTest do
 
   test "integration super fast function warning is printed once per job" do
     output = capture_io fn ->
-      Benchee.run(%{time: 0.001, warmup: 0.001}, %{"Fast" => fn -> 0 end})
+      Benchee.run(%{"Fast" => fn -> 0 end}, time: 0.001, warmup: 0.001)
     end
 
     warnings = output
@@ -115,8 +116,8 @@ defmodule BencheeTest do
 
   test "integration super fast function warnings can be deactivated" do
     output = capture_io fn ->
-      Benchee.run(%{time: 0.001, warmup: 0, print: %{fast_warning: false}},
-                  %{"Blitz" => fn -> 0 end})
+      Benchee.run(%{"Blitz" => fn -> 0 end},
+                  time: 0.001, warmup: 0, print: [fast_warning: false])
     end
 
     refute Regex.match? ~r/fast/, output
@@ -124,11 +125,11 @@ defmodule BencheeTest do
 
   test "integration comparison report can be deactivated" do
     output = capture_io fn ->
-      Benchee.run(%{time: 0.01,
+      Benchee.run(%{"Sleeps"   => fn -> :timer.sleep(10) end,
+                    "Sleeps 2" => fn -> :timer.sleep(20) end},
+                    time: 0.01,
                     warmup: 0,
-                    console: %{comparison: false}},
-                  %{"Sleeps"   => fn -> :timer.sleep(10) end,
-                    "Sleeps 2" => fn -> :timer.sleep(20) end})
+                    console: [comparison: false])
     end
 
     refute output =~ ~r/compar/i
@@ -137,11 +138,12 @@ defmodule BencheeTest do
   test "multiple formatters can be configured and are all called" do
     output = capture_io fn ->
       Benchee.run(%{
+        "Sleeps" => fn -> :timer.sleep(10) end},
         time:       0.01,
         warmup:     0.01,
         formatters: [fn(_) -> IO.puts "Formatter one" end,
                      fn(_) -> IO.puts "Formatter two" end]
-      }, %{"Sleeps" => fn -> :timer.sleep(10) end})
+      )
     end
 
     assert output =~ "Formatter one"
@@ -151,7 +153,7 @@ defmodule BencheeTest do
   @rough_10_milli_s "((9|10|11|12|13)\\.\\d{2} ms)"
   test "formatters have full access to the suite data" do
     output = capture_io fn ->
-      Benchee.run(%{
+      Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end},
         time:       0.01,
         warmup:     0.005,
         custom:     "Custom value",
@@ -175,7 +177,7 @@ defmodule BencheeTest do
           end,
           fn(suite) -> IO.puts suite.config.custom end
         ]
-      }, %{"Sleeps" => fn -> :timer.sleep(10) end})
+      )
     end
 
     assert output =~ ~r/Run time: #{@rough_10_milli_s}$/m
@@ -187,14 +189,14 @@ defmodule BencheeTest do
     output = capture_io fn ->
       map_fun = fn(i) -> [i, i * i] end
 
-      configuration = Map.merge @test_times,
-                                %{inputs: %{"list" => Enum.to_list(1..10_000)}}
+      configuration = Keyword.merge @test_times,
+                                    inputs: %{"list" => Enum.to_list(1..10_000)}
 
-      Benchee.run(configuration, %{
+      Benchee.run(%{
         "flat_map"    => fn(input) -> Enum.flat_map(input, map_fun) end,
         "map.flatten" =>
           fn(input) -> input |> Enum.map(map_fun) |> List.flatten end
-      })
+      }, configuration)
     end
 
     readme_sample_asserts(output)
@@ -203,22 +205,22 @@ defmodule BencheeTest do
   test "multiple inputs" do
     output = capture_io fn ->
       map_fun = fn(i) -> [i, i * i] end
-      inputs = %{
+      inputs = [
         inputs: %{
           "small list"  => Enum.to_list(1..100),
           "medium list" => Enum.to_list(1..1_000),
           "bigger list" => Enum.to_list(1..10_000),
         }
-      }
+      ]
 
-      configuration = Map.merge @test_times, inputs
+      configuration = Keyword.merge @test_times, inputs
 
 
-      Benchee.run(configuration, %{
+      Benchee.run(%{
         "flat_map"    => fn(input) -> Enum.flat_map(input, map_fun) end,
         "map.flatten" =>
           fn(input) -> input |> Enum.map(map_fun) |> List.flatten end
-      })
+      }, configuration)
     end
 
     assert String.contains? output, ["small list", "medium list", "bigger list"]

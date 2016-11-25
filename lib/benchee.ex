@@ -7,16 +7,20 @@ defmodule Benchee do
   alias Benchee.{Statistics, Config, Benchmark}
 
   @doc """
-  High level interface that runs the given benchmarks and prints the results on
-  the console. It is given an optional config and an array of tuples
-  of names and functions to benchmark. For configuration options see the
-  documentation of `Benchee.Config.init/1`.
+  Run benchmark jobs defined by a map and optionally provide configuration
+  options.
 
+  Runs the given benchmarks and prints the results on the console.
+
+  * jobs - a map from descriptive benchmark job name to a function to be
+  executed and benchmarked
+  * config - configuration options to alter what Benchee does, see
+  `Benchee.Config.init/1` for documentation of the available options.
+  
   ## Examples
 
-      Benchee.run(%{time: 3},
-                  %{"My Benchmark" => fn -> 1 + 1 end,
-                    "My other benchmrk" => fn -> "1" ++ "1" end})
+      Benchee.run(%{"My Benchmark" => fn -> 1 + 1 end,
+                    "My other benchmrk" => fn -> "1" ++ "1" end}, time: 3)
       # Prints a summary of the benchmark to the console
 
   """
