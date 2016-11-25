@@ -115,7 +115,7 @@ map.flatten        1.27 K
 flat_map           0.85 K - 1.49x slower
 ```
 
-See [Features][#Features] for a description of the different statistical values and what they mean.
+See [Features](#Features) for a description of the different statistical values and what they mean.
 
 If you're looking to see how to make something specific work, please refer to the [samples](https://github.com/PragTob/benchee/tree/master/samples) directory. Also, especially when wanting to extend benchee check out the [hexdocs](https://hexdocs.pm/benchee/api-reference.html).
 
