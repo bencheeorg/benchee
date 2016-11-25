@@ -2,36 +2,69 @@
 
 **You are looking at the master branch - significant changes are on the way! You might prefer to take a look at the README of the [latest release](https://github.com/PragTob/benchee/tree/0.5.0)!**
 
-Library for easy and nice (micro) benchmarking in Elixir. It allows you to compare the performance of different pieces of code and functions at a glance. Benchee is also versatile and extensible, relying only on functions - no macros!
+Library for easy and nice (micro) benchmarking in Elixir. It allows you to compare the performance of different pieces of code at a glance. Benchee is also versatile and extensible, relying only on functions - no macros! There are also a bunch of [plugins](#plugins) to draw pretty graphs and more!
 
-Somewhat inspired by [benchmark-ips](https://github.com/evanphx/benchmark-ips) from the ruby world, but a very different interface and a functional spin.
+Benchee has a nice and concise main interface, and its behavior can be altered through lots of [configuration options](#configuration):
 
-General features:
+```elixir
+list = Enum.to_list(1..10_000)
+map_fun = fn(i) -> [i, i * i] end
+
+Benchee.run(%{
+  "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
+  "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
+}, time: 3)
+```
+
+Produces the following output on the console:
+
+```
+tobi@happy ~/github/benchee $ mix run samples/run.exs
+Erlang/OTP 19 [erts-8.1] [source] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
+Elixir 1.3.4
+Benchmark suite executing with the following configuration:
+warmup: 2.0s
+time: 3.0s
+parallel: 1
+inputs: none specified
+Estimated total run time: 10.0s
+
+Benchmarking flat_map...
+Benchmarking map.flatten...
+
+Name                  ips        average  deviation         median
+map.flatten        1.27 K        0.79 ms    ±15.34%        0.76 ms
+flat_map           0.85 K        1.18 ms     ±6.00%        1.23 ms
+
+Comparison:
+map.flatten        1.27 K
+flat_map           0.85 K - 1.49x slower
+```
+
+## Features
 
 * first runs the functions for a given warmup time without recording the results, to simulate a _"warm"_ running system
-* plugin/extensible friendly architecture so you can use different formatters to generate CSV or whatever
+* plugin/extensible friendly architecture so you can use different formatters to generate CSV and more
 * well tested
 * well documented
 * execute benchmark jobs in parallel to gather more results in the same time, or simulate a system under load
-* nicely formatted console output
-* provides you with **lots of statistics** - check the next list
+* nicely formatted console output with units scaled to appropriate units
+* provides you with lots of statistics - check the next list
 
-Provides you with the following statistical data:
+Provides you with the following **statistical data**:
 
 * **average**   - average execution time (the lower the better)
-* **ips**       - iterations per second, how often can the given function be executed within one second (the higher the better)
+* **ips**       - iterations per second, aka how often can the given function be executed within one second (the higher the better)
 * **deviation** - standard deviation (how much do the results vary), given as a percentage of the average (raw absolute values also available)
-* **median**    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of samples is even). More stable than the average and somewhat more likely to be a typical value you see.
+* **median**    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of samples is even). More stable than the average and somewhat more likely to be a typical value you see. (the lower the better)
 
 Benchee does not:
 
-* Keep results of previous and compare them, if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark)
+* Keep results of previous runs and compare them, if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark)
 
 Benchee only has a small runtime dependency on `deep_merge` for merging configuration and is aimed at being the core benchmarking logic. Further functionality is provided through plugins that then pull in dependencies, such as CSV export. Check out the [available plugins](#plugins)!
 
 ## Installation
-
-When [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
 
 Add benchee to your list of dependencies in `mix.exs`:
 
@@ -41,7 +74,7 @@ def deps do
 end
 ```
 
-Install via `mix deps.get` and then happy benchmarking as described in Usage :)
+Install via `mix deps.get` and then happy benchmarking as described in [Usage](#usage) :)
 
 ## Usage
 
@@ -51,12 +84,50 @@ After installing just write a little Elixir benchmarking script:
 list = Enum.to_list(1..10_000)
 map_fun = fn(i) -> [i, i * i] end
 
-Benchee.run(%{time: 3}, %{
+Benchee.run(%{
   "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
-  "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end})
+  "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
+}, time: 3)
 ```
 
-First configuration options are passed:
+This produces the following output:
+
+```
+tobi@happy ~/github/benchee $ mix run samples/run.exs
+Erlang/OTP 19 [erts-8.1] [source] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
+Elixir 1.3.4
+Benchmark suite executing with the following configuration:
+warmup: 2.0s
+time: 3.0s
+parallel: 1
+inputs: none specified
+Estimated total run time: 10.0s
+
+Benchmarking flat_map...
+Benchmarking map.flatten...
+
+Name                  ips        average  deviation         median
+map.flatten        1.27 K        0.79 ms    ±15.34%        0.76 ms
+flat_map           0.85 K        1.18 ms     ±6.00%        1.23 ms
+
+Comparison:
+map.flatten        1.27 K
+flat_map           0.85 K - 1.49x slower
+```
+
+See [Features][#Features] for a description of the different statistical values and what they mean.
+
+If you're looking to see how to make something specific work, please refer to the [samples](https://github.com/PragTob/benchee/tree/master/samples) directory. Also, especially when wanting to extend benchee check out the [hexdocs](https://hexdocs.pm/benchee/api-reference.html).
+
+### Configuration
+
+Benchee takes a wealth of configuration options, in the most common `Benchee.run/2` interface these are passed as the second argument in the form of an optional keyword list:
+
+```elixir
+Benchee.run(%{"some function" => fn -> magic end}, print: [benchmarking: false])
+```
+
+The available options are the following (also documented in [hexdocs](https://hexdocs.pm/benchee/Benchee.Config.html#init/1)).
 
 * `warmup` - the time in seconds for which a benchmark should be run without measuring times before real measurements start. This simulates a _"warm"_ running system. Defaults to 2.
 * `time` - the time in seconds for how long each individual benchmark should be run and measured. Defaults to 5.
@@ -85,63 +156,7 @@ First configuration options are passed:
     microseconds, and counts will be displayed in ones (this is equivalent to
     the behaviour Benchee had pre 0.5.0)
 
-Running this script produces an output like:
-
-```
-tobi@happy ~/github/benchee $ mix run samples/run.exs
-Erlang/OTP 19 [erts-8.0] [source] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
-Elixir 1.3.2
-Benchmark suite executing with the following configuration:
-warmup: 2.0s
-time: 3.0s
-parallel: 1
-Estimated total run time: 10.0s
-
-Benchmarking flat_map...
-Benchmarking map.flatten...
-
-Name                  ips        average    deviation         median
-map.flatten        989.80        1.01 ms    (±12.63%)        0.99 ms
-flat_map           647.35        1.54 ms    (±10.54%)        1.56 ms
-
-Comparison:
-map.flatten        989.80
-flat_map           647.35 - 1.53x slower
-```
-
-See the general description for the meaning of the different statistics.
-
-It is important to note that the benchmarking code shown before is the convenience interface. The same benchmark in its more verbose form looks like this:
-
-```elixir
-list = Enum.to_list(1..10_000)
-map_fun = fn(i) -> [i, i * i] end
-
-Benchee.init(%{time: 3})
-|> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
-|> Benchee.benchmark("map.flatten",
-                     fn -> list |> Enum.map(map_fun) |> List.flatten end)
-|> Benchee.measure
-|> Benchee.statistics
-|> Benchee.Formatters.Console.output
-```
-
-This is a take on the _functional transformation_ of data applied to benchmarks here:
-
-1. Configure the benchmarking suite to be run
-2. run n benchmarks with the given configuration gathering raw run times per function (done in 2 steps, gathering the benchmarks and then running them with `Benchee.measure`)
-3. Generate statistics based on the raw run times
-4. Format the statistics in a suitable way
-5. Output the formatted statistics
-
-This is also part of the official API and allows for more fine grained control.
-Do you just want to have all the raw run times? Grab them before `Benchee.statistics`! Just want to have the calculated statistics and use your own formatting? Grab the result of `Benchee.statistics`! Or, maybe you want to write to a file or send an HTTP post to some online service? Just replace the `IO.puts`.
-
-This way Benchee should be flexible enough to suit your needs and be extended at will. Have a look at the [available plugins](#plugins).
-
-For more example usages and benchmarks have a look at the [`samples`](https://github.com/PragTob/benchee/tree/master/samples) directory!
-
-## Formatters
+### Formatters
 
 Among all the configuration options, one that you probably want to use are the formatters. Formatters are functions that take one argument (the benchmarking suite with all its results) and then generate some output. You can specify multiple formatters to run for the benchmarking run.
 
@@ -153,17 +168,47 @@ map_fun = fn(i) -> [i, i * i] end
 
 Benchee.run(
   %{
-    formatters: [
-      &Benchee.Formatters.CSV.output/1,
-      &Benchee.Formatters.Console.output/1
-    ],
-    csv: %{file: "my.csv"}
-  },
-  %{
     "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
     "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
-  })
+  },
+  formatters: [
+    &Benchee.Formatters.CSV.output/1,
+    &Benchee.Formatters.Console.output/1
+  ],
+  csv: %{file: "my.csv"})
 ```
+
+### More expanded/verbose usage
+
+It is important to note that the benchmarking code shown before is the convenience interface. The same benchmark in its more verbose form looks like this:
+
+```elixir
+list = Enum.to_list(1..10_000)
+map_fun = fn(i) -> [i, i * i] end
+
+Benchee.init(time: 3)
+|> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
+|> Benchee.benchmark("map.flatten",
+                     fn -> list |> Enum.map(map_fun) |> List.flatten end)
+|> Benchee.measure
+|> Benchee.statistics
+|> Benchee.Formatters.Console.output
+```
+
+This is a take on the _functional transformation_ of data applied to benchmarks here:
+
+1. Configure the benchmarking suite to be run
+2. Define the functions to be benchmarked
+3. Run n benchmarks with the given configuration gathering raw run times per function
+4. Generate statistics based on the raw run times
+5. Format the statistics in a suitable way
+6. Output the formatted statistics
+
+This is also part of the **official API** and allows for more **fine grained control**. (It's also what Benchee does internally when you use `Benchee.run/2`).
+
+Do you just want to have all the raw run times? Just work with the result of `Benchee.measure/1`! Just want to have the calculated statistics and use your own formatting? Grab the result of `Benchee.statistics/1`! Or, maybe you want to write to a file or send an HTTP post to some online service? Just use the `Benchee.Formatters.Console.format/1` and then send the result where you want.
+
+This way Benchee should be flexible enough to suit your needs and be extended at will. Have a look at the [available plugins](#plugins).
 
 ## Plugins
 
