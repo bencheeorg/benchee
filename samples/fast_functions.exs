@@ -3,13 +3,14 @@
 # a new idea to improve this.
 
 range = 1..10
-Benchee.run(%{time: 3},
-  %{"Integer addition"          => fn -> 1 + 1 end,
-    "String concatention"       => fn -> "1" <> "1" end,
-    "adding a head to an array" => fn -> [1 | [1]] end,
-    "++ array concat"           => fn -> [1] ++ [1] end,
-    "noop"                      => fn -> 0 end,
-    "Enum.map(10)"              => fn -> Enum.map(range, fn(i) -> i end) end})
+Benchee.run(%{
+  "Integer addition"          => fn -> 1 + 1 end,
+  "String concatention"       => fn -> "1" <> "1" end,
+  "adding a head to an array" => fn -> [1 | [1]] end,
+  "++ array concat"           => fn -> [1] ++ [1] end,
+  "noop"                      => fn -> 0 end,
+  "Enum.map(10)"              => fn -> Enum.map(range, fn(i) -> i end) end
+}, time: 3)
 
 #
 # Before  adding running fast functions multiple times, these where just too

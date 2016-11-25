@@ -1,11 +1,11 @@
 list = Enum.to_list(1..10_000)
 map_fun = fn(i) -> [i, i * i] end
 
-Benchee.run(%{time: 8}, %{
+Benchee.run(%{
   ":lists.flatmap" => fn -> :lists.flatmap(map_fun, list) end,
   "flat_map"        => fn -> Enum.flat_map(list, map_fun) end,
   "map |> flatten"  => fn -> list |> Enum.map(map_fun) |> List.flatten end
-})
+}, time: 8)
 
 # Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
 # Elixir 1.3.4

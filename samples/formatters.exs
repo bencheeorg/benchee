@@ -3,23 +3,19 @@ map_fun = fn(i) -> [i, i * i] end
 
 format_fun = fn(%{run_times: run_times}) ->
   IO.puts ""
+  run_times = Map.get run_times, Benchee.Benchmark.no_input
   Enum.each run_times, fn({name, times}) ->
     IO.puts "Benchee recorded #{Enum.count times} run times for #{name}!"
   end
 end
 
-Benchee.run(
-  %{
-    formatters: [
-      format_fun,
-      &Benchee.Formatters.Console.output/1
-    ],
-    csv: %{file: "my.csv"}
-  },
-  %{
-    "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
-    "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
-  })
+Benchee.run(%{
+  "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
+  "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end},
+  formatters: [
+    format_fun,
+    &Benchee.Formatters.Console.output/1]
+)
 
 # tobi@happy ~/github/benchee $ mix run samples/formatters.exs
 # Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]

@@ -1,6 +1,6 @@
 # Also way too fast and therefore not super feasible, more a test if
 # if benchmarking super fast functions has gotten any better.
-Benchee.run(%{time: 1}, %{"fast" => fn -> 1 + 1 end})
+Benchee.run(%{"fast" => fn -> 1 + 1 end}, time: 1)
 
 # tobi@happy ~/github/benchee $ mix run samples/one_fast_fun.exs
 # Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]

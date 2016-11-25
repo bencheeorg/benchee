@@ -1,3 +1,4 @@
+# Better define this module in a .ex file and then just refer to the methods
 defmodule MyMap do
 
   def map_tco(list, function) do
