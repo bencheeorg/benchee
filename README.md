@@ -70,7 +70,7 @@ Add benchee to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:benchee, "~> 0.5", only: :dev}]
+  [{:benchee, "~> 0.6", only: :dev}]
 end
 ```
 
@@ -152,9 +152,7 @@ The available options are the following (also documented in [hexdocs](https://he
     and seconds if values are large enough)
     * `:smallest` - the smallest best fit unit will be used (i.e. millisecond
     and one)
-    * `:none`     - no unit scaling will occur. Durations will be displayed in
-    microseconds, and counts will be displayed in ones (this is equivalent to
-    the behaviour Benchee had pre 0.5.0)
+    * `:none`     - no unit scaling will occur. Durations will be displayed in microseconds, and counts will be displayed in ones (this is equivalent to the behaviour Benchee had pre 0.5.0)
 
 ### Formatters
 
