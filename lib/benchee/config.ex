@@ -9,6 +9,7 @@ defmodule Benchee.Config do
   @doc """
   Returns the initial benchmark configuration for Benchee, composed of defaults
   and an optional custom configuration.
+
   Configuration times are given in seconds, but are converted to microseconds
   internally.
 
@@ -18,6 +19,11 @@ defmodule Benchee.Config do
     how often it is executed). Defaults to 5.
     * `warmup`     - the time in seconds for which the benchmarking function
     should be run without gathering results. Defaults to 2.
+    * `inputs` - a map from descriptive input names to some different input,
+    your benchmarking jobs will then be run with each of these inputs. For this
+    to work your benchmarking function gets the current input passed in as an
+    argument into the function. Defaults to `nil`, aka no input specified and
+    functions are called without an argument.
     * `parallel`   - each job will be executed in `parallel` number processes.
     Gives you more data in the same time, but also puts a load on the system
     interfering with benchmark results. Defaults to 1.

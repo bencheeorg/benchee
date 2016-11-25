@@ -131,8 +131,9 @@ The available options are the following (also documented in [hexdocs](https://he
 
 * `warmup` - the time in seconds for which a benchmark should be run without measuring times before real measurements start. This simulates a _"warm"_ running system. Defaults to 2.
 * `time` - the time in seconds for how long each individual benchmark should be run and measured. Defaults to 5.
+* `inputs` - a map from descriptive input names to some different input, your benchmarking jobs will then be run with each of these inputs. For this to work your benchmarking function gets the current input passed in as an argument into the function. Defaults to `nil`, aka no input specified and functions are called without an argument. See [Inputs](#inputs)
 * `parallel` - each job will be executed in `parallel` number processes. Gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking). Defaults to 1.
-* `formatters` - list of formatter functions you'd like to run to output the benchmarking results of the suite when using `Benchee.run/2`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter calling `Benchee.Formatters.Console.output/1`.
+* `formatters` - list of formatter functions you'd like to run to output the benchmarking results of the suite when using `Benchee.run/2`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter calling `Benchee.Formatters.Console.output/1`. See [Formatters](#formatters)
 * `print`      - a map from atoms to `true` or `false` to configure if the output identified by the atom will be printed during the standard Benchee benchmarking process. All options are enabled by default (true). Options are:
   * `:benchmarking`  - print when Benchee starts benchmarking a new job (Benchmarking name ..)
   * `:configuration` - a summary of configured benchmarking options including estimated total run time is printed before benchmarking starts
@@ -154,6 +155,79 @@ The available options are the following (also documented in [hexdocs](https://he
     and one)
     * `:none`     - no unit scaling will occur. Durations will be displayed in microseconds, and counts will be displayed in ones (this is equivalent to the behaviour Benchee had pre 0.5.0)
 
+### Inputs
+
+`:inputs` is a very useful configuration that allows you to run the same benchmarking with different inputs. Functions can have different performance characteristics on differently shaped inputs be that structure or input size.
+
+One of such cases is comparing tail-recursive and body-recursive implementations of `map`. More information in the [repository with the benchmark](https://github.com/PragTob/elixir_playground/blob/master/bench/tco_blog_post_focussed_inputs.exs) and the [blog post](https://pragtob.wordpress.com/2016/06/16/tail-call-optimization-in-elixir-erlang-not-as-efficient-and-important-as-you-probably-think/).
+
+```elixir
+map_fun = fn(i) -> i + 1 end
+inputs = %{
+  "Small (1 Thousand)"    => Enum.to_list(1..1_000),
+  "Middle (100 Thousand)" => Enum.to_list(1..100_000),
+  "Big (10 Million)"      => Enum.to_list(1..10_000_000),
+}
+
+Benchee.run %{
+  "map tail-recursive" =>
+    fn(list) -> MyMap.map_tco(list, map_fun) end,
+  "stdlib map" =>
+    fn(list) -> Enum.map(list, map_fun) end,
+  "map simple body-recursive" =>
+    fn(list) -> MyMap.map_body(list, map_fun) end,
+  "map tail-recursive different argument order" =>
+    fn(list) -> MyMap.map_tco_arg_order(list, map_fun) end
+}, time: 15, warmup: 5, inputs: inputs
+```
+
+Omitting some of the output this produces the following results:
+
+```
+##### With input Big (10 Million) #####
+Name                                                  ips        average  deviation         median
+map tail-recursive different argument order          5.09      196.48 ms     ±9.70%      191.18 ms
+map tail-recursive                                   3.86      258.84 ms    ±22.05%      246.03 ms
+stdlib map                                           2.87      348.36 ms     ±9.02%      345.21 ms
+map simple body-recursive                            2.85      350.80 ms     ±9.03%      349.33 ms
+
+Comparison:
+map tail-recursive different argument order          5.09
+map tail-recursive                                   3.86 - 1.32x slower
+stdlib map                                           2.87 - 1.77x slower
+map simple body-recursive                            2.85 - 1.79x slower
+
+##### With input Middle (100 Thousand) #####
+Name                                                  ips        average  deviation         median
+stdlib map                                         584.79        1.71 ms    ±16.20%        1.67 ms
+map simple body-recursive                          581.89        1.72 ms    ±15.38%        1.68 ms
+map tail-recursive different argument order        531.09        1.88 ms    ±17.41%        1.95 ms
+map tail-recursive                                 471.64        2.12 ms    ±18.93%        2.13 ms
+
+Comparison:
+stdlib map                                         584.79
+map simple body-recursive                          581.89 - 1.00x slower
+map tail-recursive different argument order        531.09 - 1.10x slower
+map tail-recursive                                 471.64 - 1.24x slower
+
+##### With input Small (1 Thousand) #####
+Name                                                  ips        average  deviation         median
+stdlib map                                        66.10 K       15.13 μs    ±58.17%       15.00 μs
+map tail-recursive different argument order       62.46 K       16.01 μs    ±31.43%       15.00 μs
+map simple body-recursive                         62.35 K       16.04 μs    ±60.37%       15.00 μs
+map tail-recursive                                55.68 K       17.96 μs    ±30.32%       17.00 μs
+
+Comparison:
+stdlib map                                        66.10 K
+map tail-recursive different argument order       62.46 K - 1.06x slower
+map simple body-recursive                         62.35 K - 1.06x slower
+map tail-recursive                                55.68 K - 1.19x slower
+```
+
+As you can see, the tail-recursive approach is significantly faster for the _Big_ 10 Million input while body recursion outperforms it or performs just as well on the _Middle_ and _Small_ inputs.
+
+Therefore, I **highly recommend** using this feature and checking different realistically structured and sized inputs for the functions you benchmark!
+
 ### Formatters
 
 Among all the configuration options, one that you probably want to use are the formatters. Formatters are functions that take one argument (the benchmarking suite with all its results) and then generate some output. You can specify multiple formatters to run for the benchmarking run.
@@ -173,7 +247,7 @@ Benchee.run(
     &Benchee.Formatters.CSV.output/1,
     &Benchee.Formatters.Console.output/1
   ],
-  csv: %{file: "my.csv"})
+  csv: [file: "my.csv"])
 ```
 
 ### More expanded/verbose usage
