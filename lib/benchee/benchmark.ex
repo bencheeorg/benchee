@@ -170,7 +170,7 @@ defmodule Benchee.Benchmark do
     finish_time = current_time + time
     :erlang.garbage_collect
     {n, initial_run_time} = determine_n_times(function, input, display_fast_warning)
-    do_benchmark(finish_time, function, input, [initial_run_time], n)
+    do_benchmark(finish_time, function, input, [initial_run_time], n, current_time)
   end
 
   defp current_time do
@@ -208,7 +208,7 @@ defmodule Benchee.Benchmark do
     IO.puts @fast_warning
   end
 
-  defp do_benchmark(finish_time, function, input, run_times, n, now \\ 0)
+  defp do_benchmark(finish_time, function, input, run_times, n, now)
   defp do_benchmark(finish_time, _, _, run_times, _n, now)
        when now > finish_time do
     run_times

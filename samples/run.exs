@@ -7,21 +7,22 @@ Benchee.run(%{
 }, time: 3)
 
 # tobi@happy ~/github/benchee $ mix run samples/run.exs
-# Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
+# Erlang/OTP 19 [erts-8.1] [source] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
 # Elixir 1.3.4
 # Benchmark suite executing with the following configuration:
 # warmup: 2.0s
 # time: 3.0s
 # parallel: 1
+# inputs: none specified
 # Estimated total run time: 10.0s
 #
 # Benchmarking flat_map...
 # Benchmarking map.flatten...
 #
 # Name                  ips        average  deviation         median
-# map.flatten        1.26 K        0.80 ms    ±15.96%        0.75 ms
-# flat_map           0.86 K        1.17 ms     ±4.48%        1.18 ms
+# map.flatten        1.27 K        0.79 ms    ±15.34%        0.76 ms
+# flat_map           0.85 K        1.18 ms     ±6.00%        1.23 ms
 #
 # Comparison:
-# map.flatten        1.26 K
-# flat_map           0.86 K - 1.46x slower
+# map.flatten        1.27 K
+# flat_map           0.85 K - 1.49x slower

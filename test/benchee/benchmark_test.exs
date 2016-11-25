@@ -289,4 +289,15 @@ defmodule Benchee.BenchmarkTest do
       end
     end
   end
+
+  test ".measure runs the job exactly once if its time exceeds given time" do
+    capture_io fn ->
+      config = Map.merge @config, %{time: 1_000, warmup: 0}
+      jobs = %{"Sleeps" => fn -> :timer.sleep(2) end}
+      run_times = Benchee.measure(%{config: config, jobs: jobs})
+                  |> get_in([:run_times, Benchmark.no_input, "Sleeps"])
+
+      assert length(run_times) == 1
+    end
+  end
 end
