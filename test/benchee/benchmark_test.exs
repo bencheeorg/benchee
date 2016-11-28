@@ -300,4 +300,25 @@ defmodule Benchee.BenchmarkTest do
       assert length(run_times) == 1
     end
   end
+
+  test ".measure stores run times in the right order" do
+    capture_io fn ->
+      config = Map.merge @config, %{time: 25_000, warmup: 0}
+      {:ok, agent} = Agent.start fn -> 1 end
+      increasing_function = fn ->
+        Agent.update agent, fn(state) ->
+          :timer.sleep state
+          state * 5
+        end
+      end
+      jobs = %{"Sleep more" => increasing_function}
+      run_times = Benchee.measure(%{config: config, jobs: jobs})
+                  |> get_in([:run_times, Benchmark.no_input, "Sleep more"])
+
+      assert length(run_times) >= 2 # should be 3 but good old leeway
+      # as the function takes more time each time called run times should be
+      # as if sorted ascending
+      assert run_times == Enum.sort(run_times)
+    end
+  end
 end

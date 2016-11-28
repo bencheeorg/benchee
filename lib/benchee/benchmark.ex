@@ -211,7 +211,7 @@ defmodule Benchee.Benchmark do
   defp do_benchmark(finish_time, function, input, run_times, n, now)
   defp do_benchmark(finish_time, _, _, run_times, _n, now)
        when now > finish_time do
-    run_times
+    Enum.reverse run_times # restore correct order important for graphing
   end
   defp do_benchmark(finish_time, function, input, run_times, n, _now) do
     run_time = measure_call(function, input, n)
