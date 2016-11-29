@@ -18,6 +18,7 @@
 * prewarming (discarding the first result due to some timer issues) during run time was removed, as it should already happen during the warmup period and would discard actual useful results especially for longer running macro benchmarks.
 * when the execution time of the benchmarking job exceeds the given `:time` it will now execute exactly once (used to be 2) [#49](https://github.com/PragTob/benchee/issues/49)
 * `run_times` are now in the order as recorded (used to be reverse) - important when wants to graph them/look at them to see if there are any anomalities during benchmarking
+* Remove elixir 1.4.0-rc.0 warnings
 
 # 0.5.0 (October 13, 2016)
 
