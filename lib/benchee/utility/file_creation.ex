@@ -33,7 +33,7 @@ defmodule Benchee.Utility.FileCreation do
     create_directory filename
     Enum.each names_to_content, fn({input_name, content}) ->
       input_filename = interleave(filename, input_name)
-      File.open input_filename, [:write], fn(file) ->
+      File.open input_filename, [:write, :utf8], fn(file) ->
         function.(file, content, input_filename)
       end
     end
