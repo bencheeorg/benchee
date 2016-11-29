@@ -12,6 +12,8 @@
 ## Features (Plugins)
 
 * `Benchee.Utility.FileCreation` module to help with creating files from a map of multiple inputs (or other descriptors) mapping to input and an `interleave` function that spits out the correct file names especially if the `:__no_input` marker is used
+* `Benchee.System` is available to retrieve elixir and erlang versions but it's
+also already added to the suite during `Benchee.run/2`
 
 ## Breaking Changes (Plugins)
 

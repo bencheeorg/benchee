@@ -16,7 +16,7 @@ defmodule Benchee do
   executed and benchmarked
   * config - configuration options to alter what Benchee does, see
   `Benchee.Config.init/1` for documentation of the available options.
-  
+
   ## Examples
 
       Benchee.run(%{"My Benchmark" => fn -> 1 + 1 end,
@@ -36,11 +36,13 @@ defmodule Benchee do
   defp do_run(jobs, config) do
     suite = run_benchmarks jobs, config
     output_results suite
+    suite
   end
 
   defp run_benchmarks(jobs, config) do
     config
     |> Benchee.init
+    |> Benchee.System.system
     |> Map.put(:jobs, jobs)
     |> Benchee.measure
     |> Statistics.statistics

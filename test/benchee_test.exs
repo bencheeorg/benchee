@@ -228,6 +228,27 @@ defmodule BencheeTest do
     assert length(occurences) == 3
   end
 
+  test ".run returns the suite in the end intact" do
+    capture_io fn ->
+      suite = Benchee.run(%{
+        "sleep"    => fn -> :timer.sleep 1 end
+      }, time: 0.001, warmup: 0)
+      assert %{run_times: _, statistics: _, config: _} = suite
+    end
+  end
+
+  test ".run also adds system information into the mix via Benchee.System" do
+    capture_io fn ->
+      suite = Benchee.run(%{
+        "sleep"    => fn -> :timer.sleep 1 end
+      }, time: 0.001, warmup: 0)
+      elixir = Benchee.System.elixir
+      erlang = Benchee.System.erlang
+
+      assert %{system: %{elixir: ^elixir, erlang: ^erlang}} = suite
+    end
+  end
+
   @slower_regex "\\s+- \\d\\.\\d+x slower"
   defp readme_sample_asserts(output) do
     assert output =~ @header_regex
