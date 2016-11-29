@@ -150,7 +150,7 @@ defmodule BencheeTest do
     assert output =~ "Formatter two"
   end
 
-  @rough_10_milli_s "((9|10|11|12|13)\\.\\d{2} ms)"
+  @rough_10_milli_s "((8|9|10|11|12|13|14)\\.\\d{2} ms)"
   test "formatters have full access to the suite data" do
     output = capture_io fn ->
       Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end},
