@@ -23,7 +23,7 @@ defmodule Benchee.System do
     otp_release = :erlang.system_info(:otp_release)
     file = Path.join([:code.root_dir, "releases", otp_release , "OTP_VERSION"])
     case File.read(file) do
-      {:ok, version}    -> String.trim(version)
+      {:ok, version}    -> String.strip(version)
       {:error, reason}  ->
         IO.puts "Error trying to dermine erlang version #{reason}"
     end
