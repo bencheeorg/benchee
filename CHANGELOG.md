@@ -9,6 +9,10 @@
 
 * The old way of providing the jobs as a list of tuples now removed, please switch to using a map from string to functions
 
+## Features (Plugins)
+
+* `Benchee.Utility.FileCreation` module to help with creating files from a map of multiple inputs (or other descriptors) mapping to input and an `interleave` function that spits out the correct file names especially if the `:__no_input` marker is used
+
 ## Breaking Changes (Plugins)
 
 * The structure of the output from `Benchee.Benchmark.measure/1` to `Benchee.Statistics.statistics/1` has changed to accommodate the new inputs feature there is now an additional level where in a map the input name then points to the appropriate results of the jobs. When there were no inputs the key is the value returned by `Benchee.Benchmark.no_input/0`.
