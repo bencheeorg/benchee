@@ -1,4 +1,4 @@
-defmodule Benchee.Utility.FileIntegrationTest do
+defmodule Benchee.Utility.FileCreationIntegrationTest do
   use ExUnit.Case
   import Benchee.Utility.FileCreation
   import ExUnit.CaptureIO
@@ -45,6 +45,7 @@ defmodule Benchee.Utility.FileIntegrationTest do
   defp assert_correct_files do
     assert File.exists? @file_name_1
     assert File.exists? @file_name_2
+    refute File.exists? "#{@directory}/test"
 
     assert File.read!(@file_name_1) == "abc"
     assert File.read!(@file_name_2) == "ABC"

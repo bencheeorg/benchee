@@ -45,7 +45,7 @@ defmodule Benchee.Utility.FileCreation do
   end
 
   defp create_directory(filename) do
-    directory = Path.rootname filename
+    directory = Path.dirname filename
     File.mkdir_p! directory
   end
 
