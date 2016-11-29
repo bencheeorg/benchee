@@ -1,17 +1,16 @@
 defmodule Benchee.Utility.FileIntegrationTest do
   use ExUnit.Case
-  import Benchee.Utility.File
+  import Benchee.Utility.FileCreation
 
   @directory "testing/files"
-  test ".each_input writes file contents just fine" do
+  test ".each writes file contents just fine" do
     try do
       input_to_contents = %{
         "small input" => "abc",
         "Big list"    => "ABC"
       }
-      File.mkdir_p! @directory
       filename = "#{@directory}/test.txt"
-      each_input(input_to_contents, filename, fn(file, content) ->
+      each(input_to_contents, filename, fn(file, content) ->
         :ok = IO.write file, content
       end)
 
