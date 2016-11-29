@@ -29,14 +29,19 @@ defmodule Benchee.Utility.FileCreation do
         "my.html",
         fn(file, content) -> IO.write(file, content) end)
   """
-  def each(names_to_content, filename, function) do
+  def each(names_to_content, filename, function \\ &default_each/3) do
     create_directory filename
     Enum.each names_to_content, fn({input_name, content}) ->
       input_filename = interleave(filename, input_name)
       File.open input_filename, [:write], fn(file) ->
-        function.(file, content)
+        function.(file, content, input_filename)
       end
     end
+  end
+
+  defp default_each(file, content, input_filename) do
+    :ok = IO.write file, content
+    IO.puts "Generated #{input_filename}"
   end
 
   defp create_directory(filename) do
