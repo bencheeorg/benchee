@@ -10,7 +10,7 @@ defmodule Benchee.Formatters.ConsoleTest do
   @config %{console: @console_config}
   test ".output formats and prints the results right to the console" do
     jobs = %{
-      no_input => %{
+      no_input() => %{
         "Second" => %{
           average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
         },

@@ -12,9 +12,9 @@ defmodule Benchee.Mixfile do
       consolidate_protocols: true,
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      deps: deps,
+      deps: deps(),
       docs: [source_ref: @version],
-      package: package,
+      package: package(),
       name: "Benchee",
       source_url: "https://github.com/PragTob/benchee",
       description: """

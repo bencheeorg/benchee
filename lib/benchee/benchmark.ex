@@ -47,7 +47,7 @@ defmodule Benchee.Benchmark do
     nil
   end
   defp print_configuration_information(jobs, config) do
-    print_system_information
+    print_system_information()
     print_suite_information(jobs, config)
   end
 
@@ -167,10 +167,10 @@ defmodule Benchee.Benchmark do
   end
 
   defp measure_runtimes(function, input, time, display_fast_warning) do
-    finish_time = current_time + time
+    finish_time = current_time() + time
     :erlang.garbage_collect
     {n, initial_run_time} = determine_n_times(function, input, display_fast_warning)
-    do_benchmark(finish_time, function, input, [initial_run_time], n, current_time)
+    do_benchmark(finish_time, function, input, [initial_run_time], n, current_time())
   end
 
   defp current_time do
@@ -187,7 +187,7 @@ defmodule Benchee.Benchmark do
     if run_time >= @minimum_execution_time do
       {1, run_time}
     else
-      if display_fast_warning, do: print_fast_warning
+      if display_fast_warning, do: print_fast_warning()
       try_n_times(function, input, @times_multiplicator)
     end
   end

@@ -160,7 +160,7 @@ defmodule Benchee.Formatters.Console do
   end
   defp comparison_report([reference | other_jobs], units, label_width, _config) do
     [
-      comparison_descriptor,
+      comparison_descriptor(),
       reference_report(reference, units, label_width) |
       comparisons(reference, units, label_width, other_jobs)
     ]
