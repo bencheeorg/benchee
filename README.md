@@ -33,13 +33,17 @@ Benchmarking flat_map...
 Benchmarking map.flatten...
 
 Name                  ips        average  deviation         median
-map.flatten        1.27 K        0.79 ms    ±15.34%        0.76 ms
-flat_map           0.85 K        1.18 ms     ±6.00%        1.23 ms
+map.flatten        1.04 K        0.96 ms    ±21.82%        0.90 ms
+flat_map           0.66 K        1.51 ms    ±16.98%        1.50 ms
 
 Comparison:
-map.flatten        1.27 K
-flat_map           0.85 K - 1.49x slower
+map.flatten        1.04 K
+flat_map           0.66 K - 1.56x slower
 ```
+
+The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/PragTob/benchee_html) make it possible to generate nice looking [html reports](http://www.pragtob.info/benchee/flat_map.html) and export graphs as png images like this IPS comparison chart with standard deviation:
+
+![flat_map_ips](http://www.pragtob.info/benchee/images/flat_map_ips.png)
 
 ## Features
 
@@ -62,7 +66,7 @@ Benchee does not:
 
 * Keep results of previous runs and compare them, if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark)
 
-Benchee only has a small runtime dependency on `deep_merge` for merging configuration and is aimed at being the core benchmarking logic. Further functionality is provided through plugins that then pull in dependencies, such as CSV export. Check out the [available plugins](#plugins)!
+Benchee only has a small runtime dependency on `deep_merge` for merging configuration and is aimed at being the core benchmarking logic. Further functionality is provided through plugins that then pull in dependencies, such as HTML generation and CSV export. Check out the [available plugins](#plugins)!
 
 ## Installation
 
@@ -232,22 +236,23 @@ Therefore, I **highly recommend** using this feature and checking different real
 
 Among all the configuration options, one that you probably want to use are the formatters. Formatters are functions that take one argument (the benchmarking suite with all its results) and then generate some output. You can specify multiple formatters to run for the benchmarking run.
 
-So if you are using the [CSV plugin](https://github.com/PragTob/benchee_csv) and you want to run both the console formatter and the CSV formatter this looks like this:
+So if you are using the [HTML plugin](https://github.com/PragTob/benchee_html) and you want to run both the console formatter and the HTML formatter this looks like this (after you installed it of course):
 
 ```elixir
 list = Enum.to_list(1..10_000)
 map_fun = fn(i) -> [i, i * i] end
 
-Benchee.run(
-  %{
-    "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
-    "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
-  },
+Benchee.run(%{
+  "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
+  "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
+},
   formatters: [
-    &Benchee.Formatters.CSV.output/1,
+    &Benchee.Formatters.HTML.output/1,
     &Benchee.Formatters.Console.output/1
   ],
-  csv: [file: "my.csv"])
+  html: [file: "samples_output/my.html"],
+)
+
 ```
 
 ### More expanded/verbose usage
@@ -286,9 +291,13 @@ This way Benchee should be flexible enough to suit your needs and be extended at
 
 Packages that work with Benchee to provide additional functionality.
 
-* [BencheeCSV](//github.com/PragTob/benchee_csv) - generate CSV from your Benchee benchmark results so you can import them into your favorite spreadsheet tool and make fancy graphs
+* [benchee_html](//github.com/PragTob/benchee_html) - generate HTML including a data table and many different graphs with the possibility to export individual graphs as PNG :)
+* [benchee_csv](//github.com/PragTob/benchee_csv) - generate CSV from your Benchee benchmark results so you can import them into your favorite spreadsheet tool and make fancy graphs
+* [benchee_json](//github.com/PragTob/benchee_json) - export suite results as JSON to feed anywhere or feed it to your JavaScript and make magic happen :)
 
-(You didn't really expect to find tons of plugins here when the library was just released, did you? ;) )
+With the HTML plugin for instance you can get fancy graphs like this boxplot (but normal bar chart is there as well):
+
+![boxplot](http://www.pragtob.info/benchee/images/boxplot.png)
 
 ## Contributing
 
