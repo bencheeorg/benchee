@@ -1,4 +1,8 @@
-# 0.6.0 (unreleased)
+# 0.6.0 (November 30, 2016)
+
+One of the biggest releases yet. Great stuff in here - more elixir like API for `Benchee.run/2` with the jobs as the primary argument and the optional options as the second argument and now also as the more idiomatic keyword list!
+
+The biggest feature apart from that is the possibility to use multiple inputs - which you all should do now as quite many functions behave differently with bigger, smaller or differently shaped inputs. Apart from that a bulk of work has gone into making and supporting [benchee_html](https://github.com/PragTob/benchee_html)!
 
 ## Features (User Facing)
 
