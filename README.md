@@ -303,6 +303,8 @@ With the HTML plugin for instance you can get fancy graphs like this boxplot (bu
 
 Contributions to Benchee are very welcome! Bug reports, documentation, spelling corrections, whole features, feature ideas, bugfixes, new plugins, fancy graphics... all of those (and probably more) are much appreciated contributions!
 
+Please respect the [Code of Conduct](//github.com/PragTob/benchee/blob/master/CODE_OF_CONDUCT.md).
+
 You can get started with a look at the [open issues](https://github.com/PragTob/benchee/issues).
 
 A couple of (hopefully) helpful points:
