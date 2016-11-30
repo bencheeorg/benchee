@@ -1,7 +1,5 @@
 # Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee) [![docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/) [![Inline docs](http://inch-ci.org/github/PragTob/benchee.svg)](http://inch-ci.org/github/PragTob/benchee) [![Build Status](https://travis-ci.org/PragTob/benchee.svg?branch=master)](https://travis-ci.org/PragTob/benchee)
 
-**You are looking at the master branch - significant changes are on the way! You might prefer to take a look at the README of the [latest release](https://github.com/PragTob/benchee/tree/0.5.0)!**
-
 Library for easy and nice (micro) benchmarking in Elixir. It allows you to compare the performance of different pieces of code at a glance. Benchee is also versatile and extensible, relying only on functions - no macros! There are also a bunch of [plugins](#plugins) to draw pretty graphs and more!
 
 Benchee has a nice and concise main interface, and its behavior can be altered through lots of [configuration options](#configuration):
