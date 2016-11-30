@@ -4,6 +4,7 @@
 
 * New `:inputs` configuration key that allows you to specify a map from input name to input value so that each defined benchmarking job is then executed with this input. For this to work the benchmarking function is called with the appropriate `input` as an argument. See [`samples/multiple_inputs.exs`](https://github.com/PragTob/benchee/blob/master/samples/multiple_inputs.exs) for an example. [#21]( https://github.com/PragTob/benchee/issues/21)
 * The highlevel `Benchee.run/2` is now more idiomatic elixir and takes the map of jobs as the first argument and a keywordlist of options as the second (and last) argument. The old way of passing config as a map as the first argument and the jobs as the second argument still works, **but might be deprecated later on** [#47](https://github.com/PragTob/benchee/issues/47)
+* Along with that `Benchee.init/1` now also accepts keyword lists of course
 
 ## Breaking Changes (User Facing)
 
