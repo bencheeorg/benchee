@@ -293,9 +293,13 @@ Packages that work with Benchee to provide additional functionality.
 * [benchee_csv](//github.com/PragTob/benchee_csv) - generate CSV from your Benchee benchmark results so you can import them into your favorite spreadsheet tool and make fancy graphs
 * [benchee_json](//github.com/PragTob/benchee_json) - export suite results as JSON to feed anywhere or feed it to your JavaScript and make magic happen :)
 
-With the HTML plugin for instance you can get fancy graphs like this boxplot (but normal bar chart is there as well):
+With the HTML plugin for instance you can get fancy graphs like this boxplot:
 
 ![boxplot](http://www.pragtob.info/benchee/images/boxplot.png)
+
+Of course there also are normal bar charts including standard deviation:
+
+![flat_map_ips](http://www.pragtob.info/benchee/images/flat_map_ips.png)
 
 ## Contributing
 
