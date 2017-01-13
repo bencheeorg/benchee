@@ -39,9 +39,9 @@ map.flatten        1.04 K
 flat_map           0.66 K - 1.56x slower
 ```
 
-The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/PragTob/benchee_html) make it possible to generate nice looking [html reports](http://www.pragtob.info/benchee/flat_map.html) and export graphs as png images like this IPS comparison chart with standard deviation:
+The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/PragTob/benchee_html) make it possible to generate nice looking [html reports](http://www.pragtob.info/benchee/flat_map.html), where individual graphs can also be exported as PNG images:
 
-![flat_map_ips](http://www.pragtob.info/benchee/images/flat_map_ips.png)
+![report](http://www.pragtob.info/benchee/images/report.png)
 
 ## Features
 
