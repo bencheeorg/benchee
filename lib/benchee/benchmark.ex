@@ -7,6 +7,7 @@ defmodule Benchee.Benchmark do
 
   alias Benchee.Utility.RepeatN
   alias Benchee.Conversion.Duration
+  alias Benchee.Output.BenchmarkPrinter, as: Printer
 
   @doc """
   Adds the given function and its associated name to the benchmarking jobs to
@@ -36,58 +37,11 @@ defmodule Benchee.Benchmark do
   There will be `parallel` processes spawned exeuting the benchmark job in
   parallel.
   """
-  def measure(suite = %{jobs: jobs, config: config}) do
-    print_configuration_information(jobs, config)
+  def measure(suite = %{jobs: jobs, config: config}, printer \\ Printer) do
+    printer.print_configuration_information(suite, config)
     run_times = record_runtimes(jobs, config)
 
     Map.put suite, :run_times, run_times
-  end
-
-  defp print_configuration_information(_, %{print: %{configuration: false}}) do
-    nil
-  end
-  defp print_configuration_information(jobs, config) do
-    print_system_information()
-    print_suite_information(jobs, config)
-  end
-
-  defp print_system_information do
-    IO.write :erlang.system_info(:system_version)
-    IO.puts "Elixir #{System.version}"
-  end
-
-  defp print_suite_information(jobs, %{parallel: parallel,
-                                       time:     time,
-                                       warmup:   warmup,
-                                       inputs:   inputs}) do
-    warmup_seconds = time_precision Duration.scale(warmup, :second)
-    time_seconds   = time_precision Duration.scale(time, :second)
-    job_count      = map_size jobs
-    exec_time      = warmup_seconds + time_seconds
-    total_time     = time_precision(job_count * inputs_count(inputs) * exec_time)
-
-    IO.puts "Benchmark suite executing with the following configuration:"
-    IO.puts "warmup: #{warmup_seconds}s"
-    IO.puts "time: #{time_seconds}s"
-    IO.puts "parallel: #{parallel}"
-    IO.puts "inputs: #{inputs_out(inputs)}"
-    IO.puts "Estimated total run time: #{total_time}s"
-    IO.puts ""
-  end
-
-  defp inputs_count(nil),    do: 1 # no input specified still executes
-  defp inputs_count(inputs), do: map_size(inputs)
-
-  defp inputs_out(nil), do: "none specified"
-  defp inputs_out(inputs) do
-    inputs
-    |> Map.keys
-    |> Enum.join(", ")
-  end
-
-  @round_precision 2
-  defp time_precision(float) do
-    Float.round(float, @round_precision)
   end
 
   @no_input :__no_input
@@ -118,24 +72,10 @@ defmodule Benchee.Benchmark do
     {input_name, results}
   end
 
-  defp print_input_information(@no_input) do
-    # noop
-  end
-  defp print_input_information(input_name) do
-    IO.puts "\nBenchmarking with input #{input_name}:"
-  end
-
   defp measure_job({name, function}, input, config) do
     print_benchmarking name, config
     job_run_times = parallel_benchmark function, input, config
     {name, job_run_times}
-  end
-
-  defp print_benchmarking(_, %{print: %{benchmarking: false}}) do
-    nil
-  end
-  defp print_benchmarking(name, _config) do
-    IO.puts "Benchmarking #{name}..."
   end
 
   defp parallel_benchmark(function,
@@ -165,7 +105,6 @@ defmodule Benchee.Benchmark do
   defp measure_runtimes(_function, _input, 0, _) do
     []
   end
-
   defp measure_runtimes(function, input, time, display_fast_warning) do
     finish_time = current_time() + time
     :erlang.garbage_collect
@@ -199,13 +138,6 @@ defmodule Benchee.Benchmark do
     else
       try_n_times(function, input, n * @times_multiplicator)
     end
-  end
-
-  @fast_warning """
-  Warning: The function you are trying to benchmark is super fast, making measures more unreliable! See: https://github.com/PragTob/benchee/wiki/Benchee-Warnings#fast-execution-warning
-  """
-  defp print_fast_warning do
-    IO.puts @fast_warning
   end
 
   defp do_benchmark(finish_time, function, input, run_times, n, now)
