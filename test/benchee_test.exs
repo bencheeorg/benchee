@@ -251,7 +251,7 @@ defmodule BencheeTest do
     end
   end
 
-  @slower_regex "\\s+- \\d\\.\\d+x slower"
+  @slower_regex "\\s+- \\d+\\.\\d+x slower"
   defp readme_sample_asserts(output) do
     assert output =~ @header_regex
     assert output =~ body_regex("flat_map")
