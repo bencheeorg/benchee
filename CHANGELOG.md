@@ -1,3 +1,11 @@
+# 0.7.0 (unreleased)
+
+## Features (User Facing)
+* the print out of the Erlang version now is less verbose (just major/minor)
+
+## Breaking Changes (User Facing)
+* If you use the more verbose interface (`Benchee.init` and friends, e.g. not `Benchee.run`) then you have to insert a `Benchee.system` call before `Benchee.measure` (preferably right after `Benchee.init`)
+
 # 0.6.0 (November 30, 2016)
 
 One of the biggest releases yet. Great stuff in here - more elixir like API for `Benchee.run/2` with the jobs as the primary argument and the optional options as the second argument and now also as the more idiomatic keyword list!
