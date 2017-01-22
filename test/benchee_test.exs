@@ -154,37 +154,39 @@ defmodule BencheeTest do
 
   @rough_10_milli_s "((8|9|10|11|12|13|14)\\.\\d{2} ms)"
   test "formatters have full access to the suite data" do
-    output = capture_io fn ->
-      Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end},
-        time:       0.01,
-        warmup:     0.005,
-        custom:     "Custom value",
-        formatters: [
-          fn(suite) ->
-            run_time = suite.run_times
-                       |> no_input_access
-                       |> Map.get("Sleeps")
-                       |> List.last
-                       |> Benchee.Conversion.Duration.format
+    retrying fn ->
+      output = capture_io fn ->
+        Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end},
+          time:       0.01,
+          warmup:     0.005,
+          custom:     "Custom value",
+          formatters: [
+            fn(suite) ->
+              run_time = suite.run_times
+                         |> no_input_access
+                         |> Map.get("Sleeps")
+                         |> List.last
+                         |> Benchee.Conversion.Duration.format
 
-            IO.puts "Run time: #{run_time}"
-          end,
-          fn(suite) ->
-            average = suite.statistics
-                      |> no_input_access
-                      |> Map.get("Sleeps")
-                      |> Map.get(:average)
-                      |> Benchee.Conversion.Duration.format
-            IO.puts "Average: #{average}"
-          end,
-          fn(suite) -> IO.puts suite.config.custom end
-        ]
-      )
+              IO.puts "Run time: #{run_time}"
+            end,
+            fn(suite) ->
+              average = suite.statistics
+                        |> no_input_access
+                        |> Map.get("Sleeps")
+                        |> Map.get(:average)
+                        |> Benchee.Conversion.Duration.format
+              IO.puts "Average: #{average}"
+            end,
+            fn(suite) -> IO.puts suite.config.custom end
+          ]
+        )
+      end
+
+      assert output =~ ~r/Run time: #{@rough_10_milli_s}$/m
+      assert output =~ ~r/Average: #{@rough_10_milli_s}$/m
+      assert output =~ "Custom value"
     end
-
-    assert output =~ ~r/Run time: #{@rough_10_milli_s}$/m
-    assert output =~ ~r/Average: #{@rough_10_milli_s}$/m
-    assert output =~ "Custom value"
   end
 
   test "inputs feature version of readme example" do
