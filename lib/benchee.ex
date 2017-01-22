@@ -4,8 +4,6 @@ defmodule Benchee do
   as the very high level `Benchee.run` API.
   """
 
-  alias Benchee.{Statistics, Config, Benchmark}
-
   @doc """
   Run benchmark jobs defined by a map and optionally provide configuration
   options.
@@ -42,10 +40,10 @@ defmodule Benchee do
   defp run_benchmarks(jobs, config) do
     config
     |> Benchee.init
-    |> Benchee.System.system
+    |> Benchee.system
     |> Map.put(:jobs, jobs)
-    |> Benchee.Benchmark.measure
-    |> Statistics.statistics
+    |> Benchee.measure
+    |> Benchee.statistics
   end
 
   defp output_results(suite = %{config: %{formatters: formatters}}) do
@@ -54,31 +52,12 @@ defmodule Benchee do
     end
   end
 
-  defdelegate system(suite), to: Benchee.System
-  defdelegate measure(suite, printer), to: Benchee.Benchmark
-  defdelegate measure(suite), to: Benchee.Benchmark
-
-  @doc """
-  Convenience access to `Benchee.Config.init/1` to initialize the configuration.
-  """
-  def init(config \\ %{}) do
-    Config.init(config)
-  end
-
-  @doc """
-  Convenience access to `Benchee.Benchmark.benchmark/3` to define the benchmarks
-  to run in this benchmarking suite.
-  """
-  def benchmark(suite, name, function) do
-    Benchmark.benchmark(suite, name, function)
-  end
-
-
-  @doc """
-  Convenience access to `Benchee.Statistics.statistics/1` to generate
-  statistics.
-  """
-  def statistics(suite) do
-    Statistics.statistics(suite)
-  end
+  defdelegate init(),                                    to: Benchee.Config
+  defdelegate init(config),                              to: Benchee.Config
+  defdelegate system(suite),                             to: Benchee.System
+  defdelegate measure(suite),                            to: Benchee.Benchmark
+  defdelegate measure(suite, printer),                   to: Benchee.Benchmark
+  defdelegate benchmark(suite, name, function),          to: Benchee.Benchmark
+  defdelegate benchmark(suite, name, function, printer), to: Benchee.Benchmark
+  defdelegate statistics(suite),                         to: Benchee.Statistics
 end
