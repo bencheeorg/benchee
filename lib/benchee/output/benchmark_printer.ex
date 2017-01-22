@@ -5,10 +5,19 @@ defmodule Benchee.Output.BenchmarkPrinter do
 
   alias Benchee.Conversion.Duration
 
+  @doc """
+  Shown when you try to define a benchmark with the same name twice.
+
+  How would you want to discern those anyhow?
+  """
   def duplicate_benchmark_warning(name) do
     IO.puts "You already have a job defined with the name \"#{name}\", you can't add two jobs with the same name!"
   end
 
+  @doc """
+  Prints general information such as system information and estimated
+  benchmarking time.
+  """
   def configuration_information(%{config: %{print: %{configuration: false}}}) do
     nil
   end
@@ -56,17 +65,27 @@ defmodule Benchee.Output.BenchmarkPrinter do
     Float.round(float, @round_precision)
   end
 
+  @doc """
+  Prints a notice which job is currently being benchmarked.
+  """
   def benchmarking(_, %{print: %{benchmarking: false}}), do: nil
   def benchmarking(name, _config) do
     IO.puts "Benchmarking #{name}..."
   end
 
+  @doc """
+  Prints a warning about accuracy of benchmarks when the function is super fast.
+  """
   def fast_warning do
     IO.puts """
     Warning: The function you are trying to benchmark is super fast, making measures more unreliable! See: https://github.com/PragTob/benchee/wiki/Benchee-Warnings#fast-execution-warning
     """
   end
 
+  @doc """
+  Prints an informative message about which input is currently being
+  benchmarked, when multiple inputs were specified.
+  """
   def input_information(input_name) do
     if input_name != Benchee.Benchmark.no_input do
       IO.puts "\nBenchmarking with input #{input_name}:"
