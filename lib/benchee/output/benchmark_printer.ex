@@ -3,8 +3,12 @@ defmodule Benchee.Output.BenchmarkPrinter do
   Printing happening during the Benchmark stage.
   """
 
-  def configuration_information(_, %{print: %{configuration: false}}), do: nil
-  def configuration_information(%{jobs: jobs, system: sys}, config, printer) do
+  alias Benchee.Conversion.Duration
+
+  def configuration_information(%{config: %{print: %{configuration: false}}}) do
+    nil
+  end
+  def configuration_information(%{jobs: jobs, system: sys, config: config}) do
     system_information(sys)
     suite_information(jobs, config)
   end
@@ -60,7 +64,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
     IO.puts @fast_warning
   end
 
-  defp input_information(input_name) do
+  def input_information(input_name) do
     if input_name != Benchee.Benchmark.no_input do
       IO.puts "\nBenchmarking with input #{input_name}:"
     end

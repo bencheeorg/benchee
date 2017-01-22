@@ -10,6 +10,7 @@ defmodule BencheeTest do
     capture_io fn ->
       result =
         Benchee.init(@test_times)
+        |> Benchee.system
         |> Benchee.benchmark("Sleeps", fn -> :timer.sleep(10) end)
         |> Benchee.measure
         |> Benchee.Statistics.statistics
@@ -81,6 +82,7 @@ defmodule BencheeTest do
       map_fun = fn(i) -> [i, i * i] end
 
       Benchee.init(@test_times)
+      |> Benchee.system
       |> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
       |> Benchee.benchmark("map.flatten",
                            fn -> list |> Enum.map(map_fun) |> List.flatten end)

@@ -54,6 +54,8 @@ defmodule Benchee do
     end
   end
 
+  defdelegate system(suite), to: Benchee.System
+
   @doc """
   Convenience access to `Benchee.Config.init/1` to initialize the configuration.
   """

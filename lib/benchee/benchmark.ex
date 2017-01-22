@@ -37,9 +37,9 @@ defmodule Benchee.Benchmark do
   There will be `parallel` processes spawned exeuting the benchmark job in
   parallel.
   """
-  def measure(suite = %{jobs: jobs, config: config}, printer \\ Printer) do
-    printer.print_configuration_information(suite, config)
-    run_times = record_runtimes(jobs, config)
+  def measure(suite = %{jobs: jobs, config: config}, printer \\ Printer) do
+    printer.configuration_information(suite)
+    run_times = record_runtimes(jobs, config, printer)
 
     Map.put suite, :run_times, run_times
   end
@@ -52,29 +52,32 @@ defmodule Benchee.Benchmark do
   """
   def no_input, do: @no_input
 
-  defp record_runtimes(jobs, config = %{inputs: nil}) do
-    [runtimes_for_input(@no_input_marker, jobs, config)]
+  defp record_runtimes(jobs, config = %{inputs: nil}, printer) do
+    [runtimes_for_input(@no_input_marker, jobs, config, printer)]
     |> Map.new
   end
-  defp record_runtimes(jobs, config = %{inputs: inputs}) do
+  defp record_runtimes(jobs, config = %{inputs: inputs}, printer) do
     inputs
-    |> Enum.map(fn(input) -> runtimes_for_input(input, jobs, config) end)
+    |> Enum.map(fn(input) ->
+         runtimes_for_input(input, jobs, config, printer)
+       end)
     |> Map.new
   end
 
-  defp runtimes_for_input({input_name, input}, jobs, config) do
-    print_input_information(input_name)
+  defp runtimes_for_input({input_name, input}, jobs, config, printer) do
+    printer.input_information(input_name)
 
-    results = jobs
-              |> Enum.map(fn(job) -> measure_job(job, input, config) end)
-              |> Map.new
+    results =
+      jobs
+      |> Enum.map(fn(job) -> measure_job(job, input, config, printer) end)
+      |> Map.new
 
     {input_name, results}
   end
 
-  defp measure_job({name, function}, input, config) do
-    print_benchmarking name, config
-    job_run_times = parallel_benchmark function, input, config
+  defp measure_job({name, function}, input, config, printer) do
+    printer.benchmarking name, config
+    job_run_times = parallel_benchmark function, input, config, printer
     {name, job_run_times}
   end
 
@@ -83,10 +86,11 @@ defmodule Benchee.Benchmark do
                           %{parallel: parallel,
                             time:     time,
                             warmup:   warmup,
-                            print:    %{fast_warning: fast_warning}}) do
+                            print:    %{fast_warning: fast_warning}},
+                          printer) do
     pmap 1..parallel, fn ->
-      run_warmup function, input, warmup
-      measure_runtimes function, input, time, fast_warning
+      run_warmup function, input, warmup, printer
+      measure_runtimes function, input, time, fast_warning, printer
     end
   end
 
@@ -97,18 +101,19 @@ defmodule Benchee.Benchmark do
     |> List.flatten
   end
 
-  defp run_warmup(function, input, time) do
-    measure_runtimes(function, input, time, false)
+  defp run_warmup(function, input, time, printer) do
+    measure_runtimes(function, input, time, false, printer)
   end
 
-  defp measure_runtimes(function, input, time, display_fast_warning)
-  defp measure_runtimes(_function, _input, 0, _) do
+  defp measure_runtimes(function, input, time, display_fast_warning, printer)
+  defp measure_runtimes(_function, _input, 0, _, printer) do
     []
   end
-  defp measure_runtimes(function, input, time, display_fast_warning) do
+  defp measure_runtimes(function, input, time, display_fast_warning, printer) do
     finish_time = current_time() + time
     :erlang.garbage_collect
-    {n, initial_run_time} = determine_n_times(function, input, display_fast_warning)
+    {n, initial_run_time} =
+      determine_n_times(function, input, display_fast_warning, printer)
     do_benchmark(finish_time, function, input, [initial_run_time], n, current_time())
   end
 
@@ -121,12 +126,12 @@ defmodule Benchee.Benchmark do
   # executed in the measurement cycle.
   @minimum_execution_time 10
   @times_multiplicator 10
-  defp determine_n_times(function, input, display_fast_warning) do
+  defp determine_n_times(function, input, display_fast_warning, printer) do
     run_time = measure_call function, input
     if run_time >= @minimum_execution_time do
       {1, run_time}
     else
-      if display_fast_warning, do: print_fast_warning()
+      if display_fast_warning, do: printer.fast_warning()
       try_n_times(function, input, @times_multiplicator)
     end
   end

@@ -28,15 +28,20 @@ defmodule Benchee.BenchmarkTest do
   end
 
   @config %{parallel: 1,
-            time: 40_000,
-            warmup: 20_000,
-            inputs: nil,
-            print: %{fast_warning: false, configuration: true}}
+            time:     40_000,
+            warmup:   20_000,
+            inputs:   nil,
+            print:    %{fast_warning: false, configuration: true}}
+  @system %{elixir: "1.4.0", erlang: "19.1"}
+  @default_suite %{config: @config, system: @system, jobs: %{}}
+  defp test_suite(suite_override \\ %{}) do
+    DeepMerge.deep_merge(@default_suite, suite_override)
+  end
+
   test ".measure runs a benchmark suite and enriches it with measurements" do
     retrying fn ->
       capture_io fn ->
-        config = Map.merge @config, %{time: 60_000, warmup: 10_000}
-        suite = %{config: config, jobs: %{}}
+        suite = test_suite %{config: %{time: 60_000, warmup: 10_000}}
         new_suite =
           suite
           |> Benchee.benchmark("Name", fn -> :timer.sleep(10) end)
@@ -54,8 +59,7 @@ defmodule Benchee.BenchmarkTest do
   test ".measure runs a suite with multiple jobs and gathers results" do
     retrying fn ->
       capture_io fn ->
-        config = Map.merge @config, %{time: 60_000, warmup: 10_000}
-        suite = %{config: config, jobs: %{}}
+        suite = test_suite %{config: %{time: 60_000, warmup: 10_000}}
         new_suite =
           suite
           |> Benchee.benchmark("Name", fn -> :timer.sleep(10) end)
@@ -74,9 +78,8 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure can run multiple benchmarks in parallel" do
     capture_io fn ->
-      config = Map.merge @config, %{parallel: 6, time: 60_000}
-      suite = %{
-        config: config,
+      suite = test_suite %{
+        config: %{parallel: 6, time: 60_000},
         jobs: %{"" => fn -> :timer.sleep 10 end}
       }
       new_suite = Benchee.measure suite
@@ -94,13 +97,15 @@ defmodule Benchee.BenchmarkTest do
         time = 20_000
         warmup = 10_000
         projected = time + warmup
-         # if the system is too busy there are too many false positives
-        leeway = projected * 0.4
-        config = Map.merge @config, %{time: time, warmup: warmup}
-        suite = %{config: config,
-                  jobs:   %{"" => fn -> :timer.sleep(1) end}}
+
+        suite = test_suite %{
+                  config: %{time: time, warmup: warmup},
+                  jobs:   %{"" => fn -> :timer.sleep(1) end}
+                }
         {time, _} = :timer.tc fn -> Benchee.measure(suite) end
 
+        # if the system is too busy there are too many false positives
+        leeway = projected * 0.4
         assert_in_delta projected, time, leeway,
                         "excution took too long #{time} vs. #{projected} +- #{leeway}"
       end
@@ -111,8 +116,8 @@ defmodule Benchee.BenchmarkTest do
     retrying fn ->
       capture_io fn ->
         range = 0..10
-        config = Map.merge @config, %{time: 100_000, warmup: 10_000}
-        stats = %{config: config, jobs: %{}}
+        stats = %{config: %{time: 100_000, warmup: 10_000}}
+                |> test_suite
                 |> Benchee.benchmark("noop", fn -> 0 end)
                 |> Benchee.benchmark("map", fn ->
                      Enum.map(range, fn(i) -> i end)
@@ -131,8 +136,8 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure doesn't print out information about warmup (annoying)" do
     output = capture_io fn ->
-      config = Map.merge @config, %{time: 1_000, warmup: 500}
-      %{config: config, jobs: %{}}
+      %{config: %{time: 1_000, warmup: 500}}
+      |> test_suite
       |> Benchee.benchmark("noop", fn -> 0 end)
       |> Benchee.measure
     end
@@ -142,8 +147,9 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure never calls the function if warmup and time are 0" do
     output = capture_io fn ->
-      config = Map.merge @config, %{time: 0, warmup: 0}
-      %{config: config, jobs: %{"" => fn -> IO.puts "called" end}}
+      %{config: %{time: 0, warmup: 0},
+        jobs: %{"" => fn -> IO.puts "called" end}}
+      |> test_suite
       |> Benchmark.measure
     end
 
@@ -152,14 +158,14 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure prints configuration information about the suite" do
     output = capture_io fn ->
-      config = Map.merge @config, %{parallel: 2, time: 10_000, warmup: 0}
-      %{config: config, jobs: %{}}
+      %{config: %{parallel: 2, time: 10_000, warmup: 0}}
+      |> test_suite
       |> Benchee.benchmark("noop", fn -> 0 end)
       |> Benchee.benchmark("dontcare", fn -> 0 end)
       |> Benchee.measure
     end
 
-    assert output =~ "Erlang/OTP"
+    assert output =~ "Erlang"
     assert output =~ "Elixir #{System.version}"
     assert output =~ ~r/following configuration/i
     assert output =~ "warmup: 0.0s"
@@ -171,13 +177,8 @@ defmodule Benchee.BenchmarkTest do
   @inputs %{"Arg 1" => "Argument 1", "Arg 2" => "Argument 2"}
   test ".measure respects multiple inputs in suite information" do
     output = capture_io fn ->
-      config = Map.merge @config, %{
-                                    parallel: 2,
-                                    time: 10_000,
-                                    warmup: 0,
-                                    inputs: @inputs
-                                  }
-      %{config: config, jobs: %{}}
+      %{config: %{parallel: 2, time: 10_000, warmup: 0, inputs: @inputs}}
+      |> test_suite
       |> Benchee.benchmark("noop", fn(_) -> 0 end)
       |> Benchee.benchmark("dontcare", fn(_) -> 0 end)
       |> Benchee.measure
@@ -191,14 +192,8 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure does not print configuration information when disabled" do
     output = capture_io fn ->
-      custom = %{
-                  parallel: 2,
-                  time: 1_000,
-                  warmup: 0
-                 }
-      config = Map.merge @config, custom
-      config = update_in(config, [:print, :configuration], fn(_) -> false end)
-      %{config: config, jobs: %{}}
+      %{config: %{print: %{configuration: false}}}
+      |> test_suite
       |> Benchee.benchmark("noop", fn -> 0 end)
       |> Benchee.benchmark("dontcare", fn -> 0 end)
       |> Benchee.measure
@@ -215,7 +210,7 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure prints out information what is currently benchmarking" do
     output = capture_io fn ->
-      %{config: @config, jobs: %{}}
+      test_suite()
       |> Benchee.benchmark("Something", fn -> :timer.sleep 10 end)
       |> Benchee.measure
     end
@@ -225,8 +220,8 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure doesn't print out currently benchmarking info if disabled" do
     output = capture_io fn ->
-      config = update_in @config, [:print, :benchmarking], fn(_) -> false end
-      %{config: config, jobs: %{}}
+      %{config: %{print: %{benchmarking: false}}}
+      |> test_suite
       |> Benchee.benchmark("Something", fn -> :timer.sleep 10 end)
       |> Benchee.measure
     end
@@ -236,12 +231,12 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure calls the functions with the different inputs arguments" do
     output = capture_io fn ->
-      config = Map.merge @config, %{inputs: @inputs}
       jobs = %{
         "one" => fn(input) -> IO.puts "Called one with #{input}" end,
         "two" => fn(input) -> IO.puts "Called two with #{input}" end
       }
-      %{config: config, jobs: jobs}
+      %{config: %{inputs: @inputs}, jobs: jobs}
+      |> test_suite
       |> Benchee.measure
     end
 
@@ -253,12 +248,12 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure notifies which input is being benchmarked now" do
     output = capture_io fn ->
-      config = Map.merge @config, %{inputs: @inputs}
       jobs = %{
         "one" => fn(input) -> IO.puts "Called one with #{input}" end,
         "two" => fn(input) -> IO.puts "Called two with #{input}" end
       }
-      %{config: config, jobs: jobs}
+      %{config: %{inputs: @inputs}, jobs: jobs}
+      |> test_suite
       |> Benchee.measure
     end
 
@@ -274,13 +269,17 @@ defmodule Benchee.BenchmarkTest do
           "Short wait"  => 5,
           "Longer wait" => 10
         }
-        config = Map.merge @config, %{time: 60_000,
-                                      warmup: 10_000,
-                                      inputs: inputs}
+        config = %{time: 60_000,
+                   warmup: 10_000,
+                   inputs: inputs}
         jobs = %{
           "sleep" => fn(input) -> :timer.sleep(input) end
         }
-        results = Benchee.measure(%{config: config, jobs: jobs}).run_times
+        results =
+          %{config: config, jobs: jobs}
+          |> test_suite
+          |> Benchee.measure
+          |> Map.get(:run_times)
 
         # should be 12 but the good old leeway
         assert length(results["Short wait"]["sleep"]) >= 9
@@ -292,10 +291,12 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure runs the job exactly once if its time exceeds given time" do
     capture_io fn ->
-      config = Map.merge @config, %{time: 1_000, warmup: 0}
       jobs = %{"Sleeps" => fn -> :timer.sleep(2) end}
-      run_times = Benchee.measure(%{config: config, jobs: jobs})
-                  |> get_in([:run_times, Benchmark.no_input, "Sleeps"])
+      run_times =
+        %{config: %{time: 1_000, warmup: 0}, jobs: jobs}
+        |> test_suite
+        |> Benchee.measure
+        |> get_in([:run_times, Benchmark.no_input, "Sleeps"])
 
       assert length(run_times) == 1
     end
@@ -303,7 +304,6 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure stores run times in the right order" do
     capture_io fn ->
-      config = Map.merge @config, %{time: 25_000, warmup: 0}
       {:ok, agent} = Agent.start fn -> 1 end
       increasing_function = fn ->
         Agent.update agent, fn(state) ->
@@ -312,8 +312,11 @@ defmodule Benchee.BenchmarkTest do
         end
       end
       jobs = %{"Sleep more" => increasing_function}
-      run_times = Benchee.measure(%{config: config, jobs: jobs})
-                  |> get_in([:run_times, Benchmark.no_input, "Sleep more"])
+      run_times =
+        %{config: %{time: 25_000, warmup: 0}, jobs: jobs}
+        |> test_suite
+        |> Benchee.measure
+        |> get_in([:run_times, Benchmark.no_input, "Sleep more"])
 
       assert length(run_times) >= 2 # should be 3 but good old leeway
       # as the function takes more time each time called run times should be
