@@ -44,7 +44,7 @@ defmodule Benchee do
     |> Benchee.init
     |> Benchee.System.system
     |> Map.put(:jobs, jobs)
-    |> Benchee.measure
+    |> Benchee.Benchmark.measure
     |> Statistics.statistics
   end
 
@@ -55,6 +55,8 @@ defmodule Benchee do
   end
 
   defdelegate system(suite), to: Benchee.System
+  defdelegate measure(suite, printer), to: Benchee.Benchmark
+
 
   @doc """
   Convenience access to `Benchee.Config.init/1` to initialize the configuration.
@@ -71,14 +73,6 @@ defmodule Benchee do
     Benchmark.benchmark(suite, name, function)
   end
 
-
-  @doc """
-  Convenience access to `Benchee.Benchmark.measure/1` to run the defined
-  benchmarks and measure their run time.
-  """
-  def measure(suite) do
-    Benchmark.measure(suite)
-  end
 
   @doc """
   Convenience access to `Benchee.Statistics.statistics/1` to generate
