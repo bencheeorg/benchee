@@ -1,7 +1,6 @@
 defmodule Benchee.Utility.RepeatNTest do
   use ExUnit.Case, async: true
   import Benchee.Utility.RepeatN
-  import ExUnit.CaptureIO
 
   test "calls it n times" do
     assert_called_n 10
@@ -16,14 +15,15 @@ defmodule Benchee.Utility.RepeatNTest do
   end
 
   defp assert_called_n(n) do
-    output = capture_io fn ->
-      repeat_n(fn -> IO.write "1" end, n)
-    end
+    repeat_n(fn -> send self(), :called end, n)
 
-    assert times_called(output) == n
+    assert_called_exactly_times(n)
   end
 
-  defp times_called(output) do
-    String.length output
+  defp assert_called_exactly_times(n) when n <= 0 do
+    refute_receive :called
+  end
+  defp assert_called_exactly_times(n) do
+    Enum.each(Enum.to_list(1..n), fn (_)-> assert_receive :called end)
   end
 end
