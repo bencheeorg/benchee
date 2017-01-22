@@ -1,4 +1,6 @@
-Benchee.run %{"some very long name that doesn't fit in the space" => fn -> :timer.sleep(100) end}
+Benchee.run %{
+  "some very long name that doesn't fit in the space" =>
+    fn -> :timer.sleep(100) end}
 
 # Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
 # Elixir 1.3.4

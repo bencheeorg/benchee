@@ -38,6 +38,7 @@ end
 list = Enum.to_list(1..1_000)
 map_function = fn(i) -> i + 1 end
 Benchee.init
+|> Benchee.system
 |> Benchee.benchmark("stdlib map", fn -> Enum.map(list, map_function) end)
 |> Benchee.benchmark("map with TCO and reverse",
                      fn -> MyMap.map_tco(list, map_function) end)
