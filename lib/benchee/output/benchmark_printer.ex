@@ -5,6 +5,10 @@ defmodule Benchee.Output.BenchmarkPrinter do
 
   alias Benchee.Conversion.Duration
 
+  def duplicate_benchmark_warning(name) do
+    IO.puts "You already have a job defined with the name \"#{name}\", you can't add two jobs with the same name!"
+  end
+
   def configuration_information(%{config: %{print: %{configuration: false}}}) do
     nil
   end

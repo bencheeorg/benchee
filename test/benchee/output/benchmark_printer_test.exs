@@ -3,6 +3,15 @@ defmodule Benchee.Output.BenchmarkPrintertest do
   import ExUnit.CaptureIO
   import Benchee.Output.BenchmarkPrinter
 
+  test ".duplicate_benchmark_warning" do
+    output = capture_io fn ->
+      duplicate_benchmark_warning("Something")
+    end
+
+    assert output =~ "same name"
+    assert output =~ "Something"
+  end
+
   test ".configuration_information sys information" do
     output = capture_io fn ->
       %{

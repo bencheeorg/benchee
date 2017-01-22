@@ -1,6 +1,5 @@
 defmodule Benchee.BenchmarkTest do
   use ExUnit.Case, async: true
-  import ExUnit.CaptureIO
   import Benchee.TestHelpers
   alias Benchee.Statistics
   alias Benchee.Benchmark
@@ -18,15 +17,13 @@ defmodule Benchee.BenchmarkTest do
   end
 
   test ".benchmark warns when adding a job with the same name again" do
-    output = capture_io fn ->
-      one_fun = fn -> 1 end
-      suite = %{jobs: %{"one" => one_fun}}
-      new_suite = benchmark(suite, "one", fn -> 42 end)
+    one_fun = fn -> 1 end
+    suite = %{jobs: %{"one" => one_fun}}
+    new_suite = benchmark(suite, "one", fn -> 42 end, TestPrinter)
 
-      assert new_suite == %{jobs: %{"one" => one_fun}}
-    end
+    assert new_suite == %{jobs: %{"one" => one_fun}}
 
-    assert output =~ ~r/same name/
+    assert_receive {:duplicate, "one"}
   end
 
   @config %{parallel: 1,
@@ -127,14 +124,14 @@ defmodule Benchee.BenchmarkTest do
   end
 
   test ".measure never calls the function if warmup and time are 0" do
-    output = capture_io fn ->
-      %{config: %{time: 0, warmup: 0},
-        jobs: %{"" => fn -> IO.puts "called" end}}
-      |> test_suite
-      |> Benchmark.measure(TestPrinter)
-    end
+    ref = self()
 
-    refute output =~ ~r/called/i
+    %{config: %{time: 0, warmup: 0},
+      jobs: %{"" => fn -> send(ref, :called) end}}
+    |> test_suite
+    |> Benchmark.measure(TestPrinter)
+
+    refute_receive :called
   end
 
   test ".measure asks to print te configuration" do
@@ -153,20 +150,20 @@ defmodule Benchee.BenchmarkTest do
   end
 
   @inputs %{"Arg 1" => "Argument 1", "Arg 2" => "Argument 2"}
-  test ".measure calls the functions with the different inputs arguments" do
-    output = capture_io fn ->
-      jobs = %{
-        "one" => fn(input) -> IO.puts "Called one with #{input}" end,
-        "two" => fn(input) -> IO.puts "Called two with #{input}" end
-      }
-      %{config: %{inputs: @inputs}, jobs: jobs}
-      |> test_suite
-      |> measure(TestPrinter)
-    end
+  test ".measure calls the functions with the different input arguments" do
+    ref = self()
+
+    jobs = %{
+      "one" => fn(input) -> send ref, {:one, input} end,
+      "two" => fn(input) -> send ref, {:two, input} end
+    }
+    %{config: %{inputs: @inputs}, jobs: jobs}
+    |> test_suite
+    |> measure(TestPrinter)
 
     Enum.each @inputs, fn({_name, value}) ->
-      assert output =~ "Called one with #{value}"
-      assert output =~ "Called two with #{value}"
+      assert_receive {:one, ^value}
+      assert_receive {:two, ^value}
     end
   end
 

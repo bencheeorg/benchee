@@ -14,9 +14,9 @@ defmodule Benchee.Benchmark do
   be run in this benchmarking suite as a tuple `{name, function}` to the list
   under the `:jobs` key.
   """
-  def benchmark(suite = %{jobs: jobs}, name, function) do
+  def benchmark(suite = %{jobs: jobs}, name, function, printer \\ Printer) do
     if Map.has_key?(jobs, name) do
-      IO.puts "You already have a job defined with the name \"#{name}\", you can't add two jobs with the same name!"
+      printer.duplicate_benchmark_warning name
       suite
     else
       %{suite | jobs: Map.put(jobs, name, function)}
