@@ -165,8 +165,8 @@ defmodule Benchee.BenchmarkTest do
       |> Benchee.measure
     end
 
-    assert output =~ "Erlang"
-    assert output =~ "Elixir #{System.version}"
+    assert output =~ "Erlang #{@system.erlang}"
+    assert output =~ "Elixir #{@system.elixir}"
     assert output =~ ~r/following configuration/i
     assert output =~ "warmup: 0.0s"
     assert output =~ "time: 0.01s"
