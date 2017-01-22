@@ -56,7 +56,7 @@ defmodule Benchee do
 
   defdelegate system(suite), to: Benchee.System
   defdelegate measure(suite, printer), to: Benchee.Benchmark
-
+  defdelegate measure(suite), to: Benchee.Benchmark
 
   @doc """
   Convenience access to `Benchee.Config.init/1` to initialize the configuration.
