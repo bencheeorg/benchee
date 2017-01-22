@@ -64,7 +64,7 @@ defmodule Benchee.Benchmark do
   end
 
   defp runtimes_for_input({input_name, input}, jobs, config, printer) do
-    printer.input_information(input_name)
+    printer.input_information(input_name, config)
 
     results =
       jobs

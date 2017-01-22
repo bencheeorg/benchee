@@ -89,7 +89,10 @@ defmodule Benchee.Output.BenchmarkPrinter do
   Prints an informative message about which input is currently being
   benchmarked, when multiple inputs were specified.
   """
-  def input_information(input_name) do
+  def input_information(_, %{print: %{benchmarking: false}}) do
+    nil
+  end
+  def input_information(input_name, _config) do
     if input_name != Benchee.Benchmark.no_input do
       IO.puts "\nBenchmarking with input #{input_name}:"
     end

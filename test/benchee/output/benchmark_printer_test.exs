@@ -75,7 +75,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
 
   test ".input_information notifies of the input being used" do
     output = capture_io fn ->
-      input_information("Big List")
+      input_information("Big List", %{})
     end
 
     assert output =~ ~r/with input Big List/i
@@ -84,13 +84,21 @@ defmodule Benchee.Output.BenchmarkPrintertest do
   test ".input_information does nothing when it's the no input marker" do
     marker = Benchee.Benchmark.no_input
     output = capture_io fn ->
-      input_information marker
+      input_information marker, %{}
     end
 
     assert output == ""
   end
 
-  test ".fast_warning warns with reference" do
+  test ".input_information does not print if disabled" do
+    output = capture_io fn ->
+      input_information("Big List", %{print: %{benchmarking: false}})
+    end
+
+    assert output == ""
+  end
+
+  test ".fast_warning warns with reference to more information" do
     output = capture_io fn ->
       fast_warning()
     end
