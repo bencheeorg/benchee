@@ -6,7 +6,6 @@ defmodule Benchee.Benchmark do
   """
 
   alias Benchee.Utility.RepeatN
-  alias Benchee.Conversion.Duration
   alias Benchee.Output.BenchmarkPrinter, as: Printer
 
   @doc """
@@ -106,7 +105,7 @@ defmodule Benchee.Benchmark do
   end
 
   defp measure_runtimes(function, input, time, display_fast_warning, printer)
-  defp measure_runtimes(_function, _input, 0, _, printer) do
+  defp measure_runtimes(_function, _input, 0, _, _) do
     []
   end
   defp measure_runtimes(function, input, time, display_fast_warning, printer) do
