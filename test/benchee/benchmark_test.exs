@@ -84,7 +84,7 @@ defmodule Benchee.BenchmarkTest do
     assert %{"" => run_times} = new_suite.run_times |> no_input_access
 
     # it does more work when working in parallel than it does alone
-      assert length(run_times) >= 12
+    assert length(run_times) >= 12
   end
 
   test ".measure doesn't take longer than advertised for very fast funs" do
@@ -137,79 +137,22 @@ defmodule Benchee.BenchmarkTest do
     refute output =~ ~r/called/i
   end
 
-  test ".measure prints configuration information about the suite" do
-    output = capture_io fn ->
-      %{config: %{parallel: 2, time: 10_000, warmup: 0}}
-      |> test_suite
-      |> benchmark("noop", fn -> 0 end)
-      |> benchmark("dontcare", fn -> 0 end)
-      |> measure
-    end
+  test ".measure asks to print te configuration" do
+    test_suite()
+    |> measure(TestPrinter)
 
-    assert output =~ "Erlang #{@system.erlang}"
-    assert output =~ "Elixir #{@system.elixir}"
-    assert output =~ ~r/following configuration/i
-    assert output =~ "warmup: 0.0s"
-    assert output =~ "time: 0.01s"
-    assert output =~ "parallel: 2"
-    assert output =~ "Estimated total run time: 0.02s"
+    assert_receive :configuration_information
+  end
+
+  test ".measure asks to print what is currently benchmarking" do
+    test_suite()
+    |> benchmark("Something", fn -> :timer.sleep 10 end)
+    |> measure(TestPrinter)
+
+    assert_receive {:benchmarking, "Something"}
   end
 
   @inputs %{"Arg 1" => "Argument 1", "Arg 2" => "Argument 2"}
-  test ".measure respects multiple inputs in suite information" do
-    output = capture_io fn ->
-      %{config: %{parallel: 2, time: 10_000, warmup: 0, inputs: @inputs}}
-      |> test_suite
-      |> benchmark("noop", fn(_) -> 0 end)
-      |> benchmark("dontcare", fn(_) -> 0 end)
-      |> measure
-    end
-
-    assert output =~ "time: 0.01s"
-    assert output =~ "parallel: 2"
-    assert output =~ "inputs: Arg 1, Arg 2"
-    assert output =~ "Estimated total run time: 0.04s"
-  end
-
-  test ".measure does not print configuration information when disabled" do
-    output = capture_io fn ->
-      %{config: %{print: %{configuration: false}}}
-      |> test_suite
-      |> benchmark("noop", fn -> 0 end)
-      |> benchmark("dontcare", fn -> 0 end)
-      |> measure
-    end
-
-    refute output =~ "Erlang"
-    refute output =~ "Elxir"
-    refute output =~ ~r/following configuration/i
-    refute output =~ "warmup:"
-    refute output =~ "time:"
-    refute output =~ "parallel:"
-    refute output =~ "Estimated total run time"
-  end
-
-  test ".measure prints out information what is currently benchmarking" do
-    output = capture_io fn ->
-      test_suite()
-      |> benchmark("Something", fn -> :timer.sleep 10 end)
-      |> measure
-    end
-
-    assert output =~ "Benchmarking Something"
-  end
-
-  test ".measure doesn't print out currently benchmarking info if disabled" do
-    output = capture_io fn ->
-      %{config: %{print: %{benchmarking: false}}}
-      |> test_suite
-      |> benchmark("Something", fn -> :timer.sleep 10 end)
-      |> measure
-    end
-
-    refute output =~ "Benchmarking Something"
-  end
-
   test ".measure calls the functions with the different inputs arguments" do
     output = capture_io fn ->
       jobs = %{
@@ -228,18 +171,15 @@ defmodule Benchee.BenchmarkTest do
   end
 
   test ".measure notifies which input is being benchmarked now" do
-    output = capture_io fn ->
-      jobs = %{
-        "one" => fn(input) -> IO.puts "Called one with #{input}" end,
-        "two" => fn(input) -> IO.puts "Called two with #{input}" end
-      }
-      %{config: %{inputs: @inputs}, jobs: jobs}
-      |> test_suite
-      |> measure
-    end
+    jobs = %{
+      "one" => fn(_) -> nil end
+    }
+    %{config: %{inputs: @inputs}, jobs: jobs}
+    |> test_suite
+    |> measure(TestPrinter)
 
     Enum.each @inputs, fn({name, _value}) ->
-      assert output =~ "with input #{name}"
+      assert_receive {:input_information, ^name}
     end
   end
 

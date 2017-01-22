@@ -57,11 +57,10 @@ defmodule Benchee.Output.BenchmarkPrinter do
     IO.puts "Benchmarking #{name}..."
   end
 
-  @fast_warning """
-  Warning: The function you are trying to benchmark is super fast, making measures more unreliable! See: https://github.com/PragTob/benchee/wiki/Benchee-Warnings#fast-execution-warning
-  """
   def fast_warning do
-    IO.puts @fast_warning
+    IO.puts """
+    Warning: The function you are trying to benchmark is super fast, making measures more unreliable! See: https://github.com/PragTob/benchee/wiki/Benchee-Warnings#fast-execution-warning
+    """
   end
 
   def input_information(input_name) do
