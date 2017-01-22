@@ -2,6 +2,7 @@
 
 ## Features (User Facing)
 * the print out of the Erlang version now is less verbose (just major/minor)
+* the fast_warning will now also tell you how to disable it
 
 ## Breaking Changes (User Facing)
 * If you use the more verbose interface (`Benchee.init` and friends, e.g. not `Benchee.run`) then you have to insert a `Benchee.system` call before `Benchee.measure` (preferably right after `Benchee.init`)
