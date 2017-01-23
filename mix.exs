@@ -15,6 +15,10 @@ defmodule Benchee.Mixfile do
       deps: deps(),
       docs: [source_ref: @version],
       package: package(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        "coveralls": :test, "coveralls.detail": :test,
+        "coveralls.post": :test, "coveralls.html": :test],
       name: "Benchee",
       source_url: "https://github.com/PragTob/benchee",
       description: """
@@ -38,6 +42,7 @@ defmodule Benchee.Mixfile do
       {:credo,          "~> 0.4",   only: :dev},
       {:ex_doc,         "~> 0.11",  only: :dev},
       {:earmark,        "~> 1.0.1", only: :dev},
+      {:excoveralls,    "~> 0.6.1", only: :test},
       {:inch_ex,        "~> 0.5",   only: :docs}
     ]
   end
