@@ -57,12 +57,12 @@ defmodule Benchee.Conversion.Format do
     |> format(module)
   end
 
-  # Returns the separator defined in `module.separator/0`, or the default, a space
-  defp separator(module) do
-    case function_exported?(module, :separator, 0) do
-      true  -> module.separator()
-      false -> " "
-    end
+
+  @default_separator " "
+  # should we need it again, a customer separator could be returned
+  # per module here
+  defp separator(_module) do
+    @default_separator
   end
 
   # Returns the separator, or an empty string if there isn't a label
