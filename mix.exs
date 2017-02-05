@@ -18,7 +18,8 @@ defmodule Benchee.Mixfile do
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         "coveralls": :test, "coveralls.detail": :test,
-        "coveralls.post": :test, "coveralls.html": :test],
+        "coveralls.post": :test, "coveralls.html": :test,
+        "coveralls.travis": :test],
       name: "Benchee",
       source_url: "https://github.com/PragTob/benchee",
       description: """
