@@ -2,6 +2,8 @@
 
 Library for easy and nice (micro) benchmarking in Elixir. It allows you to compare the performance of different pieces of code at a glance. Benchee is also versatile and extensible, relying only on functions - no macros! There are also a bunch of [plugins](#plugins) to draw pretty graphs and more!
 
+Benchee runs each of your functions for a given amount of time after an initial warmup. It uses the raw run times it could gather in that time to show different statistical values like average, iterations per second and the standard deviation.
+
 Benchee has a nice and concise main interface, and its behavior can be altered through lots of [configuration options](#configuration):
 
 ```elixir
