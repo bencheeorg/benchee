@@ -255,7 +255,19 @@ Benchee.run(%{
 
 ```
 
-### More expanded/verbose usage
+### Setup and teardown
+
+If you want to do setup and teardown, i.e. do something before or after the benchmarking suite executes this is very easy in benchee. As benchee is just plain old functions just do it before/after you call benchee:
+
+```elixir
+your_setup()
+
+Benchee.run %{"Awesome stuff" => fn -> magic end }
+
+your_teardown()
+```
+
+### More verbose usage
 
 It is important to note that the benchmarking code shown before is the convenience interface. The same benchmark in its more verbose form looks like this:
 
