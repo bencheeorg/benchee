@@ -217,16 +217,16 @@ defmodule Benchee.BenchmarkTest do
   end
 
   test ".measure stores run times in the right order" do
-    {:ok, agent} = Agent.start fn -> 1 end
+    {:ok, agent} = Agent.start fn -> 10 end
     increasing_function = fn ->
       Agent.update agent, fn(state) ->
         :timer.sleep state
-        state * 5
+        state * 2
       end
     end
     jobs = %{"Sleep more" => increasing_function}
     run_times =
-      %{config: %{time: 25_000, warmup: 0}, jobs: jobs}
+      %{config: %{time: 70_000, warmup: 0}, jobs: jobs}
       |> test_suite
       |> measure(TestPrinter)
       |> get_in([:run_times, Benchmark.no_input, "Sleep more"])
