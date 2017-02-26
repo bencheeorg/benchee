@@ -50,8 +50,9 @@ defmodule Benchee.Utility.FileCreation do
   end
 
   @doc """
-  Gets file name/path and the input name together.
+  Gets file name/path, the input name and others together.
 
+  Takes a list of values to interleave or just a single value.
   Handles the special no_input key to do no work at all.
 
   ## Examples
@@ -65,12 +66,51 @@ defmodule Benchee.Utility.FileCreation do
       iex> Benchee.Utility.FileCreation.interleave("bench/abc.csv", "Big Input")
       "bench/abc_big_input.csv"
 
+      iex> Benchee.Utility.FileCreation.interleave("bench/abc.csv",
+      ...>   ["Big Input"])
+      "bench/abc_big_input.csv"
+
+      iex> Benchee.Utility.FileCreation.interleave("abc.csv", [])
+      "abc.csv"
+
+      iex> Benchee.Utility.FileCreation.interleave("bench/abc.csv",
+      ...>   ["Big Input", "Comparison"])
+      "bench/abc_big_input_comparison.csv"
+
+      iex> Benchee.Utility.FileCreation.interleave("bench/A B C.csv",
+      ...>   ["Big Input", "Comparison"])
+      "bench/A B C_big_input_comparison.csv"
+
+      iex> Benchee.Utility.FileCreation.interleave("bench/abc.csv",
+      ...>   ["Big Input", "Comparison", "great Stuff"])
+      "bench/abc_big_input_comparison_great_stuff.csv"
+
       iex> marker = Benchee.Benchmark.no_input
       iex> Benchee.Utility.FileCreation.interleave("abc.csv", marker)
       "abc.csv"
+      iex> Benchee.Utility.FileCreation.interleave("abc.csv", [marker])
+      "abc.csv"
+      iex> Benchee.Utility.FileCreation.interleave("abc.csv",
+      ...>   [marker, "Comparison"])
+      "abc_comparison.csv"
+      iex> Benchee.Utility.FileCreation.interleave("abc.csv",
+      ...>   ["Something cool", marker, "Comparison"])
+      "abc_something_cool_comparison.csv"
   """
+  def interleave(filename, names) when is_list(names) do
+    file_names = names
+                 |> Enum.map(&to_filename/1)
+                 |> prepend(Path.rootname(filename))
+                 |> Enum.reject(fn(string) -> String.length(string) < 1 end)
+                 |> Enum.join("_")
+    file_names <> Path.extname(filename)
+  end
   def interleave(filename, name) do
-    Path.rootname(filename) <> to_filename(name) <> Path.extname(filename)
+    interleave(filename, [name])
+  end
+
+  defp prepend(list, item) do
+    [item | list]
   end
 
   defp to_filename(name_string) do
@@ -78,7 +118,7 @@ defmodule Benchee.Utility.FileCreation do
     case name_string do
       ^no_input -> ""
       _         ->
-        String.downcase("_" <> String.replace(name_string, " ", "_"))
+        String.downcase(String.replace(name_string, " ", "_"))
     end
   end
 end
