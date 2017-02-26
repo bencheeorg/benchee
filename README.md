@@ -320,7 +320,7 @@ Of course there also are normal bar charts including standard deviation:
 
 If you're into watching videos of conference talks and also want to learn more about benchmarking in general I can recommend watching my talk from [ElixirLive 2016](http://www.elixirlive.com/). [Slides can be found here](https://pragtob.wordpress.com/2016/12/03/slides-how-fast-is-it-really-benchmarking-in-elixir/), video - click the washed out image below ;)
 
-[![Benchee Video](http://www.pragtob.info/images/elixir_live.png)](https://www.youtube.com/watch?v=7-mE5CKXjkw)
+[![Benchee Video](http://www.pragtob.info/images/elixir_live_slide.png)](https://www.youtube.com/watch?v=7-mE5CKXjkw)
 
 ## Contributing
 
