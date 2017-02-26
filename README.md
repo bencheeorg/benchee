@@ -304,6 +304,12 @@ Of course there also are normal bar charts including standard deviation:
 
 ![flat_map_ips](http://www.pragtob.info/benchee/images/flat_map_ips.png)
 
+## Presentation + general benchmarking advice
+
+If you're into watching videos of conference talks and also want to learn more about benchmarking in general I can recommend watching my talk from [ElixirLive 2016](http://www.elixirlive.com/). [Slides can be found here](https://pragtob.wordpress.com/2016/12/03/slides-how-fast-is-it-really-benchmarking-in-elixir/), video below.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/7-mE5CKXjkw" frameborder="0" allowfullscreen></iframe>
+
 ## Contributing
 
 Contributions to Benchee are very welcome! Bug reports, documentation, spelling corrections, whole features, feature ideas, bugfixes, new plugins, fancy graphics... all of those (and probably more) are much appreciated contributions!
