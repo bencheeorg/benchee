@@ -73,7 +73,7 @@ Benchee only has a small runtime dependency on `deep_merge` for merging configur
 Add benchee to your list of dependencies in `mix.exs`:
 
 ```elixir
-def deps do
+defp deps do
   [{:benchee, "~> 0.6", only: :dev}]
 end
 ```
