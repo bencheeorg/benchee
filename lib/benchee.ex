@@ -32,9 +32,9 @@ defmodule Benchee do
   end
 
   defp do_run(jobs, config) do
-    suite = run_benchmarks jobs, config
-    output_results suite
-    suite
+    jobs
+    |> run_benchmarks(config)
+    |> output_results
   end
 
   defp run_benchmarks(jobs, config) do
@@ -50,6 +50,7 @@ defmodule Benchee do
     Enum.each formatters, fn(output_function) ->
       output_function.(suite)
     end
+    suite
   end
 
   defdelegate init(),                                    to: Benchee.Config
