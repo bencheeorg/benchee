@@ -65,7 +65,7 @@ defmodule Benchee.Statistics do
   """
   def statistics(suite = %{run_times: run_times_per_input}) do
     statistics = run_times_per_input
-                 |> map_values(&Statistics.job_statistics/1)
+                 |> p_map_values(&Statistics.job_statistics/1)
 
     Map.put suite, :statistics, statistics
   end
