@@ -6,6 +6,7 @@ elixir:
 otp_release:
   - 18.3
   - 19.2
+before_script: MIX_ENV=test mix compile --warnings-as-errors
 script: mix coveralls.travis
 after_script:
   - mix deps.get --only docs
