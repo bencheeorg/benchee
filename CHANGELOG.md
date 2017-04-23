@@ -1,4 +1,6 @@
-# 0.7.0 (unreleased)
+# 0.7.0 (April 23, 2017)
+
+Smaller convenience features in here - the biggest part of work went into breaking reports in [benchee_html](https://github.com/PragTob/benchee_html) apart :)
 
 ## Features (User Facing)
 * the print out of the Erlang version now is less verbose (just major/minor)
