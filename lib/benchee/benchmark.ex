@@ -88,7 +88,7 @@ defmodule Benchee.Benchmark do
                             print:    %{fast_warning: fast_warning}},
                           printer) do
     pmap 1..parallel, fn ->
-      run_warmup function, input, warmup, printer
+      _ = run_warmup function, input, warmup, printer
       measure_runtimes function, input, time, fast_warning, printer
     end
   end

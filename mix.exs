@@ -20,6 +20,10 @@ defmodule Benchee.Mixfile do
         "coveralls": :test, "coveralls.detail": :test,
         "coveralls.post": :test, "coveralls.html": :test,
         "coveralls.travis": :test],
+      dialyzer: [
+        flags:
+          [:unmatched_returns, :error_handling, :race_conditions, :underspecs]
+      ],
       name: "Benchee",
       source_url: "https://github.com/PragTob/benchee",
       description: """
