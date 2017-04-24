@@ -1,7 +1,9 @@
 defmodule Benchee.TestHelpers do
+  @default_retries 5
+
   # retry tests that are doing actual benchmarking and are flaky
   # on overloaded and/or slower systems
-  def retrying(asserting_function, n \\ 5)
+  def retrying(asserting_function, n \\ @default_retries)
   def retrying(asserting_function, 1) do
     asserting_function.()
   end

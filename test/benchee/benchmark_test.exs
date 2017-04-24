@@ -106,9 +106,9 @@ defmodule Benchee.BenchmarkTest do
   test "variance does not skyrocket on very fast functions" do
     retrying fn ->
       range = 0..10
-      stats = %{config: %{time: 100_000, warmup: 10_000}}
+      stats = %{config: %{time: 150_000, warmup: 20_000}}
               |> test_suite
-              |> benchmark("noop", fn -> 0 end)
+              |> benchmark("noop", fn -> 1 + 1 end)
               |> benchmark("map", fn ->
                    Enum.map(range, fn(i) -> i end)
                  end)
@@ -118,7 +118,7 @@ defmodule Benchee.BenchmarkTest do
               |> no_input_access
 
       Enum.each stats, fn({_, %{std_dev_ratio: std_dev_ratio}}) ->
-        assert std_dev_ratio <= 2.0
+        assert std_dev_ratio <= 2.5
       end
     end
   end
