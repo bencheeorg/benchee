@@ -33,7 +33,7 @@ defmodule Benchee.Mixfile do
   defp elixirc_paths(_),     do: ["lib"]
 
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :deep_merge]]
   end
 
   defp deps do
@@ -44,7 +44,8 @@ defmodule Benchee.Mixfile do
       {:ex_doc,         "~> 0.11",  only: :dev},
       {:earmark,        "~> 1.0.1", only: :dev},
       {:excoveralls,    "~> 0.6.1", only: :test},
-      {:inch_ex,        "~> 0.5",   only: :docs}
+      {:inch_ex,        "~> 0.5",   only: :docs},
+      {:dialyxir,       "~> 0.5",   only: :dev, runtime: false}
     ]
   end
 
