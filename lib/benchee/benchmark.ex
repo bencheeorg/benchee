@@ -7,18 +7,22 @@ defmodule Benchee.Benchmark do
 
   alias Benchee.Utility.RepeatN
   alias Benchee.Output.BenchmarkPrinter, as: Printer
+  alias Benchee.Suite
+
+  @type name :: String.t
 
   @doc """
   Adds the given function and its associated name to the benchmarking jobs to
   be run in this benchmarking suite as a tuple `{name, function}` to the list
   under the `:jobs` key.
   """
-  def benchmark(suite = %{jobs: jobs}, name, function, printer \\ Printer) do
+  @spec benchmark(Suite.t, name, fun, module) :: Suite.t
+  def benchmark(suite = %Suite{jobs: jobs}, name, function, printer \\ Printer) do
     if Map.has_key?(jobs, name) do
       printer.duplicate_benchmark_warning name
       suite
     else
-      %{suite | jobs: Map.put(jobs, name, function)}
+      %Suite{suite | jobs: Map.put(jobs, name, function)}
     end
   end
 
@@ -36,11 +40,12 @@ defmodule Benchee.Benchmark do
   There will be `parallel` processes spawned exeuting the benchmark job in
   parallel.
   """
-  def measure(suite = %{jobs: jobs, config: config}, printer \\ Printer) do
+  @spec measure(Suite.t, module) :: Suite.t
+  def measure(suite = %Suite{jobs: jobs, config: config}, printer \\ Printer) do
     printer.configuration_information(suite)
     run_times = record_runtimes(jobs, config, printer)
 
-    Map.put suite, :run_times, run_times
+    %Suite{suite | run_times: run_times}
   end
 
   @no_input :__no_input

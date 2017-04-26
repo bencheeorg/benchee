@@ -5,6 +5,7 @@ defmodule Benchee.Config do
 
   alias Benchee.Conversion.Duration
   alias Benchee.Utility.DeepConvert
+  alias Benchee.Suite
 
   @doc """
   Returns the initial benchmark configuration for Benchee, composed of defaults
@@ -71,7 +72,7 @@ defmodule Benchee.Config do
   ## Examples
 
       iex> Benchee.init
-      %{
+      %Benchee.Suite{
         config:
           %{
             parallel: 1,
@@ -86,11 +87,14 @@ defmodule Benchee.Config do
             },
             console: %{ comparison: true, unit_scaling: :best }
           },
-        jobs: %{}
+        jobs: %{},
+        run_times: nil,
+        statistics: nil,
+        system: nil
       }
 
       iex> Benchee.init time: 1, warmup: 0.2
-      %{
+      %Benchee.Suite{
         config:
           %{
             parallel: 1,
@@ -105,11 +109,14 @@ defmodule Benchee.Config do
             },
             console: %{ comparison: true, unit_scaling: :best }
           },
-        jobs: %{}
+        jobs: %{},
+        run_times: nil,
+        statistics: nil,
+        system: nil
       }
 
       iex> Benchee.init %{time: 1, warmup: 0.2}
-      %{
+      %Benchee.Suite{
         config:
           %{
             parallel: 1,
@@ -124,7 +131,10 @@ defmodule Benchee.Config do
             },
             console: %{ comparison: true, unit_scaling: :best }
           },
-        jobs: %{}
+        jobs: %{},
+        run_times: nil,
+        statistics: nil,
+        system: nil
       }
 
       iex> Benchee.init(
@@ -135,7 +145,7 @@ defmodule Benchee.Config do
       ...>   print: [fast_warning: false],
       ...>   console: [unit_scaling: :smallest],
       ...>   inputs: %{"Small" => 5, "Big" => 9999})
-      %{
+      %Benchee.Suite{
         config:
           %{
             parallel: 2,
@@ -150,7 +160,10 @@ defmodule Benchee.Config do
             },
             console: %{ comparison: true, unit_scaling: :smallest }
           },
-        jobs: %{}
+        jobs: %{},
+        run_times: nil,
+        statistics: nil,
+        system: nil
       }
   """
   @default_config %{
@@ -176,7 +189,8 @@ defmodule Benchee.Config do
              |> DeepMerge.deep_merge(map_config)
              |> convert_time_to_micro_s
     :ok    = :timer.start
-    %{config: config, jobs: %{}}
+
+    %Suite{config: config}
   end
 
   defp convert_time_to_micro_s(config) do
