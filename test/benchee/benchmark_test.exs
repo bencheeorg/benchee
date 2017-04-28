@@ -57,19 +57,19 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure runs a suite with multiple jobs and gathers results" do
     retrying fn ->
-      suite = test_suite %Suite{config: %{time: 60_000, warmup: 10_000}}
+      suite = test_suite %Suite{config: %{time: 100_000, warmup: 10_000}}
       new_suite =
         suite
-        |> benchmark("Name", fn -> :timer.sleep(10) end)
-        |> benchmark("Name 2", fn -> :timer.sleep(5) end)
+        |> benchmark("Name", fn -> :timer.sleep(19) end)
+        |> benchmark("Name 2", fn -> :timer.sleep(9) end)
         |> measure(TestPrinter)
 
       run_times_hash = new_suite.run_times |> no_input_access
 
-      # should be 6 but gotta give it a bit leeway
-      assert length(run_times_hash["Name"]) >= 5
-      # should be 12, but gotta give it some leeway
-      assert length(run_times_hash["Name 2"]) >= 9
+      # should be 5 but gotta give it a bit leeway
+      assert length(run_times_hash["Name"]) >= 4
+      # should be ~11, but gotta give it some leeway
+      assert length(run_times_hash["Name 2"]) >= 8
       end
   end
 
@@ -185,10 +185,10 @@ defmodule Benchee.BenchmarkTest do
   test ".measure populates results for all inputs" do
     retrying fn ->
       inputs = %{
-        "Short wait"  => 5,
-        "Longer wait" => 10
+        "Short wait"  => 9,
+        "Longer wait" => 19
       }
-      config = %{time: 60_000,
+      config = %{time: 100_000,
                  warmup: 10_000,
                  inputs: inputs}
       jobs = %{
@@ -200,10 +200,10 @@ defmodule Benchee.BenchmarkTest do
         |> measure(TestPrinter)
         |> Map.get(:run_times)
 
-      # should be 12 but the good old leeway
-      assert length(results["Short wait"]["sleep"]) >= 9
-      # should be 6 but the good old leeway
-      assert length(results["Longer wait"]["sleep"]) >= 5
+      # should be ~11 but the good old leeway
+      assert length(results["Short wait"]["sleep"]) >= 8
+      # should be 5 but the good old leeway
+      assert length(results["Longer wait"]["sleep"]) >= 4
     end
   end
 
