@@ -219,23 +219,25 @@ defmodule Benchee.BenchmarkTest do
   end
 
   test ".measure stores run times in the right order" do
-    {:ok, agent} = Agent.start fn -> 10 end
-    increasing_function = fn ->
-      Agent.update agent, fn(state) ->
-        :timer.sleep state
-        state * 2
+    retrying fn ->
+      {:ok, agent} = Agent.start fn -> 10 end
+      increasing_function = fn ->
+        Agent.update agent, fn(state) ->
+          :timer.sleep state
+          state + 30
+        end
       end
-    end
-    jobs = %{"Sleep more" => increasing_function}
-    run_times =
-      %Suite{config: %{time: 70_000, warmup: 0}, jobs: jobs}
-      |> test_suite
-      |> measure(TestPrinter)
-      |> get_in([Access.key!(:run_times), Benchmark.no_input, "Sleep more"])
+      jobs = %{"Sleep more" => increasing_function}
+      run_times =
+        %Suite{config: %{time: 70_000, warmup: 0}, jobs: jobs}
+        |> test_suite
+        |> measure(TestPrinter)
+        |> get_in([Access.key!(:run_times), Benchmark.no_input, "Sleep more"])
 
-    assert length(run_times) >= 2 # should be 3 but good old leeway
-    # as the function takes more time each time called run times should be
-    # as if sorted ascending
-    assert run_times == Enum.sort(run_times)
+      assert length(run_times) >= 2 # should be 3 but good old leeway
+      # as the function takes more time each time called run times should be
+      # as if sorted ascending
+      assert run_times == Enum.sort(run_times)
+    end
   end
 end
