@@ -7,6 +7,26 @@ defmodule Benchee.Config do
   alias Benchee.Utility.DeepConvert
   alias Benchee.Suite
 
+  @type configuration :: map | [any]
+
+  @default_config %{
+    parallel:   1,
+    time:       5,
+    warmup:     2,
+    formatters: [&Benchee.Formatters.Console.output/1],
+    inputs:     nil,
+    print:      %{
+                  benchmarking:  true,
+                  configuration: true,
+                  fast_warning:  true
+                },
+    console:    %{
+                  comparison:   true,
+                  unit_scaling: :best
+                }
+  }
+  @time_keys [:time, :warmup]
+
   @doc """
   Returns the initial benchmark configuration for Benchee, composed of defaults
   and an optional custom configuration.
@@ -166,23 +186,7 @@ defmodule Benchee.Config do
         system: nil
       }
   """
-  @default_config %{
-    parallel:   1,
-    time:       5,
-    warmup:     2,
-    formatters: [&Benchee.Formatters.Console.output/1],
-    inputs:     nil,
-    print:      %{
-                  benchmarking:  true,
-                  configuration: true,
-                  fast_warning:  true
-                },
-    console:    %{
-                  comparison:   true,
-                  unit_scaling: :best
-                }
-  }
-  @time_keys [:time, :warmup]
+  @spec init(configuration) :: Suite.t
   def init(config \\ %{}) do
     map_config = DeepConvert.to_map(config)
     config = @default_config

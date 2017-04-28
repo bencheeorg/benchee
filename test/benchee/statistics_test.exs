@@ -1,12 +1,12 @@
 defmodule Benchee.StatistcsTest do
   use ExUnit.Case, async: true
-  alias Benchee.Statistics
+  alias Benchee.{Statistics, Suite}
   doctest Benchee.Statistics
 
   @sample_1 [600, 470, 170, 430, 300]
   @sample_2 [17, 15, 23, 7, 9, 13]
   test ".statistics computes the statistics for all jobs correctly" do
-    suite = %{
+    suite = %Suite{
       run_times: %{
         "Input" => %{
           "Job 1" => @sample_1,
@@ -15,7 +15,7 @@ defmodule Benchee.StatistcsTest do
       }
     }
 
-    %{
+    %Suite{
       statistics: %{
         "Input" => %{
           "Job 1" => stats_1,
@@ -26,7 +26,7 @@ defmodule Benchee.StatistcsTest do
   end
 
   test ".statistics computes statistics correctly for multiple inputs" do
-    suite = %{
+    suite = %Suite{
       run_times: %{
         "Input 1" => %{
           "Job" => @sample_1
@@ -37,7 +37,7 @@ defmodule Benchee.StatistcsTest do
       }
     }
 
-    %{
+    %Suite{
       statistics: %{
         "Input 1" => %{
           "Job" => stats_1
@@ -72,18 +72,18 @@ defmodule Benchee.StatistcsTest do
   end
 
   test ".statistics preserves all other keys in the map handed to it" do
-    suite = %{
+    suite = %Suite{
       run_times: %{
         "Input" => %{
           "Job 1" => [600, 470, 170, 430, 300],
           "Job 2" => [17, 15, 23, 7, 9, 13]
         }
       },
-      formatters: [],
-      some_option: "value"
+      config: %{formatters: []}
     }
 
-    assert %{formatters: [], some_option: "value"} = Statistics.statistics suite
+    assert %Suite{config: %{formatters: []}} =
+      Statistics.statistics suite
   end
 
   test ".sort sorts the benchmarks correctly and retains all data" do

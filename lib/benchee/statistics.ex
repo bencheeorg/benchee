@@ -4,7 +4,7 @@ defmodule Benchee.Statistics do
   times and then compute statistics like the average and the standard devaition.
   """
 
-  alias Benchee.{Statistics, Conversion.Duration}
+  alias Benchee.{Statistics, Conversion.Duration, Suite}
   import Benchee.Utility.MapValues
   require Integer
 
@@ -37,9 +37,11 @@ defmodule Benchee.Statistics do
   ## Examples
 
       iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
-      iex> suite = %{run_times: %{"Input" => %{"My Job" => run_times}}}
+      iex> suite = %Benchee.Suite{
+      ...>   run_times: %{"Input" => %{"My Job" => run_times}}
+      ...> }
       iex> Benchee.Statistics.statistics(suite)
-      %{
+      %Benchee.Suite{
         statistics: %{
           "Input" => %{
             "My Job" => %{
@@ -59,15 +61,19 @@ defmodule Benchee.Statistics do
           "Input" => %{
             "My Job" => [200, 400, 400, 400, 500, 500, 700, 900]
           }
-        }
+        },
+        config: nil,
+        jobs: %{  },
+        system: nil
       }
 
   """
-  def statistics(suite = %{run_times: run_times_per_input}) do
+  @spec statistics(Suite.t) :: Suite.t
+  def statistics(suite = %Suite{run_times: run_times_per_input}) do
     statistics = run_times_per_input
                  |> p_map_values(&Statistics.job_statistics/1)
 
-    Map.put suite, :statistics, statistics
+    %Suite{suite | statistics: statistics}
   end
 
   @doc """

@@ -11,7 +11,7 @@ defmodule Benchee.System do
   @spec system(Suite.t) :: Suite.t
   def system(suite = %Suite{}) do
     versions = %{elixir: elixir(), erlang: erlang()}
-    %{suite | system: versions}
+    %Suite{suite | system: versions}
   end
 
   @doc """
