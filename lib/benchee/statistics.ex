@@ -4,6 +4,23 @@ defmodule Benchee.Statistics do
   times and then compute statistics like the average and the standard devaition.
   """
 
+  defstruct [:average, :ips, :std_dev, :std_dev_ratio, :std_dev_ips, :median,
+             :minimum, :maximum, :sample_size]
+
+  @type t :: %__MODULE__{
+    average: float,
+    ips: float,
+    std_dev: float,
+    std_dev_ratio: float,
+    std_dev_ips: float,
+    median: number,
+    minimum: number,
+    maximum: number,
+    sample_size: integer
+  }
+
+  @type samples :: [number]
+
   alias Benchee.{Statistics, Conversion.Duration, Suite}
   import Benchee.Utility.MapValues
   require Integer
@@ -44,7 +61,7 @@ defmodule Benchee.Statistics do
       %Benchee.Suite{
         statistics: %{
           "Input" => %{
-            "My Job" => %{
+            "My Job" => %Benchee.Statistics{
               average:       500.0,
               ips:           2000.0,
               std_dev:       200.0,
@@ -84,7 +101,8 @@ defmodule Benchee.Statistics do
 
       iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
       iex> Benchee.Statistics.job_statistics(run_times)
-      %{average:       500.0,
+      %Benchee.Statistics{
+        average:       500.0,
         ips:           2000.0,
         std_dev:       200.0,
         std_dev_ratio: 0.4,
@@ -92,9 +110,11 @@ defmodule Benchee.Statistics do
         median:        450.0,
         minimum:       200,
         maximum:       900,
-        sample_size:   8}
+        sample_size:   8
+      }
 
   """
+  @spec job_statistics(samples) :: __MODULE__.t
   def job_statistics(run_times) do
     total_time          = Enum.sum(run_times)
     iterations          = Enum.count(run_times)
@@ -107,7 +127,7 @@ defmodule Benchee.Statistics do
     minimum             = Enum.min run_times
     maximum             = Enum.max run_times
 
-    %{
+    %__MODULE__{
       average:       average,
       ips:           ips,
       std_dev:       deviation,
