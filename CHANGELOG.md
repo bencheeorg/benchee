@@ -1,3 +1,8 @@
+# 0.8.0 (unreleased)
+
+## Breaking Changes (User Facing)
+* Dropped support for elixir 1.2, new support is elixir 1.3+
+
 # 0.7.0 (April 23, 2017)
 
 Smaller convenience features in here - the biggest part of work went into breaking reports in [benchee_html](https://github.com/PragTob/benchee_html) apart :)

@@ -50,6 +50,7 @@ defmodule Benchee do
     Enum.each formatters, fn(output_function) ->
       output_function.(suite)
     end
+
     suite
   end
 

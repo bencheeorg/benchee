@@ -1,8 +1,10 @@
 defmodule Benchee.SystemTest do
   use ExUnit.Case, async: true
 
+  alias Benchee.Suite
+
   test ".system adds the content to a given suite" do
-    assert %{system: %{elixir: _, erlang: _}} = Benchee.System.system(%{})
+    assert %{system: %{elixir: _, erlang: _}} = Benchee.System.system(%Suite{})
   end
 
   test ".elixir returns the current elixir version" do

@@ -3,12 +3,15 @@ defmodule Benchee.System do
   Provides information about the system the benchmarks are run on.
   """
 
+  alias Benchee.Suite
+
   @doc """
   Adds system information to the suite (currently elixir and erlang versions).
   """
-  def system(suite) do
+  @spec system(Suite.t) :: Suite.t
+  def system(suite = %Suite{}) do
     versions = %{elixir: elixir(), erlang: erlang()}
-    Map.put suite, :system, versions
+    %Suite{suite | system: versions}
   end
 
   @doc """

@@ -4,8 +4,11 @@ defmodule Benchee.Formatters.Console do
   output through `IO.puts` on the console.
   """
 
-  alias Benchee.Statistics
-  alias Benchee.Conversion.{Count, Duration, DeviationPercent}
+  alias Benchee.{Statistics, Suite}
+  alias Benchee.Conversion.{Count, Duration, Unit, DeviationPercent}
+
+  @type job_statistics :: {Suite.key, Statistics.t}
+  @type unit_per_statistic :: %{atom => Unit.t}
 
   @default_label_width 4 # Length of column header
   @ips_width 13
@@ -17,10 +20,13 @@ defmodule Benchee.Formatters.Console do
   Formats the benchmark statistis using `Benchee.Formatters.Console.format/1`
   and then prints it out directly to the console using `IO.puts/2`
   """
-  def output(suite) do
+  @spec output(Suite.t) :: Suite.t
+  def output(suite = %Suite{}) do
     suite
     |> format
     |> IO.write
+
+    suite
   end
 
   @doc """
@@ -33,9 +39,13 @@ defmodule Benchee.Formatters.Console do
   ## Examples
 
   ```
-  iex> jobs = %{ "My Job" =>%{average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0}, "Job 2" => %{average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0}}
+  iex> jobs = %{ "My Job" => %Benchee.Statistics{average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0}, "Job 2" => %Benchee.Statistics{average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0}}
   iex> inputs = %{"My input" => jobs}
-  iex> Benchee.Formatters.Console.format(%{statistics: inputs, config: %{console: %{comparison: false, unit_scaling: :best}}})
+  iex> suite = %Benchee.Suite{
+  ...>   statistics: inputs,
+  ...>   config: %{console: %{comparison: false, unit_scaling: :best}}
+  ...> }
+  iex> Benchee.Formatters.Console.format(suite)
   [["\n##### With input My input #####", "\nName             ips        average  deviation         median\n",
   "My Job        5.00 K      200.00 μs    ±10.00%      190.00 μs\n",
   "Job 2         2.50 K      400.00 μs    ±20.00%      390.00 μs\n"]]
@@ -43,11 +53,11 @@ defmodule Benchee.Formatters.Console do
   ```
 
   """
-  def format(%{statistics: jobs_per_input, config: %{console: config}}) do
-    jobs_per_input
-    |> Enum.map(fn({input, jobs_stats}) ->
-         [input_header(input) | format_jobs(jobs_stats, config)]
-       end)
+  @spec format(Suite.t) :: [any]
+  def format(%Suite{statistics: jobs_per_input, config: %{console: config}}) do
+    Enum.map(jobs_per_input, fn({input, jobs_stats}) ->
+      [input_header(input) | format_jobs(jobs_stats, config)]
+    end)
   end
 
   defp input_header(input) do
@@ -64,7 +74,7 @@ defmodule Benchee.Formatters.Console do
   ## Examples
 
   ```
-  iex> jobs = %{ "My Job" =>%{average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0}, "Job 2" => %{average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0}}
+  iex> jobs = %{ "My Job" =>%Benchee.Statistics{average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0}, "Job 2" => %Benchee.Statistics{average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0}}
   iex> Benchee.Formatters.Console.format_jobs(jobs, %{comparison: false, unit_scaling: :best})
   ["\nName             ips        average  deviation         median\n",
   "My Job        5.00 K      200.00 μs    ±10.00%      190.00 μs\n",
@@ -124,7 +134,8 @@ defmodule Benchee.Formatters.Console do
     }
   end
 
-  defp format_jobs({name, %{average:       average,
+  @spec format_jobs(job_statistics, unit_per_statistic, integer) :: String.t
+  defp format_jobs({name, %Statistics{average:       average,
                            ips:           ips,
                            std_dev_ratio: std_dev_ratio,
                            median:        median}
@@ -152,6 +163,7 @@ defmodule Benchee.Formatters.Console do
     DeviationPercent.format(std_dev_ratio)
   end
 
+  @spec comparison_report([job_statistics], unit_per_statistic, integer, map)  :: [String.t]
   defp comparison_report([_reference], _, _, _config) do
     [] # No need for a comparison when only one benchmark was run
   end
@@ -172,6 +184,7 @@ defmodule Benchee.Formatters.Console do
     |> to_string
   end
 
+  @spec comparisons({any, Statistics.t}, %{atom => Unit.t}, integer, [{any, Statistics.t}]) :: [String.t]
   defp comparisons({_, reference_stats}, units, label_width, jobs_to_compare) do
     Enum.map jobs_to_compare, fn(job = {_, job_stats}) ->
       format_comparison(job, units, label_width, (reference_stats.ips / job_stats.ips))

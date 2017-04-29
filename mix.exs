@@ -7,7 +7,7 @@ defmodule Benchee.Mixfile do
     [
       app: :benchee,
       version: @version,
-      elixir: "~> 1.2",
+      elixir: "~> 1.3",
       elixirc_paths: elixirc_paths(Mix.env),
       consolidate_protocols: true,
       build_embedded: Mix.env == :prod,
@@ -20,6 +20,10 @@ defmodule Benchee.Mixfile do
         "coveralls": :test, "coveralls.detail": :test,
         "coveralls.post": :test, "coveralls.html": :test,
         "coveralls.travis": :test],
+      dialyzer: [
+        flags:
+          [:unmatched_returns, :error_handling, :race_conditions, :underspecs]
+      ],
       name: "Benchee",
       source_url: "https://github.com/PragTob/benchee",
       description: """
@@ -33,7 +37,7 @@ defmodule Benchee.Mixfile do
   defp elixirc_paths(_),     do: ["lib"]
 
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :deep_merge]]
   end
 
   defp deps do
@@ -44,7 +48,8 @@ defmodule Benchee.Mixfile do
       {:ex_doc,         "~> 0.11",  only: :dev},
       {:earmark,        "~> 1.0.1", only: :dev},
       {:excoveralls,    "~> 0.6.1", only: :test},
-      {:inch_ex,        "~> 0.5",   only: :docs}
+      {:inch_ex,        "~> 0.5",   only: :docs},
+      {:dialyxir,       "~> 0.5",   only: :dev, runtime: false}
     ]
   end
 
