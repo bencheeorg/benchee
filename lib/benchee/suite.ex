@@ -8,8 +8,8 @@ defmodule Benchee.Suite do
   @type t :: %__MODULE__{
     config: optional_map,
     system: optional_map,
-    run_times: %{input_key => [integer]} | nil,
-    statistics: %{input_key => Benchee.Statistics.t} | nil,
+    run_times: %{input_key => %{key => [integer]}} | nil,
+    statistics: %{input_key => %{key => Benchee.Statistics.t}} | nil,
     jobs: %{key => benchmark_function}
   }
 end
