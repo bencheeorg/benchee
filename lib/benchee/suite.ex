@@ -23,7 +23,7 @@ defimpl DeepMerge.Resolver, for: Benchee.Suite do
 
     Map.merge(original, cleaned_override, resolver)
   end
-  def resolve(_, override, _) do
-    override
+  def resolve(original, override, resolver) when is_map(override) do
+    Map.merge(original, override, resolver)
   end
 end
