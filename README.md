@@ -131,7 +131,7 @@ Benchee takes a wealth of configuration options, in the most common `Benchee.run
 Benchee.run(%{"some function" => fn -> magic end}, print: [benchmarking: false])
 ```
 
-The available options are the following (also documented in [hexdocs](https://hexdocs.pm/benchee/Benchee.Config.html#init/1)).
+The available options are the following (also documented in [hexdocs](https://hexdocs.pm/benchee/Benchee.Configuration.html#init/1)).
 
 * `warmup` - the time in seconds for which a benchmark should be run without measuring times before real measurements start. This simulates a _"warm"_ running system. Defaults to 2.
 * `time` - the time in seconds for how long each individual benchmark should be run and measured. Defaults to 5.
@@ -287,7 +287,7 @@ Benchee.init(time: 3)
 
 This is a take on the _functional transformation_ of data applied to benchmarks here:
 
-1. Configure the benchmarking suite to be run
+1. Configurationure the benchmarking suite to be run
 2. Define the functions to be benchmarked
 3. Run n benchmarks with the given configuration gathering raw run times per function
 4. Generate statistics based on the raw run times

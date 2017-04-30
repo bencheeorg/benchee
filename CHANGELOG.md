@@ -2,6 +2,7 @@
 
 ## Breaking Changes (User Facing)
 * Dropped support for elixir 1.2, new support is elixir 1.3+
+* `Benchee.Config` was renamed to `Benchee.Configuration` (important when you use the more verbose API or used it in a Plugin)
 
 # 0.7.0 (April 23, 2017)
 

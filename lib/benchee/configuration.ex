@@ -1,4 +1,4 @@
-defmodule Benchee.Config do
+defmodule Benchee.Configuration do
   @moduledoc """
   Functions to handle the configuration of Benchee, exposes `init` function.
   """
