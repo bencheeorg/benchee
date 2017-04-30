@@ -7,24 +7,36 @@ defmodule Benchee.Configuration do
   alias Benchee.Utility.DeepConvert
   alias Benchee.Suite
 
-  @type configuration :: map | [any]
+  defstruct [
+    parallel:          1,
+    time:              5,
+    warmup:            2,
+    formatters:        [&Benchee.Formatters.Console.output/1],
+    print: %{
+      benchmarking:    true,
+      configuration:   true,
+      fast_warning:    true
+    },
+    inputs:            nil,
+    formatter_options: %{
+      console: %{
+        comparison:    true,
+        unit_scaling:  :best
+      }
+    }
+  ]
 
-  @default_config %{
-    parallel:   1,
-    time:       5,
-    warmup:     2,
-    formatters: [&Benchee.Formatters.Console.output/1],
-    inputs:     nil,
-    print:      %{
-                  benchmarking:  true,
-                  configuration: true,
-                  fast_warning:  true
-                },
-    console:    %{
-                  comparison:   true,
-                  unit_scaling: :best
-                }
+  @type t :: %__MODULE__{
+    parallel:          integer,
+    time:              number,
+    warmup:            number,
+    formatters:        [((Suite.t) -> Suite.t)],
+    print:             map,
+    inputs:            %{Suite.key => any} | nil,
+    formatter_options: map
   }
+
+  @type user_configuration :: map | [any]
   @time_keys [:time, :warmup]
 
   @doc """
@@ -94,7 +106,7 @@ defmodule Benchee.Configuration do
       iex> Benchee.init
       %Benchee.Suite{
         config:
-          %{
+          %Benchee.Configuration{
             parallel: 1,
             time: 5_000_000,
             warmup: 2_000_000,
@@ -116,7 +128,7 @@ defmodule Benchee.Configuration do
       iex> Benchee.init time: 1, warmup: 0.2
       %Benchee.Suite{
         config:
-          %{
+          %Benchee.Configuration{
             parallel: 1,
             time: 1_000_000,
             warmup: 200_000.0,
@@ -138,7 +150,7 @@ defmodule Benchee.Configuration do
       iex> Benchee.init %{time: 1, warmup: 0.2}
       %Benchee.Suite{
         config:
-          %{
+          %Benchee.Configuration{
             parallel: 1,
             time: 1_000_000,
             warmup: 200_000.0,
@@ -167,7 +179,7 @@ defmodule Benchee.Configuration do
       ...>   inputs: %{"Small" => 5, "Big" => 9999})
       %Benchee.Suite{
         config:
-          %{
+          %Benchee.Configuration{
             parallel: 2,
             time: 1_000_000,
             warmup: 200_000.0,
@@ -186,10 +198,11 @@ defmodule Benchee.Configuration do
         system: nil
       }
   """
-  @spec init(configuration) :: Suite.t
+  @spec init(user_configuration) :: Suite.t
   def init(config \\ %{}) do
     map_config = DeepConvert.to_map(config)
-    config = @default_config
+
+    config = %Benchee.Configuration{}
              |> DeepMerge.deep_merge(map_config)
              |> convert_time_to_micro_s
     :ok    = :timer.start
@@ -204,5 +217,14 @@ defmodule Benchee.Configuration do
       end
       new_config
     end
+  end
+end
+
+defimpl DeepMerge.Resolver, for: Benchee.Configuration do
+  def resolve(original, override = %{__struct__: Benchee.Configuration}, resolver) do
+    override
+  end
+  def resolve(original, override, resolver) when is_map(override) do
+    Map.merge(original, override, resolver)
   end
 end
