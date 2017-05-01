@@ -74,6 +74,7 @@ defmodule Benchee.Conversion.Format do
     label
   end
 
+  defp float_precision(float) when float == 0, do: 1
   defp float_precision(float) when float < 0.01, do: 5
   defp float_precision(float) when float < 0.1, do: 4
   defp float_precision(float) when float < 0.2, do: 3

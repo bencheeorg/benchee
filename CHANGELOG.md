@@ -2,6 +2,7 @@
 
 ## Features (User Facing)
 * Providing an unrecognized configuration option (say `runNtime` instead of `runtime`) will now raise an exception
+* Durations in the configuration will now be scaled appropriately (minutes, microseconds etc)
 
 ## Bugfixes (User Facing)
 * In 0.7.0 statistics generation might time out, this is fixed by waiting infinitely - thanks @devonestes for the [report](https://github.com/PragTob/benchee/issues/71).
