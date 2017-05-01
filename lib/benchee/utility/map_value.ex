@@ -42,7 +42,7 @@ defmodule Benchee.Utility.MapValues do
          {key, Task.async(fn -> do_map_values(child_map, function) end)}
        end)
     |> Enum.map(fn({key, task}) ->
-         {key, Task.await(task)}
+         {key, Task.await(task, :infinity)}
        end)
     |> Map.new
   end
