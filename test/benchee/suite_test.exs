@@ -46,5 +46,4 @@ defmodule Benchee.SuiteTest do
       end
     end
   end
-
 end
