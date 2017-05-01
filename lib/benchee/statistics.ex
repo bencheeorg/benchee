@@ -79,7 +79,7 @@ defmodule Benchee.Statistics do
             "My Job" => [200, 400, 400, 400, 500, 500, 700, 900]
           }
         },
-        config: nil,
+        configuration: nil,
         jobs: %{  },
         system: nil
       }

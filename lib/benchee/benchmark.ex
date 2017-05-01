@@ -41,7 +41,7 @@ defmodule Benchee.Benchmark do
   parallel.
   """
   @spec measure(Suite.t, module) :: Suite.t
-  def measure(suite = %Suite{jobs: jobs, config: config}, printer \\ Printer) do
+  def measure(suite = %Suite{jobs: jobs, configuration: config}, printer \\ Printer) do
     printer.configuration_information(suite)
     run_times = record_runtimes(jobs, config, printer)
 

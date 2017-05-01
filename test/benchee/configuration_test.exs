@@ -5,8 +5,17 @@ defmodule Benchee.ConfigurationTest do
   alias Benchee.Configuration
 
   import DeepMerge
+  import Benchee.Configuration
 
   @default_config %Configuration{}
+
+  describe ".init/1" do
+    test "it crashes for values that are going to be ignored" do
+      assert_raise KeyError, fn ->
+        init runntime: 2
+      end
+    end
+  end
 
   describe ".deep_merge behaviour" do
     test "it can be adjusted with a map" do

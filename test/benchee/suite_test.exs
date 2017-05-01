@@ -5,7 +5,7 @@ defmodule Benchee.SuiteTest do
   import DeepMerge
 
   @original %Suite{
-    config: %{formatters: []},
+    configuration: %{formatters: []},
     system: %{elixir: "1.4.2", erlang: "19.2"},
     run_times: %{"Input" => %{"Job" => [1, 2, 3]}},
     statistics: %{"Input" => %{"Job" => %Statistics{ips: 500.0}}}

@@ -110,7 +110,7 @@ defmodule Benchee.Configuration do
 
       iex> Benchee.init
       %Benchee.Suite{
-        config:
+        configuration:
           %Benchee.Configuration{
             parallel: 1,
             time: 5_000_000,
@@ -135,7 +135,7 @@ defmodule Benchee.Configuration do
 
       iex> Benchee.init time: 1, warmup: 0.2
       %Benchee.Suite{
-        config:
+        configuration:
           %Benchee.Configuration{
             parallel: 1,
             time: 1_000_000,
@@ -160,7 +160,7 @@ defmodule Benchee.Configuration do
 
       iex> Benchee.init %{time: 1, warmup: 0.2}
       %Benchee.Suite{
-        config:
+        configuration:
           %Benchee.Configuration{
             parallel: 1,
             time: 1_000_000,
@@ -193,7 +193,7 @@ defmodule Benchee.Configuration do
       ...>   inputs: %{"Small" => 5, "Big" => 9999},
       ...>   formatter_options: [some: "option"])
       %Benchee.Suite{
-        config:
+        configuration:
           %Benchee.Configuration{
             parallel: 2,
             time: 1_000_000,
@@ -229,7 +229,7 @@ defmodule Benchee.Configuration do
 
     :ok    = :timer.start
 
-    %Suite{config: config}
+    %Suite{configuration: config}
   end
 
   # backwards compatible translation of formatter keys to go into
@@ -255,6 +255,7 @@ defimpl DeepMerge.Resolver, for: Benchee.Configuration do
     override
   end
   def resolve(original, override, resolver) when is_map(override) do
-    Map.merge(original, override, resolver)
+    merged = Map.merge(original, override, resolver)
+    struct! Benchee.Configuration, Map.to_list(merged)
   end
 end

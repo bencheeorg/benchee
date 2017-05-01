@@ -43,7 +43,7 @@ defmodule Benchee.Formatters.Console do
   iex> inputs = %{"My input" => jobs}
   iex> suite = %Benchee.Suite{
   ...>   statistics: inputs,
-  ...>   config: %Benchee.Configuration{
+  ...>   configuration: %Benchee.Configuration{
   ...>     formatter_options: %{
   ...>       console: %{comparison: false, unit_scaling: :best}
   ...>     }
@@ -59,7 +59,7 @@ defmodule Benchee.Formatters.Console do
   """
   @spec format(Suite.t) :: [any]
   def format(%Suite{statistics: jobs_per_input,
-                    config: %{formatter_options: %{console: config}}}) do
+                    configuration: %{formatter_options: %{console: config}}}) do
     Enum.map(jobs_per_input, fn({input, jobs_stats}) ->
       [input_header(input) | format_jobs(jobs_stats, config)]
     end)

@@ -33,7 +33,7 @@ defmodule Benchee.BenchmarkTest do
             inputs:   nil,
             print:    %{fast_warning: false, configuration: true}}
   @system %{elixir: "1.4.0", erlang: "19.1"}
-  @default_suite %Suite{config: @config, system: @system, jobs: %{}}
+  @default_suite %Suite{configuration: @config, system: @system, jobs: %{}}
 
   defp test_suite(suite_override \\ %Suite{}) do
     DeepMerge.deep_merge(@default_suite, suite_override)
@@ -41,13 +41,13 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure runs a benchmark suite and enriches it with measurements" do
     retrying fn ->
-      suite = test_suite %Suite{config: %{time: 60_000, warmup: 10_000}}
+      suite = test_suite %Suite{configuration: %{time: 60_000, warmup: 10_000}}
       new_suite =
         suite
         |> benchmark("Name", fn -> :timer.sleep(10) end)
         |> measure(TestPrinter)
 
-      assert new_suite.config == suite.config
+      assert new_suite.configuration == suite.configuration
       run_times_hash = new_suite.run_times |> no_input_access
 
       # should be 6 but gotta give it a bit leeway
@@ -57,7 +57,7 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure runs a suite with multiple jobs and gathers results" do
     retrying fn ->
-      suite = test_suite %Suite{config: %{time: 100_000, warmup: 10_000}}
+      suite = test_suite %Suite{configuration: %{time: 100_000, warmup: 10_000}}
       new_suite =
         suite
         |> benchmark("Name", fn -> :timer.sleep(19) end)
@@ -75,7 +75,7 @@ defmodule Benchee.BenchmarkTest do
 
   test ".measure can run multiple benchmarks in parallel" do
     suite = test_suite %Suite{
-      config: %{parallel: 6, time: 60_000},
+      configuration: %{parallel: 6, time: 60_000},
       jobs: %{"" => fn -> :timer.sleep 10 end}
     }
     new_suite = measure suite, TestPrinter
@@ -93,7 +93,7 @@ defmodule Benchee.BenchmarkTest do
       projected = time + warmup
 
       suite = test_suite %Suite{
-                config: %{time: time, warmup: warmup},
+                configuration: %{time: time, warmup: warmup},
                 jobs:   %{"" => fn -> :timer.sleep(1) end}
               }
       {time, _} = :timer.tc fn -> measure(suite, TestPrinter) end
@@ -108,7 +108,7 @@ defmodule Benchee.BenchmarkTest do
   test "variance does not skyrocket on very fast functions" do
     retrying fn ->
       range = 0..10
-      stats = %Suite{config: %{time: 150_000, warmup: 20_000}}
+      stats = %Suite{configuration: %{time: 150_000, warmup: 20_000}}
               |> test_suite
               |> benchmark("noop", fn -> 1 + 1 end)
               |> benchmark("map", fn ->
@@ -128,7 +128,7 @@ defmodule Benchee.BenchmarkTest do
   test ".measure never calls the function if warmup and time are 0" do
     ref = self()
 
-    %Suite{config: %{time: 0, warmup: 0},
+    %Suite{configuration: %{time: 0, warmup: 0},
       jobs: %{"" => fn -> send(ref, :called) end}}
     |> test_suite
     |> Benchmark.measure(TestPrinter)
@@ -159,7 +159,7 @@ defmodule Benchee.BenchmarkTest do
       "one" => fn(input) -> send ref, {:one, input} end,
       "two" => fn(input) -> send ref, {:two, input} end
     }
-    %Suite{config: %{inputs: @inputs}, jobs: jobs}
+    %Suite{configuration: %{inputs: @inputs}, jobs: jobs}
     |> test_suite
     |> measure(TestPrinter)
 
@@ -173,7 +173,7 @@ defmodule Benchee.BenchmarkTest do
     jobs = %{
       "one" => fn(_) -> nil end
     }
-    %Suite{config: %{inputs: @inputs}, jobs: jobs}
+    %Suite{configuration: %{inputs: @inputs}, jobs: jobs}
     |> test_suite
     |> measure(TestPrinter)
 
@@ -195,7 +195,7 @@ defmodule Benchee.BenchmarkTest do
         "sleep" => fn(input) -> :timer.sleep(input) end
       }
       results =
-        %Suite{config: config, jobs: jobs}
+        %Suite{configuration: config, jobs: jobs}
         |> test_suite
         |> measure(TestPrinter)
         |> Map.get(:run_times)
@@ -210,7 +210,7 @@ defmodule Benchee.BenchmarkTest do
   test ".measure runs the job exactly once if its time exceeds given time" do
     jobs = %{"Sleeps" => fn -> :timer.sleep(2) end}
     run_times =
-      %Suite{config: %{time: 1_000, warmup: 0}, jobs: jobs}
+      %Suite{configuration: %{time: 1_000, warmup: 0}, jobs: jobs}
       |> test_suite
       |> measure(TestPrinter)
       |> get_in([Access.key!(:run_times), Benchmark.no_input, "Sleeps"])
@@ -229,7 +229,7 @@ defmodule Benchee.BenchmarkTest do
       end
       jobs = %{"Sleep more" => increasing_function}
       run_times =
-        %Suite{config: %{time: 70_000, warmup: 0}, jobs: jobs}
+        %Suite{configuration: %{time: 70_000, warmup: 0}, jobs: jobs}
         |> test_suite
         |> measure(TestPrinter)
         |> get_in([Access.key!(:run_times), Benchmark.no_input, "Sleep more"])

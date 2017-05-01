@@ -4,6 +4,9 @@
 * Dropped support for elixir 1.2, new support is elixir 1.3+
 * `Benchee.Config` was renamed to `Benchee.Configuration` (important when you use the more verbose API or used it in a Plugin)
 
+## Breaking Changes (Plugins)
+* The `config` key is now `configuration` to go along with the Configuration name change
+
 # 0.7.0 (April 23, 2017)
 
 Smaller convenience features in here - the biggest part of work went into breaking reports in [benchee_html](https://github.com/PragTob/benchee_html) apart :)

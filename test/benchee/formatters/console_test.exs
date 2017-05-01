@@ -22,7 +22,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     }
 
     output = capture_io fn ->
-      Console.output %Suite{statistics: jobs, config: @config}
+      Console.output %Suite{statistics: jobs, configuration: @config}
     end
 
     assert output =~ ~r/First/
@@ -212,7 +212,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     }
 
     [my_arg, other_arg] =
-      Console.format(%Suite{statistics: statistics, config: @config})
+      Console.format(%Suite{statistics: statistics, configuration: @config})
 
     [input_header, header, result] = my_arg
     assert input_header =~ "My Arg"
@@ -247,7 +247,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     }
 
     [my_arg, other_arg] =
-      Console.format(%Suite{statistics: statistics, config: @config})
+      Console.format(%Suite{statistics: statistics, configuration: @config})
 
     [input_header, _header, other_job, job, _comp, ref, slower] = my_arg
     assert input_header =~ "My Arg"

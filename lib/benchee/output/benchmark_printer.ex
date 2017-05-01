@@ -18,10 +18,10 @@ defmodule Benchee.Output.BenchmarkPrinter do
   Prints general information such as system information and estimated
   benchmarking time.
   """
-  def configuration_information(%{config: %{print: %{configuration: false}}}) do
+  def configuration_information(%{configuration: %{print: %{configuration: false}}}) do
     nil
   end
-  def configuration_information(%{jobs: jobs, system: sys, config: config}) do
+  def configuration_information(%{jobs: jobs, system: sys, configuration: config}) do
     system_information(sys)
     suite_information(jobs, config)
   end
