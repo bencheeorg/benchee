@@ -41,7 +41,7 @@ defmodule Benchee.Configuration do
     assigns:           map
   }
 
-  @type user_configuration :: map | [any]
+  @type user_configuration :: map | keyword
   @time_keys [:time, :warmup]
 
   @doc """
