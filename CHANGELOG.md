@@ -6,6 +6,7 @@
 
 ## Bugfixes (User Facing)
 * In 0.7.0 statistics generation might time out, this is fixed by waiting infinitely - thanks @devonestes for the [report](https://github.com/PragTob/benchee/issues/71).
+* Unintended line break in the fast function warning removed
 
 ## Breaking Changes (User Facing)
 * Dropped support for elixir 1.2, new support is elixir 1.3+

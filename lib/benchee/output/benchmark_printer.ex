@@ -39,13 +39,15 @@ defmodule Benchee.Output.BenchmarkPrinter do
     exec_time      = warmup + time
     total_time     = job_count * inputs_count(inputs) * exec_time
 
-    IO.puts "Benchmark suite executing with the following configuration:"
-    IO.puts "warmup: #{Duration.format(warmup)}"
-    IO.puts "time: #{Duration.format(time)}"
-    IO.puts "parallel: #{parallel}"
-    IO.puts "inputs: #{inputs_out(inputs)}"
-    IO.puts "Estimated total run time: #{Duration.format(total_time)}"
-    IO.puts ""
+    IO.puts """
+    Benchmark suite executing with the following configuration:
+    warmup: #{Duration.format(warmup)}
+    time: #{Duration.format(time)}
+    parallel: #{parallel}
+    inputs: #{inputs_out(inputs)}
+    Estimated total run time: #{Duration.format(total_time)}
+
+    """
   end
 
   defp inputs_count(nil),    do: 1 # no input specified still executes
@@ -73,8 +75,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
     IO.puts """
     Warning: The function you are trying to benchmark is super fast, making measures more unreliable! See: https://github.com/PragTob/benchee/wiki/Benchee-Warnings#fast-execution-warning
 
-    You may disable this warning by passing print: [fast_warning: false] as
-    configuration options.
+    You may disable this warning by passing print: [fast_warning: false] as configuration options.
     """
   end
 
