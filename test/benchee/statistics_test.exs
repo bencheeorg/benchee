@@ -79,10 +79,10 @@ defmodule Benchee.StatistcsTest do
           "Job 2" => [17, 15, 23, 7, 9, 13]
         }
       },
-      config: %{formatters: []}
+      configuration: %{formatters: []}
     }
 
-    assert %Suite{config: %{formatters: []}} =
+    assert %Suite{configuration: %{formatters: []}} =
       Statistics.statistics suite
   end
 

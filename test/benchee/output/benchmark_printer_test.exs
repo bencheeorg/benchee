@@ -15,7 +15,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
   test ".configuration_information sys information" do
     output = capture_io fn ->
       %{
-        config: %{parallel: 2, time: 10_000, warmup: 0, inputs: nil},
+        configuration: %{parallel: 2, time: 10_000, warmup: 0, inputs: nil},
         jobs: %{"one" => nil, "two" => nil},
         system: %{elixir: "1.4", erlang: "19.2"}
       }
@@ -35,7 +35,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
   test ".configuration_information multiple inputs" do
     output = capture_io fn ->
       %{
-        config: %{parallel: 2, time: 10_000, warmup: 0, inputs: @inputs},
+        configuration: %{parallel: 2, time: 10_000, warmup: 0, inputs: @inputs},
         jobs: %{"one" => nil, "two" => nil},
         system: %{elixir: "1.4", erlang: "19.2"}
       }
@@ -50,7 +50,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
 
   test ".configuration_information does not print if disabled" do
     output = capture_io fn ->
-      %{config: %{print: %{configuration: false}}}
+      %{configuration: %{print: %{configuration: false}}}
       |> configuration_information
     end
 

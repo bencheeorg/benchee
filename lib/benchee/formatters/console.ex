@@ -43,7 +43,11 @@ defmodule Benchee.Formatters.Console do
   iex> inputs = %{"My input" => jobs}
   iex> suite = %Benchee.Suite{
   ...>   statistics: inputs,
-  ...>   config: %{console: %{comparison: false, unit_scaling: :best}}
+  ...>   configuration: %Benchee.Configuration{
+  ...>     formatter_options: %{
+  ...>       console: %{comparison: false, unit_scaling: :best}
+  ...>     }
+  ...>   }
   ...> }
   iex> Benchee.Formatters.Console.format(suite)
   [["\n##### With input My input #####", "\nName             ips        average  deviation         median\n",
@@ -54,7 +58,8 @@ defmodule Benchee.Formatters.Console do
 
   """
   @spec format(Suite.t) :: [any]
-  def format(%Suite{statistics: jobs_per_input, config: %{console: config}}) do
+  def format(%Suite{statistics: jobs_per_input,
+                    configuration: %{formatter_options: %{console: config}}}) do
     Enum.map(jobs_per_input, fn({input, jobs_stats}) ->
       [input_header(input) | format_jobs(jobs_stats, config)]
     end)

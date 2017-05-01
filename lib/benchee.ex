@@ -12,8 +12,8 @@ defmodule Benchee do
 
   * jobs - a map from descriptive benchmark job name to a function to be
   executed and benchmarked
-  * config - configuration options to alter what Benchee does, see
-  `Benchee.Config.init/1` for documentation of the available options.
+  * configuration - configuration options to alter what Benchee does, see
+  `Benchee.Configuration.init/1` for documentation of the available options.
 
   ## Examples
 
@@ -46,7 +46,7 @@ defmodule Benchee do
     |> Benchee.statistics
   end
 
-  defp output_results(suite = %{config: %{formatters: formatters}}) do
+  defp output_results(suite = %{configuration: %{formatters: formatters}}) do
     Enum.each formatters, fn(output_function) ->
       output_function.(suite)
     end
@@ -54,8 +54,8 @@ defmodule Benchee do
     suite
   end
 
-  defdelegate init(),                                    to: Benchee.Config
-  defdelegate init(config),                              to: Benchee.Config
+  defdelegate init(),                                    to: Benchee.Configuration
+  defdelegate init(config),                              to: Benchee.Configuration
   defdelegate system(suite),                             to: Benchee.System
   defdelegate measure(suite),                            to: Benchee.Benchmark
   defdelegate measure(suite, printer),                   to: Benchee.Benchmark

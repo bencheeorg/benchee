@@ -1,4 +1,4 @@
-defmodule Benchee.Config do
+defmodule Benchee.Configuration do
   @moduledoc """
   Functions to handle the configuration of Benchee, exposes `init` function.
   """
@@ -7,24 +7,41 @@ defmodule Benchee.Config do
   alias Benchee.Utility.DeepConvert
   alias Benchee.Suite
 
-  @type configuration :: map | [any]
+  defstruct [
+    parallel:          1,
+    time:              5,
+    warmup:            2,
+    formatters:        [&Benchee.Formatters.Console.output/1],
+    print: %{
+      benchmarking:    true,
+      configuration:   true,
+      fast_warning:    true
+    },
+    inputs:            nil,
+    # formatters should end up here but known once are still picked up at
+    # the top level for now
+    formatter_options: %{
+      console: %{
+        comparison:    true,
+        unit_scaling:  :best
+      }
+    },
+    # If you/your plugin/whatever needs it your data can go here
+    assigns:           %{}
+  ]
 
-  @default_config %{
-    parallel:   1,
-    time:       5,
-    warmup:     2,
-    formatters: [&Benchee.Formatters.Console.output/1],
-    inputs:     nil,
-    print:      %{
-                  benchmarking:  true,
-                  configuration: true,
-                  fast_warning:  true
-                },
-    console:    %{
-                  comparison:   true,
-                  unit_scaling: :best
-                }
+  @type t :: %__MODULE__{
+    parallel:          integer,
+    time:              number,
+    warmup:            number,
+    formatters:        [((Suite.t) -> Suite.t)],
+    print:             map,
+    inputs:            %{Suite.key => any} | nil,
+    formatter_options: map,
+    assigns:           map
   }
+
+  @type user_configuration :: map | keyword
   @time_keys [:time, :warmup]
 
   @doc """
@@ -93,8 +110,8 @@ defmodule Benchee.Config do
 
       iex> Benchee.init
       %Benchee.Suite{
-        config:
-          %{
+        configuration:
+          %Benchee.Configuration{
             parallel: 1,
             time: 5_000_000,
             warmup: 2_000_000,
@@ -105,7 +122,10 @@ defmodule Benchee.Config do
               fast_warning: true,
               configuration: true
             },
-            console: %{ comparison: true, unit_scaling: :best }
+            formatter_options: %{
+              console: %{ comparison: true, unit_scaling: :best }
+            },
+            assigns: %{}
           },
         jobs: %{},
         run_times: nil,
@@ -115,8 +135,8 @@ defmodule Benchee.Config do
 
       iex> Benchee.init time: 1, warmup: 0.2
       %Benchee.Suite{
-        config:
-          %{
+        configuration:
+          %Benchee.Configuration{
             parallel: 1,
             time: 1_000_000,
             warmup: 200_000.0,
@@ -127,7 +147,10 @@ defmodule Benchee.Config do
               fast_warning: true,
               configuration: true
             },
-            console: %{ comparison: true, unit_scaling: :best }
+            formatter_options: %{
+              console: %{ comparison: true, unit_scaling: :best }
+            },
+            assigns: %{}
           },
         jobs: %{},
         run_times: nil,
@@ -137,8 +160,8 @@ defmodule Benchee.Config do
 
       iex> Benchee.init %{time: 1, warmup: 0.2}
       %Benchee.Suite{
-        config:
-          %{
+        configuration:
+          %Benchee.Configuration{
             parallel: 1,
             time: 1_000_000,
             warmup: 200_000.0,
@@ -149,7 +172,10 @@ defmodule Benchee.Config do
               fast_warning: true,
               configuration: true
             },
-            console: %{ comparison: true, unit_scaling: :best }
+            formatter_options: %{
+              console: %{ comparison: true, unit_scaling: :best }
+            },
+            assigns: %{}
           },
         jobs: %{},
         run_times: nil,
@@ -164,10 +190,11 @@ defmodule Benchee.Config do
       ...>   formatters: [&IO.puts/2],
       ...>   print: [fast_warning: false],
       ...>   console: [unit_scaling: :smallest],
-      ...>   inputs: %{"Small" => 5, "Big" => 9999})
+      ...>   inputs: %{"Small" => 5, "Big" => 9999},
+      ...>   formatter_options: [some: "option"])
       %Benchee.Suite{
-        config:
-          %{
+        configuration:
+          %Benchee.Configuration{
             parallel: 2,
             time: 1_000_000,
             warmup: 200_000.0,
@@ -178,7 +205,11 @@ defmodule Benchee.Config do
               fast_warning: false,
               configuration: true
             },
-            console: %{ comparison: true, unit_scaling: :smallest }
+            formatter_options: %{
+              console: %{ comparison: true, unit_scaling: :smallest },
+              some: "option"
+            },
+            assigns: %{}
           },
         jobs: %{},
         run_times: nil,
@@ -186,15 +217,27 @@ defmodule Benchee.Config do
         system: nil
       }
   """
-  @spec init(configuration) :: Suite.t
+  @spec init(user_configuration) :: Suite.t
   def init(config \\ %{}) do
-    map_config = DeepConvert.to_map(config)
-    config = @default_config
+    map_config = config
+                 |> DeepConvert.to_map
+                 |> translate_formatter_keys
+
+    config = %Benchee.Configuration{}
              |> DeepMerge.deep_merge(map_config)
              |> convert_time_to_micro_s
+
     :ok    = :timer.start
 
-    %Suite{config: config}
+    %Suite{configuration: config}
+  end
+
+  # backwards compatible translation of formatter keys to go into
+  # formatter_options now
+  @formatter_keys [:console, :csv, :json, :html]
+  defp translate_formatter_keys(config) do
+      {formatter_options, config} = Map.split(config, @formatter_keys)
+    DeepMerge.deep_merge(%{formatter_options: formatter_options}, config)
   end
 
   defp convert_time_to_micro_s(config) do
@@ -204,5 +247,15 @@ defmodule Benchee.Config do
       end
       new_config
     end
+  end
+end
+
+defimpl DeepMerge.Resolver, for: Benchee.Configuration do
+  def resolve(_original, override = %{__struct__: Benchee.Configuration}, _) do
+    override
+  end
+  def resolve(original, override, resolver) when is_map(override) do
+    merged = Map.merge(original, override, resolver)
+    struct! Benchee.Configuration, Map.to_list(merged)
   end
 end
