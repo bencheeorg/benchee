@@ -1,8 +1,14 @@
 # 0.8.0 (unreleased)
 
+## Features (User Facing)
+* Providing an unrecognized configuration option (say `runNtime` instead of `runtime`) will now raise an exception
+
 ## Breaking Changes (User Facing)
 * Dropped support for elixir 1.2, new support is elixir 1.3+
 * `Benchee.Config` was renamed to `Benchee.Configuration` (important when you use the more verbose API or used it in a Plugin)
+
+## Features (Plugins)
+* Major public interfacing functions are now typespecced!
 
 ## Breaking Changes (Plugins)
 * The `config` key is now `configuration` to go along with the Configuration name change
