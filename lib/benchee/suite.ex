@@ -1,12 +1,18 @@
 defmodule Benchee.Suite do
-  defstruct [:config, :system, :run_times, :statistics, jobs: %{}]
+  defstruct [
+    :config,
+    :system,
+    :run_times,
+    :statistics,
+    jobs: %{}
+  ]
 
   @type optional_map :: map | nil
   @type key :: atom | String.t
   @type input_key :: key
   @type benchmark_function :: (() -> any) | ((any) -> any)
   @type t :: %__MODULE__{
-    config: optional_map,
+    config: Benchee.Configuration.t | nil,
     system: optional_map,
     run_times: %{input_key => %{key => [integer]}} | nil,
     statistics: %{input_key => %{key => Benchee.Statistics.t}} | nil,

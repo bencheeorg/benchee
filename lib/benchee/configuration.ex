@@ -18,12 +18,16 @@ defmodule Benchee.Configuration do
       fast_warning:    true
     },
     inputs:            nil,
+    # formatters should end up here but known once are still picked up at
+    # the top level for now
     formatter_options: %{
       console: %{
         comparison:    true,
         unit_scaling:  :best
       }
-    }
+    },
+    # If you/your plugin/whatever needs it your data can go here
+    assigns:           %{}
   ]
 
   @type t :: %__MODULE__{
@@ -33,7 +37,8 @@ defmodule Benchee.Configuration do
     formatters:        [((Suite.t) -> Suite.t)],
     print:             map,
     inputs:            %{Suite.key => any} | nil,
-    formatter_options: map
+    formatter_options: map,
+    assigns:           map
   }
 
   @type user_configuration :: map | [any]
@@ -117,7 +122,10 @@ defmodule Benchee.Configuration do
               fast_warning: true,
               configuration: true
             },
-            console: %{ comparison: true, unit_scaling: :best }
+            formatter_options: %{
+              console: %{ comparison: true, unit_scaling: :best }
+            },
+            assigns: %{}
           },
         jobs: %{},
         run_times: nil,
@@ -139,7 +147,10 @@ defmodule Benchee.Configuration do
               fast_warning: true,
               configuration: true
             },
-            console: %{ comparison: true, unit_scaling: :best }
+            formatter_options: %{
+              console: %{ comparison: true, unit_scaling: :best }
+            },
+            assigns: %{}
           },
         jobs: %{},
         run_times: nil,
@@ -161,7 +172,10 @@ defmodule Benchee.Configuration do
               fast_warning: true,
               configuration: true
             },
-            console: %{ comparison: true, unit_scaling: :best }
+            formatter_options: %{
+              console: %{ comparison: true, unit_scaling: :best }
+            },
+            assigns: %{}
           },
         jobs: %{},
         run_times: nil,
@@ -176,7 +190,8 @@ defmodule Benchee.Configuration do
       ...>   formatters: [&IO.puts/2],
       ...>   print: [fast_warning: false],
       ...>   console: [unit_scaling: :smallest],
-      ...>   inputs: %{"Small" => 5, "Big" => 9999})
+      ...>   inputs: %{"Small" => 5, "Big" => 9999},
+      ...>   formatter_options: [some: "option"])
       %Benchee.Suite{
         config:
           %Benchee.Configuration{
@@ -190,7 +205,11 @@ defmodule Benchee.Configuration do
               fast_warning: false,
               configuration: true
             },
-            console: %{ comparison: true, unit_scaling: :smallest }
+            formatter_options: %{
+              console: %{ comparison: true, unit_scaling: :smallest },
+              some: "option"
+            },
+            assigns: %{}
           },
         jobs: %{},
         run_times: nil,
@@ -200,14 +219,25 @@ defmodule Benchee.Configuration do
   """
   @spec init(user_configuration) :: Suite.t
   def init(config \\ %{}) do
-    map_config = DeepConvert.to_map(config)
+    map_config = config
+                 |> DeepConvert.to_map
+                 |> translate_formatter_keys
 
     config = %Benchee.Configuration{}
              |> DeepMerge.deep_merge(map_config)
              |> convert_time_to_micro_s
+
     :ok    = :timer.start
 
     %Suite{config: config}
+  end
+
+  # backwards compatible translation of formatter keys to go into
+  # formatter_options now
+  @formatter_keys [:console, :csv, :json, :html]
+  defp translate_formatter_keys(config) do
+      {formatter_options, config} = Map.split(config, @formatter_keys)
+    DeepMerge.deep_merge(%{formatter_options: formatter_options}, config)
   end
 
   defp convert_time_to_micro_s(config) do
@@ -221,7 +251,7 @@ defmodule Benchee.Configuration do
 end
 
 defimpl DeepMerge.Resolver, for: Benchee.Configuration do
-  def resolve(original, override = %{__struct__: Benchee.Configuration}, resolver) do
+  def resolve(_original, override = %{__struct__: Benchee.Configuration}, _) do
     override
   end
   def resolve(original, override, resolver) when is_map(override) do

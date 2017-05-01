@@ -13,38 +13,31 @@ defmodule Benchee.SuiteTest do
   describe "deep_merge resolver" do
     test "merges with another Suite rejecting nil values in the override" do
       override = %Suite{
-        config: %{formatters: [&Benchee.Formatters.Console.output/1]},
         system: %{elixir: "1.5.0-dev"}
       }
 
       result = deep_merge(@original, override)
-      expected = %Suite{
-        config: %{formatters: [&Benchee.Formatters.Console.output/1]},
+      assert %Suite{
         system: %{elixir: "1.5.0-dev", erlang: "19.2"},
         run_times: %{"Input" => %{"Job" => [1, 2, 3]}},
         statistics: %{"Input" => %{"Job" => %Statistics{ips: 500.0}}},
         jobs: %{}
-      }
-      assert ^expected = result
+      } = result
     end
 
     test "merges with a map" do
       override = %{
-        config: %{formatters: [&Benchee.Formatters.Console.output/1]},
         system: %{elixir: "1.5.0-dev"}
       }
 
       result = deep_merge(@original, override)
 
-      expected = %Suite{
-        config: %{formatters: [&Benchee.Formatters.Console.output/1]},
+      assert %Suite{
         system: %{elixir: "1.5.0-dev", erlang: "19.2"},
         run_times: %{"Input" => %{"Job" => [1, 2, 3]}},
         statistics: %{"Input" => %{"Job" => %Statistics{ips: 500.0}}},
         jobs: %{}
-      }
-
-      assert ^expected = result
+      } = result
     end
 
     test "raises when anything else is tried" do

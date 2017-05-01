@@ -8,7 +8,7 @@ defmodule Benchee.Formatters.ConsoleTest do
   alias Benchee.{Suite, Statistics}
 
   @console_config %{comparison: true, unit_scaling: :best}
-  @config %{console: @console_config}
+  @config %Benchee.Configuration{formatter_options: %{console: @console_config}}
   test ".output formats and prints the results right to the console" do
     jobs = %{
       no_input() => %{
