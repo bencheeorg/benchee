@@ -26,8 +26,8 @@ defmodule Benchee.Conversion.Duration do
     minute:      %Unit{
                     name:      :minute,
                     magnitude: @microseconds_per_minute,
-                    label:     "m",
-                    long: "Minutes"
+                    label:     "min",
+                    long:      "Minutes"
                  },
     second:      %Unit{
                     name:      :second,
@@ -45,7 +45,7 @@ defmodule Benchee.Conversion.Duration do
                     name:      :microsecond,
                     magnitude: 1,
                     label:     "μs",
-                    long:     "Microseconds"
+                    long:      "Microseconds"
                  }
   }
 
@@ -203,7 +203,10 @@ defmodule Benchee.Conversion.Duration do
       iex> Benchee.Conversion.Duration.format({45.6789, :millisecond})
       "45.68 ms"
 
-      iex> Benchee.Conversion.Duration.format({45.6789, %Benchee.Conversion.Unit{long: "Milliseconds", magnitude: 1000, label: "ms"}})
+      iex> Benchee.Conversion.Duration.format {45.6789,
+      ...>   %Benchee.Conversion.Unit{
+      ...>     long: "Milliseconds", magnitude: 1000, label: "ms"}
+      ...>   }
       "45.68 ms"
 
   """

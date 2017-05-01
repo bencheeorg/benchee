@@ -29,15 +29,19 @@ defmodule Benchee.Conversion.DurationTest do
     end
 
     test ".format(98_765_432.19)" do
-      assert format(98_765_432.19) == "1.65 m"
+      assert format(98_765_432.19) == "1.65 min"
     end
 
     test ".format(987_654_321.9876)" do
-      assert format(987_654_321.9876) == "16.46 m"
+      assert format(987_654_321.9876) == "16.46 min"
     end
 
     test ".format(9_876_543_219.8765)" do
       assert format(9_876_543_219.8765) == "2.74 h"
+    end
+
+    test ".format(0)" do
+      assert format(0) == "0.0 μs"
     end
   end
 

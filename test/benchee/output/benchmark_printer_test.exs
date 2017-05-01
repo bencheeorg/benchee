@@ -26,10 +26,31 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       assert output =~ "Erlang 19.2"
       assert output =~ "Elixir 1.4"
       assert output =~ ~r/following configuration/i
-      assert output =~ "warmup: 0.0s"
-      assert output =~ "time: 0.01s"
+      assert output =~ "warmup: 0.0 μs"
+      assert output =~ "time: 10.00 ms"
       assert output =~ "parallel: 2"
-      assert output =~ "Estimated total run time: 0.02s"
+      assert output =~ "Estimated total run time: 20.00 ms"
+    end
+
+    test "it scales times appropriately" do
+      output = capture_io fn ->
+        %{
+          configuration: %Benchee.Configuration{
+            parallel: 1,
+            time: 60_000_000,
+            warmup: 10_000_000,
+            inputs: nil
+          },
+          jobs: %{"one" => nil, "two" => nil},
+          system: %{elixir: "1.4", erlang: "19.2"}
+        }
+        |> configuration_information
+      end
+
+      assert output =~ "warmup: 10.00 s"
+      assert output =~ "time: 1.00 min"
+      assert output =~ "parallel: 1"
+      assert output =~ "Estimated total run time: 2.33 min"
     end
 
     @inputs %{"Arg 1" => "Argument 1", "Arg 2" => "Argument 2"}
@@ -43,10 +64,10 @@ defmodule Benchee.Output.BenchmarkPrintertest do
         |> configuration_information
       end
 
-      assert output =~ "time: 0.01s"
+      assert output =~ "time: 10.00 ms"
       assert output =~ "parallel: 2"
       assert output =~ "inputs: Arg 1, Arg 2"
-      assert output =~ "Estimated total run time: 0.04s"
+      assert output =~ "Estimated total run time: 40.00 ms"
     end
 
     test "does not print if disabled" do
