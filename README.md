@@ -232,6 +232,37 @@ As you can see, the tail-recursive approach is significantly faster for the _Big
 
 Therefore, I **highly recommend** using this feature and checking different realistically structured and sized inputs for the functions you benchmark!
 
+### Interpreted vs. Compiled Code
+
+As benchmarks are written in `.exs` files on the top level, the code is interpreted and not compiled. This is suboptimal as benchmarks should be **as close to the production system as possible** - otherwise benchmarks will lie to you. E.g. benchmarks _should not_ be executed within in `iex` session.
+
+In the examples above, all benchmarking functions directly call into code that is defined in another module and hence compiled so that isn't a problem and also recommended as you can also test the functions you benchmark to see that they actually do what you want them to.
+
+When writing _more complex_ benchmarking jobs (longer, more invocations, lots of pattern matches...) that doesn't hold true and it is **recommended to wrap the benchmark job definition in a module so that they are compiled:**
+
+```elixir
+defmodule MyBenchmark do
+  def benches do
+    %{"x" => fn -> ... end,
+      "y" => fn -> ... end}
+  end
+end
+
+Benchee.run(MyBenchmark.benches())
+```
+
+or even:
+
+```elixir
+defmodule MyBenchmark do
+  def benchmark do
+    Benchee.run(...)
+  end
+end
+
+MyBenchmark.benchmark()
+```
+
 ### Formatters
 
 Among all the configuration options, one that you probably want to use are the formatters. Formatters are functions that take one argument (the benchmarking suite with all its results) and then generate some output. You can specify multiple formatters to run for the benchmarking run.
