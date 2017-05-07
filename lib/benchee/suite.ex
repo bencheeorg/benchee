@@ -1,4 +1,15 @@
 defmodule Benchee.Suite do
+  @moduledoc """
+  Main benchee data structure that aggregates the results from every step.
+
+  Different layers of the benchmarking rely on different data being present
+  here. For instance for `Benchee.Statistics.statistics/1` to work the
+  `run_times` key needs to be filled with the results from
+  `Benchee.Benchmark.measure/1`.
+
+  Formatters can then use the data to display all of the results and the
+  configuration.
+  """
   defstruct [
     :configuration,
     :system,
@@ -9,13 +20,12 @@ defmodule Benchee.Suite do
 
   @type optional_map :: map | nil
   @type key :: atom | String.t
-  @type input_key :: key
   @type benchmark_function :: (() -> any) | ((any) -> any)
   @type t :: %__MODULE__{
     configuration: Benchee.Configuration.t | nil,
     system: optional_map,
-    run_times: %{input_key => %{key => [integer]}} | nil,
-    statistics: %{input_key => %{key => Benchee.Statistics.t}} | nil,
+    run_times: %{key => %{key => [integer]}} | nil,
+    statistics: %{key => %{key => Benchee.Statistics.t}} | nil,
     jobs: %{key => benchmark_function}
   }
 end

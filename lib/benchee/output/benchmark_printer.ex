@@ -1,7 +1,5 @@
 defmodule Benchee.Output.BenchmarkPrinter do
-  @moduledoc """
-  Printing happening during the Benchmark stage.
-  """
+  @moduledoc false
 
   alias Benchee.Conversion.Duration
 
