@@ -48,7 +48,7 @@ The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/Pr
 ## Features
 
 * first runs the functions for a given warmup time without recording the results, to simulate a _"warm"_ running system
-* plugin/extensible friendly architecture so you can use different formatters to generate CSV and more
+* plugin/extensible friendly architecture so you can use different formatters to generate CSV, HTML and more
 * well tested
 * well documented
 * execute benchmark jobs in parallel to gather more results in the same time, or simulate a system under load
@@ -64,7 +64,7 @@ Provides you with the following **statistical data**:
 
 Benchee does not:
 
-* Keep results of previous runs and compare them, if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark)
+* Keep results of previous runs and compare them (yet), if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark) until benchee gets that feature :)
 
 Benchee only has a small runtime dependency on `deep_merge` for merging configuration and is aimed at being the core benchmarking logic. Further functionality is provided through plugins that then pull in dependencies, such as HTML generation and CSV export. Check out the [available plugins](#plugins)!
 
@@ -74,7 +74,7 @@ Add benchee to your list of dependencies in `mix.exs`:
 
 ```elixir
 defp deps do
-  [{:benchee, "~> 0.6", only: :dev}]
+  [{:benchee, "~> 0.8", only: :dev}]
 end
 ```
 
@@ -133,11 +133,11 @@ Benchee.run(%{"some function" => fn -> magic end}, print: [benchmarking: false])
 
 The available options are the following (also documented in [hexdocs](https://hexdocs.pm/benchee/Benchee.Configuration.html#init/1)).
 
-* `warmup` - the time in seconds for which a benchmark should be run without measuring times before real measurements start. This simulates a _"warm"_ running system. Defaults to 2.
-* `time` - the time in seconds for how long each individual benchmark should be run and measured. Defaults to 5.
-* `inputs` - a map from descriptive input names to some different input, your benchmarking jobs will then be run with each of these inputs. For this to work your benchmarking function gets the current input passed in as an argument into the function. Defaults to `nil`, aka no input specified and functions are called without an argument. See [Inputs](#inputs)
-* `parallel` - each the function of each job will be executed in `parallel` number processes. If `parallel` is `4` then 4 processes will be spawned that all execute the _same_ function for the given time. When these finish/the time is up 4 new processes will be spawned for the next job/function. This gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking). Defaults to 1 (no parallel execution).
-* `formatters` - list of formatter functions you'd like to run to output the benchmarking results of the suite when using `Benchee.run/2`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter calling `Benchee.Formatters.Console.output/1`. See [Formatters](#formatters)
+* `warmup` - the time in seconds for which a benchmarking job should be run without measuring times before real measurements start. This simulates a _"warm"_ running system. Defaults to 2.
+* `time` - the time in seconds for how long each individual benchmarking job should be run and measured. Defaults to 5.
+* `inputs` - a map from descriptive input names to some different input, your benchmarking jobs will then be run with each of these inputs. For this to work your benchmarking function gets the current input passed in as an argument into the function. Defaults to `nil`, aka no input specified and functions are called without an argument. See [Inputs](#inputs).
+* `parallel` - the function of each benchmarking job will be executed in `parallel` number processes. If `parallel: 4` then 4 processes will be spawned that all execute the _same_ function for the given time. When these finish/the time is up 4 new processes will be spawned for the next job/function. This gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking). Defaults to 1 (no parallel execution).
+* `formatters` - list of formatter functions you'd like to run to output the benchmarking results of the suite when using `Benchee.run/2`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter calling `Benchee.Formatters.Console.output/1`. See [Formatters](#formatters).
 * `print`      - a map from atoms to `true` or `false` to configure if the output identified by the atom will be printed during the standard Benchee benchmarking process. All options are enabled by default (true). Options are:
   * `:benchmarking`  - print when Benchee starts benchmarking a new job (Benchmarking name ..)
   * `:configuration` - a summary of configured benchmarking options including estimated total run time is printed before benchmarking starts
@@ -161,7 +161,7 @@ The available options are the following (also documented in [hexdocs](https://he
 
 ### Inputs
 
-`:inputs` is a very useful configuration that allows you to run the same benchmarking with different inputs. Functions can have different performance characteristics on differently shaped inputs be that structure or input size.
+`:inputs` is a very useful configuration that allows you to run the same benchmarking jobs with different inputs. Functions can have different performance characteristics on differently shaped inputs - be that structure or input size.
 
 One of such cases is comparing tail-recursive and body-recursive implementations of `map`. More information in the [repository with the benchmark](https://github.com/PragTob/elixir_playground/blob/master/bench/tco_blog_post_focussed_inputs.exs) and the [blog post](https://pragtob.wordpress.com/2016/06/16/tail-call-optimization-in-elixir-erlang-not-as-efficient-and-important-as-you-probably-think/).
 
@@ -250,7 +250,7 @@ Benchee.run(%{
     &Benchee.Formatters.HTML.output/1,
     &Benchee.Formatters.Console.output/1
   ],
-  html: [file: "samples_output/my.html"],
+  formatter_options: [html: [file: "samples_output/my.html"]],
 )
 
 ```
@@ -287,14 +287,15 @@ Benchee.init(time: 3)
 
 This is a take on the _functional transformation_ of data applied to benchmarks here:
 
-1. Configurationure the benchmarking suite to be run
-2. Define the functions to be benchmarked
-3. Run n benchmarks with the given configuration gathering raw run times per function
-4. Generate statistics based on the raw run times
-5. Format the statistics in a suitable way
-6. Output the formatted statistics
+1. Configure the benchmarking suite to be run
+2. Gather System data
+3. Define the functions to be benchmarked
+4. Run n benchmarks with the given configuration gathering raw run times per function
+5. Generate statistics based on the raw run times
+6. Format the statistics in a suitable way
+7. Output the formatted statistics
 
-This is also part of the **official API** and allows for more **fine grained control**. (It's also what Benchee does internally when you use `Benchee.run/2`).
+This is also part of the **official API** and allows for more **fine grained control**. (It's also what benchee does internally when you use `Benchee.run/2`).
 
 Do you just want to have all the raw run times? Just work with the result of `Benchee.measure/1`! Just want to have the calculated statistics and use your own formatting? Grab the result of `Benchee.statistics/1`! Or, maybe you want to write to a file or send an HTTP post to some online service? Just use the `Benchee.Formatters.Console.format/1` and then send the result where you want.
 
@@ -302,7 +303,7 @@ This way Benchee should be flexible enough to suit your needs and be extended at
 
 ## Plugins
 
-Packages that work with Benchee to provide additional functionality.
+Packages that work with benchee to provide additional functionality.
 
 * [benchee_html](//github.com/PragTob/benchee_html) - generate HTML including a data table and many different graphs with the possibility to export individual graphs as PNG :)
 * [benchee_csv](//github.com/PragTob/benchee_csv) - generate CSV from your Benchee benchmark results so you can import them into your favorite spreadsheet tool and make fancy graphs
@@ -324,7 +325,7 @@ If you're into watching videos of conference talks and also want to learn more a
 
 ## Contributing
 
-Contributions to Benchee are very welcome! Bug reports, documentation, spelling corrections, whole features, feature ideas, bugfixes, new plugins, fancy graphics... all of those (and probably more) are much appreciated contributions!
+Contributions to benchee are very welcome! Bug reports, documentation, spelling corrections, whole features, feature ideas, bugfixes, new plugins, fancy graphics... all of those (and probably more) are much appreciated contributions!
 
 Please respect the [Code of Conduct](//github.com/PragTob/benchee/blob/master/CODE_OF_CONDUCT.md).
 
@@ -341,4 +342,5 @@ A couple of (hopefully) helpful points:
 
 * `mix deps.get` to install dependencies
 * `mix test` to run tests or `mix test.watch` to run them continuously while you change files
+* `mix dialyzer` to run dialyzer for type checking, might take a while on the first invocation (try building plts first with `mix dialyzer --plt`)
 * `mix credo` or `mix credo --strict` to find code style problems (not too strict with the 80 width limit for sample output in the docs)

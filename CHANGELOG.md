@@ -22,7 +22,7 @@ Another smaller release that focuses on adding type specs and structs in appropr
 
 ## Breaking Changes (Plugins)
 * The `config` key is now `configuration` to go along with the Configuration name change
-* As `Benchee.Configuration` is a proper struct now, arbitrary keys don't end up in it anymore. Custom data for plugins should be passed in through `formatter_options` or `assigns`. Existing plugin keys (`csv`, `json`, `html`) are automatically put into the `formatter_options` key space for now.
+* As `Benchee.Configuration` is a proper struct now, arbitrary keys don't end up in it anymore. Custom data for plugins should be passed in through `formatter_options` or `assigns`. Existing plugin keys (`csv`, `json`, `html` and `console`) are automatically put into the `formatter_options` key space for now.
 
 # 0.7.0 (April 23, 2017)
 
