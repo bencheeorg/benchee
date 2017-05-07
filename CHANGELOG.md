@@ -1,4 +1,4 @@
-# 0.8.0 (unreleased)
+# 0.8.0 (2017-05-07)
 
 Another smaller release that focuses on adding type specs and structs in appropriate places along with fixing a couple of small bugs.
 
