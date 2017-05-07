@@ -1,12 +1,16 @@
 # 0.8.0 (unreleased)
 
+Another smaller release that focuses on adding type specs and structs in appropriate places along with fixing a couple of small bugs.
+
 ## Features (User Facing)
 * Providing an unrecognized configuration option (say `runNtime` instead of `runtime`) will now raise an exception
 * Durations in the configuration will now be scaled appropriately (minutes, microseconds etc)
+* Major functions are type specced for your viewing pleasure in the docs and your dialyzer pleasure at type check time.
 
 ## Bugfixes (User Facing)
-* In 0.7.0 statistics generation might time out, this is fixed by waiting infinitely - thanks @devonestes for the [report](https://github.com/PragTob/benchee/issues/71).
+* In 0.7.0 statistics generation might time out if Millions of run times were captured so that it takes longer than 5 seconds, this is fixed by waiting infinitely - thanks @devonestes for the [report](https://github.com/PragTob/benchee/issues/71).
 * Unintended line break in the fast function warning removed
+* All necessary dependencies added to `:applications` (deep_merge was missing)
 
 ## Breaking Changes (User Facing)
 * Dropped support for elixir 1.2, new support is elixir 1.3+
@@ -14,9 +18,11 @@
 
 ## Features (Plugins)
 * Major public interfacing functions are now typespecced!
+* A couple of major data structures are now proper structs e.g. `Benchee.Suite`, `Benchee.Configuration`, `Benchee.Statistics`
 
 ## Breaking Changes (Plugins)
 * The `config` key is now `configuration` to go along with the Configuration name change
+* As `Benchee.Configuration` is a proper struct now, arbitrary keys don't end up in it anymore. Custom data for plugins should be passed in through `formatter_options` or `assigns`. Existing plugin keys (`csv`, `json`, `html`) are automatically put into the `formatter_options` key space for now.
 
 # 0.7.0 (April 23, 2017)
 
