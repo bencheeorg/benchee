@@ -26,7 +26,16 @@ defmodule Benchee.Output.BenchmarkPrinter do
     suite_information(jobs, config)
   end
 
-  defp system_information(%{erlang: erlang_version, elixir: elixir_version}) do
+  defp system_information(%{erlang: erlang_version,
+                            elixir: elixir_version,
+                            os: os,
+                            num_cores: num_cores,
+                            cpu_speed: cpu_speed,
+                            available_memory: available_memory}) do
+    IO.puts "Operating System: #{os}"
+    IO.puts "CPU Information: #{cpu_speed}"
+    IO.puts "Number of Available Cores: #{num_cores}"
+    IO.puts "Available memory: #{available_memory}"
     IO.puts "Elixir #{elixir_version}"
     IO.puts "Erlang #{erlang_version}"
   end
