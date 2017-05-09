@@ -61,9 +61,12 @@ defmodule Benchee.System do
   """
   def cpu_speed, do: cpu_speed(os())
 
-  defp cpu_speed(:macOS), do: system_cmd("sysctl", ["-n", "machdep.cpu.brand_string"])
   defp cpu_speed(:Windows), do: "N/A"
-  defp cpu_speed(:Linux), do: "N/A"
+  defp cpu_speed(:macOS), do: system_cmd("sysctl", ["-n", "machdep.cpu.brand_string"])
+  defp cpu_speed(:Linux) do
+    "model name\t:" <> cpu_info = to_string(:os.cmd('cat /proc/cpuinfo | grep "model name"'))
+    String.trim(cpu_info)
+  end
 
   @doc """
   Returns an integer with the total number of available memory on the machine
@@ -71,9 +74,16 @@ defmodule Benchee.System do
   """
   def available_memory, do: available_memory(os())
 
-  defp available_memory(:macOS), do: system_cmd("sysctl", ["-n", "hw.memsize"])
   defp available_memory(:Windows), do: "N/A"
-  defp available_memory(:Linux), do: "N/A"
+  defp available_memory(:macOS) do
+    {memory, _} = Integer.parse(system_cmd("sysctl", ["-n", "hw.memsize"]))
+    "#{memory / 1_000_000_000} GB"
+  end
+  defp available_memory(:Linux) do
+    "MemTotal:" <> memory = to_string(:os.cmd('cat /proc/meminfo | grep "MemTotal"'))
+    {memory, _} = memory |> String.trim() |> String.trim_trailing(" kB") |> Integer.parse
+    "#{memory / 1_000_000} GB"
+  end
 
   defp system_cmd(cmd, args) do
     {output, exit_code} = System.cmd(cmd, args)
