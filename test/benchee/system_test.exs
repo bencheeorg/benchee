@@ -28,19 +28,13 @@ defmodule Benchee.SystemTest do
     assert Enum.member?([:Linux, :macOS, :Windows], Benchee.System.os())
   end
 
-  @tag :skip
   test ".cpu_speed returns the speed of the current cpu" do
-    # How might we accurately test this?
-    # The current output for macOS is like this:
-    #
-    #   Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
+    speed = Benchee.System.cpu_speed()
+    assert speed =~ ~r/\d+.*hz/i || speed == "N/A"
   end
 
-  @tag :skip
   test ".available_memory returns the available memory on the computer" do
-    # How might we accurately test this?
-    # The current output for macOS is like this:
-    #
-    #   8589934592
+    memory = Benchee.System.available_memory()
+    assert memory > 100_000_000 || memory == "N/A"
   end
 end
