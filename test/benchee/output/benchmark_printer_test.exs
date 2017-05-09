@@ -2,6 +2,12 @@ defmodule Benchee.Output.BenchmarkPrintertest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureIO
   import Benchee.Output.BenchmarkPrinter
+  @system_info %{elixir: "1.4",
+                 erlang: "19.2",
+                 os: :macOS,
+                 num_cores: 4,
+                 cpu_speed: "Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz",
+                 available_memory: 8568392814}
 
   test ".duplicate_benchmark_warning" do
     output = capture_io fn ->
@@ -18,13 +24,17 @@ defmodule Benchee.Output.BenchmarkPrintertest do
         %{
           configuration: %{parallel: 2, time: 10_000, warmup: 0, inputs: nil},
           jobs: %{"one" => nil, "two" => nil},
-          system: %{elixir: "1.4", erlang: "19.2"}
+          system: @system_info
         }
         |> configuration_information
       end
 
       assert output =~ "Erlang 19.2"
       assert output =~ "Elixir 1.4"
+      assert output =~ "Intel"
+      assert output =~ "Cores: 4"
+      assert output =~ "macOS"
+      assert output =~ "8568392814"
       assert output =~ ~r/following configuration/i
       assert output =~ "warmup: 0.0 μs"
       assert output =~ "time: 10.00 ms"
@@ -42,7 +52,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
             inputs: nil
           },
           jobs: %{"one" => nil, "two" => nil},
-          system: %{elixir: "1.4", erlang: "19.2"}
+          system: @system_info
         }
         |> configuration_information
       end
@@ -59,7 +69,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
         %{
           configuration: %{parallel: 2, time: 10_000, warmup: 0, inputs: @inputs},
           jobs: %{"one" => nil, "two" => nil},
-          system: %{elixir: "1.4", erlang: "19.2"}
+          system: @system_info
         }
         |> configuration_information
       end
