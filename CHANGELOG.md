@@ -1,3 +1,8 @@
+# 0.9.0 (unreleased)
+
+## Features (User Facing)
+* Gather more system data like number of cores, OS, memory, cpu speed - thanks @devonestes
+
 # 0.8.0 (2017-05-07)
 
 Another smaller release that focuses on adding type specs and structs in appropriate places along with fixing a couple of small bugs.
