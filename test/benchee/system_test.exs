@@ -29,12 +29,12 @@ defmodule Benchee.SystemTest do
   end
 
   test ".cpu_speed returns the speed of the current cpu" do
-    speed = Benchee.System.cpu_speed()
-    assert speed =~ ~r/\d+.*hz/i || speed == "N/A"
+    assert Benchee.System.cpu_speed() =~ ~r/\d+.*hz/i
   end
 
   test ".available_memory returns the available memory on the computer" do
-    memory = Benchee.System.available_memory()
-    assert memory > 100_000_000 || memory == "N/A"
+    {num, rest} = Float.parse(Benchee.System.available_memory())
+    assert num > 0
+    assert rest =~ ~r/GB/
   end
 end
