@@ -64,7 +64,7 @@ defmodule Benchee.System do
   defp cpu_speed(:Windows), do: "N/A"
   defp cpu_speed(:macOS), do: system_cmd("sysctl", ["-n", "machdep.cpu.brand_string"])
   defp cpu_speed(:Linux) do
-    "model name\t:" <> cpu_info = to_string(:os.cmd('cat /proc/cpuinfo | grep "model name"'))
+    ["model name\t:" <> cpu_info] = linux_cmd("/proc/cpuinfo", ~r/model name.*:[\w \(\)\-\@\.]*ghz/i)
     String.trim(cpu_info)
   end
 
@@ -77,12 +77,21 @@ defmodule Benchee.System do
   defp available_memory(:Windows), do: "N/A"
   defp available_memory(:macOS) do
     {memory, _} = Integer.parse(system_cmd("sysctl", ["-n", "hw.memsize"]))
-    "#{memory / 1_000_000_000} GB"
+    format_memory(memory, 1_000_000_000)
   end
   defp available_memory(:Linux) do
-    "MemTotal:" <> memory = to_string(:os.cmd('cat /proc/meminfo | grep "MemTotal"'))
-    {memory, _} = memory |> String.trim() |> String.trim_trailing(" kB") |> Integer.parse
-    "#{memory / 1_000_000} GB"
+    ["MemTotal:" <> memory] = linux_cmd("/proc/meminfo", ~r/MemTotal.*kB/)
+    {memory, _} = memory
+                  |> String.trim()
+                  |> String.trim_trailing(" kB")
+                  |> Integer.parse
+    format_memory(memory, 1_000_000)
+  end
+
+  defp format_memory(memory, coefficient), do: "#{memory / coefficient} GB"
+
+  defp linux_cmd(file, regex) do
+    Regex.run(regex, system_cmd("cat", [file]))
   end
 
   defp system_cmd(cmd, args) do
