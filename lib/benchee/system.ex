@@ -61,10 +61,24 @@ defmodule Benchee.System do
   """
   def cpu_speed, do: cpu_speed(os())
 
-  defp cpu_speed(:Windows), do: "N/A"
-  defp cpu_speed(:macOS), do: system_cmd("sysctl", ["-n", "machdep.cpu.brand_string"])
+  defp cpu_speed(:Windows) do
+    parse_cpu_for(:Windows, system_cmd("WMIC", ["CPU", "GET", "NAME"]))
+  end
+  defp cpu_speed(:macOS) do
+    parse_cpu_for(:macOS, system_cmd("sysctl", ["-n", "machdep.cpu.brand_string"]))
+  end
   defp cpu_speed(:Linux) do
-    ["model name\t:" <> cpu_info] = linux_cmd("/proc/cpuinfo", ~r/model name.*:[\w \(\)\-\@\.]*ghz/i)
+    parse_cpu_for(:Linux, system_cmd("cat", ["/proc/cpuinfo"]))
+  end
+
+  def parse_cpu_for(_, "N/A"), do: "N/A"
+  def parse_cpu_for(:Windows, raw_output) do
+    "Name" <> cpu_info = raw_output
+    String.trim(cpu_info)
+  end
+  def parse_cpu_for(:macOS, raw_output), do: String.trim(raw_output)
+  def parse_cpu_for(:Linux, raw_output) do
+    ["model name\t:" <> cpu_info] = Regex.run(~r/model name.*:[\w \(\)\-\@\.]*ghz/i, raw_output)
     String.trim(cpu_info)
   end
 
@@ -74,13 +88,31 @@ defmodule Benchee.System do
   """
   def available_memory, do: available_memory(os())
 
-  defp available_memory(:Windows), do: "N/A"
+  defp available_memory(:Windows) do
+    parse_memory_for(
+      :Windows,
+      system_cmd("WMIC", ["COMPUTERSYSTEM", "GET", "TOTALPHYSICALMEMORY"])
+    )
+  end
   defp available_memory(:macOS) do
-    {memory, _} = Integer.parse(system_cmd("sysctl", ["-n", "hw.memsize"]))
-    format_memory(memory, 1_000_000_000)
+    parse_memory_for(:macOS, system_cmd("sysctl", ["-n", "hw.memsize"]))
   end
   defp available_memory(:Linux) do
-    ["MemTotal:" <> memory] = linux_cmd("/proc/meminfo", ~r/MemTotal.*kB/)
+    parse_memory_for(:Linux, system_cmd("cat", ["/proc/meminfo"]))
+  end
+
+  defp parse_memory_for(_, "N/A"), do: "N/A"
+  defp parse_memory_for(:Windows, raw_output) do
+    [memory] = Regex.run(~r/\d+/, raw_output)
+    {memory, _} = Integer.parse(memory)
+    format_memory(memory, 1_000_000_000)
+  end
+  defp parse_memory_for(:macOS, raw_output) do
+    {memory, _} = Integer.parse(raw_output)
+    format_memory(memory, 1_000_000_000)
+  end
+  defp parse_memory_for(:Linux, raw_output) do
+    ["MemTotal:" <> memory] = Regex.run(~r/MemTotal.*kB/, raw_output)
     {memory, _} = memory
                   |> String.trim()
                   |> String.trim_trailing(" kB")
@@ -89,10 +121,6 @@ defmodule Benchee.System do
   end
 
   defp format_memory(memory, coefficient), do: "#{memory / coefficient} GB"
-
-  defp linux_cmd(file, regex) do
-    Regex.run(regex, system_cmd("cat", [file]))
-  end
 
   defp system_cmd(cmd, args) do
     {output, exit_code} = System.cmd(cmd, args)
