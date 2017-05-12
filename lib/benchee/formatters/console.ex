@@ -108,10 +108,16 @@ defmodule Benchee.Formatters.Console do
 
   defp label_width(jobs) do
     max_label_width = jobs
-      |> Enum.map(fn({job_name, _}) -> String.length(job_name) end)
+      |> Enum.map(&name_length/1)
       |> Stream.concat([@default_label_width])
       |> Enum.max
     max_label_width + 1
+  end
+
+  defp name_length({job_name, _}) do
+    job_name
+      |> to_string
+      |> String.length
   end
 
   defp job_reports(jobs, units, label_width) do
