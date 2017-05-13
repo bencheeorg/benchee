@@ -101,15 +101,18 @@ defmodule Benchee.System do
     parse_memory_for(:Linux, system_cmd("cat", ["/proc/meminfo"]))
   end
 
+  @kilobyte_to_gigabyte 1_000_000
+  @byte_to_gigabyte 1_000 * @kilobyte_to_gigabyte
+
   defp parse_memory_for(_, "N/A"), do: "N/A"
   defp parse_memory_for(:Windows, raw_output) do
     [memory] = Regex.run(~r/\d+/, raw_output)
     {memory, _} = Integer.parse(memory)
-    format_memory(memory, 1_000_000_000)
+    format_memory(memory, @byte_to_gigabyte)
   end
   defp parse_memory_for(:macOS, raw_output) do
     {memory, _} = Integer.parse(raw_output)
-    format_memory(memory, 1_000_000_000)
+    format_memory(memory, @byte_to_gigabyte)
   end
   defp parse_memory_for(:Linux, raw_output) do
     ["MemTotal:" <> memory] = Regex.run(~r/MemTotal.*kB/, raw_output)
@@ -117,7 +120,7 @@ defmodule Benchee.System do
                   |> String.trim()
                   |> String.trim_trailing(" kB")
                   |> Integer.parse
-    format_memory(memory, 1_000_000)
+    format_memory(memory, @kilobyte_to_gigabyte)
   end
 
   defp format_memory(memory, coefficient), do: "#{memory / coefficient} GB"
