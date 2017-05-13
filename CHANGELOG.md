@@ -1,7 +1,7 @@
 # 0.9.0 (unreleased)
 
 ## Features (User Facing)
-* Gather more system data like number of cores, OS, memory, cpu speed - thanks @devonestes
+* Gather more system data like number of cores, Operating System, memory, cpu speed - thanks @devonestes and @OvermindDL1
 
 # 0.8.0 (2017-05-07)
 
