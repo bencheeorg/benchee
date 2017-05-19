@@ -43,9 +43,23 @@ defmodule Benchee.Benchmark do
   @spec measure(Suite.t, module) :: Suite.t
   def measure(suite = %Suite{jobs: jobs, configuration: config}, printer \\ Printer) do
     printer.configuration_information(suite)
-    run_times = record_runtimes(jobs, config, printer)
+    results = record_results(jobs, config, printer)
+    run_times = parse_results(results, fn({key, {run_times, _}}) ->
+      {key, run_times}
+    end)
+    memory_usages = parse_results(results, fn({key, {_, memory_usages}}) ->
+      {key, memory_usages}
+    end)
 
-    %Suite{suite | run_times: run_times}
+    %Suite{suite | run_times: run_times, memory_usages: memory_usages}
+  end
+
+  defp parse_results(results, func) do
+    results
+      |> Enum.map(fn({input, map}) ->
+        {input, map |> Enum.map(func) |> Map.new}
+      end)
+      |> Map.new
   end
 
   @no_input :__no_input
@@ -56,11 +70,11 @@ defmodule Benchee.Benchmark do
   """
   def no_input, do: @no_input
 
-  defp record_runtimes(jobs, config = %{inputs: nil}, printer) do
+  defp record_results(jobs, config = %{inputs: nil}, printer) do
     [runtimes_for_input(@no_input_marker, jobs, config, printer)]
     |> Map.new
   end
-  defp record_runtimes(jobs, config = %{inputs: inputs}, printer) do
+  defp record_results(jobs, config = %{inputs: inputs}, printer) do
     inputs
     |> Enum.map(fn(input) ->
          runtimes_for_input(input, jobs, config, printer)
@@ -81,8 +95,10 @@ defmodule Benchee.Benchmark do
 
   defp measure_job({name, function}, input, config, printer) do
     printer.benchmarking name, config
-    job_run_times = parallel_benchmark function, input, config, printer
-    {name, job_run_times}
+    results = parallel_benchmark function, input, config, printer
+    job_run_times = results |> Enum.map(fn({run_times, _memory_usages}) -> run_times end) |> List.flatten
+    memory_usages = results |> Enum.map(fn({_run_times, memory_usages}) -> memory_usages end) |> List.flatten
+    {name, {job_run_times, memory_usages}}
   end
 
   defp parallel_benchmark(function,
@@ -115,10 +131,10 @@ defmodule Benchee.Benchmark do
   end
   defp measure_runtimes(function, input, time, display_fast_warning, printer) do
     finish_time = current_time() + time
-    :erlang.garbage_collect
+    :erlang.garbage_collect()
     {n, initial_run_time} =
       determine_n_times(function, input, display_fast_warning, printer)
-    do_benchmark(finish_time, function, input, [initial_run_time], n, current_time())
+    do_benchmark(finish_time, function, input, [initial_run_time], [], n, current_time())
   end
 
   defp current_time do
@@ -149,16 +165,20 @@ defmodule Benchee.Benchmark do
     end
   end
 
-  defp do_benchmark(finish_time, function, input, run_times, n, now)
-  defp do_benchmark(finish_time, _, _, run_times, _n, now)
+  defp do_benchmark(finish_time, function, input, run_times, memory_usages, n, now)
+  defp do_benchmark(finish_time, _, _, run_times, memory_usages, _n, now)
        when now > finish_time do
-    Enum.reverse run_times # restore correct order important for graphing
+    {Enum.reverse(run_times), memory_usages}
   end
-  defp do_benchmark(finish_time, function, input, run_times, n, _now) do
+  defp do_benchmark(finish_time, function, input, run_times, memory_usages, n, _now) do
+    :erlang.garbage_collect()
+    before_run = :erlang.memory(:total)
     run_time = measure_call(function, input, n)
+    after_run = :erlang.memory(:total)
     updated_run_times = [run_time | run_times]
+    updated_memory_usages = [after_run - before_run | memory_usages]
     do_benchmark(finish_time, function, input,
-                 updated_run_times, n, current_time())
+                 updated_run_times, updated_memory_usages, n, current_time())
   end
 
   defp measure_call(function, input, n \\ 1)

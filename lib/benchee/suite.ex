@@ -14,6 +14,7 @@ defmodule Benchee.Suite do
     :configuration,
     :system,
     :run_times,
+    :memory_usages,
     :statistics,
     jobs: %{}
   ]
@@ -25,6 +26,7 @@ defmodule Benchee.Suite do
     configuration: Benchee.Configuration.t | nil,
     system: optional_map,
     run_times: %{key => %{key => [integer]}} | nil,
+    memory_usages: %{key => %{key => [integer]}} | nil,
     statistics: %{key => %{key => Benchee.Statistics.t}} | nil,
     jobs: %{key => benchmark_function}
   }
