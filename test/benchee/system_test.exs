@@ -2,6 +2,7 @@ defmodule Benchee.SystemTest do
   use ExUnit.Case, async: true
 
   alias Benchee.Suite
+  import ExUnit.CaptureIO
 
   test ".system adds the content to a given suite" do
     system_info = Benchee.System.system(%Suite{})
@@ -36,5 +37,16 @@ defmodule Benchee.SystemTest do
     {num, rest} = Float.parse(Benchee.System.available_memory())
     assert num > 0
     assert rest =~ ~r/GB/
+  end
+
+  test ".system_cmd handles errors gracefully" do
+    system_func = fn(_, _) -> {"ERROR", 1} end
+    captured_io = capture_io(fn ->
+      Benchee.System.system_cmd("cat", "dev/null", system_func)
+    end)
+
+    assert captured_io =~ "Something went wrong"
+    assert captured_io =~ "ERROR"
+    assert Benchee.System.system_cmd("cat", "dev/null", system_func) == "N/A"
   end
 end
