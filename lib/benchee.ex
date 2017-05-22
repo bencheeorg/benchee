@@ -33,6 +33,7 @@ defmodule Benchee do
 
   defp do_run(jobs, config) do
     jobs
+    |> normalize_names
     |> run_benchmarks(config)
     |> output_results
   end
@@ -52,6 +53,12 @@ defmodule Benchee do
     end
 
     suite
+  end
+
+  defp normalize_names(jobs) do
+    for {key, fun} <- jobs, into: %{} do
+      {to_string(key), fun}
+    end
   end
 
   defdelegate init(),                                    to: Benchee.Configuration
