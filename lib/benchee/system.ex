@@ -125,8 +125,8 @@ defmodule Benchee.System do
 
   defp format_memory(memory, coefficient), do: "#{memory / coefficient} GB"
 
-  defp system_cmd(cmd, args) do
-    {output, exit_code} = System.cmd(cmd, args)
+  def system_cmd(cmd, args, system_func \\ &System.cmd/2) do
+    {output, exit_code} = system_func.(cmd, args)
     if exit_code > 0 do
       IO.puts("Something went wrong trying to get system information:")
       IO.puts(output)
