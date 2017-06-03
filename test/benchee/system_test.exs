@@ -47,6 +47,8 @@ defmodule Benchee.SystemTest do
 
     assert captured_io =~ "Something went wrong"
     assert captured_io =~ "ERROR"
-    assert Benchee.System.system_cmd("cat", "dev/null", system_func) == "N/A"
+    capture_io fn ->
+      assert Benchee.System.system_cmd("cat", "dev/null", system_func) == "N/A"
+    end
   end
 end
