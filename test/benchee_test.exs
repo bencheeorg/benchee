@@ -253,6 +253,16 @@ defmodule BencheeTest do
     end
   end
 
+  test ".run accepts atom keys" do
+    capture_io fn ->
+      suite = Benchee.run(%{
+        sleep: fn -> :timer.sleep 1 end
+      }, time: 0.001, warmup: 0)
+
+      assert Map.keys(suite.jobs) == ~w(sleep)
+    end
+  end
+
   @slower_regex "\\s+- \\d+\\.\\d+x slower"
   defp readme_sample_asserts(output) do
     assert output =~ @header_regex
