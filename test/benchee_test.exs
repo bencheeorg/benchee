@@ -253,7 +253,7 @@ defmodule BencheeTest do
     end
   end
 
-  test ".run accepts atom keys" do
+  test ".run accepts atom keys for jobs" do
     capture_io fn ->
       suite = Benchee.run(%{
         sleep: fn -> :timer.sleep 1 end
@@ -261,6 +261,30 @@ defmodule BencheeTest do
 
       assert Map.keys(suite.jobs) == ~w(sleep)
     end
+  end
+
+  test ".run accepts arom keys for inputs" do
+    output = capture_io fn ->
+      map_fun = fn(i) -> [i, i * i] end
+      inputs = [
+        inputs: %{
+          "small list"  => Enum.to_list(1..100),
+          mediumList:      Enum.to_list(1..1_000)
+        }
+      ]
+
+      configuration = Keyword.merge @test_times, inputs
+
+      Benchee.run(%{
+        "flat_map"    => fn(input) -> Enum.flat_map(input, map_fun) end,
+        "map.flatten" =>
+          fn(input) -> input |> Enum.map(map_fun) |> List.flatten end
+      }, configuration)
+    end
+
+    assert String.contains? output, ["small list", "mediumList"]
+    occurences = Regex.scan body_regex("flat_map"), output
+    assert length(occurences) == 2
   end
 
   @slower_regex "\\s+- \\d+\\.\\d+x slower"
