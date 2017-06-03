@@ -18,11 +18,12 @@ defmodule Benchee.Benchmark do
   """
   @spec benchmark(Suite.t, name, fun, module) :: Suite.t
   def benchmark(suite = %Suite{jobs: jobs}, name, function, printer \\ Printer) do
-    if Map.has_key?(jobs, name) do
-      printer.duplicate_benchmark_warning name
+    normalized_name = to_string(name)
+    if Map.has_key?(jobs, normalized_name) do
+      printer.duplicate_benchmark_warning normalized_name
       suite
     else
-      %Suite{suite | jobs: Map.put(jobs, name, function)}
+      %Suite{suite | jobs: Map.put(jobs, normalized_name, function)}
     end
   end
 

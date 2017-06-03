@@ -33,7 +33,6 @@ defmodule Benchee do
 
   defp do_run(jobs, config) do
     jobs
-    |> normalize_names
     |> run_benchmarks(config)
     |> output_results
   end
@@ -42,7 +41,7 @@ defmodule Benchee do
     config
     |> Benchee.init
     |> Benchee.system
-    |> Map.put(:jobs, jobs)
+    |> add_benchmarking_jobs(jobs)
     |> Benchee.measure
     |> Benchee.statistics
   end
@@ -55,9 +54,9 @@ defmodule Benchee do
     suite
   end
 
-  defp normalize_names(jobs) do
-    for {key, fun} <- jobs, into: %{} do
-      {to_string(key), fun}
+  defp add_benchmarking_jobs(suite, jobs) do
+    Enum.reduce jobs, suite, fn({key, function}, suite_acc) ->
+      Benchee.benchmark(suite_acc, key, function)
     end
   end
 
