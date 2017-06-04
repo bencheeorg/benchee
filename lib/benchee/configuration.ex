@@ -219,17 +219,21 @@ defmodule Benchee.Configuration do
   """
   @spec init(user_configuration) :: Suite.t
   def init(config \\ %{}) do
-    map_config = config
-                 |> DeepConvert.to_map
-                 |> translate_formatter_keys
-
-    config = %Benchee.Configuration{}
-             |> DeepMerge.deep_merge(map_config)
-             |> convert_time_to_micro_s
-
     :ok    = :timer.start
 
+    config = config
+             |> standardized_user_configuration
+             |> merge_with_defaults
+             |> convert_time_to_micro_s
+
     %Suite{configuration: config}
+  end
+
+  defp standardized_user_configuration(config) do
+    config
+    |> DeepConvert.to_map
+    |> translate_formatter_keys
+    |> force_string_input_keys
   end
 
   # backwards compatible translation of formatter keys to go into
@@ -238,6 +242,18 @@ defmodule Benchee.Configuration do
   defp translate_formatter_keys(config) do
       {formatter_options, config} = Map.split(config, @formatter_keys)
     DeepMerge.deep_merge(%{formatter_options: formatter_options}, config)
+  end
+
+  defp force_string_input_keys(%{inputs: inputs} = config) do
+    standardized_inputs = for {name, value} <- inputs, into: %{} do
+                            {to_string(name), value}
+                          end
+    %{config | inputs: standardized_inputs}
+  end
+  defp force_string_input_keys(config), do: config
+
+  defp merge_with_defaults(user_config) do
+    DeepMerge.deep_merge(%Benchee.Configuration{}, user_config)
   end
 
   defp convert_time_to_micro_s(config) do

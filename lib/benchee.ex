@@ -41,7 +41,7 @@ defmodule Benchee do
     config
     |> Benchee.init
     |> Benchee.system
-    |> Map.put(:jobs, jobs)
+    |> add_benchmarking_jobs(jobs)
     |> Benchee.measure
     |> Benchee.statistics
   end
@@ -52,6 +52,12 @@ defmodule Benchee do
     end
 
     suite
+  end
+
+  defp add_benchmarking_jobs(suite, jobs) do
+    Enum.reduce jobs, suite, fn({key, function}, suite_acc) ->
+      Benchee.benchmark(suite_acc, key, function)
+    end
   end
 
   defdelegate init(),                                    to: Benchee.Configuration

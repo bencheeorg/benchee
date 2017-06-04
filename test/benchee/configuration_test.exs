@@ -2,7 +2,7 @@ defmodule Benchee.ConfigurationTest do
   use ExUnit.Case, async: true
   doctest Benchee.Configuration
 
-  alias Benchee.Configuration
+  alias Benchee.{Configuration, Suite}
 
   import DeepMerge
   import Benchee.Configuration
@@ -14,6 +14,21 @@ defmodule Benchee.ConfigurationTest do
       assert_raise KeyError, fn ->
         init runntime: 2
       end
+    end
+
+    test "it converts input keys to strings" do
+      suite = init inputs: %{"map" => %{}, list: []}
+
+      assert %Suite{
+        configuration: %{inputs: %{"list" => [], "map" => %{}}}
+      } = suite
+    end
+
+    test "it loses duplicated inputs keys after normalization" do
+      suite = init inputs: %{"map" => %{}, map: %{}}
+
+      assert %Suite{configuration: %{inputs: inputs}} = suite
+      assert %{"map" => %{}} == inputs
     end
   end
 

@@ -18,6 +18,14 @@ defmodule Benchee.BenchmarkTest do
       assert new_suite == %Suite{jobs: %{"two" => two_fun, "one" => one_fun}}
     end
 
+    test "can add jobs with atom keys but converts them to string" do
+      suite = %Suite{}
+              |> benchmark("one job", fn -> 1 end)
+              |> benchmark(:something, fn -> 2 end)
+
+      assert %Suite{jobs: %{"one job" => _, "something" => _}} = suite
+    end
+
     test "warns when adding a job with the same name again" do
       one_fun = fn -> 1 end
       suite = %Suite{jobs: %{"one" => one_fun}}
@@ -26,6 +34,18 @@ defmodule Benchee.BenchmarkTest do
       assert new_suite == %Suite{jobs: %{"one" => one_fun}}
 
       assert_receive {:duplicate, "one"}
+    end
+
+    test "warns when adding the same job again even if it's atom and string" do
+      suite = %Suite{}
+              |> benchmark("something", fn -> 1 end, TestPrinter)
+              |> benchmark(:something, fn -> 2 end, TestPrinter)
+
+      assert %Suite{jobs: jobs}  =  suite
+      assert map_size(jobs)      == 1
+      assert %{"something" => _} = jobs
+      
+      assert_receive {:duplicate, "something"}
     end
   end
 
