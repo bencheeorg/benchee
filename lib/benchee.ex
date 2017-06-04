@@ -1,6 +1,7 @@
 # Idea from this:
 # https://elixirforum.com/t/writing-a-library-for-use-in-both-elixir-and-erlang/2900/5?u=pragtob
 defmodule Benchee.Impl do
+  @moduledoc false
   defmacro __using__(_) do
     quote do
       @doc """
@@ -75,6 +76,15 @@ defmodule Benchee do
   @moduledoc """
   Top level module providing convenience access to needed functions as well
   as the very high level `Benchee.run` API.
+
+  Intended Elixir interface.
+  """
+  use Benchee.Impl
+end
+
+defmodule :benchee do
+  @moduledoc """
+  High-Level interface for more convenient usage from Erlang. Same as `Benchee`.
   """
   use Benchee.Impl
 end
