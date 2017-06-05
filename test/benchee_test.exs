@@ -76,6 +76,21 @@ defmodule BencheeTest do
     readme_sample_asserts output
   end
 
+  test "erlang style :benchee integration" do
+    output = capture_io fn ->
+      list = Enum.to_list(1..10_000)
+      map_fun = fn(i) -> [i, i * i] end
+
+      :benchee.run(%{
+        "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
+        "map.flatten" =>
+          fn -> list |> Enum.map(map_fun) |> List.flatten end
+      }, time: 0.01, warmup: 0.005)
+    end
+
+    readme_sample_asserts output
+  end
+
   test "integration expanded README example" do
     output = capture_io fn ->
       list = Enum.to_list(1..10_000)
