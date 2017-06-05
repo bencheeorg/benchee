@@ -4,6 +4,7 @@
 * Gather more system data like number of cores, Operating System, memory, cpu speed - thanks @devonestes and @OvermindDL1
 * the names for jobs in the map of `Benchee.run/2` or in `Benchee.benchmark/3` may now be given as strings or atoms - atoms will be converted to strings internally though for consistency and avoiding name duplicates
 * the names of inputs in the benchee configuration may now be given as strings or atoms - atoms will be converted to strings internally though for consistency and avoiding name duplicates
+* Benchee is now also available _"Erlang Style"_ to be called on an atom like `:benchee.run(_, _)` for better Erlang compatibility
 
 # 0.8.0 (2017-05-07)
 
