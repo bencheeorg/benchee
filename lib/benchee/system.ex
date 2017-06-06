@@ -86,44 +86,26 @@ defmodule Benchee.System do
   Returns an integer with the total number of available memory on the machine
   running the benchmarks.
   """
-  def available_memory, do: available_memory(os())
+  @byte_to_gigabyte 1024 * 1024 * 1024
+  def available_memory do
+    {:ok, pid} = :memsup.start_link()
 
-  defp available_memory(:Windows) do
-    parse_memory_for(
-      :Windows,
-      system_cmd("WMIC", ["COMPUTERSYSTEM", "GET", "TOTALPHYSICALMEMORY"])
-    )
-  end
-  defp available_memory(:macOS) do
-    parse_memory_for(:macOS, system_cmd("sysctl", ["-n", "hw.memsize"]))
-  end
-  defp available_memory(:Linux) do
-    parse_memory_for(:Linux, system_cmd("cat", ["/proc/meminfo"]))
-  end
+    # see: http://erlang.org/doc/man/memsup.html#get_system_memory_data-0
+    # we use total_memory not the system one as what's really interesting is
+    # what is available to the Erlang VM not the system as a whole.
+    total_memory_giga_byte = :memsup.get_system_memory_data()
+                             |> Keyword.get(:total_memory)
+                             |> Kernel./(@byte_to_gigabyte)
 
-  @kilobyte_to_gigabyte 1_000_000
-  @byte_to_gigabyte 1_000 * @kilobyte_to_gigabyte
-
-  defp parse_memory_for(_, "N/A"), do: "N/A"
-  defp parse_memory_for(:Windows, raw_output) do
-    [memory] = Regex.run(~r/\d+/, raw_output)
-    {memory, _} = Integer.parse(memory)
-    format_memory(memory, @byte_to_gigabyte)
+    Process.unlink(pid)
+    # Feels like I tried a lot of things for the exiting to stop printing messsages
+    # :error_logger.tty(false); capture_io, capture_io with :stderr, starting os_mon
+    # myself
+    # might as well be I did a mistake...
+    Process.unlink(pid)
+    Process.exit(pid, :normal) # kill right here to avoid annoying messages in the end
+    "#{total_memory_giga_byte} GB"
   end
-  defp parse_memory_for(:macOS, raw_output) do
-    {memory, _} = Integer.parse(raw_output)
-    format_memory(memory, @byte_to_gigabyte)
-  end
-  defp parse_memory_for(:Linux, raw_output) do
-    ["MemTotal:" <> memory] = Regex.run(~r/MemTotal.*kB/, raw_output)
-    {memory, _} = memory
-                  |> String.trim()
-                  |> String.trim_trailing(" kB")
-                  |> Integer.parse
-    format_memory(memory, @kilobyte_to_gigabyte)
-  end
-
-  defp format_memory(memory, coefficient), do: "#{memory / coefficient} GB"
 
   def system_cmd(cmd, args, system_func \\ &System.cmd/2) do
     {output, exit_code} = system_func.(cmd, args)
