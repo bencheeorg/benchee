@@ -97,7 +97,6 @@ defmodule Benchee.System do
                              |> Keyword.get(:total_memory)
                              |> Kernel./(@byte_to_gigabyte)
 
-    Process.unlink(pid)
     # Feels like I tried a lot of things for the exiting to stop printing messsages
     # :error_logger.tty(false); capture_io, capture_io with :stderr, starting os_mon
     # myself
