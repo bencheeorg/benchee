@@ -94,6 +94,8 @@ Benchee.run(%{
 })
 ```
 
+(names can also be specified as `:atoms` if you want to)
+
 This produces the following output:
 
 ```
@@ -161,7 +163,7 @@ The available options are the following (also documented in [hexdocs](https://he
 
 ### Inputs
 
-`:inputs` is a very useful configuration that allows you to run the same benchmarking jobs with different inputs. Functions can have different performance characteristics on differently shaped inputs - be that structure or input size.
+`:inputs` is a very useful configuration that allows you to run the same benchmarking jobs with different inputs. You specify the inputs as a map from name (String or atom) to the actual input value. Functions can have different performance characteristics on differently shaped inputs - be that structure or input size.
 
 One of such cases is comparing tail-recursive and body-recursive implementations of `map`. More information in the [repository with the benchmark](https://github.com/PragTob/elixir_playground/blob/master/bench/tco_blog_post_focussed_inputs.exs) and the [blog post](https://pragtob.wordpress.com/2016/06/16/tail-call-optimization-in-elixir-erlang-not-as-efficient-and-important-as-you-probably-think/).
 
@@ -185,50 +187,7 @@ Benchee.run %{
 }, time: 15, warmup: 5, inputs: inputs
 ```
 
-Omitting some of the output this produces the following results:
-
-```
-##### With input Big (10 Million) #####
-Name                                                  ips        average  deviation         median
-map tail-recursive different argument order          5.09      196.48 ms     ±9.70%      191.18 ms
-map tail-recursive                                   3.86      258.84 ms    ±22.05%      246.03 ms
-stdlib map                                           2.87      348.36 ms     ±9.02%      345.21 ms
-map simple body-recursive                            2.85      350.80 ms     ±9.03%      349.33 ms
-
-Comparison:
-map tail-recursive different argument order          5.09
-map tail-recursive                                   3.86 - 1.32x slower
-stdlib map                                           2.87 - 1.77x slower
-map simple body-recursive                            2.85 - 1.79x slower
-
-##### With input Middle (100 Thousand) #####
-Name                                                  ips        average  deviation         median
-stdlib map                                         584.79        1.71 ms    ±16.20%        1.67 ms
-map simple body-recursive                          581.89        1.72 ms    ±15.38%        1.68 ms
-map tail-recursive different argument order        531.09        1.88 ms    ±17.41%        1.95 ms
-map tail-recursive                                 471.64        2.12 ms    ±18.93%        2.13 ms
-
-Comparison:
-stdlib map                                         584.79
-map simple body-recursive                          581.89 - 1.00x slower
-map tail-recursive different argument order        531.09 - 1.10x slower
-map tail-recursive                                 471.64 - 1.24x slower
-
-##### With input Small (1 Thousand) #####
-Name                                                  ips        average  deviation         median
-stdlib map                                        66.10 K       15.13 μs    ±58.17%       15.00 μs
-map tail-recursive different argument order       62.46 K       16.01 μs    ±31.43%       15.00 μs
-map simple body-recursive                         62.35 K       16.04 μs    ±60.37%       15.00 μs
-map tail-recursive                                55.68 K       17.96 μs    ±30.32%       17.00 μs
-
-Comparison:
-stdlib map                                        66.10 K
-map tail-recursive different argument order       62.46 K - 1.06x slower
-map simple body-recursive                         62.35 K - 1.06x slower
-map tail-recursive                                55.68 K - 1.19x slower
-```
-
-As you can see, the tail-recursive approach is significantly faster for the _Big_ 10 Million input while body recursion outperforms it or performs just as well on the _Middle_ and _Small_ inputs.
+This means each function will be benchmarked with each input that is specified in the inputs. Then you'll get the output divided by input so you can see which function is fastest for which input.
 
 Therefore, I **highly recommend** using this feature and checking different realistically structured and sized inputs for the functions you benchmark!
 
@@ -338,24 +297,28 @@ tobi@comfy ~/github/benchee_erlang_try $ rebar3 shell
 Erlang/OTP 18 [erts-7.3] [source] [64-bit] [smp:4:4] [async-threads:0] [hipe] [kernel-poll:false]
 
 Eshell V7.3  (abort with ^G)
-1> 'Elixir.Benchee':run(#{<<"My Function">> => fun() -> lists:sort([8, 2, 3, 4, 2, 1, 3, 4, 9, 10, 11, 12, 13, 20, 1000, -4, -5]) end}).
+1> benchee:run(#{myFunc => fun() -> lists:sort([8, 2, 3, 4, 2, 1, 3, 4, 9, 10, 11, 12, 13, 20, 1000, -4, -5]) end}, [{warmup, 0}, {time, 2}]).
+Operating System: Linux
+CPU Information: Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+Number of Available Cores: 4
+Available memory: 8.05344 GB
 Elixir 1.3.4
 Erlang 18.3
 Benchmark suite executing with the following configuration:
-warmup: 2.00 s
-time: 5.00 s
+warmup: 0.0 μs
+time: 2.00 s
 parallel: 1
 inputs: none specified
-Estimated total run time: 7.00 s
+Estimated total run time: 2.00 s
 
 
-Benchmarking My Function...
+Benchmarking myFunc...
 
-Name                  ips        average  deviation         median
-My Function      284.94 K        3.51 μs   ±414.26%        3.00 μs
+Name             ips        average  deviation         median
+myFunc      289.71 K        3.45 μs   ±250.31%        3.00 μs
 ```
 
-This doesn't seem to be too reliable right now, so suggestions are very welcome :)
+This doesn't seem to be too reliable right now, so suggestions and input are very welcome :)
 
 ## Plugins
 
