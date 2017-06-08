@@ -72,9 +72,11 @@ defmodule Benchee.BenchmarkTest do
 
         assert new_suite.configuration == suite.configuration
         run_times_hash = new_suite.run_times |> no_input_access
+        memory_usage_hash = new_suite.memory_usages |> no_input_access
 
         # should be 6 but gotta give it a bit leeway
         assert length(run_times_hash["Name"]) >= 5
+        assert length(memory_usage_hash["Name"]) >= 5
       end
     end
 
@@ -88,11 +90,14 @@ defmodule Benchee.BenchmarkTest do
           |> measure(TestPrinter)
 
         run_times_hash = new_suite.run_times |> no_input_access
+        memory_usage_hash = new_suite.memory_usages |> no_input_access
 
         # should be 5 but gotta give it a bit leeway
         assert length(run_times_hash["Name"]) >= 4
+        assert length(memory_usage_hash["Name"]) >= 4
         # should be ~11, but gotta give it some leeway
         assert length(run_times_hash["Name 2"]) >= 8
+        assert length(memory_usage_hash["Name 2"]) >= 8
         end
     end
 
@@ -104,9 +109,11 @@ defmodule Benchee.BenchmarkTest do
       new_suite = measure suite, TestPrinter
 
       assert %{"" => run_times} = new_suite.run_times |> no_input_access
+      assert %{"" => memory_usages} = new_suite.memory_usages |> no_input_access
 
       # it does more work when working in parallel than it does alone
       assert length(run_times) >= 12
+      assert length(memory_usages) >= 12
     end
 
     test "doesn't take longer than advertised for very fast funs" do
@@ -221,12 +228,16 @@ defmodule Benchee.BenchmarkTest do
           %Suite{configuration: config, jobs: jobs}
           |> test_suite
           |> measure(TestPrinter)
-          |> Map.get(:run_times)
+
+        run_times = Map.get(results, :run_times)
+        memory_usages = Map.get(results, :memory_usages)
 
         # should be ~11 but the good old leeway
-        assert length(results["Short wait"]["sleep"]) >= 8
+        assert length(run_times["Short wait"]["sleep"]) >= 8
+        assert length(memory_usages["Short wait"]["sleep"]) >= 8
         # should be 5 but the good old leeway
-        assert length(results["Longer wait"]["sleep"]) >= 4
+        assert length(run_times["Longer wait"]["sleep"]) >= 4
+        assert length(memory_usages["Longer wait"]["sleep"]) >= 4
       end
     end
 
