@@ -268,6 +268,21 @@ defmodule Benchee.Formatters.ConsoleTest do
       ref_2 =~ ~r/Other Job/
       slower_2 =~ ~r/Job.+slower/
     end
+
+    test "allows atoms as labels" do
+      statistics = %{
+        arg: %{
+          experiment: %Statistics{
+            average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
+          }
+        }
+      }
+
+      [[header, _columns, data]] = Console.format(%Suite{statistics: statistics, configuration: @config})
+
+      assert header =~ ~r/arg/
+      assert data =~ ~r/experiment/
+    end
   end
 
   defp assert_column_width(name, string, expected_width) do
