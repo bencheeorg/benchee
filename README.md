@@ -301,6 +301,62 @@ Do you just want to have all the raw run times? Just work with the result of `Be
 
 This way Benchee should be flexible enough to suit your needs and be extended at will. Have a look at the [available plugins](#plugins).
 
+### Usage from Erlang
+
+There is an [example project](https://github.com/PragTob/benchee_erlang_try) to check out.
+
+You can use the [rebar3_elixir_compile](https://github.com/barrel-db/rebar3_elixir_compile) plugin. In your `rebar.config` you can do the following which should get you started:
+
+```erlang
+deps, [
+  {benchee, {elixir, "benchee", "0.9.0"}}
+]}.
+
+{plugins, [
+    { rebar3_elixir_compile, ".*", {git, "https://github.com/barrel-db/rebar3_elixir_compile.git", {branch, "master"}}}
+]}.
+
+{provider_hooks, [
+  {pre, [{compile, {ex, compile}}]},
+  {pre, [{release, {ex, compile}}]}
+]}.
+
+{elixir_opts,
+  [
+    {env, dev}
+  ]
+}.
+```
+
+Then benchee already provides a `:benchee` interface for erlang compatibility which you can use. Sadly couldn't get it to work in an escript yet.
+
+You can then invoke it like this (for instance):
+
+```
+tobi@comfy ~/github/benchee_erlang_try $ rebar3 shell
+===> dependencies etc.
+Erlang/OTP 18 [erts-7.3] [source] [64-bit] [smp:4:4] [async-threads:0] [hipe] [kernel-poll:false]
+
+Eshell V7.3  (abort with ^G)
+1> 'Elixir.Benchee':run(#{<<"My Function">> => fun() -> lists:sort([8, 2, 3, 4, 2, 1, 3, 4, 9, 10, 11, 12, 13, 20, 1000, -4, -5]) end}).
+Elixir 1.3.4
+Erlang 18.3
+Benchmark suite executing with the following configuration:
+warmup: 2.00 s
+time: 5.00 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 7.00 s
+
+
+Benchmarking My Function...
+
+Name                  ips        average  deviation         median
+My Function      284.94 K        3.51 μs   ±414.26%        3.00 μs
+```
+
+This doesn't seem to be too reliable right now, so suggestions are very welcome :)
+
 ## Plugins
 
 Packages that work with benchee to provide additional functionality.
