@@ -1,5 +1,5 @@
 defmodule Benchee.TestHelpers do
-  @default_retries 5
+  @default_retries 10
 
   # retry tests that are doing actual benchmarking and are flaky
   # on overloaded and/or slower systems
