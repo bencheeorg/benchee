@@ -94,7 +94,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
     nil
   end
   def input_information(input_name, _config) do
-    if input_name != Benchee.Benchmark.no_input do
+    if input_name != Benchee.Benchmark.Runner.no_input() do
       IO.puts "\nBenchmarking with input #{input_name}:"
     end
   end

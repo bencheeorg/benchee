@@ -14,6 +14,7 @@ defmodule Benchee.Suite do
     :configuration,
     :system,
     :run_times,
+    :benchmarks,
     :statistics,
     jobs: %{}
   ]

@@ -1,7 +1,7 @@
 defmodule Benchee.Formatters.ConsoleTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureIO
-  import Benchee.Benchmark, only: [no_input: 0]
+  import Benchee.Benchmark.Runner, only: [no_input: 0]
   doctest Benchee.Formatters.Console
 
   alias Benchee.Formatters.Console

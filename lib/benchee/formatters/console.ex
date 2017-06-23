@@ -66,7 +66,7 @@ defmodule Benchee.Formatters.Console do
   end
 
   defp input_header(input) do
-    no_input_marker = Benchee.Benchmark.no_input
+    no_input_marker = Benchee.Benchmark.Runner.no_input()
     case input do
       ^no_input_marker -> ""
       _                -> "\n##### With input #{input} #####"

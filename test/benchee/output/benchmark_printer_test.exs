@@ -118,7 +118,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
     end
 
     test "does nothing when it's the no input marker" do
-      marker = Benchee.Benchmark.no_input
+      marker = Benchee.Benchmark.Runner.no_input()
       output = capture_io fn ->
         input_information marker, %{}
       end
