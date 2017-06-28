@@ -3,6 +3,7 @@ defmodule Benchee.BenchmarkTest do
   import Benchee.TestHelpers
   alias Benchee.Statistics
   alias Benchee.Benchmark
+  alias Benchee.Benchmark.Runner
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
   alias Benchee.Suite
   import Benchee.Benchmark
@@ -44,7 +45,7 @@ defmodule Benchee.BenchmarkTest do
       assert %Suite{jobs: jobs}  =  suite
       assert map_size(jobs)      == 1
       assert %{"something" => _} = jobs
-      
+
       assert_receive {:duplicate, "something"}
     end
   end
@@ -236,7 +237,7 @@ defmodule Benchee.BenchmarkTest do
         %Suite{configuration: %{time: 1_000, warmup: 0}, jobs: jobs}
         |> test_suite
         |> measure(TestPrinter)
-        |> get_in([Access.key!(:run_times), Benchmark.no_input, "Sleeps"])
+        |> get_in([Access.key!(:run_times), Runner.no_input(), "Sleeps"])
 
       assert length(run_times) == 1
     end
@@ -255,7 +256,7 @@ defmodule Benchee.BenchmarkTest do
           %Suite{configuration: %{time: 70_000, warmup: 0}, jobs: jobs}
           |> test_suite
           |> measure(TestPrinter)
-          |> get_in([Access.key!(:run_times), Benchmark.no_input, "Sleep more"])
+          |> get_in([Access.key!(:run_times), Runner.no_input(), "Sleep more"])
 
         assert length(run_times) >= 2 # should be 3 but good old leeway
         # as the function takes more time each time called run times should be

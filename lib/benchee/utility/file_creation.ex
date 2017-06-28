@@ -85,7 +85,7 @@ defmodule Benchee.Utility.FileCreation do
       ...>   ["Big Input", "Comparison", "great Stuff"])
       "bench/abc_big_input_comparison_great_stuff.csv"
 
-      iex> marker = Benchee.Benchmark.no_input
+      iex> marker = Benchee.Benchmark.Runner.no_input()
       iex> Benchee.Utility.FileCreation.interleave("abc.csv", marker)
       "abc.csv"
       iex> Benchee.Utility.FileCreation.interleave("abc.csv", [marker])
@@ -114,7 +114,7 @@ defmodule Benchee.Utility.FileCreation do
   end
 
   defp to_filename(name_string) do
-    no_input = Benchee.Benchmark.no_input
+    no_input = Benchee.Benchmark.Runner.no_input()
     case name_string do
       ^no_input -> ""
       _         ->

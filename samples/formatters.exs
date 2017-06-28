@@ -3,7 +3,7 @@ map_fun = fn(i) -> [i, i * i] end
 
 format_fun = fn(%{run_times: run_times}) ->
   IO.puts ""
-  run_times = Map.get run_times, Benchee.Benchmark.no_input
+  run_times = Map.get run_times, Benchee.Benchmark.Runner.no_input()
   Enum.each run_times, fn({name, times}) ->
     IO.puts "Benchee recorded #{Enum.count times} run times for #{name}!"
   end

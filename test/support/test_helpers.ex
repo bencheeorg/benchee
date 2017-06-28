@@ -16,5 +16,5 @@ defmodule Benchee.TestHelpers do
     end
   end
 
-  def no_input_access(map), do: map[Benchee.Benchmark.no_input]
+  def no_input_access(map), do: map[Benchee.Benchmark.Runner.no_input()]
 end
