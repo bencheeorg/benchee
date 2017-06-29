@@ -3,6 +3,8 @@ defmodule Benchee.BenchmarkTest do
   import Benchee.TestHelpers
   alias Benchee.Statistics
   alias Benchee.Benchmark
+  alias Benchee.Configuration
+  alias Benchee.Benchmark.Scenario
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
   alias Benchee.Suite
   import Benchee.Benchmark
@@ -10,12 +12,13 @@ defmodule Benchee.BenchmarkTest do
   doctest Benchee.Benchmark
 
   describe ".benchmark" do
+    # TODO: Delete this test once we're moved over to Benchee.Runner
     test "adds the job to the jobs to be executed" do
       one_fun = fn -> 1 end
       suite = %Suite{jobs: %{"one" => one_fun}}
       two_fun = fn -> 2 end
       new_suite = benchmark(suite, "two", two_fun)
-      assert new_suite == %Suite{jobs: %{"two" => two_fun, "one" => one_fun}}
+      assert new_suite.jobs == %{"two" => two_fun, "one" => one_fun}
     end
 
     test "can add jobs with atom keys but converts them to string" do
@@ -23,29 +26,47 @@ defmodule Benchee.BenchmarkTest do
               |> benchmark("one job", fn -> 1 end)
               |> benchmark(:something, fn -> 2 end)
 
+      # TODO: Delete this first assertion once Benchee.Runner is in place
       assert %Suite{jobs: %{"one job" => _, "something" => _}} = suite
+
+      job_names = Enum.map(suite.scenarios, fn(scenario) -> scenario.job_name end)
+      assert job_names == ["one job", "something"]
     end
 
-    test "warns when adding a job with the same name again" do
+    test "warns when adding the same job again even if it's atom and string" do
       one_fun = fn -> 1 end
-      suite = %Suite{jobs: %{"one" => one_fun}}
-      new_suite = benchmark(suite, "one", fn -> 42 end, TestPrinter)
+      scenario = %Scenario{job_name: "one", function: one_fun}
+      suite = %Suite{scenarios: [scenario]}
+      new_suite = benchmark(suite, :one, fn -> 42 end, TestPrinter)
 
-      assert new_suite == %Suite{jobs: %{"one" => one_fun}}
+      assert new_suite == %Suite{scenarios: [scenario]}
 
       assert_receive {:duplicate, "one"}
     end
 
-    test "warns when adding the same job again even if it's atom and string" do
-      suite = %Suite{}
-              |> benchmark("something", fn -> 1 end, TestPrinter)
-              |> benchmark(:something, fn -> 2 end, TestPrinter)
+    test "adds a %Scenario{} to the suite for a job with no inputs" do
+      job_name = "one job"
+      function = fn -> 1 end
+      config = %Configuration{inputs: nil}
+      suite = benchmark(%Suite{configuration: config}, job_name, function)
+      expected_scenario =
+        %Scenario{job_name: job_name, function: function,
+                  input: Benchmark.no_input(), input_name: Benchmark.no_input()}
 
-      assert %Suite{jobs: jobs}  =  suite
-      assert map_size(jobs)      == 1
-      assert %{"something" => _} = jobs
-      
-      assert_receive {:duplicate, "something"}
+      assert suite.scenarios == [expected_scenario]
+    end
+
+    test "adds a %Scenario{} to the suite for each input of a job" do
+      job_name = "one job"
+      function = fn -> 1 end
+      config = %Configuration{inputs: %{"large" => 100_000, "small" => 10}}
+      suite = benchmark(%Suite{configuration: config}, job_name, function)
+      input_names = Enum.map(suite.scenarios, fn(scenario) -> scenario.input_name end)
+      inputs = Enum.map(suite.scenarios, fn(scenario) -> scenario.input end)
+
+      assert length(suite.scenarios) == 2
+      assert input_names == ["large", "small"]
+      assert inputs == [100_000, 10]
     end
   end
 

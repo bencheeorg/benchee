@@ -15,7 +15,8 @@ defmodule Benchee.Suite do
     :system,
     :run_times,
     :statistics,
-    jobs: %{}
+    jobs: %{},
+    scenarios: []
   ]
 
   @type optional_map :: map | nil
@@ -26,7 +27,8 @@ defmodule Benchee.Suite do
     system: optional_map,
     run_times: %{key => %{key => [integer]}} | nil,
     statistics: %{key => %{key => Benchee.Statistics.t}} | nil,
-    jobs: %{key => benchmark_function}
+    jobs: %{key => benchmark_function},
+    scenarios: [] | [Benchee.Benchmark.Scenario.t]
   }
 end
 

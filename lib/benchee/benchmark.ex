@@ -8,25 +8,32 @@ defmodule Benchee.Benchmark do
   alias Benchee.Utility.RepeatN
   alias Benchee.Output.BenchmarkPrinter, as: Printer
   alias Benchee.Suite
+  alias Benchee.Benchmark.Scenario
 
-  @type name :: String.t
+  @type job_name :: String.t | atom
+  @no_input :__no_input
+  @no_input_marker {@no_input, @no_input}
+
+  @doc """
+  Key in the result for when there were no inputs given.
+  """
+  def no_input, do: @no_input
 
   @doc """
   Adds the given function and its associated name to the benchmarking jobs to
   be run in this benchmarking suite as a tuple `{name, function}` to the list
   under the `:jobs` key.
   """
-  @spec benchmark(Suite.t, name, fun, module) :: Suite.t
-  def benchmark(suite = %Suite{jobs: jobs}, name, function, printer \\ Printer) do
-    normalized_name = to_string(name)
-    if Map.has_key?(jobs, normalized_name) do
-      printer.duplicate_benchmark_warning normalized_name
+  @spec benchmark(Suite.t, job_name, fun, module) :: Suite.t
+  def benchmark(suite = %Suite{scenarios: scenarios}, job_name, function, printer \\ Printer) do
+    normalized_name = to_string(job_name)
+    if duplicated_job_name?(scenarios, normalized_name) do
+      printer.duplicate_benchmark_warning(normalized_name)
       suite
     else
-      %Suite{suite | jobs: Map.put(jobs, normalized_name, function)}
+      add_scenario(suite, normalized_name, function)
     end
   end
-
 
   @doc """
   Executes the benchmarks defined before by first running the defined functions
@@ -38,7 +45,7 @@ defmodule Benchee.Benchmark do
   Warmup is usually important for run times with JIT but it seems to have some
   effect on the BEAM as well.
 
-  There will be `parallel` processes spawned exeuting the benchmark job in
+  There will be `parallel` processes spawned executing the benchmark job in
   parallel.
   """
   @spec measure(Suite.t, module) :: Suite.t
@@ -49,13 +56,32 @@ defmodule Benchee.Benchmark do
     %Suite{suite | run_times: run_times}
   end
 
-  @no_input :__no_input
-  @no_input_marker {@no_input, @no_input}
+  defp duplicated_job_name?(scenarios, job_name) do
+    Enum.any?(scenarios, fn(scenario) -> scenario.job_name == job_name end)
+  end
 
-  @doc """
-  Key in the result for when there were no inputs given.
-  """
-  def no_input, do: @no_input
+  defp add_scenario(suite = %Suite{jobs: jobs, scenarios: scenarios, configuration: config},
+                    job_name, function) do
+    new_scenarios = build_scenarios_for_job(job_name, function, config)
+    jobs = Map.put(jobs, job_name, function)
+    %Suite{suite | jobs: jobs, scenarios: List.flatten([scenarios | new_scenarios])}
+  end
+
+  defp build_scenarios_for_job(job_name, function, config)
+  defp build_scenarios_for_job(job_name, function, nil) do
+    [%Scenario{job_name: job_name, function: function, input: @no_input,
+               input_name: @no_input}]
+  end
+  defp build_scenarios_for_job(job_name, function, %{inputs: nil}) do
+    [%Scenario{job_name: job_name, function: function, input: @no_input,
+               input_name: @no_input}]
+  end
+  defp build_scenarios_for_job(job_name, function, %{inputs: inputs}) do
+    Enum.map(inputs, fn({input_name, input}) ->
+      %Scenario{job_name: job_name, function: function, input: input,
+                input_name: input_name}
+    end)
+  end
 
   defp record_runtimes(jobs, config = %{inputs: nil}, printer) do
     [runtimes_for_input(@no_input_marker, jobs, config, printer)]
