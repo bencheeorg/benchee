@@ -1,9 +1,13 @@
 defmodule Benchee.Benchmark.Runner do
-  @moduledoc false
+  @moduledoc """
+  This module actually runs our benchmark scenarios, adding information about
+  run time and memory usage to each scenario.
+  """
 
   alias Benchee.Benchmark
   alias Benchee.Benchmark.{Scenario, ScenarioContext}
   alias Benchee.Utility.RepeatN
+  alias Benchee.Configuration
 
   @doc """
   Executes the benchmarks defined before by first running the defined functions
@@ -20,55 +24,34 @@ defmodule Benchee.Benchmark.Runner do
   """
   @spec run_scenarios([%Scenario{}], %ScenarioContext{}) :: [%Scenario{}]
   def run_scenarios(scenarios, scenario_context) do
-    Enum.map(scenarios, fn(scenario) ->
-      run_scenario(scenario, scenario_context)
+    Enum.flat_map(scenarios, fn(scenario) ->
+      parallel_benchmark(scenario, scenario_context)
     end)
   end
 
-  defp run_scenario(scenario, _scenario_context) do
-    scenario
-  end
-
-  defp record_runtimes(jobs, config = %{inputs: nil}, printer) do
-    [runtimes_for_input(@no_input_marker, jobs, config, printer)]
-    |> Map.new
-  end
-  defp record_runtimes(jobs, config = %{inputs: inputs}, printer) do
-    inputs
-    |> Enum.map(fn(input) ->
-         runtimes_for_input(input, jobs, config, printer)
-       end)
-    |> Map.new
-  end
-
-  defp runtimes_for_input({input_name, input}, jobs, config, printer) do
+  defp parallel_benchmark(scenario = %Scenario{job_name: job_name, input_name: input_name},
+                          scenario_context = %ScenarioContext{printer: printer, config: config}) do
     printer.input_information(input_name, config)
-
-    results =
-      jobs
-      |> Enum.map(fn(job) -> measure_job(job, input, config, printer) end)
-      |> Map.new
-
-    {input_name, results}
-  end
-
-  defp measure_job({name, function}, input, config, printer) do
-    printer.benchmarking name, config
-    job_run_times = parallel_benchmark function, input, config, printer
-    {name, job_run_times}
-  end
-
-  defp parallel_benchmark(function,
-                          input,
-                          %{parallel: parallel,
-                            time:     time,
-                            warmup:   warmup,
-                            print:    %{fast_warning: fast_warning}},
-                          printer) do
-    pmap 1..parallel, fn ->
-      _ = run_warmup function, input, warmup, printer
-      measure_runtimes function, input, time, fast_warning, printer
+    printer.benchmarking(job_name, config)
+    pmap 1..config.parallel, fn ->
+      run_warmup(scenario, scenario_context)
+      run_benchmark(scenario, scenario_context)
     end
+  end
+
+  def run_warmup(scenario,
+                 scenario_context = %ScenarioContext{config: %Configuration{warmup: warmup}}) do
+    warmup_context = %ScenarioContext{scenario_context | show_fast_warning: false,
+                                                         run_time: warmup}
+    measure_runtimes(scenario, warmup_context)
+  end
+
+  def run_benchmark(scenario,
+                    scenario_context = %ScenarioContext{config: %Configuration{time: run_time, print: %{fast_warning: fast_warning}}}) do
+    measurement_context =
+      %ScenarioContext{scenario_context | show_fast_warning: fast_warning,
+                                          run_time: run_time}
+    measure_runtimes(scenario, measurement_context)
   end
 
   defp pmap(collection, func) do
@@ -78,20 +61,18 @@ defmodule Benchee.Benchmark.Runner do
     |> List.flatten
   end
 
-  defp run_warmup(function, input, time, printer) do
-    measure_runtimes(function, input, time, false, printer)
-  end
-
-  defp measure_runtimes(function, input, time, display_fast_warning, printer)
-  defp measure_runtimes(_function, _input, 0, _, _) do
-    []
-  end
-  defp measure_runtimes(function, input, time, display_fast_warning, printer) do
-    finish_time = current_time() + time
+  defp measure_runtimes(scenario, %ScenarioContext{run_time: 0}), do: scenario
+  defp measure_runtimes(scenario, scenario_context = %ScenarioContext{run_time: run_time}) do
+    end_time = current_time() + run_time
     :erlang.garbage_collect
-    {n, initial_run_time} =
-      determine_n_times(function, input, display_fast_warning, printer)
-    do_benchmark(finish_time, function, input, [initial_run_time], n, current_time())
+    {num_iterations, initial_run_time} =
+      determine_n_times(scenario, scenario_context)
+    updated_scenario = %Scenario{scenario | run_times: [initial_run_time]}
+    new_context =
+      %ScenarioContext{scenario_context | current_time: current_time(),
+                                          end_time: end_time,
+                                          num_iterations: num_iterations}
+    do_benchmark(updated_scenario, new_context)
   end
 
   defp current_time do
@@ -103,66 +84,67 @@ defmodule Benchee.Benchmark.Runner do
   # executed in the measurement cycle.
   @minimum_execution_time 10
   @times_multiplicator 10
-  defp determine_n_times(function, input, display_fast_warning, printer) do
-    run_time = measure_call function, input
+  defp determine_n_times(scenario,
+                         scenario_context = %ScenarioContext{show_fast_warning: fast_warning,
+                                                             printer: printer}) do
+    run_time = measure_call(scenario, scenario_context)
     if run_time >= @minimum_execution_time do
       {1, run_time}
     else
-      if display_fast_warning, do: printer.fast_warning()
-      try_n_times(function, input, @times_multiplicator)
+      if fast_warning, do: printer.fast_warning()
+      new_context =
+        %ScenarioContext{scenario_context | num_iterations: @times_multiplicator}
+      try_n_times(scenario, new_context)
     end
   end
 
-  defp try_n_times(function, input, n) do
-    run_time = measure_call_n_times function, input, n
+  defp try_n_times(scenario,
+                   scenario_context = %ScenarioContext{num_iterations: num_iterations}) do
+    run_time = measure_call_n_times(scenario, scenario_context)
     if run_time >= @minimum_execution_time do
-      {n, run_time / n}
+      {num_iterations, run_time / num_iterations}
     else
-      try_n_times(function, input, n * @times_multiplicator)
+      new_context =
+        %ScenarioContext{scenario_context | num_iterations: num_iterations * @times_multiplicator}
+      try_n_times(scenario, new_context)
     end
   end
 
-  defp do_benchmark(finish_time, function, input, run_times, n, now)
-  defp do_benchmark(finish_time, _, _, run_times, _n, now)
-       when now > finish_time do
-    Enum.reverse run_times # restore correct order important for graphing
+  defp do_benchmark(scenario = %Scenario{run_times: run_times},
+                    %ScenarioContext{current_time: current_time, end_time: end_time})
+       when current_time > end_time do
+    # restore correct order - important for graphing
+    %Scenario{scenario | run_times: Enum.reverse(run_times)}
   end
-  defp do_benchmark(finish_time, function, input, run_times, n, _now) do
-    run_time = measure_call(function, input, n)
-    updated_run_times = [run_time | run_times]
-    do_benchmark(finish_time, function, input,
-                 updated_run_times, n, current_time())
-  end
-
-  defp measure_call(function, input, n \\ 1)
-  defp measure_call(function, @no_input, 1) do
-    {microseconds, _return_value} = :timer.tc function
-    microseconds
-  end
-  defp measure_call(function, input, 1) do
-    {microseconds, _return_value} = :timer.tc function, [input]
-    microseconds
-  end
-  defp measure_call(function, input, n) do
-    measure_call_n_times(function, input, n) / n
+  defp do_benchmark(scenario = %Scenario{run_times: run_times},
+                    scenario_context) do
+    run_time = measure_call(scenario, scenario_context)
+    updated_scenario = %Scenario{scenario | run_times: [run_time | run_times]}
+    updated_context = %ScenarioContext{scenario_context | current_time: current_time()}
+    do_benchmark(updated_scenario, updated_context)
   end
 
-  defp measure_call_n_times(function, @no_input, n) do
+  defp measure_call(scenario,
+                    scenario_context = %ScenarioContext{num_iterations: num_iterations}) do
+    measure_call_n_times(scenario, scenario_context) / num_iterations
+  end
+
+  @no_input Benchmark.no_input()
+  defp measure_call_n_times(%Scenario{function: function, input: @no_input},
+                            %ScenarioContext{num_iterations: num_iterations}) do
     {microseconds, _return_value} = :timer.tc fn ->
-      RepeatN.repeat_n(function, n)
+      RepeatN.repeat_n(function, num_iterations)
     end
 
     microseconds
   end
-  defp measure_call_n_times(function, input, n) do
-    call_with_arg = fn ->
-      function.(input)
-    end
+  defp measure_call_n_times(%Scenario{function: function, input: input},
+                            %ScenarioContext{num_iterations: num_iterations}) do
+    fun_with_input = fn -> function.(input) end
     {microseconds, _return_value} = :timer.tc fn ->
-      RepeatN.repeat_n(call_with_arg, n)
+      RepeatN.repeat_n(fun_with_input, num_iterations)
     end
 
     microseconds
   end
-
 end

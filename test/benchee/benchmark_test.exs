@@ -1,7 +1,5 @@
 defmodule Benchee.BenchmarkTest do
   use ExUnit.Case, async: true
-  import Benchee.TestHelpers
-  alias Benchee.Statistics
   alias Benchee.Benchmark
   alias Benchee.Configuration
   alias Benchee.Benchmark.{Scenario, ScenarioContext}

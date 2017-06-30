@@ -1,65 +1,76 @@
 defmodule Benchee.Benchmark.RunnerTest do
   use ExUnit.Case, async: true
   import Benchee.TestHelpers
+  alias Benchee.Suite
+  alias Benchee.Benchmark
+  alias Benchee.Configuration
+  alias Benchee.Statistics
+  alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
 
-  @config %{parallel: 1,
-            time:     40_000,
-            warmup:   20_000,
-            inputs:   nil,
-            print:    %{fast_warning: false, configuration: true}}
+  @config %Configuration{parallel: 1,
+                         time:     40_000,
+                         warmup:   20_000,
+                         inputs:   nil,
+                         print:    %{fast_warning: false, configuration: true}}
   @system %{elixir: "1.4.0", erlang: "19.1"}
-  @default_suite %Suite{configuration: @config, system: @system, jobs: %{}}
+  @default_suite %Suite{configuration: @config, system: @system}
 
   defp test_suite(suite_override \\ %{}) do
     DeepMerge.deep_merge(@default_suite, suite_override)
   end
 
-  describe ".measure" do
+  defp run_times_for(suite, job_name, input_name \\ Benchmark.no_input()) do
+    filter_fun = fn(scenario) ->
+      scenario.job_name == job_name && scenario.input_name == input_name
+    end
+    map_fun = fn(scenario) -> scenario.run_times end
+
+    suite.scenarios
+    |> Enum.filter_map(filter_fun, map_fun)
+    |> List.flatten()
+  end
+
+  describe ".run_scenarios" do
     test "runs a benchmark suite and enriches it with measurements" do
       retrying fn ->
-        suite = test_suite %Suite{configuration: %{time: 60_000, warmup: 10_000}}
+        suite = test_suite(%Suite{configuration: %{time: 60_000, warmup: 10_000}})
         new_suite =
           suite
-          |> benchmark("Name", fn -> :timer.sleep(10) end)
-          |> measure(TestPrinter)
+          |> Benchmark.benchmark("Name", fn -> :timer.sleep(10) end)
+          |> Benchmark.measure(TestPrinter)
 
         assert new_suite.configuration == suite.configuration
-        [scenario] = new_suite.scenarios
+        run_times = run_times_for(new_suite, "Name")
 
         # should be 6 but gotta give it a bit leeway
-        assert length(scenario.run_times) >= 5
+        assert length(run_times) >= 5
       end
     end
 
     test "runs a suite with multiple jobs and gathers results" do
       retrying fn ->
-        suite = test_suite %Suite{configuration: %{time: 100_000, warmup: 10_000}}
+        suite = test_suite(%Suite{configuration: %{time: 100_000, warmup: 10_000}})
         new_suite =
           suite
-          |> benchmark("Name", fn -> :timer.sleep(19) end)
-          |> benchmark("Name 2", fn -> :timer.sleep(9) end)
-          |> measure(TestPrinter)
-
-        run_times_hash = new_suite.run_times |> no_input_access
+          |> Benchmark.benchmark("Name", fn -> :timer.sleep(19) end)
+          |> Benchmark.benchmark("Name 2", fn -> :timer.sleep(9) end)
+          |> Benchmark.measure(TestPrinter)
 
         # should be 5 but gotta give it a bit leeway
-        assert length(run_times_hash["Name"]) >= 4
+        assert length(run_times_for(new_suite, "Name")) >= 4
         # should be ~11, but gotta give it some leeway
-        assert length(run_times_hash["Name 2"]) >= 8
-        end
+        assert length(run_times_for(new_suite, "Name 2")) >= 8
+      end
     end
 
     test "can run multiple benchmarks in parallel" do
-      suite = test_suite %Suite{
-        configuration: %{parallel: 6, time: 60_000},
-        jobs: %{"" => fn -> :timer.sleep 10 end}
-      }
-      new_suite = measure suite, TestPrinter
-
-      assert %{"" => run_times} = new_suite.run_times |> no_input_access
+      suite = test_suite(%Suite{configuration: %{parallel: 6, time: 60_000}})
+      new_suite = suite
+                  |> Benchmark.benchmark("", fn -> :timer.sleep 10 end)
+                  |> Benchmark.measure(TestPrinter)
 
       # it does more work when working in parallel than it does alone
-      assert length(run_times) >= 12
+      assert length(run_times_for(new_suite, "")) >= 12
     end
 
     test "doesn't take longer than advertised for very fast funs" do
@@ -68,11 +79,11 @@ defmodule Benchee.Benchmark.RunnerTest do
         warmup = 10_000
         projected = time + warmup
 
-        suite = test_suite %Suite{
-                  configuration: %{time: time, warmup: warmup},
-                  jobs:   %{"" => fn -> :timer.sleep(1) end}
-                }
-        {time, _} = :timer.tc fn -> measure(suite, TestPrinter) end
+        suite = %Suite{configuration: %{time: time, warmup: warmup}}
+                |> test_suite()
+                |> Benchmark.benchmark("", fn -> :timer.sleep(1) end)
+
+        {time, _} = :timer.tc fn -> Benchmark.measure(suite, TestPrinter) end
 
         # if the system is too busy there are too many false positives
         leeway = projected * 0.4
@@ -81,19 +92,19 @@ defmodule Benchee.Benchmark.RunnerTest do
       end
     end
 
+    @tag :skip
     test "variance does not skyrocket on very fast functions" do
       retrying fn ->
         range = 0..10
         stats = %Suite{configuration: %{time: 150_000, warmup: 20_000}}
                 |> test_suite
-                |> benchmark("noop", fn -> 1 + 1 end)
-                |> benchmark("map", fn ->
+                |> Benchmark.benchmark("noop", fn -> 1 + 1 end)
+                |> Benchmark.benchmark("map", fn ->
                      Enum.map(range, fn(i) -> i end)
                    end)
-                |> measure(TestPrinter)
+                |> Benchmark.measure(TestPrinter)
                 |> Statistics.statistics
                 |> Map.get(:statistics)
-                |> no_input_access
 
         Enum.each stats, fn({_, %{std_dev_ratio: std_dev_ratio}}) ->
           assert std_dev_ratio <= 2.5
@@ -104,9 +115,9 @@ defmodule Benchee.Benchmark.RunnerTest do
     test "never calls the function if warmup and time are 0" do
       ref = self()
 
-      %Suite{configuration: %{time: 0, warmup: 0},
-        jobs: %{"" => fn -> send(ref, :called) end}}
+      %Suite{configuration: %{time: 0, warmup: 0}}
       |> test_suite
+      |> Benchmark.benchmark("", fn -> send(ref, :called) end)
       |> Benchmark.measure(TestPrinter)
 
       refute_receive :called
@@ -114,23 +125,22 @@ defmodule Benchee.Benchmark.RunnerTest do
 
     test "asks to print what is currently benchmarking" do
       test_suite()
-      |> benchmark("Something", fn -> :timer.sleep 10 end)
-      |> measure(TestPrinter)
+      |> Benchmark.benchmark("Something", fn -> :timer.sleep 10 end)
+      |> Benchmark.measure(TestPrinter)
 
       assert_receive {:benchmarking, "Something"}
     end
 
     @inputs %{"Arg 1" => "Argument 1", "Arg 2" => "Argument 2"}
+
     test "calls the functions with the different input arguments" do
       ref = self()
 
-      jobs = %{
-        "one" => fn(input) -> send ref, {:one, input} end,
-        "two" => fn(input) -> send ref, {:two, input} end
-      }
-      %Suite{configuration: %{inputs: @inputs}, jobs: jobs}
+      %Suite{configuration: %{inputs: @inputs}}
       |> test_suite
-      |> measure(TestPrinter)
+      |> Benchmark.benchmark("one", fn(input) -> send ref, {:one, input} end)
+      |> Benchmark.benchmark("two", fn(input) -> send ref, {:two, input} end)
+      |> Benchmark.measure(TestPrinter)
 
       Enum.each @inputs, fn({_name, value}) ->
         assert_receive {:one, ^value}
@@ -139,12 +149,10 @@ defmodule Benchee.Benchmark.RunnerTest do
     end
 
     test "notifies which input is being benchmarked now" do
-      jobs = %{
-        "one" => fn(_) -> nil end
-      }
-      %Suite{configuration: %{inputs: @inputs}, jobs: jobs}
+      %Suite{configuration: %{inputs: @inputs}}
       |> test_suite
-      |> measure(TestPrinter)
+      |> Benchmark.benchmark("one", fn(_) -> nil end)
+      |> Benchmark.measure(TestPrinter)
 
       Enum.each @inputs, fn({name, _value}) ->
         assert_receive {:input_information, ^name}
@@ -160,31 +168,27 @@ defmodule Benchee.Benchmark.RunnerTest do
         config = %{time: 100_000,
                    warmup: 10_000,
                    inputs: inputs}
-        jobs = %{
-          "sleep" => fn(input) -> :timer.sleep(input) end
-        }
-        results =
-          %Suite{configuration: config, jobs: jobs}
+        new_suite =
+          %Suite{configuration: config}
           |> test_suite
-          |> measure(TestPrinter)
-          |> Map.get(:run_times)
+          |> Benchmark.benchmark("sleep", fn(input) -> :timer.sleep(input) end)
+          |> Benchmark.measure(TestPrinter)
 
         # should be ~11 but the good old leeway
-        assert length(results["Short wait"]["sleep"]) >= 8
+        assert length(run_times_for(new_suite, "sleep", "Short wait")) >= 8
         # should be 5 but the good old leeway
-        assert length(results["Longer wait"]["sleep"]) >= 4
+        assert length(run_times_for(new_suite, "sleep", "Longer wait")) >= 4
       end
     end
 
     test "runs the job exactly once if its time exceeds given time" do
-      jobs = %{"Sleeps" => fn -> :timer.sleep(2) end}
-      run_times =
-        %Suite{configuration: %{time: 1_000, warmup: 0}, jobs: jobs}
+      new_suite =
+        %Suite{configuration: %{time: 100, warmup: 0}}
         |> test_suite
-        |> measure(TestPrinter)
-        |> get_in([Access.key!(:run_times), Benchmark.no_input, "Sleeps"])
+        |> Benchmark.benchmark("Sleeps", fn -> :timer.sleep(2) end)
+        |> Benchmark.measure(TestPrinter)
 
-      assert length(run_times) == 1
+      assert length(run_times_for(new_suite, "Sleeps")) == 1
     end
 
     test "stores run times in the right order" do
@@ -196,12 +200,12 @@ defmodule Benchee.Benchmark.RunnerTest do
             state + 30
           end
         end
-        jobs = %{"Sleep more" => increasing_function}
         run_times =
-          %Suite{configuration: %{time: 70_000, warmup: 0}, jobs: jobs}
+          %Suite{configuration: %{time: 70_000, warmup: 0}}
           |> test_suite
-          |> measure(TestPrinter)
-          |> get_in([Access.key!(:run_times), Benchmark.no_input, "Sleep more"])
+          |> Benchmark.benchmark("Sleep more", increasing_function)
+          |> Benchmark.measure(TestPrinter)
+          |> run_times_for("Sleep more")
 
         assert length(run_times) >= 2 # should be 3 but good old leeway
         # as the function takes more time each time called run times should be
@@ -210,5 +214,4 @@ defmodule Benchee.Benchmark.RunnerTest do
       end
     end
   end
-
 end

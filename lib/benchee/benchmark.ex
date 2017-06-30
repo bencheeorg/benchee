@@ -66,7 +66,9 @@ defmodule Benchee.Benchmark do
   `Benchee.Benchmark.Runner.run_scenarios/2`.
   """
   @spec measure(Suite.t, module, module) :: Suite.t
-  def measure(suite = %Suite{scenarios: scenarios, configuration: config}, printer \\ Printer, runner \\ Runner) do
+  def measure(suite = %Suite{scenarios: scenarios, configuration: config},
+              printer \\ Printer,
+              runner \\ Runner) do
     printer.configuration_information(suite)
     scenario_context = %ScenarioContext{config: config, printer: printer}
     scenarios = runner.run_scenarios(scenarios, scenario_context)
