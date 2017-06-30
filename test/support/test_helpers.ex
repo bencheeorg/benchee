@@ -16,5 +16,6 @@ defmodule Benchee.TestHelpers do
     end
   end
 
-  def no_input_access(map), do: map[Benchee.Benchmark.no_input]
+  # TODO: Delete this once Runner is implemented
+  def no_input_access(map) when is_map(map), do: map[Benchee.Benchmark.no_input]
 end
