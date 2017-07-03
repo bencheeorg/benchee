@@ -2,7 +2,7 @@ defmodule Benchee.Formatters.ConsoleTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureIO
   import Benchee.Benchmark, only: [no_input: 0]
-  doctest Benchee.Formatters.Console
+  # doctest Benchee.Formatters.Console
 
   alias Benchee.Formatters.Console
   alias Benchee.{Suite, Statistics}
@@ -10,6 +10,7 @@ defmodule Benchee.Formatters.ConsoleTest do
   @console_config %{comparison: true, unit_scaling: :best}
   @config %Benchee.Configuration{formatter_options: %{console: @console_config}}
   describe ".output" do
+    @tag :skip
     test "formats and prints the results right to the console" do
       jobs = %{
         no_input() => %{
@@ -36,6 +37,7 @@ defmodule Benchee.Formatters.ConsoleTest do
   end
 
   describe ".format_jobs" do
+    @tag :skip
     test "sorts the the given stats fastest to slowest" do
       jobs = %{
         "Second" => %Statistics{
@@ -57,6 +59,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert Regex.match?(~r/Third/,  result_3)
     end
 
+    @tag :skip
     test "adjusts the label width to longest name" do
       jobs = %{
         "Second" => %Statistics{
@@ -92,6 +95,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert_column_width third_name, result_3, expected_width_wide
     end
 
+    @tag :skip
     test "creates comparisons" do
       jobs = %{
         "Second" => %Statistics{
@@ -110,6 +114,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert Regex.match? ~r/^Second\s+5.00 K\s+- 2.00x slower/, slower
     end
 
+    @tag :skip
     test "can omit the comparisons" do
       jobs = %{
         "Second" => %Statistics{
@@ -132,6 +137,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       refute Regex.match? ~r/^Second\s+5.00 K\s+- 2.00x slower/, output
     end
 
+    @tag :skip
     test "adjusts the label width to longest name for comparisons" do
       second_name = String.duplicate("a", 40)
       jobs = %{
@@ -151,6 +157,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert_column_width second_name, slower, expected_width
     end
 
+    @tag :skip
     test "doesn't create comparisons with only one benchmark run" do
       jobs  = %{
         "First" => %Statistics{
@@ -165,6 +172,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       refute Regex.match? ~r/(Comparison|x slower)/, Enum.join([header, result])
     end
 
+    @tag :skip
     test "formats small averages and medians more precisely" do
       fast = %{
         "First" => %Statistics{
@@ -180,6 +188,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert Regex.match? ~r/0.0125\s?μs/, result
     end
 
+    @tag :skip
     test "doesn't output weird 'e' formats" do
       jobs = %{
         "Job" => %Statistics{
@@ -202,6 +211,7 @@ defmodule Benchee.Formatters.ConsoleTest do
 
   describe ".format" do
     @header_regex ~r/Name.+ips.+average.+deviation.+median.*/
+    @tag :skip
     test "with multiple inputs and just one job" do
       statistics = %{
         "My Arg" => %{
@@ -231,6 +241,7 @@ defmodule Benchee.Formatters.ConsoleTest do
 
     end
 
+    @tag :skip
     test "with multiple inputs and two jobs" do
       statistics = %{
         "My Arg" => %{

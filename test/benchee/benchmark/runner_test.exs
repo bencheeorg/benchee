@@ -92,11 +92,10 @@ defmodule Benchee.Benchmark.RunnerTest do
       end
     end
 
-    @tag :skip
     test "variance does not skyrocket on very fast functions" do
       retrying fn ->
         range = 0..10
-        stats = %Suite{configuration: %{time: 150_000, warmup: 20_000}}
+        suite = %Suite{configuration: %{time: 150_000, warmup: 20_000}}
                 |> test_suite
                 |> Benchmark.benchmark("noop", fn -> 1 + 1 end)
                 |> Benchmark.benchmark("map", fn ->
@@ -104,11 +103,12 @@ defmodule Benchee.Benchmark.RunnerTest do
                    end)
                 |> Benchmark.measure(TestPrinter)
                 |> Statistics.statistics
-                |> Map.get(:statistics)
 
-        Enum.each stats, fn({_, %{std_dev_ratio: std_dev_ratio}}) ->
+        stats = Enum.map(suite.scenarios, fn(scenario) -> scenario.run_time_statistics end)
+
+        Enum.each(stats, fn(%Statistics{std_dev_ratio: std_dev_ratio}) ->
           assert std_dev_ratio <= 2.5
-        end
+        end)
       end
     end
 
