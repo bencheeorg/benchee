@@ -6,7 +6,6 @@ defmodule BencheeTest do
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median$/m
   @test_times   [time: 0.01, warmup: 0.005]
-  @tag :skip
   test "integration step by step" do
     capture_io fn ->
       result =
@@ -23,7 +22,6 @@ defmodule BencheeTest do
     end
   end
 
-  @tag :skip
   test "integration high level interface .run" do
     output = capture_io fn ->
       Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end}, @test_times)
@@ -35,7 +33,6 @@ defmodule BencheeTest do
     refute Regex.match? ~r/x slower/, output
   end
 
-  @tag :skip
   test "integration multiple funs in .run" do
     output = capture_io fn ->
       Benchee.run(%{
@@ -48,7 +45,6 @@ defmodule BencheeTest do
     assert Regex.match?(body_regex("Magic"), output)
   end
 
-  @tag :skip
   test "integration high level README example old school map config" do
     output = capture_io fn ->
       list = Enum.to_list(1..10_000)
@@ -65,7 +61,6 @@ defmodule BencheeTest do
     readme_sample_asserts(output)
   end
 
-  @tag :skip
   test "integration keywordlist as options in second place" do
     output = capture_io fn ->
       list = Enum.to_list(1..10_000)
@@ -81,7 +76,6 @@ defmodule BencheeTest do
     readme_sample_asserts output
   end
 
-  @tag :skip
   test "erlang style :benchee integration" do
     output = capture_io fn ->
       list = Enum.to_list(1..10_000)
@@ -97,7 +91,6 @@ defmodule BencheeTest do
     readme_sample_asserts output
   end
 
-  @tag :skip
   test "integration expanded README example" do
     output = capture_io fn ->
       list = Enum.to_list(1..10_000)
@@ -117,7 +110,6 @@ defmodule BencheeTest do
     readme_sample_asserts(output)
   end
 
-  @tag :skip
   test "integration super fast function print warnings" do
     output = capture_io fn ->
       Benchee.run(%{"Sleeps" => fn -> 0 end}, time: 0.001, warmup: 0)
@@ -127,7 +119,6 @@ defmodule BencheeTest do
     assert Regex.match? ~r/unreliable/, output
   end
 
-  @tag :skip
   test "integration super fast function warning is printed once per job" do
     output = capture_io fn ->
       Benchee.run(%{"Fast" => fn -> 0 end}, time: 0.001, warmup: 0.001)
@@ -140,7 +131,6 @@ defmodule BencheeTest do
     assert Enum.count(warnings) == 1
   end
 
-  @tag :skip
   test "integration super fast function warnings can be deactivated" do
     output = capture_io fn ->
       Benchee.run(%{"Blitz" => fn -> 0 end},
@@ -150,7 +140,6 @@ defmodule BencheeTest do
     refute Regex.match? ~r/fast/, output
   end
 
-  @tag :skip
   test "integration comparison report can be deactivated" do
     output = capture_io fn ->
       Benchee.run(%{"Sleeps"   => fn -> :timer.sleep(10) end,
@@ -163,7 +152,6 @@ defmodule BencheeTest do
     refute output =~ ~r/compar/i
   end
 
-  @tag :skip
   test "multiple formatters can be configured and are all called" do
     output = capture_io fn ->
       Benchee.run(%{
@@ -180,34 +168,33 @@ defmodule BencheeTest do
   end
 
   @rough_10_milli_s "((8|9|10|11|12|13|14)\\.\\d{2} ms)"
-  @tag :skip
   test "formatters have full access to the suite data, values in assigns" do
     retrying fn ->
+      formatter_one = fn(suite) ->
+        run_time = suite.scenarios
+                   |> (fn([scenario | _]) -> List.last(scenario.run_times) end).()
+                   |> Benchee.Conversion.Duration.format
+
+        IO.puts "Run time: #{run_time}"
+      end
+
+      formatter_two = fn(suite) ->
+        average = suite.scenarios
+                  |> (fn([scenario | _]) -> scenario.run_time_statistics.average end).()
+                  |> Benchee.Conversion.Duration.format
+        IO.puts "Average: #{average}"
+      end
+
+      formatter_three = fn(suite) ->
+        IO.puts suite.configuration.assigns.custom
+      end
+
       output = capture_io fn ->
         Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end},
           time:       0.01,
           warmup:     0.005,
           assigns:   %{custom: "Custom value"},
-          formatters: [
-            fn(suite) ->
-              run_time = suite.run_times
-                         |> no_input_access
-                         |> Map.get("Sleeps")
-                         |> List.last
-                         |> Benchee.Conversion.Duration.format
-
-              IO.puts "Run time: #{run_time}"
-            end,
-            fn(suite) ->
-              average = suite.statistics
-                        |> no_input_access
-                        |> Map.get("Sleeps")
-                        |> Map.get(:average)
-                        |> Benchee.Conversion.Duration.format
-              IO.puts "Average: #{average}"
-            end,
-            fn(suite) -> IO.puts suite.configuration.assigns.custom end
-          ]
+          formatters: [formatter_one, formatter_two, formatter_three]
         )
       end
 
@@ -217,7 +204,6 @@ defmodule BencheeTest do
     end
   end
 
-  @tag :skip
   test "inputs feature version of readme example" do
     output = capture_io fn ->
       map_fun = fn(i) -> [i, i * i] end
@@ -235,7 +221,6 @@ defmodule BencheeTest do
     readme_sample_asserts(output)
   end
 
-  @tag :skip
   test "multiple inputs" do
     output = capture_io fn ->
       map_fun = fn(i) -> [i, i * i] end
@@ -262,17 +247,15 @@ defmodule BencheeTest do
     assert length(occurences) == 3
   end
 
-  @tag :skip
   test ".run returns the suite in the end intact" do
     capture_io fn ->
       suite = Benchee.run(%{
         "sleep"    => fn -> :timer.sleep 1 end
       }, time: 0.001, warmup: 0)
-      assert %{run_times: _, statistics: _, configuration: _} = suite
+      assert %{scenarios: _, configuration: _} = suite
     end
   end
 
-  @tag :skip
   test ".run also adds system information into the mix via Benchee.System" do
     capture_io fn ->
       suite = Benchee.run(%{
@@ -285,19 +268,17 @@ defmodule BencheeTest do
     end
   end
 
-  @tag :skip
   test ".run accepts atom keys for jobs" do
     capture_io fn ->
       suite = Benchee.run(%{
         sleep: fn -> :timer.sleep 1 end
       }, time: 0.001, warmup: 0)
 
-      assert Map.keys(suite.jobs) == ~w(sleep)
+      assert Enum.map(suite.scenarios, &(&1.job_name)) == ~w(sleep)
     end
   end
 
-  @tag :skip
-  test ".run accepts arom keys for inputs" do
+  test ".run accepts atom keys for inputs" do
     output = capture_io fn ->
       map_fun = fn(i) -> [i, i * i] end
       inputs = [

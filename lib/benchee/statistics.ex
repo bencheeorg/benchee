@@ -38,6 +38,7 @@ defmodule Benchee.Statistics do
        %Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 200.0}},
        %Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 400.0}}]
   """
+  @spec sort([%Scenario{}]) :: [%Scenario{}]
   def sort(scenarios) do
     Enum.sort_by(scenarios, fn(%Scenario{run_time_statistics: %Statistics{average: average}}) -> average end)
   end
