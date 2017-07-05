@@ -15,7 +15,4 @@ defmodule Benchee.TestHelpers do
         retrying(asserting_function, n - 1)
     end
   end
-
-  # TODO: Delete this once Runner is implemented
-  def no_input_access(map) when is_map(map), do: map[Benchee.Benchmark.no_input]
 end

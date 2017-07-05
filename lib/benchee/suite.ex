@@ -13,27 +13,19 @@ defmodule Benchee.Suite do
   defstruct [
     :configuration,
     :system,
-    :run_times,
-    :statistics,
-    jobs: %{},
     scenarios: []
   ]
 
   @type optional_map :: map | nil
-  @type key :: atom | String.t
-  @type benchmark_function :: (() -> any) | ((any) -> any)
   @type t :: %__MODULE__{
     configuration: Benchee.Configuration.t | nil,
     system: optional_map,
-    run_times: %{key => %{key => [integer]}} | nil,
-    statistics: %{key => %{key => Benchee.Statistics.t}} | nil,
-    jobs: %{key => benchmark_function},
     scenarios: [] | [Benchee.Benchmark.Scenario.t]
   }
 end
 
 defimpl DeepMerge.Resolver, for: Benchee.Suite do
-  def resolve(original, override = %{__struct__: Benchee.Suite}, resolver) do
+  def resolve(original, override = %Benchee.Suite{}, resolver) do
     cleaned_override = override
                        |> Map.from_struct
                        |> Enum.reject(fn({_key, value}) -> is_nil(value) end)

@@ -127,9 +127,6 @@ defmodule Benchee.Configuration do
             },
             assigns: %{}
           },
-        jobs: %{},
-        run_times: nil,
-        statistics: nil,
         system: nil
       }
 
@@ -152,9 +149,6 @@ defmodule Benchee.Configuration do
             },
             assigns: %{}
           },
-        jobs: %{},
-        run_times: nil,
-        statistics: nil,
         system: nil
       }
 
@@ -177,9 +171,6 @@ defmodule Benchee.Configuration do
             },
             assigns: %{}
           },
-        jobs: %{},
-        run_times: nil,
-        statistics: nil,
         system: nil
       }
 
@@ -211,9 +202,6 @@ defmodule Benchee.Configuration do
             },
             assigns: %{}
           },
-        jobs: %{},
-        run_times: nil,
-        statistics: nil,
         system: nil
       }
   """
