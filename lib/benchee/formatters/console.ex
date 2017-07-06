@@ -7,7 +7,6 @@ defmodule Benchee.Formatters.Console do
   alias Benchee.{Statistics, Suite, Benchmark.Scenario}
   alias Benchee.Conversion.{Count, Duration, Unit, DeviationPercent}
 
-  @type job_statistics :: {Suite.key, Statistics.t}
   @type unit_per_statistic :: %{atom => Unit.t}
 
   @default_label_width 4 # Length of column header
@@ -71,16 +70,16 @@ defmodule Benchee.Formatters.Console do
   def format(%Suite{scenarios: scenarios,
                     configuration: %{formatter_options: %{console: config}}}) do
     scenarios
-    |> Enum.group_by(fn(%Scenario{input_name: input_name}) -> input_name end)
+    |> Enum.group_by(&(&1.input_name))
     |> Enum.map(fn({input, scenarios}) ->
-        [input_header(input) | format_jobs(scenarios, config)]
+        [input_header(input) | format_scenarios(scenarios, config)]
       end)
   end
 
+  @no_input_marker Benchee.Benchmark.no_input()
   defp input_header(input) do
-    no_input_marker = Benchee.Benchmark.no_input
     case input do
-      ^no_input_marker -> ""
+      @no_input_marker -> ""
       _                -> "\n##### With input #{input} #####"
     end
   end
@@ -103,7 +102,7 @@ defmodule Benchee.Formatters.Console do
   ...>     }
   ...>   }
   ...> ]
-  iex> Benchee.Formatters.Console.format_jobs(scenarios, %{comparison: false, unit_scaling: :best})
+  iex> Benchee.Formatters.Console.format_scenarios(scenarios, %{comparison: false, unit_scaling: :best})
   ["\nName             ips        average  deviation         median\n",
   "My Job        5.00 K      200.00 μs    ±10.00%      190.00 μs\n",
   "Job 2         2.50 K      400.00 μs    ±20.00%      390.00 μs\n"]
@@ -111,14 +110,14 @@ defmodule Benchee.Formatters.Console do
   ```
 
   """
-  @spec format_jobs([%Scenario{}], map) :: [any]
-  def format_jobs(scenarios, config) do
+  @spec format_scenarios([Scenario.t], map) :: [any, ...]
+  def format_scenarios(scenarios, config) do
     sorted_scenarios = Statistics.sort(scenarios)
     units = units(sorted_scenarios, config)
     label_width = label_width(sorted_scenarios)
 
     [column_descriptors(label_width) |
-      job_reports(sorted_scenarios, units, label_width)
+      scenario_reports(sorted_scenarios, units, label_width)
       ++ comparison_report(sorted_scenarios, units, label_width, config)]
   end
 
@@ -132,14 +131,14 @@ defmodule Benchee.Formatters.Console do
 
   defp label_width(scenarios) do
     max_label_width = scenarios
-      |> Enum.map(fn(%Scenario{job_name: job_name}) -> String.length(job_name) end)
+      |> Enum.map(&(String.length(&1.job_name)))
       |> Stream.concat([@default_label_width])
       |> Enum.max
     max_label_width + 1
   end
 
-  defp job_reports(scenarios, units, label_width) do
-    Enum.map(scenarios, fn(scenario) -> format_job(scenario, units, label_width) end)
+  defp scenario_reports(scenarios, units, label_width) do
+    Enum.map(scenarios, &(format_scenario(&1, units, label_width)))
   end
 
   defp units(scenarios, %{unit_scaling: scaling_strategy}) do
@@ -147,7 +146,7 @@ defmodule Benchee.Formatters.Console do
     #   %{run_time: [12345, 15431, 13222], ips: [1, 2, 3]}
     measurements =
       scenarios
-      |> Enum.flat_map(fn(scenario) -> Map.to_list(scenario.run_time_statistics) end)
+      |> Enum.flat_map(&(Map.to_list(&1.run_time_statistics)))
       |> Enum.group_by(fn({stat_name, _}) -> stat_name end,
                        fn({_, value}) -> value end)
 
@@ -157,16 +156,16 @@ defmodule Benchee.Formatters.Console do
     }
   end
 
-  @spec format_job(%Scenario{}, unit_per_statistic, integer) :: String.t
-  defp format_job(%Scenario{job_name: name, run_time_statistics: %Statistics{
-                           average:       average,
-                           ips:           ips,
-                           std_dev_ratio: std_dev_ratio,
-                           median:        median}
-                         },
-                         %{run_time:      run_time_unit,
-                           ips:           ips_unit,
-                         }, label_width) do
+  @spec format_scenario(Scenario.t, unit_per_statistic, integer) :: String.t
+  defp format_scenario(%Scenario{job_name: name, run_time_statistics: %Statistics{
+                                 average:       average,
+                                 ips:           ips,
+                                 std_dev_ratio: std_dev_ratio,
+                                 median:        median}
+                               },
+                               %{run_time:      run_time_unit,
+                                 ips:           ips_unit,
+                               }, label_width) do
     "~*s~*ts~*ts~*ts~*ts\n"
     |> :io_lib.format([-label_width, name, @ips_width, ips_out(ips, ips_unit),
                        @average_width, run_time_out(average, run_time_unit),
@@ -187,7 +186,7 @@ defmodule Benchee.Formatters.Console do
     DeviationPercent.format(std_dev_ratio)
   end
 
-  @spec comparison_report([%Scenario{}], unit_per_statistic, integer, map)  :: [String.t]
+  @spec comparison_report([Scenario.t], unit_per_statistic, integer, map)  :: [String.t]
   defp comparison_report(scenarios, units, label_width, config)
   defp comparison_report([_scenario], _, _, _) do
     [] # No need for a comparison when only one benchmark was run
@@ -203,20 +202,24 @@ defmodule Benchee.Formatters.Console do
     ]
   end
 
-  defp reference_report(%Scenario{job_name: name, run_time_statistics: %Statistics{ips: ips}}, %{ips: ips_unit}, label_width) do
+  defp reference_report(%Scenario{job_name: name,
+                                  run_time_statistics: %Statistics{ips: ips}},
+                        %{ips: ips_unit}, label_width) do
     "~*s~*s\n"
     |> :io_lib.format([-label_width, name, @ips_width, ips_out(ips, ips_unit)])
     |> to_string
   end
 
-  @spec comparisons(%Scenario{}, %{atom => Unit.t}, integer, [%Scenario{}]) :: [String.t]
+  @spec comparisons(Scenario.t, %{atom => Unit.t}, integer, [Scenario.t]) :: [String.t]
   defp comparisons(%Scenario{run_time_statistics: reference_stats}, units, label_width, scenarios_to_compare) do
     Enum.map(scenarios_to_compare, fn(scenario = %Scenario{run_time_statistics: job_stats}) ->
       format_comparison(scenario, units, label_width, (reference_stats.ips / job_stats.ips))
     end)
   end
 
-  defp format_comparison(%Scenario{job_name: name, run_time_statistics: %Statistics{ips: ips}}, %{ips: ips_unit}, label_width, times_slower) do
+  defp format_comparison(%Scenario{job_name: name,
+                                   run_time_statistics: %Statistics{ips: ips}},
+                         %{ips: ips_unit}, label_width, times_slower) do
     "~*s~*s - ~.2fx slower\n"
     |> :io_lib.format([-label_width, name, @ips_width, ips_out(ips, ips_unit), times_slower])
     |> to_string

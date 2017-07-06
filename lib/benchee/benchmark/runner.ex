@@ -22,7 +22,7 @@ defmodule Benchee.Benchmark.Runner do
   There will be `parallel` processes spawned executing the benchmark job in
   parallel.
   """
-  @spec run_scenarios([%Scenario{}], %ScenarioContext{}) :: [%Scenario{}]
+  @spec run_scenarios([Scenario.t], ScenarioContext.t) :: [Scenario.t]
   def run_scenarios(scenarios, scenario_context) do
     Enum.flat_map(scenarios, fn(scenario) ->
       parallel_benchmark(scenario, scenario_context)
@@ -39,15 +39,17 @@ defmodule Benchee.Benchmark.Runner do
     end
   end
 
-  def run_warmup(scenario,
-                 scenario_context = %ScenarioContext{config: %Configuration{warmup: warmup}}) do
+  def run_warmup(scenario, scenario_context = %ScenarioContext{
+                   config: %Configuration{warmup: warmup}
+                 }) do
     warmup_context = %ScenarioContext{scenario_context | show_fast_warning: false,
                                                          run_time: warmup}
     measure_runtimes(scenario, warmup_context)
   end
 
-  def run_benchmark(scenario,
-                    scenario_context = %ScenarioContext{config: %Configuration{time: run_time, print: %{fast_warning: fast_warning}}}) do
+  def run_benchmark(scenario, scenario_context = %ScenarioContext{
+                      config: %Configuration{time: run_time, print: %{fast_warning: fast_warning}}
+                    }) do
     measurement_context =
       %ScenarioContext{scenario_context | show_fast_warning: fast_warning,
                                           run_time: run_time}
@@ -84,9 +86,9 @@ defmodule Benchee.Benchmark.Runner do
   # executed in the measurement cycle.
   @minimum_execution_time 10
   @times_multiplicator 10
-  defp determine_n_times(scenario,
-                         scenario_context = %ScenarioContext{show_fast_warning: fast_warning,
-                                                             printer: printer}) do
+  defp determine_n_times(scenario, scenario_context = %ScenarioContext{
+                           show_fast_warning: fast_warning, printer: printer
+                         }) do
     run_time = measure_call(scenario, scenario_context)
     if run_time >= @minimum_execution_time do
       {1, run_time}
@@ -98,34 +100,36 @@ defmodule Benchee.Benchmark.Runner do
     end
   end
 
-  defp try_n_times(scenario,
-                   scenario_context = %ScenarioContext{num_iterations: num_iterations}) do
+  defp try_n_times(scenario, scenario_context = %ScenarioContext{
+                     num_iterations: num_iterations
+                   }) do
     run_time = measure_call_n_times(scenario, scenario_context)
     if run_time >= @minimum_execution_time do
       {num_iterations, run_time / num_iterations}
     else
-      new_context =
-        %ScenarioContext{scenario_context | num_iterations: num_iterations * @times_multiplicator}
+      new_context = %ScenarioContext{
+        scenario_context | num_iterations: num_iterations * @times_multiplicator
+      }
       try_n_times(scenario, new_context)
     end
   end
 
-  defp do_benchmark(scenario = %Scenario{run_times: run_times},
-                    %ScenarioContext{current_time: current_time, end_time: end_time})
-       when current_time > end_time do
+  defp do_benchmark(scenario = %Scenario{run_times: run_times}, %ScenarioContext{
+                      current_time: current_time, end_time: end_time
+                    }) when current_time > end_time do
     # restore correct order - important for graphing
     %Scenario{scenario | run_times: Enum.reverse(run_times)}
   end
-  defp do_benchmark(scenario = %Scenario{run_times: run_times},
-                    scenario_context) do
+  defp do_benchmark(scenario = %Scenario{run_times: run_times}, scenario_context) do
     run_time = measure_call(scenario, scenario_context)
     updated_scenario = %Scenario{scenario | run_times: [run_time | run_times]}
     updated_context = %ScenarioContext{scenario_context | current_time: current_time()}
     do_benchmark(updated_scenario, updated_context)
   end
 
-  defp measure_call(scenario,
-                    scenario_context = %ScenarioContext{num_iterations: num_iterations}) do
+  defp measure_call(scenario, scenario_context = %ScenarioContext{
+                      num_iterations: num_iterations
+                    }) do
     measure_call_n_times(scenario, scenario_context) / num_iterations
   end
 

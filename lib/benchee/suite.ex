@@ -16,6 +16,7 @@ defmodule Benchee.Suite do
     scenarios: []
   ]
 
+  @type key :: atom | String.t
   @type optional_map :: map | nil
   @type t :: %__MODULE__{
     configuration: Benchee.Configuration.t | nil,

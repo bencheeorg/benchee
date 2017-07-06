@@ -37,7 +37,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     end
   end
 
-  describe ".format_jobs" do
+  describe ".format_scenarios" do
     test "sorts the the given stats fastest to slowest" do
       scenarios = [
         %Scenario{job_name: "Second", run_time_statistics: %Statistics{
@@ -52,7 +52,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       ]
 
       [_header, result_1, result_2, result_3 | _dont_care] =
-        Console.format_jobs(scenarios, @console_config)
+        Console.format_scenarios(scenarios, @console_config)
 
       assert Regex.match?(~r/First/,  result_1)
       assert Regex.match?(~r/Second/, result_2)
@@ -71,7 +71,7 @@ defmodule Benchee.Formatters.ConsoleTest do
 
       expected_width = String.length "Second"
       [header, result_1, result_2 | _dont_care] =
-        Console.format_jobs(scenarios, @console_config)
+        Console.format_scenarios(scenarios, @console_config)
 
       assert_column_width "Name", header, expected_width
       assert_column_width "First", result_1, expected_width
@@ -87,7 +87,7 @@ defmodule Benchee.Formatters.ConsoleTest do
 
       # Include extra long name, expect width of 40 characters
       [header, result_1, result_2, result_3 | _dont_care] =
-        Console.format_jobs(longer_scenarios, @console_config)
+        Console.format_scenarios(longer_scenarios, @console_config)
 
       assert_column_width "Name", header, third_length
       assert_column_width "First", result_1, third_length
@@ -106,7 +106,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       ]
 
       [_, _, _, comp_header, reference, slower] =
-        Console.format_jobs(scenarios, @console_config)
+        Console.format_scenarios(scenarios, @console_config)
 
       assert Regex.match? ~r/Comparison/, comp_header
       assert Regex.match? ~r/^First\s+10.00 K$/m, reference
@@ -123,7 +123,7 @@ defmodule Benchee.Formatters.ConsoleTest do
         }}
       ]
 
-      output =  Enum.join Console.format_jobs(
+      output =  Enum.join Console.format_scenarios(
                   scenarios,
                   %{
                     comparison:   false,
@@ -148,7 +148,7 @@ defmodule Benchee.Formatters.ConsoleTest do
 
       expected_width = String.length(second_name)
       [_, _, _, _comp_header, reference, slower] =
-        Console.format_jobs(scenarios, @console_config)
+        Console.format_scenarios(scenarios, @console_config)
 
       assert_column_width "First", reference, expected_width
       assert_column_width second_name, slower, expected_width
@@ -161,7 +161,7 @@ defmodule Benchee.Formatters.ConsoleTest do
         }}
       ]
 
-      assert [header, result] = Console.format_jobs scenarios, @console_config
+      assert [header, result] = Console.format_scenarios(scenarios, @console_config)
       refute Regex.match? ~r/(Comparison|x slower)/, Enum.join([header, result])
     end
 
@@ -172,7 +172,7 @@ defmodule Benchee.Formatters.ConsoleTest do
         }}
       ]
 
-      assert [_, result] = Console.format_jobs scenarios, @console_config
+      assert [_, result] = Console.format_scenarios(scenarios, @console_config)
       assert Regex.match? ~r/0.150\s?μs/, result
       assert Regex.match? ~r/0.0125\s?μs/, result
     end
@@ -187,7 +187,7 @@ defmodule Benchee.Formatters.ConsoleTest do
         }}
       ]
 
-      assert [_, result] = Console.format_jobs scenarios, @console_config
+      assert [_, result] = Console.format_scenarios(scenarios, @console_config)
 
       refute result =~ ~r/\de\d/
       assert result =~ "11.00 ms"
