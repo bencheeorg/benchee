@@ -14,7 +14,7 @@ defmodule Benchee.Benchmark.Runner do
   for `warmup` time without gathering results and them running them for `time`
   gathering their run times.
 
-  This means the total run time of a single benchmarking job is warmup + time.
+  This means the total run time of a single benchmarking scenario is warmup + time.
 
   Warmup is usually important for run times with JIT but it seems to have some
   effect on the BEAM as well.
@@ -42,18 +42,13 @@ defmodule Benchee.Benchmark.Runner do
   def run_warmup(scenario, scenario_context = %ScenarioContext{
                    config: %Configuration{warmup: warmup}
                  }) do
-    warmup_context = %ScenarioContext{scenario_context | show_fast_warning: false,
-                                                         run_time: warmup}
-    measure_runtimes(scenario, warmup_context)
+    measure_runtimes(scenario, scenario_context, warmup, false)
   end
 
   def run_benchmark(scenario, scenario_context = %ScenarioContext{
                       config: %Configuration{time: run_time, print: %{fast_warning: fast_warning}}
                     }) do
-    measurement_context =
-      %ScenarioContext{scenario_context | show_fast_warning: fast_warning,
-                                          run_time: run_time}
-    measure_runtimes(scenario, measurement_context)
+    measure_runtimes(scenario, scenario_context, run_time, fast_warning)
   end
 
   defp pmap(collection, func) do
@@ -63,12 +58,13 @@ defmodule Benchee.Benchmark.Runner do
     |> List.flatten
   end
 
-  defp measure_runtimes(scenario, %ScenarioContext{run_time: 0}), do: scenario
-  defp measure_runtimes(scenario, scenario_context = %ScenarioContext{run_time: run_time}) do
+  defp measure_runtimes(scenario, context, run_time, show_fast_warning)
+  defp measure_runtimes(scenario, _, 0, _), do: scenario
+  defp measure_runtimes(scenario, scenario_context, run_time, show_fast_warning) do
     end_time = current_time() + run_time
     :erlang.garbage_collect
     {num_iterations, initial_run_time} =
-      determine_n_times(scenario, scenario_context)
+      determine_n_times(scenario, scenario_context, show_fast_warning)
     updated_scenario = %Scenario{scenario | run_times: [initial_run_time]}
     new_context =
       %ScenarioContext{scenario_context | current_time: current_time(),
@@ -87,8 +83,8 @@ defmodule Benchee.Benchmark.Runner do
   @minimum_execution_time 10
   @times_multiplicator 10
   defp determine_n_times(scenario, scenario_context = %ScenarioContext{
-                           show_fast_warning: fast_warning, printer: printer
-                         }) do
+                           printer: printer
+                         }, fast_warning) do
     run_time = measure_call(scenario, scenario_context)
     if run_time >= @minimum_execution_time do
       {1, run_time}

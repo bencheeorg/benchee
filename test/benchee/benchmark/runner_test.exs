@@ -1,10 +1,7 @@
 defmodule Benchee.Benchmark.RunnerTest do
   use ExUnit.Case, async: true
   import Benchee.TestHelpers
-  alias Benchee.Suite
-  alias Benchee.Benchmark
-  alias Benchee.Configuration
-  alias Benchee.Statistics
+  alias Benchee.{Suite, Benchmark, Configuration, Statistics}
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
 
   @config %Configuration{parallel: 1,
@@ -64,7 +61,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     end
 
     test "can run multiple benchmarks in parallel" do
-      suite = test_suite(%Suite{configuration: %{parallel: 6, time: 60_000}})
+      suite = test_suite(%Suite{configuration: %{parallel: 4, time: 60_000}})
       new_suite = suite
                   |> Benchmark.benchmark("", fn -> :timer.sleep 10 end)
                   |> Benchmark.measure(TestPrinter)

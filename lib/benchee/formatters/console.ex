@@ -70,7 +70,7 @@ defmodule Benchee.Formatters.Console do
   def format(%Suite{scenarios: scenarios,
                     configuration: %{formatter_options: %{console: config}}}) do
     scenarios
-    |> Enum.group_by(&(&1.input_name))
+    |> Enum.group_by(fn(scenario) -> scenario.input_name end)
     |> Enum.map(fn({input, scenarios}) ->
         [input_header(input) | format_scenarios(scenarios, config)]
       end)
@@ -130,15 +130,17 @@ defmodule Benchee.Formatters.Console do
   end
 
   defp label_width(scenarios) do
-    max_label_width = scenarios
-      |> Enum.map(&(String.length(&1.job_name)))
+    max_label_width =
+      scenarios
+      |> Enum.map(fn(scenario) -> String.length(scenario.job_name) end)
       |> Stream.concat([@default_label_width])
       |> Enum.max
     max_label_width + 1
   end
 
   defp scenario_reports(scenarios, units, label_width) do
-    Enum.map(scenarios, &(format_scenario(&1, units, label_width)))
+    Enum.map(scenarios,
+             fn(scenario) -> format_scenario(scenario, units, label_width) end)
   end
 
   defp units(scenarios, %{unit_scaling: scaling_strategy}) do
@@ -146,7 +148,7 @@ defmodule Benchee.Formatters.Console do
     #   %{run_time: [12345, 15431, 13222], ips: [1, 2, 3]}
     measurements =
       scenarios
-      |> Enum.flat_map(&(Map.to_list(&1.run_time_statistics)))
+      |> Enum.flat_map(fn(scenario) -> Map.to_list(scenario.run_time_statistics) end)
       |> Enum.group_by(fn({stat_name, _}) -> stat_name end,
                        fn({_, value}) -> value end)
 
