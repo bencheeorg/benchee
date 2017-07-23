@@ -170,31 +170,31 @@ defmodule BencheeTest do
   @rough_10_milli_s "((8|9|10|11|12|13|14)\\.\\d{2} ms)"
   test "formatters have full access to the suite data, values in assigns" do
     retrying fn ->
+      formatter_one = fn(suite) ->
+        run_time = suite.scenarios
+                   |> (fn([scenario | _]) -> List.last(scenario.run_times) end).()
+                   |> Benchee.Conversion.Duration.format
+
+        IO.puts "Run time: #{run_time}"
+      end
+
+      formatter_two = fn(suite) ->
+        average = suite.scenarios
+                  |> (fn([scenario | _]) -> scenario.run_time_statistics.average end).()
+                  |> Benchee.Conversion.Duration.format
+        IO.puts "Average: #{average}"
+      end
+
+      formatter_three = fn(suite) ->
+        IO.puts suite.configuration.assigns.custom
+      end
+
       output = capture_io fn ->
         Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end},
           time:       0.01,
           warmup:     0.005,
           assigns:   %{custom: "Custom value"},
-          formatters: [
-            fn(suite) ->
-              run_time = suite.run_times
-                         |> no_input_access
-                         |> Map.get("Sleeps")
-                         |> List.last
-                         |> Benchee.Conversion.Duration.format
-
-              IO.puts "Run time: #{run_time}"
-            end,
-            fn(suite) ->
-              average = suite.statistics
-                        |> no_input_access
-                        |> Map.get("Sleeps")
-                        |> Map.get(:average)
-                        |> Benchee.Conversion.Duration.format
-              IO.puts "Average: #{average}"
-            end,
-            fn(suite) -> IO.puts suite.configuration.assigns.custom end
-          ]
+          formatters: [formatter_one, formatter_two, formatter_three]
         )
       end
 
@@ -252,7 +252,7 @@ defmodule BencheeTest do
       suite = Benchee.run(%{
         "sleep"    => fn -> :timer.sleep 1 end
       }, time: 0.001, warmup: 0)
-      assert %{run_times: _, statistics: _, configuration: _} = suite
+      assert %{scenarios: _, configuration: _} = suite
     end
   end
 
@@ -274,11 +274,11 @@ defmodule BencheeTest do
         sleep: fn -> :timer.sleep 1 end
       }, time: 0.001, warmup: 0)
 
-      assert Map.keys(suite.jobs) == ~w(sleep)
+      assert Enum.map(suite.scenarios, &(&1.job_name)) == ~w(sleep)
     end
   end
 
-  test ".run accepts arom keys for inputs" do
+  test ".run accepts atom keys for inputs" do
     output = capture_io fn ->
       map_fun = fn(i) -> [i, i * i] end
       inputs = [

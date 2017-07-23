@@ -2,6 +2,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureIO
   import Benchee.Output.BenchmarkPrinter
+  alias Benchee.Benchmark.Scenario
   @system_info %{elixir: "1.4",
                  erlang: "19.2",
                  os: :macOS,
@@ -23,7 +24,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       output = capture_io fn ->
         %{
           configuration: %{parallel: 2, time: 10_000, warmup: 0, inputs: nil},
-          jobs: %{"one" => nil, "two" => nil},
+          scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
           system: @system_info
         }
         |> configuration_information
@@ -51,7 +52,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
             warmup: 10_000_000,
             inputs: nil
           },
-          jobs: %{"one" => nil, "two" => nil},
+          scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
           system: @system_info
         }
         |> configuration_information
@@ -68,7 +69,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       output = capture_io fn ->
         %{
           configuration: %{parallel: 2, time: 10_000, warmup: 0, inputs: @inputs},
-          jobs: %{"one" => nil, "two" => nil},
+          scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
           system: @system_info
         }
         |> configuration_information

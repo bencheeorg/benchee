@@ -19,9 +19,9 @@ defmodule Benchee.Output.BenchmarkPrinter do
   def configuration_information(%{configuration: %{print: %{configuration: false}}}) do
     nil
   end
-  def configuration_information(%{jobs: jobs, system: sys, configuration: config}) do
+  def configuration_information(%{scenarios: scenarios, system: sys, configuration: config}) do
     system_information(sys)
-    suite_information(jobs, config)
+    suite_information(scenarios, config)
   end
 
   defp system_information(%{erlang: erlang_version,
@@ -38,11 +38,11 @@ defmodule Benchee.Output.BenchmarkPrinter do
     IO.puts "Erlang #{erlang_version}"
   end
 
-  defp suite_information(jobs, %{parallel: parallel,
+  defp suite_information(scenarios, %{parallel: parallel,
                                  time:     time,
                                  warmup:   warmup,
                                  inputs:   inputs}) do
-    job_count      = map_size jobs
+    job_count      = length(scenarios)
     exec_time      = warmup + time
     total_time     = job_count * inputs_count(inputs) * exec_time
 

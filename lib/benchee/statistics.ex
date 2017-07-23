@@ -1,6 +1,6 @@
 defmodule Benchee.Statistics do
   @moduledoc """
-  Statistics related functionality that is meant to take the raw benchmark run
+  Statistics related functionality that is meant to take the raw benchmark run
   times and then compute statistics like the average and the standard devaition.
   """
 
@@ -21,9 +21,27 @@ defmodule Benchee.Statistics do
 
   @type samples :: [number]
 
-  alias Benchee.{Statistics, Conversion.Duration, Suite}
-  import Benchee.Utility.MapValues
+  alias Benchee.{Statistics, Conversion.Duration, Suite, Benchmark.Scenario}
   require Integer
+
+  @doc """
+  Sorts the given scenarios fastest to slowest by run_time average.
+
+  ## Examples
+
+      iex> scenario_1 = %Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 100.0}}
+      iex> scenario_2 = %Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 200.0}}
+      iex> scenario_3 = %Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 400.0}}
+      iex> scenarios = [scenario_2, scenario_3, scenario_1]
+      iex> Benchee.Statistics.sort(scenarios)
+      [%Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 100.0}},
+       %Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 200.0}},
+       %Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 400.0}}]
+  """
+  @spec sort([%Scenario{}]) :: [%Scenario{}]
+  def sort(scenarios) do
+    Enum.sort_by(scenarios, fn(%Scenario{run_time_statistics: %Statistics{average: average}}) -> average end)
+  end
 
   @doc """
   Takes a job suite with job run times, returns a map representing the
@@ -53,15 +71,24 @@ defmodule Benchee.Statistics do
 
   ## Examples
 
-      iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
-      iex> suite = %Benchee.Suite{
-      ...>   run_times: %{"Input" => %{"My Job" => run_times}}
-      ...> }
+      iex> scenarios = [
+      ...>   %Benchee.Benchmark.Scenario{
+      ...>     job_name: "My Job",
+      ...>     run_times: [200, 400, 400, 400, 500, 500, 700, 900],
+      ...>     input_name: "Input",
+      ...>     input: "Input"
+      ...>   }
+      ...> ]
+      iex> suite = %Benchee.Suite{scenarios: scenarios}
       iex> Benchee.Statistics.statistics(suite)
       %Benchee.Suite{
-        statistics: %{
-          "Input" => %{
-            "My Job" => %Benchee.Statistics{
+        scenarios: [
+          %Benchee.Benchmark.Scenario{
+            job_name: "My Job",
+            run_times: [200, 400, 400, 400, 500, 500, 700, 900],
+            input_name: "Input",
+            input: "Input",
+            run_time_statistics: %Benchee.Statistics{
               average:       500.0,
               ips:           2000.0,
               std_dev:       200.0,
@@ -73,24 +100,20 @@ defmodule Benchee.Statistics do
               sample_size:   8
             }
           }
-        },
-        run_times: %{
-          "Input" => %{
-            "My Job" => [200, 400, 400, 400, 500, 500, 700, 900]
-          }
-        },
+        ],
         configuration: nil,
-        jobs: %{  },
         system: nil
       }
 
   """
   @spec statistics(Suite.t) :: Suite.t
-  def statistics(suite = %Suite{run_times: run_times_per_input}) do
-    statistics = run_times_per_input
-                 |> p_map_values(&Statistics.job_statistics/1)
+  def statistics(suite = %Suite{scenarios: scenarios}) do
+    new_scenarios = Enum.map(scenarios, fn(scenario) ->
+      stats = job_statistics(scenario.run_times)
+      %Scenario{scenario | run_time_statistics: stats}
+    end)
 
-    %Suite{suite | statistics: statistics}
+    %Suite{suite | scenarios: new_scenarios}
   end
 
   @doc """
@@ -138,21 +161,6 @@ defmodule Benchee.Statistics do
       maximum:       maximum,
       sample_size:   iterations
     }
-  end
-
-  @doc """
-  Sorts the given jobs fastest to slowest by average.
-
-  ## Examples
-
-      iex> jobs = %{"Second" => %{average: 200.0}, "Third"  => %{average: 400.0}, "First"  => %{average: 100.0}}
-      iex> Benchee.Statistics.sort(jobs)
-      [{"First",  %{average: 100.0}},
-       {"Second", %{average: 200.0}},
-       {"Third",  %{average: 400.0}}]
-  """
-  def sort(jobs) do
-    Enum.sort_by jobs, fn({_, %{average: average}}) -> average end
   end
 
   defp iterations_per_second(average_microseconds) do

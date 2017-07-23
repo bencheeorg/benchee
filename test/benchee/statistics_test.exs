@@ -1,50 +1,40 @@
 defmodule Benchee.StatistcsTest do
   use ExUnit.Case, async: true
-  alias Benchee.{Statistics, Suite}
+  alias Benchee.{Statistics, Suite, Benchmark.Scenario}
   doctest Benchee.Statistics
 
   @sample_1 [600, 470, 170, 430, 300]
   @sample_2 [17, 15, 23, 7, 9, 13]
   describe ".statistics" do
     test "computes the statistics for all jobs correctly" do
-      suite = %Suite{
-        run_times: %{
-          "Input" => %{
-            "Job 1" => @sample_1,
-            "Job 2" => @sample_2
-          }
-        }
-      }
+      scenarios = [
+        %Scenario{input: "Input", input_name: "Input", job_name: "Job 1",
+                  run_times: @sample_1},
+        %Scenario{input: "Input", input_name: "Input", job_name: "Job 2",
+                  run_times: @sample_2}
+      ]
+      suite = %Suite{scenarios: scenarios}
+      new_suite = Statistics.statistics(suite)
 
-      %Suite{
-        statistics: %{
-          "Input" => %{
-            "Job 1" => stats_1,
-            "Job 2" => stats_2}}} = Statistics.statistics suite
+      stats_1 = stats_for(new_suite, "Job 1", "Input")
+      stats_2 = stats_for(new_suite, "Job 2", "Input")
 
       sample_1_asserts(stats_1)
       sample_2_asserts(stats_2)
     end
 
     test "computes statistics correctly for multiple inputs" do
-      suite = %Suite{
-        run_times: %{
-          "Input 1" => %{
-            "Job" => @sample_1
-          },
-          "Input 2" => %{
-            "Job" => @sample_2
-          }
-        }
-      }
+      scenarios = [
+        %Scenario{input: "Input 1", input_name: "Input 1", job_name: "Job",
+                  run_times: @sample_1},
+        %Scenario{input: "Input 2", input_name: "Input 2", job_name: "Job",
+                  run_times: @sample_2}
+      ]
+      suite = %Suite{scenarios: scenarios}
+      new_suite = Statistics.statistics(suite)
 
-      %Suite{
-        statistics: %{
-          "Input 1" => %{
-            "Job" => stats_1
-          },
-          "Input 2" => %{
-            "Job" => stats_2}}} = Statistics.statistics suite
+      stats_1 = stats_for(new_suite, "Job", "Input 1")
+      stats_2 = stats_for(new_suite, "Job", "Input 2")
 
       sample_1_asserts(stats_1)
       sample_2_asserts(stats_2)
@@ -52,17 +42,19 @@ defmodule Benchee.StatistcsTest do
 
     test "preserves all other keys in the map handed to it" do
       suite = %Suite{
-        run_times: %{
-          "Input" => %{
-            "Job 1" => [600, 470, 170, 430, 300],
-            "Job 2" => [17, 15, 23, 7, 9, 13]
-          }
-        },
+        scenarios: [],
         configuration: %{formatters: []}
       }
 
       assert %Suite{configuration: %{formatters: []}} =
         Statistics.statistics suite
+    end
+
+    defp stats_for(suite, job_name, input_name) do
+      %Scenario{run_time_statistics: stats} = Enum.find(suite.scenarios, fn(scenario) ->
+        scenario.job_name == job_name && scenario.input_name == input_name
+      end)
+      stats
     end
 
     defp sample_1_asserts(stats) do
@@ -90,13 +82,13 @@ defmodule Benchee.StatistcsTest do
 
   describe ".sort" do
     test "sorts the benchmarks correctly and retains all data" do
-      fourth = {"Fourth", %{average: 400.1, ips: 4_999.0,  std_dev_ratio: 0.7}}
-      second = {"Second", %{average: 200.0, ips: 5_000.0,  std_dev_ratio: 2.1}}
-      third  = {"Third",  %{average: 400.0, ips: 2_500.0,  std_dev_ratio: 1.5}}
-      first  = {"First",  %{average: 100.0, ips: 10_000.0, std_dev_ratio: 0.3}}
-      jobs = Map.new [fourth, second, third, first]
+      fourth = %Scenario{run_time_statistics: %Statistics{average: 400.1}}
+      second = %Scenario{run_time_statistics: %Statistics{average: 200.0}}
+      third = %Scenario{run_time_statistics: %Statistics{average: 400.0}}
+      first = %Scenario{run_time_statistics: %Statistics{average: 100.0}}
+      scenarios = [fourth, second, third, first]
 
-      assert Statistics.sort(jobs) == [first, second, third, fourth]
+      assert Statistics.sort(scenarios) == [first, second, third, fourth]
     end
   end
 end

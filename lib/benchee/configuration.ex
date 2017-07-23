@@ -127,10 +127,8 @@ defmodule Benchee.Configuration do
             },
             assigns: %{}
           },
-        jobs: %{},
-        run_times: nil,
-        statistics: nil,
-        system: nil
+        system: nil,
+        scenarios: []
       }
 
       iex> Benchee.init time: 1, warmup: 0.2
@@ -152,10 +150,8 @@ defmodule Benchee.Configuration do
             },
             assigns: %{}
           },
-        jobs: %{},
-        run_times: nil,
-        statistics: nil,
-        system: nil
+        system: nil,
+        scenarios: []
       }
 
       iex> Benchee.init %{time: 1, warmup: 0.2}
@@ -177,10 +173,8 @@ defmodule Benchee.Configuration do
             },
             assigns: %{}
           },
-        jobs: %{},
-        run_times: nil,
-        statistics: nil,
-        system: nil
+        system: nil,
+        scenarios: []
       }
 
       iex> Benchee.init(
@@ -211,10 +205,8 @@ defmodule Benchee.Configuration do
             },
             assigns: %{}
           },
-        jobs: %{},
-        run_times: nil,
-        statistics: nil,
-        system: nil
+        system: nil,
+        scenarios: []
       }
   """
   @spec init(user_configuration) :: Suite.t
