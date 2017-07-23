@@ -1,3 +1,8 @@
+## 0.10.0 - unreleased
+
+### Breakin Changes (Plugins)
+* `:run_times`, `:statistics` and `:jobs` have been removed and folded together into `:scenarios` - a scenario holds the benchmarking function, porentially the input, the raw run times measures and the computed statistics. With this data structure, all the relevant data for one scenario is one place although it takes a lot to change, this seems to be the best way going forward. Huge thanks to `@devonestes`!
+
 ## 0.9.0 (2017-06-08)
 
 This release focuses on adding more system specific information like CPU etc. and for better erlang compatibilityif you wanna use benchee from erlang. There is an [example project](https://github.com/PragTob/benchee_erlang_try) but calling Elixir from Erlang hasn't been as easy as I hoped :)
