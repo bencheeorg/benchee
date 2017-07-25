@@ -108,12 +108,19 @@ defmodule Benchee.Statistics do
   """
   @spec statistics(Suite.t) :: Suite.t
   def statistics(suite = %Suite{scenarios: scenarios}) do
-    new_scenarios = Enum.map(scenarios, fn(scenario) ->
+    new_scenarios = parallel_map(scenarios, fn(scenario) ->
       stats = job_statistics(scenario.run_times)
       %Scenario{scenario | run_time_statistics: stats}
     end)
 
     %Suite{suite | scenarios: new_scenarios}
+  end
+
+  defp parallel_map(scenarios, func) do
+    scenarios
+    |> Enum.map(fn(scenario) -> fn() -> func.(scenario) end end)
+    |> Enum.map(fn(func) -> Task.async(func) end)
+    |> Enum.map(&Task.await(&1, :infinity))
   end
 
   @doc """
