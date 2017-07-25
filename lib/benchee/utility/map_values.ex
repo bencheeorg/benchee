@@ -14,7 +14,6 @@ defmodule Benchee.Utility.MapValues do
       ...> fn(value) -> value + 1 end)
       %{a: %{b: 3, c: 1}, d: %{e: 3}}
   """
-  require IEx
   def map_values(map, function) do
     map
     |> Enum.map(fn({key, child_map}) ->
