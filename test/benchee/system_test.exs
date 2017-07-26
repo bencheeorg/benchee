@@ -41,14 +41,33 @@ defmodule Benchee.SystemTest do
 
   test ".system_cmd handles errors gracefully" do
     system_func = fn(_, _) -> {"ERROR", 1} end
+    success_callback = fn(_) -> nil end
     captured_io = capture_io(fn ->
-      Benchee.System.system_cmd("cat", "dev/null", system_func)
+      Benchee.System.system_cmd("cat", "dev/null", success_callback, system_func)
     end)
 
     assert captured_io =~ "Something went wrong"
     assert captured_io =~ "ERROR"
     capture_io fn ->
-      assert Benchee.System.system_cmd("cat", "dev/null", system_func) == "N/A"
+      assert Benchee.System.system_cmd("cat", "dev/null", success_callback, system_func) == "N/A"
     end
+  end
+
+  test ".parse_cpu_for handles Semaphore specific CI results" do
+    semaphore_output = "model name	: Intel Core Processor (Haswell)"
+    system_func = fn(_, _) -> {semaphore_output, 0} end
+    success_callback = fn(output) -> Benchee.System.parse_cpu_for(:Linux, output) end
+
+    output = Benchee.System.system_cmd("test", "args", success_callback, system_func)
+    assert output =~ "Haswell"
+  end
+
+  test ".parse_cpu_for handles unknown formats on Linux" do
+    unknown_processor = "Bender D Bending Rodriguez"
+    system_func = fn(_, _) -> {unknown_processor, 0} end
+    success_callback = fn(output) -> Benchee.System.parse_cpu_for(:Linux, output) end
+
+    output = Benchee.System.system_cmd("test", "args", success_callback, system_func)
+    assert output =~ "Unrecognized processor"
   end
 end
