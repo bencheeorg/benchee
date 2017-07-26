@@ -6,7 +6,7 @@ defmodule Benchee.Benchmark.Runner do
 
   alias Benchee.Benchmark
   alias Benchee.Benchmark.{Scenario, ScenarioContext}
-  alias Benchee.Utility.RepeatN
+  alias Benchee.Utility.{RepeatN, Parallel}
   alias Benchee.Configuration
 
   @doc """
@@ -33,10 +33,10 @@ defmodule Benchee.Benchmark.Runner do
                           scenario_context = %ScenarioContext{printer: printer, config: config}) do
     printer.input_information(input_name, config)
     printer.benchmarking(job_name, config)
-    pmap 1..config.parallel, fn ->
+    Parallel.map(1..config.parallel, fn(_task_number) ->
       run_warmup(scenario, scenario_context)
       run_benchmark(scenario, scenario_context)
-    end
+    end)
   end
 
   def run_warmup(scenario, scenario_context = %ScenarioContext{
@@ -49,13 +49,6 @@ defmodule Benchee.Benchmark.Runner do
                       config: %Configuration{time: run_time, print: %{fast_warning: fast_warning}}
                     }) do
     measure_runtimes(scenario, scenario_context, run_time, fast_warning)
-  end
-
-  defp pmap(collection, func) do
-    collection
-    |> Enum.map(fn(_) -> Task.async(func) end)
-    |> Enum.map(&Task.await(&1, :infinity))
-    |> List.flatten
   end
 
   defp measure_runtimes(scenario, context, run_time, show_fast_warning)

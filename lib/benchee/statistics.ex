@@ -21,7 +21,8 @@ defmodule Benchee.Statistics do
 
   @type samples :: [number]
 
-  alias Benchee.{Statistics, Conversion.Duration, Suite, Benchmark.Scenario}
+  alias Benchee.{Statistics, Conversion.Duration, Suite, Benchmark.Scenario,
+                 Utility.Parallel}
   require Integer
 
   @doc """
@@ -108,7 +109,7 @@ defmodule Benchee.Statistics do
   """
   @spec statistics(Suite.t) :: Suite.t
   def statistics(suite = %Suite{scenarios: scenarios}) do
-    new_scenarios = Enum.map(scenarios, fn(scenario) ->
+    new_scenarios = Parallel.map(scenarios, fn(scenario) ->
       stats = job_statistics(scenario.run_times)
       %Scenario{scenario | run_time_statistics: stats}
     end)
