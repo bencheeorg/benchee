@@ -62,13 +62,19 @@ defmodule Benchee.System do
   def cpu_speed, do: cpu_speed(os())
 
   defp cpu_speed(:Windows) do
-    parse_cpu_for(:Windows, system_cmd("WMIC", ["CPU", "GET", "NAME"]))
+    system_cmd("WMIC", ["CPU", "GET", "NAME"], fn(output) ->
+      parse_cpu_for(:Windows, output)
+    end)
   end
   defp cpu_speed(:macOS) do
-    parse_cpu_for(:macOS, system_cmd("sysctl", ["-n", "machdep.cpu.brand_string"]))
+    system_cmd("sysctl", ["-n", "machdep.cpu.brand_string"], fn(output) ->
+      parse_cpu_for(:macOS, output)
+    end)
   end
   defp cpu_speed(:Linux) do
-    parse_cpu_for(:Linux, system_cmd("cat", ["/proc/cpuinfo"]))
+    system_cmd("cat", ["/proc/cpuinfo"], fn(output) ->
+      parse_cpu_for(:Linux, output)
+    end)
   end
 
   def parse_cpu_for(_, "N/A"), do: "N/A"
@@ -92,16 +98,19 @@ defmodule Benchee.System do
   def available_memory, do: available_memory(os())
 
   defp available_memory(:Windows) do
-    parse_memory_for(
-      :Windows,
-      system_cmd("WMIC", ["COMPUTERSYSTEM", "GET", "TOTALPHYSICALMEMORY"])
-    )
+    system_cmd("WMIC", ["COMPUTERSYSTEM", "GET", "TOTALPHYSICALMEMORY"], fn(output) ->
+      parse_memory_for(:Windows, output)
+    end)
   end
   defp available_memory(:macOS) do
-    parse_memory_for(:macOS, system_cmd("sysctl", ["-n", "hw.memsize"]))
+    system_cmd("sysctl", ["-n", "hw.memsize"], fn(output) ->
+      parse_memory_for(:macOS, output)
+    end)
   end
   defp available_memory(:Linux) do
-    parse_memory_for(:Linux, system_cmd("cat", ["/proc/meminfo"]))
+    system_cmd("cat", ["/proc/meminfo"], fn(output) ->
+      parse_memory_for(:Linux, output)
+    end)
   end
 
   @kilobyte_to_gigabyte 1_000_000
@@ -128,14 +137,14 @@ defmodule Benchee.System do
 
   defp format_memory(memory, coefficient), do: "#{memory / coefficient} GB"
 
-  def system_cmd(cmd, args, system_func \\ &System.cmd/2) do
+  def system_cmd(cmd, args, success_callback, system_func \\ &System.cmd/2) do
     {output, exit_code} = system_func.(cmd, args)
     if exit_code > 0 do
       IO.puts("Something went wrong trying to get system information:")
       IO.puts(output)
       "N/A"
     else
-      output
+      success_callback.(output)
     end
   end
 end
