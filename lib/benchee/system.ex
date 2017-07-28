@@ -78,12 +78,12 @@ defmodule Benchee.System do
   end
   def parse_cpu_for(:macOS, raw_output), do: String.trim(raw_output)
   def parse_cpu_for(:Linux, raw_output) do
-    Regex.run(~r/model name.*:([\w \(\)\-\@\.]*)/i, raw_output, capture: :all_but_first)
-    |> parse_cpu_for_(:Linux)
+    match_info = Regex.run(~r/model name.*:([\w \(\)\-\@\.]*)/i, raw_output, capture: :all_but_first)
+    case match_info do
+      [cpu_info] -> String.trim(cpu_info)
+      _          -> "Unrecognized processor"
+    end
   end
-
-  defp parse_cpu_for_(_cpu_info = nil,  :Linux), do: "Unrecognized processor"
-  defp parse_cpu_for_([cpu_info],       :Linux), do: String.trim(cpu_info)
 
   @doc """
   Returns an integer with the total number of available memory on the machine

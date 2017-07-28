@@ -33,6 +33,18 @@ defmodule Benchee.SystemTest do
     assert Benchee.System.cpu_speed() =~ ~r/\d+.*hz/i
   end
 
+  test ".parse_cpu_for :Linux handles Semaphore CI output" do
+    semaphore_output = "model name	: Intel Core Processor (Haswell)"
+    output = Benchee.System.parse_cpu_for(:Linux, semaphore_output)
+    assert output =~ "Haswell"
+  end
+
+  test ".parse_cpu_for :Linux handles unknown architectures" do
+    raw_output = "Bender Bending Rodriguez"
+    output = Benchee.System.parse_cpu_for(:Linux, raw_output)
+    assert output == "Unrecognized processor"
+  end
+
   test ".available_memory returns the available memory on the computer" do
     {num, rest} = Float.parse(Benchee.System.available_memory())
     assert num > 0
