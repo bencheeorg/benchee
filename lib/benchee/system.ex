@@ -68,7 +68,7 @@ defmodule Benchee.System do
     parse_cpu_for(:macOS, system_cmd("sysctl", ["-n", "machdep.cpu.brand_string"]))
   end
   defp cpu_speed(:Linux) do
-    parse_cpu_for(:Linux, system_cmd("cat", ["/proc/cpuinfo"]))
+    parse_cpu_for(:Linux, system_cmd("cat", ["/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"]))
   end
 
   def parse_cpu_for(_, "N/A"), do: "N/A"
@@ -78,8 +78,14 @@ defmodule Benchee.System do
   end
   def parse_cpu_for(:macOS, raw_output), do: String.trim(raw_output)
   def parse_cpu_for(:Linux, raw_output) do
-    Regex.run(~r/model name.*:([\w \(\)\-\@\.]*)/i, raw_output, capture: :all_but_first)
-    |> parse_cpu_for_(:Linux)
+    String.trim(raw_output)
+    raw_output
+    |> String.trim
+    |> Float.parse
+    |> elem(0)
+    |> (fn (raw_float) -> raw_float / 1000 end).()
+    |> Float.to_string
+    |> (fn (float_str) -> float_str <> " Mhz" end).()
   end
 
   defp parse_cpu_for_(_cpu_info = nil,  :Linux), do: "Unrecognized processor"
