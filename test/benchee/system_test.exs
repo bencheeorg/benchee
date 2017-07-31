@@ -33,16 +33,31 @@ defmodule Benchee.SystemTest do
     assert Benchee.System.cpu_speed() =~ ~r/\d+.*hz/i
   end
 
-  test ".parse_cpu_for :Linux handles Semaphore CI output" do
-    semaphore_output = "model name	: Intel Core Processor (Haswell)"
-    output = Benchee.System.parse_cpu_for(:Linux, semaphore_output)
-    assert output =~ "Haswell"
-  end
+  describe ".parse_cpu_for" do
+    @cat_proc_cpu_info_excerpt """
+    processor	: 0
+    vendor_id	: GenuineIntel
+    cpu family	: 6
+    model		: 60
+    model name	: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
+    stepping	: 3
+    """
+    test "for :Linux handles some normal intel output" do
+      output = Benchee.System.parse_cpu_for(:Linux, @cat_proc_cpu_info_excerpt)
+      assert output =~ "Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz"
+    end
 
-  test ".parse_cpu_for :Linux handles unknown architectures" do
-    raw_output = "Bender Bending Rodriguez"
-    output = Benchee.System.parse_cpu_for(:Linux, raw_output)
-    assert output == "Unrecognized processor"
+    test "for :Linux handles Semaphore CI output" do
+      semaphore_output = "model name	: Intel Core Processor (Haswell)"
+      output = Benchee.System.parse_cpu_for(:Linux, semaphore_output)
+      assert output =~ "Haswell"
+    end
+
+    test "for :Linux handles unknown architectures" do
+      raw_output = "Bender Bending Rodriguez"
+      output = Benchee.System.parse_cpu_for(:Linux, raw_output)
+      assert output == "Unrecognized processor"
+    end
   end
 
   test ".available_memory returns the available memory on the computer" do
