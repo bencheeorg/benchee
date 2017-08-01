@@ -71,6 +71,8 @@ defmodule Benchee.System do
     parse_cpu_for(:Linux, system_cmd("cat", ["/proc/cpuinfo"]))
   end
 
+  @linux_cpuinfo_regex ~r/model name.*:([\w \(\)\-\@\.]*)/i
+
   def parse_cpu_for(_, "N/A"), do: "N/A"
   def parse_cpu_for(:Windows, raw_output) do
     "Name" <> cpu_info = raw_output
@@ -78,7 +80,9 @@ defmodule Benchee.System do
   end
   def parse_cpu_for(:macOS, raw_output), do: String.trim(raw_output)
   def parse_cpu_for(:Linux, raw_output) do
-    match_info = Regex.run(~r/model name.*:([\w \(\)\-\@\.]*)/i, raw_output, capture: :all_but_first)
+    match_info = Regex.run(@linux_cpuinfo_regex,
+                           raw_output,
+                           capture: :all_but_first)
     case match_info do
       [cpu_info] -> String.trim(cpu_info)
       _          -> "Unrecognized processor"
