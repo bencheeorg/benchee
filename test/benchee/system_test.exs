@@ -29,8 +29,8 @@ defmodule Benchee.SystemTest do
     assert Enum.member?([:Linux, :macOS, :Windows], Benchee.System.os())
   end
 
-  test ".cpu_speed returns the speed of the current cpu" do
-    assert Benchee.System.cpu_speed() =~ ~r/\d+.*hz/i
+  test ".cpu_speed returns a string (more accurate tests in .parse_cpu_for)" do
+    assert "" <> _actual_content = Benchee.System.cpu_speed()
   end
 
   describe ".parse_cpu_for" do
