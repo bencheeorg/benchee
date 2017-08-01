@@ -236,7 +236,7 @@ defmodule Benchee.Configuration do
     DeepMerge.deep_merge(%{formatter_options: formatter_options}, config)
   end
 
-  defp force_string_input_keys(%{inputs: inputs} = config) do
+  defp force_string_input_keys(config = %{inputs: inputs}) do
     standardized_inputs = for {name, value} <- inputs, into: %{} do
                             {to_string(name), value}
                           end
