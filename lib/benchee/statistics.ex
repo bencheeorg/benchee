@@ -41,7 +41,11 @@ defmodule Benchee.Statistics do
   """
   @spec sort([%Scenario{}]) :: [%Scenario{}]
   def sort(scenarios) do
-    Enum.sort_by(scenarios, fn(%Scenario{run_time_statistics: %Statistics{average: average}}) -> average end)
+    Enum.sort_by(scenarios,
+      fn(%Scenario{run_time_statistics: %Statistics{average: average}}) ->
+        average
+      end
+    )
   end
 
   @doc """

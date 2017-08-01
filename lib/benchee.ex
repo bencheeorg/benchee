@@ -1,4 +1,5 @@
 # Idea from this:
+# credo:disable-for-next-line
 # https://elixirforum.com/t/writing-a-library-for-use-in-both-elixir-and-erlang/2900/5?u=pragtob
 defmodule Benchee.Impl do
   @moduledoc false
@@ -60,14 +61,15 @@ defmodule Benchee.Impl do
         end
       end
 
-      defdelegate init(),                                    to: Benchee.Configuration
-      defdelegate init(config),                              to: Benchee.Configuration
-      defdelegate system(suite),                             to: Benchee.System
-      defdelegate measure(suite),                            to: Benchee.Benchmark
-      defdelegate measure(suite, printer),                   to: Benchee.Benchmark
-      defdelegate benchmark(suite, name, function),          to: Benchee.Benchmark
-      defdelegate benchmark(suite, name, function, printer), to: Benchee.Benchmark
-      defdelegate statistics(suite),                         to: Benchee.Statistics
+      defdelegate init(),                           to: Benchee.Configuration
+      defdelegate init(config),                     to: Benchee.Configuration
+      defdelegate system(suite),                    to: Benchee.System
+      defdelegate measure(suite),                   to: Benchee.Benchmark
+      defdelegate measure(suite, printer),          to: Benchee.Benchmark
+      defdelegate benchmark(suite, name, function), to: Benchee.Benchmark
+      defdelegate statistics(suite),                to: Benchee.Statistics
+      defdelegate benchmark(suite, name, function, printer),
+        to: Benchee.Benchmark
     end
   end
 end

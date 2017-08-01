@@ -57,7 +57,6 @@ defmodule Benchee.Conversion.Format do
     |> format(module)
   end
 
-
   @default_separator " "
   # should we need it again, a customer separator could be returned
   # per module here

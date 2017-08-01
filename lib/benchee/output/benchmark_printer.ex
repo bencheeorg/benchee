@@ -1,7 +1,7 @@
 defmodule Benchee.Output.BenchmarkPrinter do
   @moduledoc false
 
-  alias Benchee.Conversion.Duration
+  alias Benchee.{Conversion.Duration, Benchmark}
 
   @doc """
   Shown when you try to define a benchmark with the same name twice.
@@ -94,7 +94,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
     nil
   end
   def input_information(input_name, _config) do
-    if input_name != Benchee.Benchmark.no_input do
+    if input_name != Benchmark.no_input do
       IO.puts "\nBenchmarking with input #{input_name}:"
     end
   end

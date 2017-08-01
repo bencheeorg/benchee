@@ -1,4 +1,14 @@
 defmodule Benchee.Benchmark.Scenario do
+  @moduledoc """
+  A Scenario in Benchee is a particular case of a whole benchmarking suite. That
+  is the combination of a particular function to benchmark (`job_name` and
+  `function`) in combination with a specific input (`input_name` and `input`).
+
+  It then gathers all data measured for this particular combination during
+  `Benchee.Benchmark.measure` (`run_times` and `memory_usages`),
+  which are then used later in the process by `Benchee.Statistics` to compute
+  the relevant statistics (`run_time_statistics` and `memory_usage_statistics`).
+  """
   defstruct [
     :job_name,
     :function,

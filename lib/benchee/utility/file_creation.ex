@@ -3,6 +3,8 @@ defmodule Benchee.Utility.FileCreation do
   Methods to create files used in plugins.
   """
 
+  alias Benchee.Benchmark
+
   @doc """
   Open a file for write for all key/value pairs, interleaves the file name and
   calls function with file, content and filename.
@@ -114,7 +116,7 @@ defmodule Benchee.Utility.FileCreation do
   end
 
   defp to_filename(name_string) do
-    no_input = Benchee.Benchmark.no_input
+    no_input = Benchmark.no_input
     case name_string do
       ^no_input -> ""
       _         ->

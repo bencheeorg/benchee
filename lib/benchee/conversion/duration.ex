@@ -12,7 +12,8 @@ defmodule Benchee.Conversion.Duration do
   @milliseconds_per_second 1000
   @seconds_per_minute 60
   @minutes_per_hour 60
-  @microseconds_per_second @microseconds_per_millisecond * @milliseconds_per_second
+  @microseconds_per_second @microseconds_per_millisecond *
+    @milliseconds_per_second
   @microseconds_per_minute @microseconds_per_second * @seconds_per_minute
   @microseconds_per_hour @microseconds_per_minute * @minutes_per_hour
 
