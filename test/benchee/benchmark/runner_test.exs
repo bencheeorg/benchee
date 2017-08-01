@@ -23,8 +23,8 @@ defmodule Benchee.Benchmark.RunnerTest do
     map_fun = fn(scenario) -> scenario.run_times end
 
     suite.scenarios
-    |> Enum.filter_map(filter_fun, map_fun)
-    |> List.flatten()
+    |> Enum.filter(filter_fun)
+    |> Enum.flat_map(map_fun)
   end
 
   describe ".run_scenarios" do
