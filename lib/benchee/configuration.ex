@@ -3,15 +3,19 @@ defmodule Benchee.Configuration do
   Functions to handle the configuration of Benchee, exposes `init` function.
   """
 
-  alias Benchee.Conversion.Duration
-  alias Benchee.Utility.DeepConvert
-  alias Benchee.Suite
+  alias Benchee.{
+    Suite,
+    Configuration,
+    Conversion.Duration,
+    Utility.DeepConvert,
+    Formatters.Console
+  }
 
   defstruct [
     parallel:          1,
     time:              5,
     warmup:            2,
-    formatters:        [&Benchee.Formatters.Console.output/1],
+    formatters:        [&Console.output/1],
     print: %{
       benchmarking:    true,
       configuration:   true,
@@ -245,7 +249,7 @@ defmodule Benchee.Configuration do
   defp force_string_input_keys(config), do: config
 
   defp merge_with_defaults(user_config) do
-    DeepMerge.deep_merge(%Benchee.Configuration{}, user_config)
+    DeepMerge.deep_merge(%Configuration{}, user_config)
   end
 
   defp convert_time_to_micro_s(config) do
