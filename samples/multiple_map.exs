@@ -70,11 +70,11 @@ Benchee.init
 # Benchmarking stdlib map...
 #
 # Name                               ips        average  deviation         median
-# stdlib map                     65.83 K       15.19 μs    ±15.89%       15.00 μs
-# bodyrecusrive map              65.68 K       15.23 μs    ±18.47%       15.00 μs
-# map tco no reverse             61.45 K       16.27 μs    ±23.99%       16.00 μs
-# map with TCO and reverse       56.81 K       17.60 μs    ±24.37%       17.00 μs
-# map with TCO and ++             0.94 K     1063.33 μs     ±6.11%     1041.00 μs
+# stdlib map                     65.83 K       15.19 μs    ±15.89%       15 μs
+# bodyrecusrive map              65.68 K       15.23 μs    ±18.47%       15 μs
+# map tco no reverse             61.45 K       16.27 μs    ±23.99%       16 μs
+# map with TCO and reverse       56.81 K       17.60 μs    ±24.37%       17 μs
+# map with TCO and ++             0.94 K     1063.33 μs     ±6.11%     1041 μs
 #
 # Comparison:
 # stdlib map                     65.83 K

@@ -20,8 +20,8 @@ Benchee.run(%{
 # Benchmarking map.flatten...
 #
 # Name                  ips        average  deviation         median
-# flat_map           2.29 K      437.22 μs    ±17.32%      418.00 μs
-# map.flatten        1.28 K      778.50 μs    ±15.92%      767.00 μs
+# flat_map           2.29 K      437.22 μs    ±17.32%      418 μs
+# map.flatten        1.28 K      778.50 μs    ±15.92%      767 μs
 #
 # Comparison:
 # flat_map           2.29 K

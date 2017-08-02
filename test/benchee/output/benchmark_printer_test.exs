@@ -37,10 +37,10 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       assert output =~ "macOS"
       assert output =~ "8568392814"
       assert output =~ ~r/following configuration/i
-      assert output =~ "warmup: 0.0 μs"
-      assert output =~ "time: 10.00 ms"
+      assert output =~ "warmup: 0 μs"
+      assert output =~ "time: 10 ms"
       assert output =~ "parallel: 2"
-      assert output =~ "Estimated total run time: 20.00 ms"
+      assert output =~ "Estimated total run time: 20 ms"
     end
 
     test "it scales times appropriately" do
@@ -58,8 +58,8 @@ defmodule Benchee.Output.BenchmarkPrintertest do
         |> configuration_information
       end
 
-      assert output =~ "warmup: 10.00 s"
-      assert output =~ "time: 1.00 min"
+      assert output =~ "warmup: 10 s"
+      assert output =~ "time: 1 min"
       assert output =~ "parallel: 1"
       assert output =~ "Estimated total run time: 2.33 min"
     end
@@ -75,10 +75,10 @@ defmodule Benchee.Output.BenchmarkPrintertest do
         |> configuration_information
       end
 
-      assert output =~ "time: 10.00 ms"
+      assert output =~ "time: 10 ms"
       assert output =~ "parallel: 2"
       assert output =~ "inputs: Arg 1, Arg 2"
-      assert output =~ "Estimated total run time: 40.00 ms"
+      assert output =~ "Estimated total run time: 40 ms"
     end
 
     test "does not print if disabled" do

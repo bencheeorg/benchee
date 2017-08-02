@@ -39,8 +39,8 @@ inputs: %{
 #
 # ##### With input Small #####
 # Name                  ips        average  deviation         median
-# map.flatten       18.14 K       55.13 μs     ±9.31%       54.00 μs
-# flat_map          10.65 K       93.91 μs     ±8.70%       94.00 μs
+# map.flatten       18.14 K       55.13 μs     ±9.31%       54 μs
+# flat_map          10.65 K       93.91 μs     ±8.70%       94 μs
 #
 # Comparison:
 # map.flatten       18.14 K

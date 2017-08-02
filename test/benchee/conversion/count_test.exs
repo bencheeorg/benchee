@@ -59,7 +59,7 @@ defmodule Benchee.Conversion.CountTest do
 
   describe ".format" do
     test "1_000_000" do
-      assert format(1_000_000) == "1.00 M"
+      assert format(1_000_000) == "1 M"
     end
 
     test "1_000.1234" do

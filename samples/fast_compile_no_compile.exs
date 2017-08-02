@@ -27,11 +27,11 @@ Benchmark.benchmark()
 # Elixir 1.4.2
 # Erlang 19.2
 # Benchmark suite executing with the following configuration:
-# warmup: 2.00 s
-# time: 3.00 s
+# warmup: 2 s
+# time: 3 s
 # parallel: 1
 # inputs: none specified
-# Estimated total run time: 15.00 s
+# Estimated total run time: 15 s
 #
 # ...
 #
@@ -49,11 +49,11 @@ Benchmark.benchmark()
 # Elixir 1.4.2
 # Erlang 19.2
 # Benchmark suite executing with the following configuration:
-# warmup: 2.00 s
-# time: 3.00 s
+# warmup: 2 s
+# time: 3 s
 # parallel: 1
 # inputs: none specified
-# Estimated total run time: 15.00 s
+# Estimated total run time: 15 s
 #
 # ...
 #

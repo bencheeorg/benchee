@@ -17,7 +17,7 @@ Benchee.run %{"five" => fn -> :timer.sleep(1000) end}, parallel: 5, time: 10
 # Benchmarking one...
 #
 # Name           ips        average  deviation         median
-# one           1.00         1.00 s     ±0.00%         1.00 s
+# one           1         1 s     ±0.00%         1 s
 # Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
 # Elixir 1.3.4
 # Benchmark suite executing with the following configuration:
@@ -29,7 +29,7 @@ Benchee.run %{"five" => fn -> :timer.sleep(1000) end}, parallel: 5, time: 10
 # Benchmarking three...
 #
 # Name            ips        average  deviation         median
-# three          1.00         1.00 s     ±0.00%         1.00 s
+# three          1         1 s     ±0.00%         1 s
 # Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
 # Elixir 1.3.4
 # Benchmark suite executing with the following configuration:
@@ -41,4 +41,4 @@ Benchee.run %{"five" => fn -> :timer.sleep(1000) end}, parallel: 5, time: 10
 # Benchmarking five...
 #
 # Name           ips        average  deviation         median
-# five          1.00         1.00 s     ±0.00%         1.00 s
+# five          1         1 s     ±0.00%         1 s

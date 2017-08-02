@@ -21,8 +21,12 @@ defmodule Benchee.Conversion.Format do
   """
   def format(count, label, separator) do
     separator = separator(label, separator)
-    "~.#{float_precision(count)}f~ts~ts"
-    |> :io_lib.format([count, separator, label])
+    "#{number_format(count)}#{separator}#{label}"
+  end
+
+  defp number_format(count) do
+    count
+    |> :erlang.float_to_list(decimals: float_precision(count))
     |> to_string
   end
 
@@ -73,7 +77,7 @@ defmodule Benchee.Conversion.Format do
     label
   end
 
-  defp float_precision(float) when float == 0, do: 1
+  defp float_precision(float) when trunc(float) == float, do: 0
   defp float_precision(float) when float < 0.01, do: 5
   defp float_precision(float) when float < 0.1, do: 4
   defp float_precision(float) when float < 0.2, do: 3
