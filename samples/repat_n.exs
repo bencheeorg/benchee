@@ -27,11 +27,11 @@ Benchee.run %{
 # Benchmarking Recursion...
 #
 # Name                                 ips        average  deviation         median
-# Recursion                        90.60 K       11.04 μs     ±8.72%       11 μs
-# Enum.each (list)                 50.41 K       19.84 μs    ±20.27%       20 μs
-# List comprehension (list)        44.60 K       22.42 μs    ±13.40%       22 μs
-# List comprehension (range)       20.73 K       48.24 μs     ±8.69%       47 μs
-# Enum.each (range)                19.94 K       50.14 μs     ±6.42%       50 μs
+# Recursion                        90.60 K       11.04 μs     ±8.72%          11 μs
+# Enum.each (list)                 50.41 K       19.84 μs    ±20.27%          20 μs
+# List comprehension (list)        44.60 K       22.42 μs    ±13.40%          22 μs
+# List comprehension (range)       20.73 K       48.24 μs     ±8.69%          47 μs
+# Enum.each (range)                19.94 K       50.14 μs     ±6.42%          50 μs
 #
 # Comparison:
 # Recursion                        90.60 K

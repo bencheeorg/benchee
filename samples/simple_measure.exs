@@ -17,4 +17,4 @@ Benchee.init
 # Benchmarking map...
 #
 # Name           ips        average  deviation         median
-# map        20.10 K       49.75 μs     ±7.57%       49 μs
+# map        20.10 K       49.75 μs     ±7.57%          49 μs

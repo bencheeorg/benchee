@@ -33,8 +33,8 @@ Benchmarking flat_map...
 Benchmarking map.flatten...
 
 Name                  ips        average  deviation         median
-flat_map           2.29 K      437.22 μs    ±17.32%      418 μs
-map.flatten        1.28 K      778.50 μs    ±15.92%      767 μs
+flat_map           2.29 K      437.22 μs    ±17.32%         418 μs
+map.flatten        1.28 K      778.50 μs    ±15.92%         767 μs
 
 Comparison:
 flat_map           2.29 K
@@ -113,8 +113,8 @@ Benchmarking flat_map...
 Benchmarking map.flatten...
 
 Name                  ips        average  deviation         median
-flat_map           2.28 K      438.07 μs    ±16.66%      419 μs
-map.flatten        1.25 K      802.99 μs    ±13.40%      782 μs
+flat_map           2.28 K      438.07 μs    ±16.66%         419 μs
+map.flatten        1.25 K      802.99 μs    ±13.40%         782 μs
 
 Comparison:
 flat_map           2.28 K
@@ -315,7 +315,7 @@ Estimated total run time: 2 s
 Benchmarking myFunc...
 
 Name             ips        average  deviation         median
-myFunc      289.71 K        3.45 μs   ±250.31%        3 μs
+myFunc      289.71 K        3.45 μs   ±250.31%           3 μs
 ```
 
 This doesn't seem to be too reliable right now, so suggestions and input are very welcome :)
