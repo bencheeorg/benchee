@@ -31,7 +31,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert output =~ ~r/First/
       assert output =~ ~r/Second/
       assert output =~ ~r/200/
-      assert output =~ ~r/5.00 K/
+      assert output =~ ~r/5 K/
       assert output =~ ~r/10.00%/
       assert output =~ ~r/195.5/
     end
@@ -109,8 +109,8 @@ defmodule Benchee.Formatters.ConsoleTest do
         Console.format_scenarios(scenarios, @console_config)
 
       assert Regex.match? ~r/Comparison/, comp_header
-      assert Regex.match? ~r/^First\s+10.00 K$/m, reference
-      assert Regex.match? ~r/^Second\s+5.00 K\s+- 2.00x slower/, slower
+      assert Regex.match? ~r/^First\s+10 K$/m, reference
+      assert Regex.match? ~r/^Second\s+5 K\s+- 2.00x slower/, slower
     end
 
     test "can omit the comparisons" do
@@ -131,8 +131,8 @@ defmodule Benchee.Formatters.ConsoleTest do
                   })
 
       refute Regex.match? ~r/Comparison/i, output
-      refute Regex.match? ~r/^First\s+10.00 K$/m, output
-      refute Regex.match? ~r/^Second\s+5.00 K\s+- 2.00x slower/, output
+      refute Regex.match? ~r/^First\s+10 K$/m, output
+      refute Regex.match? ~r/^Second\s+5 K\s+- 2.00x slower/, output
     end
 
     test "adjusts the label width to longest name for comparisons" do
@@ -190,10 +190,10 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert [_, result] = Console.format_scenarios(scenarios, @console_config)
 
       refute result =~ ~r/\de\d/
-      assert result =~ "11.00 ms"
-      assert result =~ "12.00 K"
+      assert result =~ "11 ms"
+      assert result =~ "12 K"
       assert result =~ "13000"
-      assert result =~ "140.00 ms"
+      assert result =~ "140 ms"
     end
   end
 
@@ -256,7 +256,7 @@ defmodule Benchee.Formatters.ConsoleTest do
 
       [input_header, _header, other_job, job, _comp, ref, slower] = my_arg
       assert input_header =~ "My Arg"
-      assert other_job =~ ~r/Other Job.+10.+100.+30\.00%.+98\.0/
+      assert other_job =~ ~r/Other Job.+10.+100.+30\.00%.+98/
       assert job =~ ~r/Job.+5.+200.+10\.00%.+195\.5/
       ref =~ ~r/Other Job/
       slower =~ ~r/Job.+slower/

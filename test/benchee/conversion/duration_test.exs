@@ -40,8 +40,12 @@ defmodule Benchee.Conversion.DurationTest do
       assert format(9_876_543_219.8765) == "2.74 h"
     end
 
+    test ".format(523.0)" do
+      assert format(523.0) == "523 μs"
+    end
+
     test ".format(0)" do
-      assert format(0) == "0.0 μs"
+      assert format(0) == "0 μs"
     end
   end
 

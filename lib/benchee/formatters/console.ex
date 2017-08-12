@@ -60,8 +60,8 @@ defmodule Benchee.Formatters.Console do
   ...> }
   iex> Benchee.Formatters.Console.format(suite)
   [["\n##### With input My input #####", "\nName             ips        average  deviation         median\n",
-  "My Job        5.00 K      200.00 μs    ±10.00%      190.00 μs\n",
-  "Job 2         2.50 K      400.00 μs    ±20.00%      390.00 μs\n"]]
+  "My Job           5 K         200 μs    ±10.00%         190 μs\n",
+  "Job 2         2.50 K         400 μs    ±20.00%         390 μs\n"]]
 
   ```
 
@@ -105,8 +105,8 @@ defmodule Benchee.Formatters.Console do
   iex> configuration = %{comparison: false, unit_scaling: :best}
   iex> Benchee.Formatters.Console.format_scenarios(scenarios, configuration)
   ["\nName             ips        average  deviation         median\n",
-  "My Job        5.00 K      200.00 μs    ±10.00%      190.00 μs\n",
-  "Job 2         2.50 K      400.00 μs    ±20.00%      390.00 μs\n"]
+  "My Job           5 K         200 μs    ±10.00%         190 μs\n",
+  "Job 2         2.50 K         400 μs    ±20.00%         390 μs\n"]
 
   ```
 

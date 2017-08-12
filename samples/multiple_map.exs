@@ -53,32 +53,37 @@ Benchee.init
 |> Benchee.Formatters.Console.format
 |> IO.puts
 
-
-# tobi@happy ~/github/benchee $ mix run samples/multiple_map.exs
-# Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
-# Elixir 1.3.4
+# tobi@speedy ~/github/benchee $ mix run samples/multiple_map.exs
+# Operating System: Linux
+# CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
+# Number of Available Cores: 8
+# Available memory: 16.372016 GB
+# Elixir 1.5.0
+# Erlang 20.0
 # Benchmark suite executing with the following configuration:
-# warmup: 2.0s
-# time: 5.0s
+# warmup: 2 s
+# time: 5 s
 # parallel: 1
-# Estimated total run time: 35.0s
+# inputs: none specified
+# Estimated total run time: 35 s
 #
+#
+# Benchmarking stdlib map...
+# Benchmarking map with TCO and reverse...
+# Benchmarking map with TCO and ++...
 # Benchmarking bodyrecusrive map...
 # Benchmarking map tco no reverse...
-# Benchmarking map with TCO and ++...
-# Benchmarking map with TCO and reverse...
-# Benchmarking stdlib map...
 #
 # Name                               ips        average  deviation         median
-# stdlib map                     65.83 K       15.19 μs    ±15.89%       15.00 μs
-# bodyrecusrive map              65.68 K       15.23 μs    ±18.47%       15.00 μs
-# map tco no reverse             61.45 K       16.27 μs    ±23.99%       16.00 μs
-# map with TCO and reverse       56.81 K       17.60 μs    ±24.37%       17.00 μs
-# map with TCO and ++             0.94 K     1063.33 μs     ±6.11%     1041.00 μs
+# stdlib map                     64.02 K       15.62 μs    ±58.42%          15 μs
+# bodyrecusrive map              63.40 K       15.77 μs    ±63.46%          15 μs
+# map tco no reverse             57.25 K       17.47 μs    ±53.28%          17 μs
+# map with TCO and reverse       52.71 K       18.97 μs    ±57.10%          19 μs
+# map with TCO and ++             1.05 K      955.39 μs    ±21.62%         812 μs
 #
 # Comparison:
-# stdlib map                     65.83 K
-# bodyrecusrive map              65.68 K - 1.00x slower
-# map tco no reverse             61.45 K - 1.07x slower
-# map with TCO and reverse       56.81 K - 1.16x slower
-# map with TCO and ++             0.94 K - 70.00x slower
+# stdlib map                     64.02 K
+# bodyrecusrive map              63.40 K - 1.01x slower
+# map tco no reverse             57.25 K - 1.12x slower
+# map with TCO and reverse       52.71 K - 1.21x slower
+# map with TCO and ++             1.05 K - 61.17x slower
