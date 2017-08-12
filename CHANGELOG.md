@@ -1,5 +1,8 @@
 ## 0.10.0 - unreleased
 
+### Features (User Facing)
+* Don't show more precision than we have - i.e. 234.00 microseconds (measurements are in microseconds and .00 doesn't gain you anything)
+
 ### Bugfixes (User Facing)
 * Determining CPUs was toos trict/too assuming of a specific pattern breaking in certain environments (like Semaphore CI). That is more relaxed now thanks to `@predrag-rakic`!
 
