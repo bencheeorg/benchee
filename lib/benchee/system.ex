@@ -108,8 +108,8 @@ defmodule Benchee.System do
     parse_memory_for(:Linux, system_cmd("cat", ["/proc/meminfo"]))
   end
 
-  @kilobyte_to_gigabyte 1_000_000
-  @byte_to_gigabyte 1_000 * @kilobyte_to_gigabyte
+  @kilobyte_to_gigabyte 1024 * 1024
+  @byte_to_gigabyte 1024 * @kilobyte_to_gigabyte
 
   defp parse_memory_for(_, "N/A"), do: "N/A"
   defp parse_memory_for(:Windows, raw_output) do
