@@ -40,6 +40,16 @@ defmodule Benchee.StatistcsTest do
       sample_2_asserts(stats_2)
     end
 
+    @mode_sample [55, 40, 67, 55, 44, 40, 10, 8, 55, 90, 67]
+    test "mode is calculated correctly" do
+      scenarios = [%Scenario{run_times: @mode_sample}]
+      suite = %Suite{scenarios: scenarios}
+              |> Statistics.statistics
+
+      [%Scenario{run_time_statistics: stats}] = suite.scenarios
+      assert stats.mode == 55
+    end
+
     test "preserves all other keys in the map handed to it" do
       suite = %Suite{
         scenarios: [],
@@ -57,6 +67,8 @@ defmodule Benchee.StatistcsTest do
       stats
     end
 
+    # no mode asserts in the sample asserts as the samples have no duplicated
+    # values and therefore mode isn't a useful value
     defp sample_1_asserts(stats) do
       assert stats.average == 394.0
       assert_in_delta stats.std_dev, 147.32, 0.01

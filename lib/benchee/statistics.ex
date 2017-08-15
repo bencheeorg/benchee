@@ -5,7 +5,7 @@ defmodule Benchee.Statistics do
   """
 
   defstruct [:average, :ips, :std_dev, :std_dev_ratio, :std_dev_ips, :median,
-             :minimum, :maximum, :sample_size]
+             :mode, :minimum, :maximum, :sample_size]
 
   @type t :: %__MODULE__{
     average: float,
@@ -14,6 +14,7 @@ defmodule Benchee.Statistics do
     std_dev_ratio: float,
     std_dev_ips: float,
     median: number,
+    mode: number,
     minimum: number,
     maximum: number,
     sample_size: integer
@@ -100,6 +101,7 @@ defmodule Benchee.Statistics do
               std_dev_ratio: 0.4,
               std_dev_ips:   800.0,
               median:        450.0,
+              mode:          400,
               minimum:       200,
               maximum:       900,
               sample_size:   8
@@ -136,6 +138,7 @@ defmodule Benchee.Statistics do
         std_dev_ratio: 0.4,
         std_dev_ips:   800.0,
         median:        450.0,
+        mode:          400,
         minimum:       200,
         maximum:       900,
         sample_size:   8
@@ -152,6 +155,7 @@ defmodule Benchee.Statistics do
     standard_dev_ratio  = deviation / average
     standard_dev_ips    = ips * standard_dev_ratio
     median              = compute_median(run_times, iterations)
+    {mode, _mode_count} = compute_mode(run_times)
     minimum             = Enum.min run_times
     maximum             = Enum.max run_times
 
@@ -162,6 +166,7 @@ defmodule Benchee.Statistics do
       std_dev_ratio: standard_dev_ratio,
       std_dev_ips:   standard_dev_ips,
       median:        median,
+      mode:          mode,
       minimum:       minimum,
       maximum:       maximum,
       sample_size:   iterations
@@ -191,6 +196,14 @@ defmodule Benchee.Statistics do
     else
       (Enum.at(sorted, middle) + Enum.at(sorted, middle - 1)) / 2
     end
+  end
+
+  defp compute_mode(samples) do
+    samples
+    |> Enum.reduce(%{}, fn(sample, counts) ->
+         Map.update(counts, sample, 1, fn(old_value) -> old_value + 1 end)
+       end)
+    |> Enum.max_by(fn({_sample, occurences}) -> occurences end)
   end
 
   defp to_float(maybe_integer) do
