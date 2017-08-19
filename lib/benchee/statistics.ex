@@ -4,6 +4,8 @@ defmodule Benchee.Statistics do
   times and then compute statistics like the average and the standard devaition.
   """
 
+  alias Benchee.Statistics.Mode
+
   defstruct [:average, :ips, :std_dev, :std_dev_ratio, :std_dev_ips, :median,
              :mode, :minimum, :maximum, :sample_size]
 
@@ -66,6 +68,9 @@ defmodule Benchee.Statistics do
       value (or average of the two middle values when the number of times is
       even). More stable than the average and somewhat more likely to be a
       typical you see.
+    * mode          - the run time(s) that occur the most. Often one value, but
+      can be multiple values if they occur the same amount of times. If no value
+      occures at least twice, this value will be nil.
     * minimum       - the smallest (fastest) run time measured for the job
     * maximum       - the biggest (slowest) run time measured for the job
     * sample_size   - the number of run time measurements taken
@@ -155,7 +160,7 @@ defmodule Benchee.Statistics do
     standard_dev_ratio  = deviation / average
     standard_dev_ips    = ips * standard_dev_ratio
     median              = compute_median(run_times, iterations)
-    {mode, _mode_count} = compute_mode(run_times)
+    mode                = Mode.mode(run_times)
     minimum             = Enum.min run_times
     maximum             = Enum.max run_times
 
@@ -196,14 +201,6 @@ defmodule Benchee.Statistics do
     else
       (Enum.at(sorted, middle) + Enum.at(sorted, middle - 1)) / 2
     end
-  end
-
-  defp compute_mode(samples) do
-    samples
-    |> Enum.reduce(%{}, fn(sample, counts) ->
-         Map.update(counts, sample, 1, fn(old_value) -> old_value + 1 end)
-       end)
-    |> Enum.max_by(fn({_sample, occurences}) -> occurences end)
   end
 
   defp to_float(maybe_integer) do

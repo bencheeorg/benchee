@@ -67,8 +67,6 @@ defmodule Benchee.StatistcsTest do
       stats
     end
 
-    # no mode asserts in the sample asserts as the samples have no duplicated
-    # values and therefore mode isn't a useful value
     defp sample_1_asserts(stats) do
       assert stats.average == 394.0
       assert_in_delta stats.std_dev, 147.32, 0.01
@@ -78,6 +76,7 @@ defmodule Benchee.StatistcsTest do
       assert stats.minimum == 170
       assert stats.maximum == 600
       assert stats.sample_size == 5
+      assert stats.mode == nil
     end
 
     defp sample_2_asserts(stats) do
@@ -89,6 +88,7 @@ defmodule Benchee.StatistcsTest do
       assert stats.minimum == 7
       assert stats.maximum == 23
       assert stats.sample_size == 6
+      assert stats.mode == nil
     end
   end
 
