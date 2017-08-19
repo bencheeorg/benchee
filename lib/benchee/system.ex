@@ -130,7 +130,7 @@ defmodule Benchee.System do
     format_memory(memory, @kilobyte_to_gigabyte)
   end
 
-  defp format_memory(memory, coefficient), do: "#{memory / coefficient} GB"
+  defp format_memory(memory, coefficient), do: "#{Float.round(memory / coefficient, 2)} GB"
 
   def system_cmd(cmd, args, system_func \\ &System.cmd/2) do
     {output, exit_code} = system_func.(cmd, args)

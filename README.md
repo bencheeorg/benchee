@@ -301,7 +301,7 @@ Eshell V7.3  (abort with ^G)
 Operating System: Linux
 CPU Information: Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
 Number of Available Cores: 4
-Available memory: 8.05344 GB
+Available memory: 8.05 GB
 Elixir 1.3.4
 Erlang 18.3
 Benchmark suite executing with the following configuration:

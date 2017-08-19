@@ -62,7 +62,12 @@ defmodule Benchee.SystemTest do
 
   test ".available_memory returns the available memory on the computer" do
     {num, rest} = Float.parse(Benchee.System.available_memory())
+    decimal_part_of_available_memory = "#{num}"
+      |> String.split( ".")
+      |> Enum.at(1)
+      |> String.length()
     assert num > 0
+    assert decimal_part_of_available_memory <= 2
     assert rest =~ ~r/GB/
   end
 
