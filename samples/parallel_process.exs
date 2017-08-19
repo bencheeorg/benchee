@@ -8,7 +8,7 @@ Benchee.run %{"five" => fn -> :timer.sleep(1000) end}, parallel: 5, time: 10
 # Operating System: Linux
 # CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
 # Number of Available Cores: 8
-# Available memory: 16.372016 GB
+# Available memory: 16.37 GB
 # Elixir 1.5.0
 # Erlang 20.0
 # Benchmark suite executing with the following configuration:
@@ -26,7 +26,7 @@ Benchee.run %{"five" => fn -> :timer.sleep(1000) end}, parallel: 5, time: 10
 # Operating System: Linux
 # CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
 # Number of Available Cores: 8
-# Available memory: 16.372016 GB
+# Available memory: 16.37 GB
 # Elixir 1.5.0
 # Erlang 20.0
 # Benchmark suite executing with the following configuration:
@@ -51,7 +51,7 @@ Benchee.run %{"five" => fn -> :timer.sleep(1000) end}, parallel: 5, time: 10
 # Operating System: Linux
 # CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
 # Number of Available Cores: 8
-# Available memory: 16.372016 GB
+# Available memory: 16.37 GB
 # Elixir 1.5.0
 # Erlang 20.0
 # Benchmark suite executing with the following configuration:
