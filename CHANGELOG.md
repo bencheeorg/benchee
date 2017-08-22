@@ -2,6 +2,7 @@
 
 ### Features (User Facing)
 * Don't show more precision than we have - i.e. 234.00 microseconds (measurements are in microseconds and .00 doesn't gain you anything)
+* Limit precision of available memory displayed, you don't need to know 7.45678932 GB. Thanks to `@elpikel`.
 
 ### Bugfixes (User Facing)
 * Determining CPUs was toos trict/too assuming of a specific pattern breaking in certain environments (like Semaphore CI). That is more relaxed now thanks to `@predrag-rakic`! 
