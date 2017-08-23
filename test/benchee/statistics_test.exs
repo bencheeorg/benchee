@@ -40,6 +40,16 @@ defmodule Benchee.StatistcsTest do
       sample_2_asserts(stats_2)
     end
 
+    @mode_sample [55, 40, 67, 55, 44, 40, 10, 8, 55, 90, 67]
+    test "mode is calculated correctly" do
+      scenarios = [%Scenario{run_times: @mode_sample}]
+      suite = %Suite{scenarios: scenarios}
+              |> Statistics.statistics
+
+      [%Scenario{run_time_statistics: stats}] = suite.scenarios
+      assert stats.mode == 55
+    end
+
     test "preserves all other keys in the map handed to it" do
       suite = %Suite{
         scenarios: [],
@@ -66,6 +76,7 @@ defmodule Benchee.StatistcsTest do
       assert stats.minimum == 170
       assert stats.maximum == 600
       assert stats.sample_size == 5
+      assert stats.mode == nil
     end
 
     defp sample_2_asserts(stats) do
@@ -77,6 +88,7 @@ defmodule Benchee.StatistcsTest do
       assert stats.minimum == 7
       assert stats.maximum == 23
       assert stats.sample_size == 6
+      assert stats.mode == nil
     end
   end
 

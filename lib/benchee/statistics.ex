@@ -4,8 +4,10 @@ defmodule Benchee.Statistics do
   times and then compute statistics like the average and the standard devaition.
   """
 
+  alias Benchee.Statistics.Mode
+
   defstruct [:average, :ips, :std_dev, :std_dev_ratio, :std_dev_ips, :median,
-             :minimum, :maximum, :sample_size]
+             :mode, :minimum, :maximum, :sample_size]
 
   @type t :: %__MODULE__{
     average: float,
@@ -14,6 +16,7 @@ defmodule Benchee.Statistics do
     std_dev_ratio: float,
     std_dev_ips: float,
     median: number,
+    mode: number,
     minimum: number,
     maximum: number,
     sample_size: integer
@@ -65,6 +68,9 @@ defmodule Benchee.Statistics do
       value (or average of the two middle values when the number of times is
       even). More stable than the average and somewhat more likely to be a
       typical you see.
+    * mode          - the run time(s) that occur the most. Often one value, but
+      can be multiple values if they occur the same amount of times. If no value
+      occures at least twice, this value will be nil.
     * minimum       - the smallest (fastest) run time measured for the job
     * maximum       - the biggest (slowest) run time measured for the job
     * sample_size   - the number of run time measurements taken
@@ -100,6 +106,7 @@ defmodule Benchee.Statistics do
               std_dev_ratio: 0.4,
               std_dev_ips:   800.0,
               median:        450.0,
+              mode:          400,
               minimum:       200,
               maximum:       900,
               sample_size:   8
@@ -136,6 +143,7 @@ defmodule Benchee.Statistics do
         std_dev_ratio: 0.4,
         std_dev_ips:   800.0,
         median:        450.0,
+        mode:          400,
         minimum:       200,
         maximum:       900,
         sample_size:   8
@@ -152,6 +160,7 @@ defmodule Benchee.Statistics do
     standard_dev_ratio  = deviation / average
     standard_dev_ips    = ips * standard_dev_ratio
     median              = compute_median(run_times, iterations)
+    mode                = Mode.mode(run_times)
     minimum             = Enum.min run_times
     maximum             = Enum.max run_times
 
@@ -162,6 +171,7 @@ defmodule Benchee.Statistics do
       std_dev_ratio: standard_dev_ratio,
       std_dev_ips:   standard_dev_ips,
       median:        median,
+      mode:          mode,
       minimum:       minimum,
       maximum:       maximum,
       sample_size:   iterations
