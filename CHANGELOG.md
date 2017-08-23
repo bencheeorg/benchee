@@ -8,6 +8,10 @@
 * Determining CPUs was toos trict/too assuming of a specific pattern breaking in certain environments (like Semaphore CI). That is more relaxed now thanks to `@predrag-rakic`! 
 * Memory is now correctly converted using the binary (1024) interpreation, instead of the decimal one (1000)
 
+
+### Features (Plugins)
+* the statistics now also provide the mode of the samples
+
 ### Breakin Changes (Plugins)
 * `:run_times`, `:statistics` and `:jobs` have been removed and folded together into `:scenarios` - a scenario holds the benchmarking function, porentially the input, the raw run times measures and the computed statistics. With this data structure, all the relevant data for one scenario is one place although it takes a lot to change, this seems to be the best way going forward. Huge thanks to `@devonestes`!
 
