@@ -357,6 +357,8 @@ A couple of (hopefully) helpful points:
 * When in doubt if something is a good idea open an issue first to discuss it
 * In case I don't respond feel free to bump the issue/PR or ping me on other places
 
+If you're on the [elixir-lang slack](https://elixir-lang.slack.com) also feel free to drop by in `#benchee` and say hi!
+
 ## Development
 
 * `mix deps.get` to install dependencies
