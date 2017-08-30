@@ -4,6 +4,8 @@ defmodule Benchee.Formatters.Console do
   output through `IO.write` on the console.
   """
 
+  @behaviour Benchee.Formatter
+
   alias Benchee.{Statistics, Suite, Benchmark.Scenario}
   alias Benchee.Conversion.{Count, Duration, Unit, DeviationPercent}
 
@@ -21,9 +23,9 @@ defmodule Benchee.Formatters.Console do
   """
   @spec output(Suite.t) :: Suite.t
   def output(suite = %Suite{}) do
-    suite
-    |> format
-    |> IO.write
+    _ = suite
+        |> format
+        |> write
 
     suite
   end
@@ -74,6 +76,16 @@ defmodule Benchee.Formatters.Console do
     |> Enum.map(fn({input, scenarios}) ->
         [input_header(input) | format_scenarios(scenarios, config)]
       end)
+  end
+
+  @doc """
+  Takes the output of `format/1` and writes that to the console.
+  """
+  @spec write(any) :: :ok | {:error, String.t}
+  def write(output) do
+    IO.write(output)
+  rescue
+    _ -> {:error, "Unknown Error"}
   end
 
   @no_input_marker Benchee.Benchmark.no_input()
