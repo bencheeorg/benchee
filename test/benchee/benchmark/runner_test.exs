@@ -334,7 +334,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       assert local_count == global_count
       # should be closer to 10 by you know slow CI systems...
-      assert global_count >= 3
+      assert global_count >= 2
     end
 
   end
