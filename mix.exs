@@ -19,7 +19,7 @@ defmodule Benchee.Mixfile do
       preferred_cli_env: [
         "coveralls": :test, "coveralls.detail": :test,
         "coveralls.post": :test, "coveralls.html": :test,
-        "coveralls.travis": :test],
+        "coveralls.travis": :test, "safe_coveralls.travis": :test],
       dialyzer: [
         flags:
           [:unmatched_returns, :error_handling, :race_conditions, :underspecs]
@@ -33,7 +33,7 @@ defmodule Benchee.Mixfile do
     ]
   end
 
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "test/support", "mix"]
   defp elixirc_paths(_),     do: ["lib"]
 
   def application do
