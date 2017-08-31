@@ -148,24 +148,24 @@ defmodule Benchee.Benchmark.Runner do
     if local_before_each,  do: local_before_each.()
   end
 
-  defp measure_call(scenario, scenario_context) do
-    measure_call_n_times(scenario, scenario_context)
+  @no_input Benchmark.no_input()
+  defp measure_call(%Scenario{function: function, input: @no_input},
+                    %ScenarioContext{num_iterations: iterations}) do
+    measure_call function, iterations
+  end
+  defp measure_call(%Scenario{function: function, input: input},
+                    %ScenarioContext{num_iterations: iterations}) do
+    fun_with_input = fn -> function.(input) end
+    measure_call fun_with_input, iterations
   end
 
-  @no_input Benchmark.no_input()
-  defp measure_call_n_times(%Scenario{function: function, input: @no_input},
-                            %ScenarioContext{num_iterations: num_iterations}) do
-    {microseconds, _return_value} = :timer.tc fn ->
-      RepeatN.repeat_n(function, num_iterations)
-    end
-
+  defp measure_call(function, 1) do
+    {microseconds, _return_value} = :timer.tc function
     microseconds
   end
-  defp measure_call_n_times(%Scenario{function: function, input: input},
-                            %ScenarioContext{num_iterations: num_iterations}) do
-    fun_with_input = fn -> function.(input) end
+  defp measure_call(function, iterations) do
     {microseconds, _return_value} = :timer.tc fn ->
-      RepeatN.repeat_n(fun_with_input, num_iterations)
+      RepeatN.repeat_n(function, iterations)
     end
 
     microseconds
