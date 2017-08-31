@@ -31,7 +31,8 @@ defmodule Benchee.Configuration do
       }
     },
     # If you/your plugin/whatever needs it your data can go here
-    assigns:           %{}
+    assigns:           %{},
+    before_each:       nil
   ]
 
   @type t :: %__MODULE__{
@@ -42,7 +43,8 @@ defmodule Benchee.Configuration do
     print:             map,
     inputs:            %{Suite.key => any} | nil,
     formatter_options: map,
-    assigns:           map
+    assigns:           map,
+    before_each:       fun | nil
   }
 
   @type user_configuration :: map | keyword
@@ -129,7 +131,8 @@ defmodule Benchee.Configuration do
             formatter_options: %{
               console: %{ comparison: true, unit_scaling: :best }
             },
-            assigns: %{}
+            assigns: %{},
+            before_each: nil
           },
         system: nil,
         scenarios: []
@@ -152,7 +155,8 @@ defmodule Benchee.Configuration do
             formatter_options: %{
               console: %{ comparison: true, unit_scaling: :best }
             },
-            assigns: %{}
+            assigns: %{},
+            before_each: nil
           },
         system: nil,
         scenarios: []
@@ -175,7 +179,8 @@ defmodule Benchee.Configuration do
             formatter_options: %{
               console: %{ comparison: true, unit_scaling: :best }
             },
-            assigns: %{}
+            assigns: %{},
+            before_each: nil
           },
         system: nil,
         scenarios: []
@@ -207,7 +212,8 @@ defmodule Benchee.Configuration do
               console: %{ comparison: true, unit_scaling: :smallest },
               some: "option"
             },
-            assigns: %{}
+            assigns: %{},
+            before_each: nil
           },
         system: nil,
         scenarios: []

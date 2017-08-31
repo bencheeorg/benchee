@@ -247,12 +247,12 @@ defmodule BencheeTest do
     assert length(occurences) == 3
   end
 
-  test ".run returns the suite in the end intact" do
+  test ".run returns the suite intact" do
     capture_io fn ->
       suite = Benchee.run(%{
         "sleep"    => fn -> :timer.sleep 1 end
       }, time: 0.001, warmup: 0)
-      assert %{scenarios: _, configuration: _} = suite
+      assert %Benchee.Suite{scenarios: _, configuration: _} = suite
     end
   end
 
@@ -300,6 +300,22 @@ defmodule BencheeTest do
     assert String.contains? output, ["small list", "mediumList"]
     occurences = Regex.scan body_regex("flat_map"), output
     assert length(occurences) == 2
+  end
+
+  describe "before_each" do
+    test "it runs all of them" do
+      capture_io fn ->
+        myself = self()
+        Benchee.run %{
+          "sleeper"   => {fn -> :timer.sleep 1 end,
+                          before_each: fn -> send myself, :local end },
+          "sleeper 2" => fn -> :timer.sleep 1 end
+        }, time: 0.0001, warmup: 0,
+           before_each: fn -> send myself, :global end
+      end
+
+      assert_received_exactly [:global, :local, :global]
+    end
   end
 
   @slower_regex "\\s+- \\d+\\.\\d+x slower"

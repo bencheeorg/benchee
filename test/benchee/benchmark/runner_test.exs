@@ -210,5 +210,132 @@ defmodule Benchee.Benchmark.RunnerTest do
         assert run_times == Enum.sort(run_times)
       end
     end
+
+    test "global before_each triggers" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 0,
+          time: 100,
+          before_each: fn -> send(me, :before) end
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", fn -> :timer.sleep 1 end)
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [:before]
+    end
+
+    test "scenario before_each triggers" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 0,
+          time: 100
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
+                             before_each: fn -> send(me, :before) end})
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [:before]
+    end
+
+    test "before_each triggers during warmup and runtime" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 100,
+          time: 100
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
+                             before_each: fn -> send(me, :before) end})
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [:before, :before]
+    end
+
+    test "before_each triggers for each input" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 0,
+          time: 100,
+          before_each: fn -> send me, :global end,
+          inputs: %{"one" => 1, "two" => 2}
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn(_) -> :timer.sleep 1 end,
+                             before_each: fn -> send me, :local end})
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [:global, :local, :global, :local]
+    end
+
+    test "scenario before_each triggers only for that scenario" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 0,
+          time: 100,
+          before_each: fn -> send me, :global end
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
+                             before_each: fn -> send me, :local end})
+      |> Benchmark.benchmark("job 2", fn -> :timer.sleep 1 end)
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [:global, :local, :global]
+    end
+
+    test "different before_eachs triggers only for that scenario" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 0,
+          time: 100,
+          before_each: fn -> send me, :global end
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
+                             before_each: fn -> send me, :local end})
+      |> Benchmark.benchmark("job 2", {fn -> :timer.sleep 1 end,
+                             before_each: fn -> send me, :local_2 end})
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [:global, :local, :global, :local_2]
+    end
+
+    test "before_each triggers for every invocation" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 0,
+          time: 10_000,
+          before_each: fn -> send me, :global end
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
+                             before_each: fn -> send me, :local end})
+      |> Benchmark.measure(TestPrinter)
+
+      {:messages, messages} = Process.info self(), :messages
+      local_count  = Enum.count messages, fn(message) -> message == :local end
+      global_count = Enum.count messages, fn(message) -> message == :global end
+
+      assert local_count == global_count
+      # should be closer to 10 by you know slow CI systems...
+      assert global_count >= 3
+    end
+
   end
 end

@@ -86,7 +86,7 @@ defmodule Benchee.Benchmark.Runner do
   defp determine_n_times(scenario, scenario_context = %ScenarioContext{
                            printer: printer
                          }, fast_warning) do
-    run_time = measure_call(scenario, scenario_context)
+    run_time = run_iteration(scenario, scenario_context)
     if run_time >= @minimum_execution_time do
       {1, run_time}
     else
@@ -100,7 +100,7 @@ defmodule Benchee.Benchmark.Runner do
   defp try_n_times(scenario, scenario_context = %ScenarioContext{
                      num_iterations: num_iterations
                    }) do
-    run_time = measure_call_n_times(scenario, scenario_context)
+    run_time = run_iteration(scenario, scenario_context)
     if run_time >= @minimum_execution_time do
       {num_iterations, run_time / num_iterations}
     else
@@ -120,17 +120,36 @@ defmodule Benchee.Benchmark.Runner do
   end
   defp do_benchmark(scenario = %Scenario{run_times: run_times},
                     scenario_context) do
-    run_time = measure_call(scenario, scenario_context)
+    run_time = measure_iteration(scenario, scenario_context)
     updated_scenario = %Scenario{scenario | run_times: [run_time | run_times]}
     updated_context =
       %ScenarioContext{scenario_context | current_time: current_time()}
     do_benchmark(updated_scenario, updated_context)
   end
 
-  defp measure_call(scenario, scenario_context = %ScenarioContext{
-                      num_iterations: num_iterations
-                    }) do
-    measure_call_n_times(scenario, scenario_context) / num_iterations
+  defp measure_iteration(scenario, scenario_context = %ScenarioContext{
+                          num_iterations: num_iterations
+                        }) do
+    run_iteration(scenario, scenario_context) / num_iterations
+  end
+
+  defp run_iteration(scenario, scenario_context) do
+    run_before_each(scenario, scenario_context)
+    measure_call(scenario, scenario_context)
+  end
+
+  defp run_before_each(%{
+                          before_each: local_before_each
+                        },
+                        %{
+                          config: %{before_each: global_before_each}
+                        }) do
+    if global_before_each, do: global_before_each.()
+    if local_before_each,  do: local_before_each.()
+  end
+
+  defp measure_call(scenario, scenario_context) do
+    measure_call_n_times(scenario, scenario_context)
   end
 
   @no_input Benchmark.no_input()
