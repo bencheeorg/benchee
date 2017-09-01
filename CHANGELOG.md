@@ -11,6 +11,7 @@
 
 ### Features (Plugins)
 * the statistics now also provide the mode of the samples
+* There is a new `Benchee.Formatter` behaviour to adopt and enforce a uniform format for formatters
 
 ### Breakin Changes (Plugins)
 * `:run_times`, `:statistics` and `:jobs` have been removed and folded together into `:scenarios` - a scenario holds the benchmarking function, porentially the input, the raw run times measures and the computed statistics. With this data structure, all the relevant data for one scenario is one place although it takes a lot to change, this seems to be the best way going forward. Huge thanks to `@devonestes`!
