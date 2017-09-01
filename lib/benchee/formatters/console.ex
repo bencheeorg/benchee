@@ -23,9 +23,9 @@ defmodule Benchee.Formatters.Console do
   """
   @spec output(Suite.t) :: Suite.t
   def output(suite = %Suite{}) do
-    _ = suite
-        |> format
-        |> write
+    :ok = suite
+          |> format
+          |> write
 
     suite
   end

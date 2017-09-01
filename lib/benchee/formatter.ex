@@ -18,9 +18,7 @@ defmodule Benchee.Formatter do
   @spec parallel_output(Suite.t, [module]) :: Suite.t
   def parallel_output(suite, modules) do
     modules
-    |> Parallel.map(fn(module) ->
-         {module, module.format(suite)}
-       end)
+    |> Parallel.map(fn(module) -> {module, module.format(suite)} end)
     |> Enum.each(fn({module, output}) -> module.write(output) end)
 
     suite
