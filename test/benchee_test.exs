@@ -247,6 +247,26 @@ defmodule BencheeTest do
     assert length(occurences) == 3
   end
 
+  test "multiple inputs with very fast functions" do
+    output = capture_io fn ->
+      inputs = [inputs: %{"number_one" => 1, :symbole_one => :one}]
+
+      configuration = Keyword.merge @test_times, inputs
+
+      Benchee.run(%{
+        "identity" => fn(i) -> i end
+      }, configuration)
+    end
+
+    assert Regex.match?(@header_regex, output)
+    assert Regex.match? ~r/fast/, output
+    assert Regex.match? ~r/unreliable/, output
+
+    assert String.contains? output, ["number_one", "symbol_one"]
+    occurences = Regex.scan body_regex("identity"), output
+    assert length(occurences) == 2
+  end
+
   test ".run returns the suite intact" do
     capture_io fn ->
       suite = Benchee.run(%{
@@ -302,19 +322,24 @@ defmodule BencheeTest do
     assert length(occurences) == 2
   end
 
-  describe "before_each" do
+  describe "hooks" do
     test "it runs all of them" do
       capture_io fn ->
         myself = self()
         Benchee.run %{
           "sleeper"   => {fn -> :timer.sleep 1 end,
-                          before_each: fn -> send myself, :local end },
+                          before_each: fn -> send myself, :local_before end,
+                          after_each:  fn -> send myself, :local_after end},
           "sleeper 2" => fn -> :timer.sleep 1 end
         }, time: 0.0001, warmup: 0,
-           before_each: fn -> send myself, :global end
+           before_each: fn -> send myself, :global_before end,
+           after_each:  fn -> send myself, :global_after end
       end
 
-      assert_received_exactly [:global, :local, :global]
+      assert_received_exactly [
+        :global_before, :local_before, :local_after, :global_after,
+        :global_before, :global_after
+      ]
     end
   end
 
