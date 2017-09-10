@@ -70,6 +70,7 @@ defmodule Benchee.Benchmark.Runner do
         fn ->
           run_before_each(scenario, scenario_context)
           function.()
+          run_after_each(scenario, scenario_context)
         end,
         iterations
       )
@@ -84,6 +85,7 @@ defmodule Benchee.Benchmark.Runner do
         fn ->
           run_before_each(scenario, scenario_context)
           function.(input)
+          run_after_each(scenario, scenario_context)
         end,
         iterations
       )
@@ -198,6 +200,7 @@ defmodule Benchee.Benchmark.Runner do
                         }) do
     run_before_each(scenario, scenario_context)
     {microseconds, _return_value} = :timer.tc function
+    run_after_each(scenario, scenario_context)
     microseconds
   end
   defp measure_iteration(_scenario, %ScenarioContext{
@@ -205,8 +208,8 @@ defmodule Benchee.Benchmark.Runner do
                           benchmarking_function: function
                         }) when iterations > 1 do
     # When we have more than one iteration, then the repetition and calling
-    # of before hooks is already included in the function, for reference/
-    # reasoning see `build_benchmarking_function/2`
+    # of hooks is already included in the function, for reference/reasoning see
+    # `build_benchmarking_function/2`
     {microseconds, _return_value} = :timer.tc function
     microseconds
   end
@@ -219,5 +222,15 @@ defmodule Benchee.Benchmark.Runner do
                        }) do
     if global_before_each, do: global_before_each.()
     if local_before_each,  do: local_before_each.()
+  end
+
+  defp run_after_each(%{
+                        after_each: local_after_each
+                      },
+                      %{
+                        config: %{after_each: global_after_each}
+                      }) do
+    if global_after_each, do: global_after_each.()
+    if local_after_each,  do: local_after_each.()
   end
 end

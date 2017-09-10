@@ -18,7 +18,8 @@ defmodule Benchee.Benchmark.Scenario do
     :memory_usage_statistics,
     run_times: [],
     memory_usages: [],
-    before_each: nil
+    before_each: nil,
+    after_each: nil
   ]
 
   @type t :: %__MODULE__{
@@ -30,6 +31,7 @@ defmodule Benchee.Benchmark.Scenario do
     run_time_statistics: Benchee.Statistics.t | nil,
     memory_usages: [non_neg_integer] | [],
     memory_usage_statistics: Benchee.Statistics.t | nil,
-    before_each: fun | nil
+    before_each: fun | nil,
+    after_each: fun | nil
   }
 end
