@@ -316,17 +316,18 @@ defmodule Benchee.Benchmark.RunnerTest do
 
     test "before_each triggers for every invocation" do
       me = self()
-      %Suite{
-        configuration: %{
-          warmup: 0,
-          time: 10_000,
-          before_each: fn -> send me, :global end
-        }
-      }
-      |> test_suite
-      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
-                             before_each: fn -> send me, :local end})
-      |> Benchmark.measure(TestPrinter)
+      suite = %Suite{
+                configuration: %{
+                  warmup: 0,
+                  time: 10_000,
+                  before_each: fn -> send me, :global end
+                }
+              }
+      result = suite
+               |> test_suite
+               |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
+                                     before_each: fn -> send me, :local end})
+               |> Benchmark.measure(TestPrinter)
 
       {:messages, messages} = Process.info self(), :messages
       local_count  = Enum.count messages, fn(message) -> message == :local end
@@ -334,7 +335,44 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       assert local_count == global_count
       # should be closer to 10 by you know slow CI systems...
-      assert global_count >= 2
+      hook_call_count = global_count
+      assert hook_call_count >= 2
+      # for every sample that we have, we should have run a hook
+      [%{run_times: run_times}] = result.scenarios
+      sample_size = length(run_times)
+      assert sample_size == hook_call_count
+    end
+
+    test "hooks also trigger for very fast invocations" do
+      me = self()
+      suite = %Suite{
+                configuration: %{
+                  warmup: 0,
+                  time: 1_000,
+                  before_each: fn -> send me, :global_fast end
+                }
+              }
+      result = suite
+               |> test_suite
+               |> Benchmark.benchmark("job", {fn -> 0 end,
+                                      before_each: fn -> send me, :local_fast end})
+               |> Benchmark.measure(TestPrinter)
+
+      {:messages, messages} = Process.info self(), :messages
+      local_count  = Enum.count messages, fn(message) -> message == :local_fast end
+      global_count = Enum.count messages, fn(message) -> message == :global_fast end
+
+      assert local_count == global_count
+      # we should get a repeat factor of at least 10 and at least a couple
+      # of invocations
+      hook_call_count = global_count
+      assert hook_call_count >= 50
+
+      # we repeat the call but report it back as just one time (average) but
+      # we need to run the hooks more often than that (for every iteration)
+      [%{run_times: run_times}] = result.scenarios
+      sample_size = length(run_times)
+      assert hook_call_count > sample_size + 10
     end
 
   end

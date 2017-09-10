@@ -86,7 +86,7 @@ defmodule Benchee.Benchmark.Runner do
   defp determine_n_times(scenario, scenario_context = %ScenarioContext{
                            printer: printer
                          }, fast_warning) do
-    run_time = run_iteration(scenario, scenario_context)
+    run_time = measure_iteration(scenario, scenario_context)
     if run_time >= @minimum_execution_time do
       {1, run_time}
     else
@@ -100,7 +100,7 @@ defmodule Benchee.Benchmark.Runner do
   defp try_n_times(scenario, scenario_context = %ScenarioContext{
                      num_iterations: num_iterations
                    }) do
-    run_time = run_iteration(scenario, scenario_context)
+    run_time = measure_iteration(scenario, scenario_context)
     if run_time >= @minimum_execution_time do
       {num_iterations, run_time / num_iterations}
     else
@@ -128,46 +128,44 @@ defmodule Benchee.Benchmark.Runner do
   end
 
   defp measure_iteration(scenario, scenario_context = %ScenarioContext{
-                          num_iterations: num_iterations
+                          num_iterations: 1
                         }) do
-    run_iteration(scenario, scenario_context) / num_iterations
-  end
-
-  defp run_iteration(scenario, scenario_context) do
+    function = benchmarking_function(scenario)
     run_before_each(scenario, scenario_context)
-    measure_call(scenario, scenario_context)
-  end
-
-  defp run_before_each(%{
-                          before_each: local_before_each
-                        },
-                        %{
-                          config: %{before_each: global_before_each}
-                        }) do
-    if global_before_each, do: global_before_each.()
-    if local_before_each,  do: local_before_each.()
-  end
-
-  @no_input Benchmark.no_input()
-  defp measure_call(%Scenario{function: function, input: @no_input},
-                    %ScenarioContext{num_iterations: iterations}) do
-    measure_call function, iterations
-  end
-  defp measure_call(%Scenario{function: function, input: input},
-                    %ScenarioContext{num_iterations: iterations}) do
-    fun_with_input = fn -> function.(input) end
-    measure_call fun_with_input, iterations
-  end
-
-  defp measure_call(function, 1) do
     {microseconds, _return_value} = :timer.tc function
     microseconds
   end
-  defp measure_call(function, iterations) do
+  defp measure_iteration(scenario, scenario_context = %ScenarioContext{
+                          num_iterations: iterations
+                        }) do
+    function = benchmarking_function(scenario)
     {microseconds, _return_value} = :timer.tc fn ->
-      RepeatN.repeat_n(function, iterations)
+      RepeatN.repeat_n(
+        fn ->
+          run_before_each(scenario, scenario_context)
+          function.()
+        end,
+        iterations
+      )
     end
-
     microseconds
+  end
+
+  @no_input Benchmark.no_input()
+  defp benchmarking_function(%Scenario{function: func, input: @no_input}) do
+    func
+  end
+  defp benchmarking_function(%Scenario{function: func, input: input}) do
+    fn -> func.(input) end
+  end
+
+  defp run_before_each(%{
+                         before_each: local_before_each
+                       },
+                       %{
+                         config: %{before_each: global_before_each}
+                       }) do
+    if global_before_each, do: global_before_each.()
+    if local_before_each,  do: local_before_each.()
   end
 end
