@@ -32,6 +32,13 @@ defmodule Benchee.Benchmark.Runner do
     end)
   end
 
+  defp update_num_iterations(scenario_context, scenario, num_iterations) do
+    # every update of the number iterations could mean we need a different
+    # benchmarking function (as we go from 1 to n iterations)
+    %ScenarioContext{scenario_context | num_iterations: num_iterations}
+    |> update_benchmarking_function(scenario)
+  end
+
   defp update_benchmarking_function(scenario_context, scenario) do
     %ScenarioContext{scenario_context |
       benchmarking_function:
@@ -114,9 +121,8 @@ defmodule Benchee.Benchmark.Runner do
       determine_n_times(scenario, scenario_context, fast_warning)
     new_context =
       %ScenarioContext{scenario_context | current_time: current_time(),
-                                          end_time: end_time,
-                                          num_iterations: num_iterations}
-      |> update_benchmarking_function(scenario) # accomodate iterations
+                                          end_time: end_time}
+      |> update_num_iterations(scenario, num_iterations)
 
     updated_scenario = %Scenario{scenario | run_times: [initial_run_time]}
     do_benchmark(updated_scenario, new_context)
@@ -139,9 +145,9 @@ defmodule Benchee.Benchmark.Runner do
       {1, run_time}
     else
       if fast_warning, do: printer.fast_warning()
-      new_context =
-        %ScenarioContext{scenario_context | num_iterations: @times_multiplier}
-        |> update_benchmarking_function(scenario)
+      new_context = update_num_iterations(scenario_context,
+                                          scenario,
+                                          @times_multiplier)
       try_n_times(scenario, new_context)
     end
   end
@@ -153,11 +159,9 @@ defmodule Benchee.Benchmark.Runner do
     if run_time >= @minimum_execution_time do
       {num_iterations, run_time / num_iterations}
     else
-      new_context =
-        %ScenarioContext{
-          scenario_context | num_iterations: num_iterations * @times_multiplier
-        }
-        |> update_benchmarking_function(scenario)
+      new_context = update_num_iterations(scenario_context,
+                                          scenario,
+                                          num_iterations * @times_multiplier)
       try_n_times(scenario, new_context)
     end
   end
