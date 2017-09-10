@@ -114,7 +114,8 @@ defmodule Benchee.Benchmark.Runner do
   defp run_warmup(scenario, scenario_context = %ScenarioContext{
                    config: %Configuration{warmup: warmup}
                  }) do
-    measure_runtimes(scenario, scenario_context, warmup, false)
+    _ = measure_runtimes(scenario, scenario_context, warmup, false)
+    nil
   end
 
   defp run_benchmark(scenario, scenario_context = %ScenarioContext{
