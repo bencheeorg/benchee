@@ -39,7 +39,6 @@ defmodule Benchee.Benchmark.Runner do
     }
   end
 
-  @no_input Benchmark.no_input()
   # Builds the appropriate function to benchmark. Takes into account the
   # combinations of the following cases:
   #
@@ -52,45 +51,30 @@ defmodule Benchee.Benchmark.Runner do
   #   execution and hooks anymore and sadly we also measure the time of the
   #   hooks.
   defp build_benchmarking_function(
-      %Scenario{function: function, input: @no_input},
-      %ScenarioContext{num_iterations: 1}) do
-    function
-  end
-  defp build_benchmarking_function(
       %Scenario{function: function, input: input},
       %ScenarioContext{num_iterations: 1}) do
-    fn -> function.(input) end
-  end
-  defp build_benchmarking_function(
-        scenario = %Scenario{function: function, input: @no_input},
-        scenario_context = %ScenarioContext{num_iterations: iterations})
-        when iterations > 1 do
-    fn ->
-      RepeatN.repeat_n(
-        fn ->
-          run_before_each(scenario, scenario_context)
-          function.()
-          run_after_each(scenario, scenario_context)
-        end,
-        iterations
-      )
-    end
+    main_function(function, input)
   end
   defp build_benchmarking_function(
         scenario = %Scenario{function: function, input: input},
         scenario_context = %ScenarioContext{num_iterations: iterations})
         when iterations > 1 do
+    main = main_function(function, input)
     fn ->
       RepeatN.repeat_n(
         fn ->
           run_before_each(scenario, scenario_context)
-          function.(input)
+          main.()
           run_after_each(scenario, scenario_context)
         end,
         iterations
       )
     end
   end
+
+  @no_input Benchmark.no_input()
+  defp main_function(function, @no_input), do: function
+  defp main_function(function, input),     do: fn -> function.(input) end
 
   defp parallel_benchmark(
          scenario = %Scenario{job_name: job_name, input_name: input_name},
