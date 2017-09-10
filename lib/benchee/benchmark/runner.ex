@@ -138,31 +138,18 @@ defmodule Benchee.Benchmark.Runner do
   @minimum_execution_time 10
   @times_multiplier 10
   defp determine_n_times(scenario, scenario_context = %ScenarioContext{
+                           num_iterations: num_iterations,
                            printer: printer
                          }, fast_warning) do
     run_time = measure_iteration(scenario, scenario_context)
     if run_time >= @minimum_execution_time do
-      {1, run_time}
+      {num_iterations, run_time / num_iterations}
     else
       if fast_warning, do: printer.fast_warning()
       new_context = update_num_iterations(scenario_context,
                                           scenario,
-                                          @times_multiplier)
-      try_n_times(scenario, new_context)
-    end
-  end
-
-  defp try_n_times(scenario, scenario_context = %ScenarioContext{
-                     num_iterations: num_iterations
-                   }) do
-    run_time = measure_iteration(scenario, scenario_context)
-    if run_time >= @minimum_execution_time do
-      {num_iterations, run_time / num_iterations}
-    else
-      new_context = update_num_iterations(scenario_context,
-                                          scenario,
                                           num_iterations * @times_multiplier)
-      try_n_times(scenario, new_context)
+      determine_n_times(scenario, new_context, false)
     end
   end
 
