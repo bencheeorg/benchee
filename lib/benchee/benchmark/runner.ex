@@ -97,13 +97,13 @@ defmodule Benchee.Benchmark.Runner do
     end)
   end
 
-  def run_warmup(scenario, scenario_context = %ScenarioContext{
+  defp run_warmup(scenario, scenario_context = %ScenarioContext{
                    config: %Configuration{warmup: warmup}
                  }) do
     measure_runtimes(scenario, scenario_context, warmup, false)
   end
 
-  def run_benchmark(scenario, scenario_context = %ScenarioContext{
+  defp run_benchmark(scenario, scenario_context = %ScenarioContext{
                       config: %Configuration{
                         time: run_time,
                         print: %{fast_warning: fast_warning}
@@ -162,17 +162,23 @@ defmodule Benchee.Benchmark.Runner do
   end
   defp do_benchmark(scenario = %Scenario{run_times: run_times},
                     scenario_context) do
-    run_time = measure_iteration(scenario, scenario_context)
+    run_time = iteration_time(scenario, scenario_context)
     updated_scenario = %Scenario{scenario | run_times: [run_time | run_times]}
     updated_context =
       %ScenarioContext{scenario_context | current_time: current_time()}
     do_benchmark(updated_scenario, updated_context)
   end
 
+  defp iteration_time(scenario, scenario_context = %ScenarioContext{
+                                  num_iterations: num_iterations
+                                }) do
+    measure_iteration(scenario, scenario_context) / num_iterations
+  end
+
   defp measure_iteration(scenario, scenario_context = %ScenarioContext{
-                          num_iterations: 1,
-                          benchmarking_function: function
-                        }) do
+                                     num_iterations: 1,
+                                     benchmarking_function: function
+                                   }) do
     run_before_each(scenario, scenario_context)
     {microseconds, _return_value} = :timer.tc function
     run_after_each(scenario, scenario_context)

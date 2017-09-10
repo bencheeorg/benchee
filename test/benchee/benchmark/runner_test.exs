@@ -70,6 +70,18 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert length(run_times_for(new_suite, "")) >= 12
     end
 
+    test "very fast function times are reported correctly" do
+      suite = test_suite()
+              |> Benchmark.benchmark("", fn -> 1 end)
+              |> Benchmark.measure(TestPrinter)
+              |> Benchee.statistics()
+
+      [%{run_time_statistics: %{average: average}}] = suite.scenarios
+
+      # They are repeated but times are scaled down for the repetition again
+      assert average < 10
+    end
+
     test "doesn't take longer than advertised for very fast funs" do
       retrying fn ->
         time = 20_000
