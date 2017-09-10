@@ -9,7 +9,14 @@ defmodule Benchee.Benchmark.RunnerTest do
                          warmup:   20_000,
                          inputs:   nil,
                          print:    %{fast_warning: false, configuration: true}}
-  @system %{elixir: "1.4.0", erlang: "19.1"}
+  @system %{
+    elixir:           "1.4.0",
+    erlang:           "19.1",
+    num_cores:        "4",
+    os:               "Super Duper",
+    available_memory: "8 Trillion",
+    cpu_speed:        "light speed"
+  }
   @default_suite %Suite{configuration: @config, system: @system}
 
   defp test_suite(suite_override \\ %{}) do
@@ -71,11 +78,17 @@ defmodule Benchee.Benchmark.RunnerTest do
     end
 
     test "very fast functions print a warning" do
-      test_suite()
-      |> Benchmark.benchmark("", fn -> 1 end)
-      |> Benchmark.measure(TestPrinter)
+      output = ExUnit.CaptureIO.capture_io fn ->
+        %Suite{configuration: %{print: %{fast_warning: true}}}
+        |> test_suite()
+        |> Benchmark.benchmark("", fn -> 1 end)
+        |> Benchmark.measure()
+      end
 
-      assert_received :fast_warning
+      # need to asser on IO here as our message sending trick doesn't work
+      # as we spawn new processes to do our benchmarking work therfore the
+      # message never arrives here...
+      assert output =~ ~r/Warning.+fast.+unreliable/i
     end
 
     test "very fast function times are reported correctly" do
