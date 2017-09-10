@@ -70,6 +70,14 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert length(run_times_for(new_suite, "")) >= 12
     end
 
+    test "very fast functions print a warning" do
+      test_suite()
+      |> Benchmark.benchmark("", fn -> 1 end)
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received :fast_warning
+    end
+
     test "very fast function times are reported correctly" do
       suite = test_suite()
               |> Benchmark.benchmark("", fn -> 1 end)

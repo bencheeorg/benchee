@@ -63,6 +63,20 @@ defmodule Benchee.Benchmark.Runner do
     main_function(function, input)
   end
   defp build_benchmarking_function(
+        %Scenario{
+          function: function, input: input, before_each: nil, after_each: nil
+        },
+        %ScenarioContext{
+          num_iterations: iterations,
+          config: %{after_each: nil, before_each: nil}
+        })
+        when iterations > 1 do
+    main = main_function(function, input)
+    # with no before/after each we can safely omit them and don't get the hit
+    # on run time measurements (See PR discussions for this for more info #127)
+    fn -> RepeatN.repeat_n(main, iterations) end
+  end
+  defp build_benchmarking_function(
         scenario = %Scenario{function: function, input: input},
         scenario_context = %ScenarioContext{num_iterations: iterations})
         when iterations > 1 do
