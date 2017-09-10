@@ -409,8 +409,8 @@ defmodule Benchee.Benchmark.RunnerTest do
       hook_call_count = local_before_count
 
       # we should get a repeat factor of at least 10 and at least a couple
-      # of invocations
-      assert hook_call_count >= 50
+      # of invocations, need to be conservative for CI/slow PCs
+      assert hook_call_count > 20
 
       # we repeat the call but report it back as just one time (average) but
       # we need to run the hooks more often than that (for every iteration)
