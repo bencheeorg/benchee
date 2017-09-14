@@ -226,7 +226,7 @@ defmodule Benchee.Benchmark.Runner do
                       %{
                         config: %{after_each: global_after_each}
                       }) do
-    if global_after_each, do: global_after_each.()
     if local_after_each,  do: local_after_each.()
+    if global_after_each, do: global_after_each.()
   end
 end
