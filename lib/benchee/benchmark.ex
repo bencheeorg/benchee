@@ -7,6 +7,7 @@ defmodule Benchee.Benchmark do
   alias Benchee.Output.BenchmarkPrinter, as: Printer
   alias Benchee.Suite
   alias Benchee.Benchmark.{Scenario, ScenarioContext, Runner}
+  alias Benchee.Utility.DeepConvert
 
   @type job_name :: String.t | atom
   @no_input :__no_input
@@ -45,18 +46,28 @@ defmodule Benchee.Benchmark do
 
   defp build_scenarios_for_job(job_name, function, config)
   defp build_scenarios_for_job(job_name, function, nil) do
-    [%Scenario{job_name: job_name, function: function, input: @no_input,
-               input_name: @no_input}]
+    [build_scenario(%{job_name: job_name, function: function, input: @no_input,
+                      input_name: @no_input})]
   end
   defp build_scenarios_for_job(job_name, function, %{inputs: nil}) do
-    [%Scenario{job_name: job_name, function: function, input: @no_input,
-               input_name: @no_input}]
+    [build_scenario(%{job_name: job_name, function: function, input: @no_input,
+                     input_name: @no_input})]
   end
   defp build_scenarios_for_job(job_name, function, %{inputs: inputs}) do
     Enum.map(inputs, fn({input_name, input}) ->
-      %Scenario{job_name: job_name, function: function, input: input,
-                input_name: input_name}
+      build_scenario(%{job_name: job_name, function: function, input: input,
+                       input_name: input_name})
     end)
+  end
+
+  defp build_scenario(scenario_data = %{function: {function, options}}) do
+    scenario_data
+    |> Map.put(:function, function)
+    |> Map.merge(DeepConvert.to_map(options))
+    |> build_scenario
+  end
+  defp build_scenario(scenario_data) do
+    struct!(Scenario, scenario_data)
   end
 
   @doc """

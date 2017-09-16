@@ -52,6 +52,20 @@ defmodule Benchee.BenchmarkTest do
       assert input_names == ["large", "small"]
       assert inputs == [100_000, 10]
     end
+
+    test "can deal with the options tuple" do
+      function = fn -> 1 end
+      before   = fn -> 2 end
+      suite =
+        %Suite{}
+        |> Benchmark.benchmark("job", {function, before_each: before})
+
+      [scenario] = suite.scenarios
+      assert %{
+        job_name: "job",
+        function: ^function,
+        before_each: ^before } = scenario
+    end
   end
 
   describe ".measure" do

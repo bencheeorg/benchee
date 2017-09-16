@@ -9,7 +9,14 @@ defmodule Benchee.Benchmark.RunnerTest do
                          warmup:   20_000,
                          inputs:   nil,
                          print:    %{fast_warning: false, configuration: true}}
-  @system %{elixir: "1.4.0", erlang: "19.1"}
+  @system %{
+    elixir:           "1.4.0",
+    erlang:           "19.1",
+    num_cores:        "4",
+    os:               "Super Duper",
+    available_memory: "8 Trillion",
+    cpu_speed:        "light speed"
+  }
   @default_suite %Suite{configuration: @config, system: @system}
 
   defp test_suite(suite_override \\ %{}) do
@@ -68,6 +75,32 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       # it does more work when working in parallel than it does alone
       assert length(run_times_for(new_suite, "")) >= 12
+    end
+
+    test "very fast functions print a warning" do
+      output = ExUnit.CaptureIO.capture_io fn ->
+        %Suite{configuration: %{print: %{fast_warning: true}}}
+        |> test_suite()
+        |> Benchmark.benchmark("", fn -> 1 end)
+        |> Benchmark.measure()
+      end
+
+      # need to asser on IO here as our message sending trick doesn't work
+      # as we spawn new processes to do our benchmarking work therfore the
+      # message never arrives here...
+      assert output =~ ~r/Warning.+fast.+unreliable/i
+    end
+
+    test "very fast function times are reported correctly" do
+      suite = test_suite()
+              |> Benchmark.benchmark("", fn -> 1 end)
+              |> Benchmark.measure(TestPrinter)
+              |> Benchee.statistics()
+
+      [%{run_time_statistics: %{average: average}}] = suite.scenarios
+
+      # They are repeated but times are scaled down for the repetition again
+      assert average < 10
     end
 
     test "doesn't take longer than advertised for very fast funs" do
@@ -210,5 +243,214 @@ defmodule Benchee.Benchmark.RunnerTest do
         assert run_times == Enum.sort(run_times)
       end
     end
+
+    test "global hooks triggers" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 0,
+          time: 100,
+          before_each: fn -> send(me, :before) end,
+          after_each: fn -> send(me, :after) end
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", fn -> :timer.sleep 1 end)
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [:before, :after]
+    end
+
+    test "scenario hooks triggers" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 0,
+          time: 100
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
+                             before_each: fn -> send(me, :before) end,
+                             after_each: fn -> send(me, :after) end})
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [:before, :after]
+    end
+
+    test "hooks trigger during warmup and runtime" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 100,
+          time: 100
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
+                             before_each: fn -> send(me, :before) end,
+                             after_each:  fn -> send(me, :after) end})
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [:before, :after, :before, :after]
+    end
+
+    test "hooks trigger for each input" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 0,
+          time: 100,
+          before_each: fn -> send me, :global_before end,
+          after_each:  fn -> send me, :global_after end,
+          inputs: %{"one" => 1, "two" => 2}
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn(_) -> :timer.sleep 1 end,
+                             before_each: fn -> send me, :local_before end,
+                             after_each:  fn -> send me, :local_after end})
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [
+        :global_before, :local_before, :local_after, :global_after,
+        :global_before, :local_before, :local_after, :global_after
+      ]
+    end
+
+    test "scenario hooks trigger only for that scenario" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 0,
+          time: 100,
+          before_each: fn -> send me, :global_before end,
+          after_each:  fn -> send me, :global_after end
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
+                             before_each: fn -> send me, :local_1_before end})
+      |> Benchmark.benchmark("job 2", fn -> :timer.sleep 1 end)
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [
+        :global_before, :local_1_before, :global_after,
+        :global_before, :global_after
+      ]
+    end
+
+    test "different hooks trigger only for that scenario" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 0,
+          time: 100,
+          before_each: fn -> send me, :global_before end,
+          after_each:  fn -> send me, :global_after end
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
+                             before_each: fn -> send me, :local_before end,
+                             after_each:  fn -> send me, :local_after end})
+      |> Benchmark.benchmark("job 2", {fn -> :timer.sleep 1 end,
+                             before_each: fn -> send me, :local_2_before end,
+                             after_each:  fn -> send me, :local_2_after end})
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [
+        :global_before, :local_before, :local_after, :global_after,
+        :global_before, :local_2_before, :local_2_after, :global_after
+      ]
+    end
+
+    test "before_each triggers for every invocation" do
+      me = self()
+      suite = %Suite{
+                configuration: %{
+                  warmup: 0,
+                  time: 10_000,
+                  before_each: fn -> send me, :global_before end,
+                  after_each:  fn -> send me, :global_after end
+                }
+              }
+      result =
+        suite
+        |> test_suite
+        |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
+                               before_each: fn -> send me, :local_before end,
+                               after_each:  fn -> send me, :local_after end})
+        |> Benchmark.measure(TestPrinter)
+
+      {:messages, messages} = Process.info self(), :messages
+      global_before_count =
+        Enum.count messages, fn(message) -> message == :global_before end
+      local_before_count =
+        Enum.count messages, fn(message) -> message == :local_before end
+      local_after_count =
+        Enum.count messages, fn(message) -> message == :local_after end
+      global_after_count =
+        Enum.count messages, fn(message) -> message == :global_after end
+
+
+      assert local_before_count == global_before_count
+      assert local_after_count == global_after_count
+      assert local_before_count == local_after_count
+      hook_call_count = local_before_count
+
+      # should be closer to 10 by you know slow CI systems...
+      assert hook_call_count >= 2
+      # for every sample that we have, we should have run a hook
+      [%{run_times: run_times}] = result.scenarios
+      sample_size = length(run_times)
+      assert sample_size == hook_call_count
+    end
+
+    test "hooks also trigger for very fast invocations" do
+      me = self()
+      suite = %Suite{
+                configuration: %{
+                  warmup: 0,
+                  time: 1_000,
+                  before_each: fn -> send me, :global_before end,
+                  after_each:  fn -> send me, :global_after end
+                }
+              }
+      result =
+        suite
+        |> test_suite
+        |> Benchmark.benchmark("job", {fn -> 0 end,
+                               before_each: fn -> send me, :local_before end,
+                               after_each:  fn -> send me, :local_after end})
+        |> Benchmark.measure(TestPrinter)
+
+      {:messages, messages} = Process.info self(), :messages
+      global_before_count =
+        Enum.count messages, fn(message) -> message == :global_before end
+      local_before_count =
+        Enum.count messages, fn(message) -> message == :local_before end
+      local_after_count =
+        Enum.count messages, fn(message) -> message == :local_after end
+      global_after_count =
+        Enum.count messages, fn(message) -> message == :global_after end
+
+
+      assert local_before_count == global_before_count
+      assert local_after_count == global_after_count
+      assert local_before_count == local_after_count
+      hook_call_count = local_before_count
+
+      # we should get a repeat factor of at least 10 and at least a couple
+      # of invocations, need to be conservative for CI/slow PCs
+      assert hook_call_count > 20
+
+      # we repeat the call but report it back as just one time (average) but
+      # we need to run the hooks more often than that (for every iteration)
+      [%{run_times: run_times}] = result.scenarios
+      sample_size = length(run_times)
+      assert hook_call_count > sample_size + 10
+    end
+
   end
 end

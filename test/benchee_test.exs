@@ -115,8 +115,9 @@ defmodule BencheeTest do
       Benchee.run(%{"Sleeps" => fn -> 0 end}, time: 0.001, warmup: 0)
     end
 
-    assert Regex.match? ~r/fast/, output
-    assert Regex.match? ~r/unreliable/, output
+    assert output =~ ~r/fast/
+    assert output =~ ~r/unreliable/
+    assert output =~ ~r/^Sleeps\s+\d+.+\s+0\.\d+ μs/m
   end
 
   test "integration super fast function warning is printed once per job" do
@@ -247,12 +248,32 @@ defmodule BencheeTest do
     assert length(occurences) == 3
   end
 
-  test ".run returns the suite in the end intact" do
+  test "multiple inputs with very fast functions" do
+    output = capture_io fn ->
+      inputs = [inputs: %{"number_one" => 1, :symbole_one => :one}]
+
+      configuration = Keyword.merge @test_times, inputs
+
+      Benchee.run(%{
+        "identity" => fn(i) -> i end
+      }, configuration)
+    end
+
+    assert Regex.match?(@header_regex, output)
+    assert Regex.match? ~r/fast/, output
+    assert Regex.match? ~r/unreliable/, output
+
+    assert String.contains? output, ["number_one", "symbol_one"]
+    occurences = Regex.scan body_regex("identity"), output
+    assert length(occurences) == 2
+  end
+
+  test ".run returns the suite intact" do
     capture_io fn ->
       suite = Benchee.run(%{
         "sleep"    => fn -> :timer.sleep 1 end
       }, time: 0.001, warmup: 0)
-      assert %{scenarios: _, configuration: _} = suite
+      assert %Benchee.Suite{scenarios: _, configuration: _} = suite
     end
   end
 
@@ -302,14 +323,35 @@ defmodule BencheeTest do
     assert length(occurences) == 2
   end
 
+  describe "hooks" do
+    test "it runs all of them" do
+      capture_io fn ->
+        myself = self()
+        Benchee.run %{
+          "sleeper"   => {fn -> :timer.sleep 1 end,
+                          before_each: fn -> send myself, :local_before end,
+                          after_each:  fn -> send myself, :local_after end},
+          "sleeper 2" => fn -> :timer.sleep 1 end
+        }, time: 0.0001, warmup: 0,
+           before_each: fn -> send myself, :global_before end,
+           after_each:  fn -> send myself, :global_after end
+      end
+
+      assert_received_exactly [
+        :global_before, :local_before, :local_after, :global_after,
+        :global_before, :global_after
+      ]
+    end
+  end
+
   @slower_regex "\\s+- \\d+\\.\\d+x slower"
   defp readme_sample_asserts(output) do
     assert output =~ @header_regex
     assert output =~ body_regex("flat_map")
     assert output =~ body_regex("map.flatten")
     assert output =~ ~r/Comparison/, output
-    assert output =~ ~r/^map.flatten\s+\d+\.\d+\s*.?(#{@slower_regex})?$/m
-    assert output =~ ~r/^flat_map\s+\d+\.\d+\s*.?(#{@slower_regex})?$/m
+    assert output =~ ~r/^map.flatten\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
+    assert output =~ ~r/^flat_map\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
     assert output =~ ~r/#{@slower_regex}/m
 
     refute Regex.match?(~r/fast/i, output)

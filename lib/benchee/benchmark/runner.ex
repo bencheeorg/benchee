@@ -26,9 +26,76 @@ defmodule Benchee.Benchmark.Runner do
   @spec run_scenarios([Scenario.t], ScenarioContext.t) :: [Scenario.t]
   def run_scenarios(scenarios, scenario_context) do
     Enum.flat_map(scenarios, fn(scenario) ->
+      scenario_context =
+        update_benchmarking_function(scenario_context, scenario)
       parallel_benchmark(scenario, scenario_context)
     end)
   end
+
+  defp update_num_iterations(scenario_context, scenario, num_iterations) do
+    # every update of the number iterations could mean we need a different
+    # benchmarking function (as we go from 1 to n iterations)
+    %ScenarioContext{scenario_context | num_iterations: num_iterations}
+    |> update_benchmarking_function(scenario)
+  end
+
+  defp update_benchmarking_function(scenario_context, scenario) do
+    %ScenarioContext{scenario_context |
+      benchmarking_function:
+        build_benchmarking_function(scenario, scenario_context)
+    }
+  end
+
+  # Builds the appropriate function to benchmark. Takes into account the
+  # combinations of the following cases:
+  #
+  # * an input is specified - creates a 0-argument function calling the original
+  #   function with that input
+  # * number of iterations - when there's more than one iteration we repeat the
+  #   benchmarking function during execution and measure the the total run time.
+  #   We only run multiple iterations if a function is so fast that we can't
+  #   accurately measure it in one go. Hence, we can't split up the function
+  #   execution and hooks anymore and sadly we also measure the time of the
+  #   hooks.
+  defp build_benchmarking_function(
+      %Scenario{function: function, input: input},
+      %ScenarioContext{num_iterations: 1}) do
+    main_function(function, input)
+  end
+  defp build_benchmarking_function(
+        %Scenario{
+          function: function, input: input, before_each: nil, after_each: nil
+        },
+        %ScenarioContext{
+          num_iterations: iterations,
+          config: %{after_each: nil, before_each: nil}
+        })
+        when iterations > 1 do
+    main = main_function(function, input)
+    # with no before/after each we can safely omit them and don't get the hit
+    # on run time measurements (See PR discussions for this for more info #127)
+    fn -> RepeatN.repeat_n(main, iterations) end
+  end
+  defp build_benchmarking_function(
+        scenario = %Scenario{function: function, input: input},
+        scenario_context = %ScenarioContext{num_iterations: iterations})
+        when iterations > 1 do
+    main = main_function(function, input)
+    fn ->
+      RepeatN.repeat_n(
+        fn ->
+          run_before_each(scenario, scenario_context)
+          main.()
+          run_after_each(scenario, scenario_context)
+        end,
+        iterations
+      )
+    end
+  end
+
+  @no_input Benchmark.no_input()
+  defp main_function(function, @no_input), do: function
+  defp main_function(function, input),     do: fn -> function.(input) end
 
   defp parallel_benchmark(
          scenario = %Scenario{job_name: job_name, input_name: input_name},
@@ -44,13 +111,14 @@ defmodule Benchee.Benchmark.Runner do
     end)
   end
 
-  def run_warmup(scenario, scenario_context = %ScenarioContext{
+  defp run_warmup(scenario, scenario_context = %ScenarioContext{
                    config: %Configuration{warmup: warmup}
                  }) do
-    measure_runtimes(scenario, scenario_context, warmup, false)
+    _ = measure_runtimes(scenario, scenario_context, warmup, false)
+    nil
   end
 
-  def run_benchmark(scenario, scenario_context = %ScenarioContext{
+  defp run_benchmark(scenario, scenario_context = %ScenarioContext{
                       config: %Configuration{
                         time: run_time,
                         print: %{fast_warning: fast_warning}
@@ -66,11 +134,12 @@ defmodule Benchee.Benchmark.Runner do
     :erlang.garbage_collect
     {num_iterations, initial_run_time} =
       determine_n_times(scenario, scenario_context, fast_warning)
-    updated_scenario = %Scenario{scenario | run_times: [initial_run_time]}
     new_context =
       %ScenarioContext{scenario_context | current_time: current_time(),
-                                          end_time: end_time,
-                                          num_iterations: num_iterations}
+                                          end_time: end_time}
+      |> update_num_iterations(scenario, num_iterations)
+
+    updated_scenario = %Scenario{scenario | run_times: [initial_run_time]}
     do_benchmark(updated_scenario, new_context)
   end
 
@@ -84,30 +153,18 @@ defmodule Benchee.Benchmark.Runner do
   @minimum_execution_time 10
   @times_multiplier 10
   defp determine_n_times(scenario, scenario_context = %ScenarioContext{
+                           num_iterations: num_iterations,
                            printer: printer
                          }, fast_warning) do
-    run_time = measure_call(scenario, scenario_context)
-    if run_time >= @minimum_execution_time do
-      {1, run_time}
-    else
-      if fast_warning, do: printer.fast_warning()
-      new_context =
-        %ScenarioContext{scenario_context | num_iterations: @times_multiplier}
-      try_n_times(scenario, new_context)
-    end
-  end
-
-  defp try_n_times(scenario, scenario_context = %ScenarioContext{
-                     num_iterations: num_iterations
-                   }) do
-    run_time = measure_call_n_times(scenario, scenario_context)
+    run_time = measure_iteration(scenario, scenario_context)
     if run_time >= @minimum_execution_time do
       {num_iterations, run_time / num_iterations}
     else
-      new_context = %ScenarioContext{
-        scenario_context | num_iterations: num_iterations * @times_multiplier
-      }
-      try_n_times(scenario, new_context)
+      if fast_warning, do: printer.fast_warning()
+      new_context = update_num_iterations(scenario_context,
+                                          scenario,
+                                          num_iterations * @times_multiplier)
+      determine_n_times(scenario, new_context, false)
     end
   end
 
@@ -120,35 +177,56 @@ defmodule Benchee.Benchmark.Runner do
   end
   defp do_benchmark(scenario = %Scenario{run_times: run_times},
                     scenario_context) do
-    run_time = measure_call(scenario, scenario_context)
+    run_time = iteration_time(scenario, scenario_context)
     updated_scenario = %Scenario{scenario | run_times: [run_time | run_times]}
     updated_context =
       %ScenarioContext{scenario_context | current_time: current_time()}
     do_benchmark(updated_scenario, updated_context)
   end
 
-  defp measure_call(scenario, scenario_context = %ScenarioContext{
-                      num_iterations: num_iterations
-                    }) do
-    measure_call_n_times(scenario, scenario_context) / num_iterations
+  defp iteration_time(scenario, scenario_context = %ScenarioContext{
+                                  num_iterations: num_iterations
+                                }) do
+    measure_iteration(scenario, scenario_context) / num_iterations
   end
 
-  @no_input Benchmark.no_input()
-  defp measure_call_n_times(%Scenario{function: function, input: @no_input},
-                            %ScenarioContext{num_iterations: num_iterations}) do
-    {microseconds, _return_value} = :timer.tc fn ->
-      RepeatN.repeat_n(function, num_iterations)
-    end
-
+  defp measure_iteration(scenario, scenario_context = %ScenarioContext{
+                                     num_iterations: 1,
+                                     benchmarking_function: function
+                                   }) do
+    run_before_each(scenario, scenario_context)
+    {microseconds, _return_value} = :timer.tc function
+    run_after_each(scenario, scenario_context)
     microseconds
   end
-  defp measure_call_n_times(%Scenario{function: function, input: input},
-                            %ScenarioContext{num_iterations: num_iterations}) do
-    fun_with_input = fn -> function.(input) end
-    {microseconds, _return_value} = :timer.tc fn ->
-      RepeatN.repeat_n(fun_with_input, num_iterations)
-    end
-
+  defp measure_iteration(_scenario, %ScenarioContext{
+                          num_iterations: iterations,
+                          benchmarking_function: function
+                        }) when iterations > 1 do
+    # When we have more than one iteration, then the repetition and calling
+    # of hooks is already included in the function, for reference/reasoning see
+    # `build_benchmarking_function/2`
+    {microseconds, _return_value} = :timer.tc function
     microseconds
+  end
+
+  defp run_before_each(%{
+                         before_each: local_before_each
+                       },
+                       %{
+                         config: %{before_each: global_before_each}
+                       }) do
+    if global_before_each, do: global_before_each.()
+    if local_before_each,  do: local_before_each.()
+  end
+
+  defp run_after_each(%{
+                        after_each: local_after_each
+                      },
+                      %{
+                        config: %{after_each: global_after_each}
+                      }) do
+    if local_after_each,  do: local_after_each.()
+    if global_after_each, do: global_after_each.()
   end
 end
