@@ -328,18 +328,29 @@ defmodule BencheeTest do
       capture_io fn ->
         myself = self()
         Benchee.run %{
-          "sleeper"   => {fn -> :timer.sleep 1 end,
-                          before_each: fn -> send myself, :local_before end,
-                          after_each:  fn -> send myself, :local_after end},
+          "sleeper"   => {
+            fn -> :timer.sleep 1 end,
+            before_each: fn -> send myself, :local_before end,
+            after_each:  fn -> send myself, :local_after end,
+            before_scenario: fn -> send myself, :local_before_scenario end,
+            after_scenario: fn -> send myself, :local_after_scenario end},
           "sleeper 2" => fn -> :timer.sleep 1 end
-        }, time: 0.0001, warmup: 0,
+        }, time: 0.0001,
+           warmup: 0,
            before_each: fn -> send myself, :global_before end,
-           after_each:  fn -> send myself, :global_after end
+           after_each:  fn -> send myself, :global_after end,
+           before_scenario: fn -> send myself, :global_before_scenario end,
+           after_scenario:  fn -> send myself, :global_after_scenario end
       end
 
       assert_received_exactly [
-        :global_before, :local_before, :local_after, :global_after,
-        :global_before, :global_after
+        # first job with all those local hooks
+        :global_before_scenario, :local_before_scenario, :global_before,
+        :local_before, :local_after, :global_after, :local_after_scenario,
+        :global_after_scenario,
+        # second job that only runs global hooks
+        :global_before_scenario, :global_before, :global_after,
+        :global_after_scenario
       ]
     end
   end

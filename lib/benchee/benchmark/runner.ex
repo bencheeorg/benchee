@@ -106,16 +106,32 @@ defmodule Benchee.Benchmark.Runner do
     printer.input_information(input_name, config)
     printer.benchmarking(job_name, config)
     Parallel.map(1..config.parallel, fn(_task_number) ->
-      run_warmup(scenario, scenario_context)
-      run_benchmark(scenario, scenario_context)
+      run_scenario(scenario, scenario_context)
     end)
+  end
+
+  defp run_scenario(scenario, scenario_context) do
+    run_before_scenario(scenario, scenario_context)
+    _ = run_warmup(scenario, scenario_context)
+    measurements = run_benchmark(scenario, scenario_context)
+    run_after_scenario(scenario, scenario_context)
+    measurements
+  end
+
+  defp run_before_scenario(%{
+                             before_scenario: local_before_scenario
+                           },
+                           %{
+                             config: %{before_scenario: global_before_scenario}
+                           }) do
+    if global_before_scenario, do: global_before_scenario.()
+    if local_before_scenario,  do: local_before_scenario.()
   end
 
   defp run_warmup(scenario, scenario_context = %ScenarioContext{
                    config: %Configuration{warmup: warmup}
                  }) do
-    _ = measure_runtimes(scenario, scenario_context, warmup, false)
-    nil
+    measure_runtimes(scenario, scenario_context, warmup, false)
   end
 
   defp run_benchmark(scenario, scenario_context = %ScenarioContext{
@@ -125,6 +141,16 @@ defmodule Benchee.Benchmark.Runner do
                       }
                     }) do
     measure_runtimes(scenario, scenario_context, run_time, fast_warning)
+  end
+
+  defp run_after_scenario(%{
+                            after_scenario: local_after_scenario
+                          },
+                          %{
+                            config: %{after_scenario: global_after_scenario}
+                          }) do
+    if local_after_scenario,  do: local_after_scenario.()
+    if global_after_scenario, do: global_after_scenario.()
   end
 
   defp measure_runtimes(scenario, context, run_time, fast_warning)

@@ -54,17 +54,20 @@ defmodule Benchee.BenchmarkTest do
     end
 
     test "can deal with the options tuple" do
-      function = fn -> 1 end
-      before   = fn -> 2 end
+      function       = fn -> 1 end
+      before         = fn -> 2 end
+      after_scenario = fn -> 3 end
       suite =
         %Suite{}
-        |> Benchmark.benchmark("job", {function, before_each: before})
+        |> Benchmark.benchmark("job", {
+          function, before_each: before, after_scenario: after_scenario})
 
       [scenario] = suite.scenarios
       assert %{
         job_name: "job",
         function: ^function,
-        before_each: ^before } = scenario
+        before_each: ^before,
+        after_scenario: ^after_scenario } = scenario
     end
   end
 

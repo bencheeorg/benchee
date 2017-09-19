@@ -270,15 +270,20 @@ defmodule Benchee.Benchmark.RunnerTest do
         }
       }
       |> test_suite
-      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
-                             before_each: fn -> send(me, :before) end,
-                             after_each: fn -> send(me, :after) end})
+      |> Benchmark.benchmark("job", {
+           fn -> :timer.sleep 1 end,
+           before_each: fn -> send(me, :before) end,
+           after_each: fn -> send(me, :after) end,
+           before_scenario: fn -> send(me, :before_scenario) end,
+           after_scenario: fn -> send(me, :after_scenario) end})
       |> Benchmark.measure(TestPrinter)
 
-      assert_received_exactly [:before, :after]
+      assert_received_exactly [
+        :before_scenario, :before, :after, :after_scenario
+      ]
     end
 
-    test "hooks trigger during warmup and runtime" do
+    test "hooks trigger during warmup and runtime but scenarios once" do
       me = self()
       %Suite{
         configuration: %{
@@ -287,12 +292,17 @@ defmodule Benchee.Benchmark.RunnerTest do
         }
       }
       |> test_suite
-      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
-                             before_each: fn -> send(me, :before) end,
-                             after_each:  fn -> send(me, :after) end})
+      |> Benchmark.benchmark("job", {
+           fn -> :timer.sleep 1 end,
+           before_each: fn -> send(me, :before) end,
+           after_each: fn -> send(me, :after) end,
+           before_scenario: fn -> send(me, :before_scenario) end,
+           after_scenario: fn -> send(me, :after_scenario) end})
       |> Benchmark.measure(TestPrinter)
 
-      assert_received_exactly [:before, :after, :before, :after]
+      assert_received_exactly [
+        :before_scenario, :before, :after, :before, :after, :after_scenario
+      ]
     end
 
     test "hooks trigger for each input" do
@@ -303,18 +313,25 @@ defmodule Benchee.Benchmark.RunnerTest do
           time: 100,
           before_each: fn -> send me, :global_before end,
           after_each:  fn -> send me, :global_after end,
+          before_scenario: fn -> send me, :global_before_scenario end,
+          after_scenario:  fn -> send me, :global_after_scenario end,
           inputs: %{"one" => 1, "two" => 2}
         }
       }
       |> test_suite
-      |> Benchmark.benchmark("job", {fn(_) -> :timer.sleep 1 end,
-                             before_each: fn -> send me, :local_before end,
-                             after_each:  fn -> send me, :local_after end})
+      |> Benchmark.benchmark("job", {
+           fn(_) -> :timer.sleep 1 end,
+           before_each: fn -> send(me, :local_before) end,
+           after_each: fn -> send(me, :local_after) end,
+           before_scenario: fn -> send(me, :local_before_scenario) end,
+           after_scenario: fn -> send(me, :local_after_scenario) end})
       |> Benchmark.measure(TestPrinter)
 
       assert_received_exactly [
-        :global_before, :local_before, :local_after, :global_after,
-        :global_before, :local_before, :local_after, :global_after
+        :global_before_scenario, :local_before_scenario, :global_before, :local_before, :local_after, :global_after, :local_after_scenario,
+        :global_after_scenario,
+        :global_before_scenario, :local_before_scenario, :global_before, :local_before, :local_after, :global_after, :local_after_scenario,
+        :global_after_scenario,
       ]
     end
 
@@ -325,18 +342,22 @@ defmodule Benchee.Benchmark.RunnerTest do
           warmup: 0,
           time: 100,
           before_each: fn -> send me, :global_before end,
-          after_each:  fn -> send me, :global_after end
+          after_each:  fn -> send me, :global_after end,
+          after_scenario: fn -> send me, :global_after_scenario end
         }
       }
       |> test_suite
-      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
-                             before_each: fn -> send me, :local_1_before end})
+      |> Benchmark.benchmark("job", {
+           fn -> :timer.sleep 1 end,
+           before_each: fn -> send me, :local_1_before end,
+           before_scenario: fn -> send me, :local_scenario_before end})
       |> Benchmark.benchmark("job 2", fn -> :timer.sleep 1 end)
       |> Benchmark.measure(TestPrinter)
 
       assert_received_exactly [
-        :global_before, :local_1_before, :global_after,
-        :global_before, :global_after
+        :global_before, :local_scenario_before, :local_1_before, :global_after,
+        :global_after_scenario,
+        :global_before, :global_after, :global_after_scenario
       ]
     end
 
@@ -351,39 +372,65 @@ defmodule Benchee.Benchmark.RunnerTest do
         }
       }
       |> test_suite
-      |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
-                             before_each: fn -> send me, :local_before end,
-                             after_each:  fn -> send me, :local_after end})
-      |> Benchmark.benchmark("job 2", {fn -> :timer.sleep 1 end,
-                             before_each: fn -> send me, :local_2_before end,
-                             after_each:  fn -> send me, :local_2_after end})
+      |> Benchmark.benchmark("job", {
+           fn -> :timer.sleep 1 end,
+           before_each: fn -> send me, :local_before end,
+           after_each:  fn -> send me, :local_after end,
+           before_scenario: fn -> send me, :local_before_scenario end})
+      |> Benchmark.benchmark("job 2", {
+           fn -> :timer.sleep 1 end,
+           before_each: fn -> send me, :local_2_before end,
+           after_each:  fn -> send me, :local_2_after end,
+           after_scenario: fn -> send me, :local_2_after_scenario end})
       |> Benchmark.measure(TestPrinter)
 
       assert_received_exactly [
-        :global_before, :local_before, :local_after, :global_after,
-        :global_before, :local_2_before, :local_2_after, :global_after
+        :local_before_scenario, :global_before, :local_before, :local_after,
+        :global_after,
+        :global_before, :local_2_before, :local_2_after, :global_after,
+        :local_2_after_scenario
       ]
     end
 
-    test "before_each triggers for every invocation" do
+    test "each triggers for every invocation, scenario once" do
       me = self()
       suite = %Suite{
                 configuration: %{
                   warmup: 0,
                   time: 10_000,
                   before_each: fn -> send me, :global_before end,
-                  after_each:  fn -> send me, :global_after end
+                  after_each:  fn -> send me, :global_after end,
+                  before_scenario: fn -> send me, :global_before_scenario end,
+                  after_scenario: fn -> send me, :global_after_scenario end,
                 }
               }
       result =
         suite
         |> test_suite
-        |> Benchmark.benchmark("job", {fn -> :timer.sleep 1 end,
-                               before_each: fn -> send me, :local_before end,
-                               after_each:  fn -> send me, :local_after end})
+        |> Benchmark.benchmark("job", {
+             fn -> :timer.sleep 1 end,
+             before_each: fn -> send me, :local_before end,
+             after_each:  fn -> send me, :local_after end,
+             before_scenario: fn -> send(me, :local_before_scenario) end,
+             after_scenario: fn -> send(me, :local_after_scenario) end})
         |> Benchmark.measure(TestPrinter)
 
       {:messages, messages} = Process.info self(), :messages
+
+      global_before_sceneario_count =
+        Enum.count messages, fn(msg) -> msg == :global_before_scenario end
+      local_before_sceneario_count =
+        Enum.count messages, fn(msg) -> msg == :local_before_scenario end
+      local_after_sceneario_count =
+        Enum.count messages, fn(msg) -> msg == :local_after_scenario end
+      global_after_sceneario_count =
+        Enum.count messages, fn(msg) -> msg == :global_after_scenario end
+
+      assert global_before_sceneario_count == 1
+      assert local_before_sceneario_count  == 1
+      assert local_after_sceneario_count   == 1
+      assert global_after_sceneario_count  == 1
+
       global_before_count =
         Enum.count messages, fn(message) -> message == :global_before end
       local_before_count =
