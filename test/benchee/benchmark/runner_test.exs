@@ -251,7 +251,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           warmup: 0,
           time: 100,
           before_each: fn -> send(me, :before) end,
-          after_each: fn -> send(me, :after) end
+          after_each: fn(_) -> send(me, :after) end
         }
       }
       |> test_suite
@@ -273,7 +273,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> Benchmark.benchmark("job", {
            fn -> :timer.sleep 1 end,
            before_each: fn -> send(me, :before) end,
-           after_each: fn -> send(me, :after) end,
+           after_each: fn(_) -> send(me, :after) end,
            before_scenario: fn -> send(me, :before_scenario) end,
            after_scenario: fn -> send(me, :after_scenario) end})
       |> Benchmark.measure(TestPrinter)
@@ -295,7 +295,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> Benchmark.benchmark("job", {
            fn -> :timer.sleep 1 end,
            before_each: fn -> send(me, :before) end,
-           after_each: fn -> send(me, :after) end,
+           after_each: fn(_) -> send(me, :after) end,
            before_scenario: fn -> send(me, :before_scenario) end,
            after_scenario: fn -> send(me, :after_scenario) end})
       |> Benchmark.measure(TestPrinter)
@@ -312,7 +312,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           warmup: 0,
           time: 100,
           before_each: fn -> send me, :global_before end,
-          after_each:  fn -> send me, :global_after end,
+          after_each:  fn(_) -> send me, :global_after end,
           before_scenario: fn -> send me, :global_before_scenario end,
           after_scenario:  fn -> send me, :global_after_scenario end,
           inputs: %{"one" => 1, "two" => 2}
@@ -322,7 +322,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> Benchmark.benchmark("job", {
            fn(_) -> :timer.sleep 1 end,
            before_each: fn -> send(me, :local_before) end,
-           after_each: fn -> send(me, :local_after) end,
+           after_each: fn(_) -> send(me, :local_after) end,
            before_scenario: fn -> send(me, :local_before_scenario) end,
            after_scenario: fn -> send(me, :local_after_scenario) end})
       |> Benchmark.measure(TestPrinter)
@@ -342,7 +342,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           warmup: 0,
           time: 100,
           before_each: fn -> send me, :global_before end,
-          after_each:  fn -> send me, :global_after end,
+          after_each:  fn(_) -> send me, :global_after end,
           after_scenario: fn -> send me, :global_after_scenario end
         }
       }
@@ -368,19 +368,19 @@ defmodule Benchee.Benchmark.RunnerTest do
           warmup: 0,
           time: 100,
           before_each: fn -> send me, :global_before end,
-          after_each:  fn -> send me, :global_after end
+          after_each:  fn(_) -> send me, :global_after end
         }
       }
       |> test_suite
       |> Benchmark.benchmark("job", {
            fn -> :timer.sleep 1 end,
            before_each: fn -> send me, :local_before end,
-           after_each:  fn -> send me, :local_after end,
+           after_each:  fn(_) -> send me, :local_after end,
            before_scenario: fn -> send me, :local_before_scenario end})
       |> Benchmark.benchmark("job 2", {
            fn -> :timer.sleep 1 end,
            before_each: fn -> send me, :local_2_before end,
-           after_each:  fn -> send me, :local_2_after end,
+           after_each:  fn(_) -> send me, :local_2_after end,
            after_scenario: fn -> send me, :local_2_after_scenario end})
       |> Benchmark.measure(TestPrinter)
 
@@ -399,7 +399,7 @@ defmodule Benchee.Benchmark.RunnerTest do
                   warmup: 0,
                   time: 10_000,
                   before_each: fn -> send me, :global_before end,
-                  after_each:  fn -> send me, :global_after end,
+                  after_each:  fn(_) -> send me, :global_after end,
                   before_scenario: fn -> send me, :global_before_scenario end,
                   after_scenario: fn -> send me, :global_after_scenario end,
                 }
@@ -410,7 +410,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> Benchmark.benchmark("job", {
              fn -> :timer.sleep 1 end,
              before_each: fn -> send me, :local_before end,
-             after_each:  fn -> send me, :local_after end,
+             after_each:  fn(_) -> send me, :local_after end,
              before_scenario: fn -> send(me, :local_before_scenario) end,
              after_scenario: fn -> send(me, :local_after_scenario) end})
         |> Benchmark.measure(TestPrinter)
@@ -461,7 +461,7 @@ defmodule Benchee.Benchmark.RunnerTest do
                   warmup: 0,
                   time: 1_000,
                   before_each: fn -> send me, :global_before end,
-                  after_each:  fn -> send me, :global_after end
+                  after_each:  fn(_) -> send me, :global_after end
                 }
               }
       result =
@@ -469,7 +469,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> test_suite
         |> Benchmark.benchmark("job", {fn -> 0 end,
                                before_each: fn -> send me, :local_before end,
-                               after_each:  fn -> send me, :local_after end})
+                               after_each:  fn(_) -> send me, :local_after end})
         |> Benchmark.measure(TestPrinter)
 
       {:messages, messages} = Process.info self(), :messages
@@ -497,6 +497,52 @@ defmodule Benchee.Benchmark.RunnerTest do
       [%{run_times: run_times}] = result.scenarios
       sample_size = length(run_times)
       assert hook_call_count > sample_size + 10
+    end
+
+    test "after_each hooks have access to the return value of the invocation" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 100,
+          time: 100,
+          after_each: fn(out) -> send(me, {:global, out}) end
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn ->
+           # still keep to make sure we only get one iteration and not too fast
+           :timer.sleep 1
+           :value
+         end, after_each: fn(out) -> send(me, {:local, out}) end})
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received_exactly [
+        {:global, :value}, {:local, :value},
+        {:global, :value}, {:local, :value}
+      ]
+    end
+
+    test "after_each hooks with super fast functions" do
+      me = self()
+      %Suite{
+        configuration: %{
+          warmup: 100,
+          time: 100,
+          after_each: fn(out) -> send(me, {:global, out}) end
+        }
+      }
+      |> test_suite
+      |> Benchmark.benchmark("job", {fn ->
+           # still keep to make sure we only get one iteration and not too fast
+           :timer.sleep 1
+           :value
+         end, after_each: fn(out) -> send(me, {:local, out}) end})
+      |> Benchmark.measure(TestPrinter)
+
+      assert_received {:global, :value}
+      assert_received {:local, :value}
+      assert_received {:global, :value}
+      assert_received {:local, :value}
     end
 
   end
