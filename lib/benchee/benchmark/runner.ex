@@ -85,8 +85,8 @@ defmodule Benchee.Benchmark.Runner do
       RepeatN.repeat_n(
         fn ->
           run_before_each(scenario, scenario_context)
-          main.()
-          run_after_each(scenario, scenario_context)
+          return_value = main.()
+          run_after_each(return_value, scenario, scenario_context)
         end,
         iterations
       )
@@ -221,8 +221,8 @@ defmodule Benchee.Benchmark.Runner do
                                      benchmarking_function: function
                                    }) do
     run_before_each(scenario, scenario_context)
-    {microseconds, _return_value} = :timer.tc function
-    run_after_each(scenario, scenario_context)
+    {microseconds, return_value} = :timer.tc function
+    run_after_each(return_value, scenario, scenario_context)
     microseconds
   end
   defp measure_iteration(_scenario, %ScenarioContext{
@@ -246,13 +246,14 @@ defmodule Benchee.Benchmark.Runner do
     if local_before_each,  do: local_before_each.()
   end
 
-  defp run_after_each(%{
+  defp run_after_each(return_value,
+                      %{
                         after_each: local_after_each
                       },
                       %{
                         config: %{after_each: global_after_each}
                       }) do
-    if local_after_each,  do: local_after_each.()
-    if global_after_each, do: global_after_each.()
+    if local_after_each,  do: local_after_each.(return_value)
+    if global_after_each, do: global_after_each.(return_value)
   end
 end

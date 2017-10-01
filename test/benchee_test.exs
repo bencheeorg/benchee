@@ -331,14 +331,14 @@ defmodule BencheeTest do
           "sleeper"   => {
             fn -> :timer.sleep 1 end,
             before_each: fn -> send myself, :local_before end,
-            after_each:  fn -> send myself, :local_after end,
+            after_each:  fn(_) -> send myself, :local_after end,
             before_scenario: fn -> send myself, :local_before_scenario end,
             after_scenario: fn -> send myself, :local_after_scenario end},
           "sleeper 2" => fn -> :timer.sleep 1 end
         }, time: 0.0001,
            warmup: 0,
            before_each: fn -> send myself, :global_before end,
-           after_each:  fn -> send myself, :global_after end,
+           after_each:  fn(_) -> send myself, :global_after end,
            before_scenario: fn -> send myself, :global_before_scenario end,
            after_scenario:  fn -> send myself, :global_after_scenario end
       end
