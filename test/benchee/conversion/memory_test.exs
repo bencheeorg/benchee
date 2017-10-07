@@ -5,7 +5,7 @@ defmodule Benchee.Conversion.MemoryTest do
 
   describe ".format" do
     test ".format(1_023)" do
-    assert format(1_023) == "1023 B"
+      assert format(1_023) == "1023 B"
     end
 
     test ".format(1025)" do

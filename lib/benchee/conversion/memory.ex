@@ -14,36 +14,36 @@ defmodule Benchee.Conversion.Memory do
   @bytes_per_terabyte @bytes_per_gigabyte * @bytes_per_kilobyte
 
   @units %{
-      terabyte:        %Unit{
-                      name:      :terabyte,
-                      magnitude: @bytes_per_terabyte,
-                      label:     "TB",
-                      long:      "Terabytes"
-                  },
-      gigabyte:        %Unit{
-                      name:      :gigabyte,
-                      magnitude: @bytes_per_gigabyte,
-                      label:     "GB",
-                      long:      "Gigabytes"
-                   },
-      megabyte:      %Unit{
-                      name:      :megabyte,
-                      magnitude: @bytes_per_megabyte,
-                      label:     "MB",
-                      long:      "Megabytes"
-                   },
-      kilobyte:      %Unit{
-                      name:      :kilobyte,
-                      magnitude: @bytes_per_kilobyte,
-                      label:     "KB",
-                      long:      "Kilobytes"
-                   },
-      byte: %Unit{
-                      name:      :byte,
-                      magnitude: 1,
-                      label:     "B",
-                      long:      "Bytes"
-                   }
+    terabyte: %Unit{
+                name:      :terabyte,
+                magnitude: @bytes_per_terabyte,
+                label:     "TB",
+                long:      "Terabytes"
+              },
+    gigabyte: %Unit{
+                name:      :gigabyte,
+                magnitude: @bytes_per_gigabyte,
+                label:     "GB",
+                long:      "Gigabytes"
+              },
+    megabyte: %Unit{
+                name:      :megabyte,
+                magnitude: @bytes_per_megabyte,
+                label:     "MB",
+                long:      "Megabytes"
+              },
+    kilobyte: %Unit{
+                name:      :kilobyte,
+                magnitude: @bytes_per_kilobyte,
+                label:     "KB",
+                long:      "Kilobytes"
+              },
+    byte:     %Unit{
+                name:      :byte,
+                magnitude: 1,
+                label:     "B",
+                long:      "Bytes"
+              }
   }
 
   @doc """
@@ -138,6 +138,8 @@ defmodule Benchee.Conversion.Memory do
 
   Pass `[strategy: :smallest]` to always return the smallest unit in the list.
   Pass `[strategy: :largest]` to always return the largest unit in the list.
+  Pass `[strategy: :best]` to always return the most frequent unit in the list.
+  Pass `[strategy: :none]` to always return :byte.
 
   ## Examples
 
@@ -159,7 +161,7 @@ defmodule Benchee.Conversion.Memory do
   end
 
   @doc """
-  The most basic unit in which momory occur, byte.
+  The most basic unit in which memory occur, byte.
 
   ## Examples
 

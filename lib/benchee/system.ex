@@ -113,24 +113,20 @@ defmodule Benchee.System do
   defp parse_memory_for(:Windows, raw_output) do
     [memory] = Regex.run(~r/\d+/, raw_output)
     {memory, _} = Integer.parse(memory)
-    format_memory(memory)
+    Memory.format(memory)
   end
   defp parse_memory_for(:macOS, raw_output) do
     {memory, _} = Integer.parse(raw_output)
-    format_memory(memory)
+    Memory.format(memory)
   end
   defp parse_memory_for(:Linux, raw_output) do
-    ["MemTotal:" <> memory] = Regex.run(~r/MemTotal.*kB/, raw_output)
-    {memory, _} = memory
+    ["MemTotal:" <> memory_info] = Regex.run(~r/MemTotal.*kB/, raw_output)
+    {memory_in_kilobytes, _} = memory_info
                   |> String.trim()
                   |> String.trim_trailing(" kB")
                   |> Integer.parse
-    format_memory(memory * 1024)
-  end
-
-  defp format_memory(memory) do
-    scaled_memory = Memory.scale(memory, :gigabyte)
-    Memory.format({scaled_memory, :gigabyte})
+    memory_in_bytes = memory_in_kilobytes * 1024
+    Memory.format(memory_in_bytes)
   end
 
   def system_cmd(cmd, args, system_func \\ &System.cmd/2) do
