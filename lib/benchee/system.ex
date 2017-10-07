@@ -4,6 +4,7 @@ defmodule Benchee.System do
   """
 
   alias Benchee.Suite
+  alias Benchee.Conversion.Memory
 
   @doc """
   Adds system information to the suite (currently elixir and erlang versions).
@@ -108,29 +109,25 @@ defmodule Benchee.System do
     parse_memory_for(:Linux, system_cmd("cat", ["/proc/meminfo"]))
   end
 
-  @kilobyte_to_gigabyte 1024 * 1024
-  @byte_to_gigabyte 1024 * @kilobyte_to_gigabyte
-
   defp parse_memory_for(_, "N/A"), do: "N/A"
   defp parse_memory_for(:Windows, raw_output) do
     [memory] = Regex.run(~r/\d+/, raw_output)
     {memory, _} = Integer.parse(memory)
-    format_memory(memory, @byte_to_gigabyte)
+    Memory.format(memory)
   end
   defp parse_memory_for(:macOS, raw_output) do
     {memory, _} = Integer.parse(raw_output)
-    format_memory(memory, @byte_to_gigabyte)
+    Memory.format(memory)
   end
   defp parse_memory_for(:Linux, raw_output) do
-    ["MemTotal:" <> memory] = Regex.run(~r/MemTotal.*kB/, raw_output)
-    {memory, _} = memory
+    ["MemTotal:" <> memory_info] = Regex.run(~r/MemTotal.*kB/, raw_output)
+    {memory_in_kilobytes, _} = memory_info
                   |> String.trim()
                   |> String.trim_trailing(" kB")
                   |> Integer.parse
-    format_memory(memory, @kilobyte_to_gigabyte)
+    memory_in_bytes = memory_in_kilobytes * 1024
+    Memory.format(memory_in_bytes)
   end
-
-  defp format_memory(memory, coefficient), do: "#{Float.round(memory / coefficient, 2)} GB"
 
   def system_cmd(cmd, args, system_func \\ &System.cmd/2) do
     {output, exit_code} = system_func.(cmd, args)
