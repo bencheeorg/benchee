@@ -6,7 +6,7 @@ defmodule Benchee.Formatters.Console do
 
   @behaviour Benchee.Formatter
 
-  alias Benchee.{Statistics, Suite, Benchmark.Scenario}
+  alias Benchee.{Statistics, Suite, Benchmark.Scenario, Configuration}
   alias Benchee.Conversion.{Count, Duration, Unit, DeviationPercent}
 
   @type unit_per_statistic :: %{atom => Unit.t}
@@ -56,8 +56,9 @@ defmodule Benchee.Formatters.Console do
   ...>   scenarios: scenarios,
   ...>   configuration: %Benchee.Configuration{
   ...>     formatter_options: %{
-  ...>       console: %{comparison: false, unit_scaling: :best}
-  ...>     }
+  ...>       console: %{comparison: false}
+  ...>     },
+  ...>     unit_scaling: :best
   ...>   }
   ...> }
   iex> Benchee.Formatters.Console.format(suite)
@@ -69,8 +70,8 @@ defmodule Benchee.Formatters.Console do
 
   """
   @spec format(Suite.t) :: [any]
-  def format(%Suite{scenarios: scenarios,
-                    configuration: %{formatter_options: %{console: config}}}) do
+  def format(%Suite{scenarios: scenarios, configuration: config}) do
+    config = console_configuration(config)
     scenarios
     |> Enum.group_by(fn(scenario) -> scenario.input_name end)
     |> Enum.map(fn({input, scenarios}) ->
@@ -86,6 +87,17 @@ defmodule Benchee.Formatters.Console do
     IO.write(output)
   rescue
     _ -> {:error, "Unknown Error"}
+  end
+
+  defp console_configuration(%Configuration{
+                               formatter_options: %{console: config},
+                               unit_scaling: scaling_strategy}) do
+    if Map.has_key?(config, :unit_scaling), do: warn_unit_scaling()
+    Map.put config, :unit_scaling, scaling_strategy
+  end
+
+  defp warn_unit_scaling do
+    IO.puts "unit_scaling is now a top level configuration option, avoid passing it as a formatter option."
   end
 
   @no_input_marker Benchee.Benchmark.no_input()

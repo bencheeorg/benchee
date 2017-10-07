@@ -12,6 +12,7 @@ defmodule Benchee.Conversion.Scale do
   @type unit_atom :: atom
   @type any_unit :: unit | unit_atom
   @type scaled_number :: {number, unit}
+  @type best_unit_strategy :: :best | :largest | :smallest | :none
 
   @doc """
   Scales a number in a domain's base unit to an equivalent value in the best

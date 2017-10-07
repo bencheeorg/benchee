@@ -7,6 +7,7 @@ defmodule Benchee.Configuration do
     Suite,
     Configuration,
     Conversion.Duration,
+    Conversion.Scale,
     Utility.DeepConvert,
     Formatters.Console
   }
@@ -26,10 +27,10 @@ defmodule Benchee.Configuration do
     # the top level for now
     formatter_options: %{
       console: %{
-        comparison:    true,
-        unit_scaling:  :best
+        comparison:    true
       }
     },
+    unit_scaling:     :best,
     # If you/your plugin/whatever needs it your data can go here
     assigns:           %{},
     before_each:       nil,
@@ -46,6 +47,7 @@ defmodule Benchee.Configuration do
     print:             map,
     inputs:            %{Suite.key => any} | nil,
     formatter_options: map,
+    unit_scaling:      Scale.best_unit_strategy,
     assigns:           map,
     before_each:       fun | nil,
     after_each:        fun | nil,
@@ -101,22 +103,23 @@ defmodule Benchee.Configuration do
     `print` options the boolean options are also enabled by default:
       * `:comparison`   - if the comparison of the different benchmarking jobs
       (x times slower than) is shown (true/false)
-      * `:unit_scaling` - the strategy for choosing a unit for durations and
-      counts. When scaling a value, Benchee finds the "best fit" unit (the
-      largest unit for which the result is at least 1). For example, 1_200_000
-      scales to `1.2 M`, while `800_000` scales to `800 K`. The `unit_scaling`
-      strategy determines how Benchee chooses the best fit unit for an entire
-      list of values, when the individual values in the list may have different
-      best fit units. There are four strategies, defaulting to `:best`:
-          * `:best`     - the most frequent best fit unit will be used, a tie
-          will result in the larger unit being selected.
-          * `:largest`  - the largest best fit unit will be used (i.e. thousand
-          and seconds if values are large enough).
-          * `:smallest` - the smallest best fit unit will be used (i.e.
-          millisecond and one)
-          * `:none`     - no unit scaling will occur. Durations will be displayed
-          in microseconds, and counts will be displayed in ones (this is
-          equivalent to the behaviour Benchee had pre 0.5.0)
+    * `:unit_scaling` - the strategy for choosing a unit for durations and
+    counts. May or may not be implemented by a given formatter (The console
+    formatter implements it). When scaling a value, Benchee finds the "best fit"
+    unit (the largest unit for which the result is at least 1). For example,
+    1_200_000 scales to `1.2 M`, while `800_000` scales to `800 K`. The
+    `unit_scaling` strategy determines how Benchee chooses the best fit unit for
+    an entire list of values, when the individual values in the list may have
+    different best fit units. There are four strategies, defaulting to `:best`:
+      * `:best`     - the most frequent best fit unit will be used, a tie
+      will result in the larger unit being selected.
+      * `:largest`  - the largest best fit unit will be used (i.e. thousand
+      and seconds if values are large enough).
+      * `:smallest` - the smallest best fit unit will be used (i.e.
+      millisecond and one)
+      * `:none`     - no unit scaling will occur. Durations will be displayed
+      in microseconds, and counts will be displayed in ones (this is
+      equivalent to the behaviour Benchee had pre 0.5.0)
 
   ## Examples
 
@@ -135,8 +138,9 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{ comparison: true, unit_scaling: :best }
+              console: %{comparison: true}
             },
+            unit_scaling: :best,
             assigns: %{},
             before_each: nil,
             after_each: nil,
@@ -162,8 +166,9 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{ comparison: true, unit_scaling: :best }
+              console: %{comparison: true}
             },
+            unit_scaling: :best,
             assigns: %{},
             before_each: nil,
             after_each: nil,
@@ -189,8 +194,9 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{ comparison: true, unit_scaling: :best }
+              console: %{comparison: true}
             },
+            unit_scaling: :best,
             assigns: %{},
             before_each: nil,
             after_each: nil,
@@ -207,9 +213,10 @@ defmodule Benchee.Configuration do
       ...>   warmup: 0.2,
       ...>   formatters: [&IO.puts/2],
       ...>   print: [fast_warning: false],
-      ...>   console: [unit_scaling: :smallest],
+      ...>   console: [comparison: false],
       ...>   inputs: %{"Small" => 5, "Big" => 9999},
-      ...>   formatter_options: [some: "option"])
+      ...>   formatter_options: [some: "option"],
+      ...>   unit_scaling: :smallest)
       %Benchee.Suite{
         configuration:
           %Benchee.Configuration{
@@ -224,9 +231,10 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{ comparison: true, unit_scaling: :smallest },
+              console: %{comparison: false},
               some: "option"
             },
+            unit_scaling: :smallest,
             assigns: %{},
             before_each: nil,
             after_each: nil,
