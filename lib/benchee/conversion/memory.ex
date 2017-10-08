@@ -46,6 +46,131 @@ defmodule Benchee.Conversion.Memory do
               }
   }
 
+  # Unit conversion functions
+
+  @doc """
+  Converts a value for a specified unit and converts it to the equivalent of another unit of measure.
+
+  ## Examples
+
+    iex> {value, unit} = Benchee.Conversion.Memory.convert({1024, %Benchee.Conversion.Unit{name: :kilobyte}}, %Benchee.Conversion.Unit{name: :megabyte})
+    iex> value
+    1.0
+    iex> unit.name
+    :megabyte
+  """
+  def convert({value, current_unit}, desired_unit) when current_unit == desired_unit do
+    {value, current_unit}
+  end
+  def convert({value, current_unit_atom}, desired_unit_atom) when is_atom(current_unit_atom) and is_atom(desired_unit_atom) do
+    current_value_unit = {value, unit_for(current_unit_atom)}
+    desired_unit = unit_for(desired_unit_atom)
+    convert(current_value_unit, desired_unit)
+  end
+
+  # Bytes conversions
+  def convert({value, %Unit{name: :byte}}, byte_unit = %Unit{name: :kilobyte}) do
+    converted_value = divide_by_thousands_of_bytes(value, 1)
+    {converted_value, byte_unit}
+  end
+  def convert({value, %Unit{name: :byte}}, megabyte_unit = %Unit{name: :megabyte}) do
+    converted_value = divide_by_thousands_of_bytes(value, 2)
+    {converted_value, megabyte_unit}
+  end
+  def convert({value, %Unit{name: :byte}}, gigabyte_unit = %Unit{name: :gigabyte}) do
+    converted_value = divide_by_thousands_of_bytes(value, 3)
+    {converted_value, gigabyte_unit}
+  end
+  def convert({value, %Unit{name: :byte}}, terabyte_unit = %Unit{name: :terabyte}) do
+    converted_value = divide_by_thousands_of_bytes(value, 4)
+    {converted_value, terabyte_unit}
+  end
+
+  # Kilobytes conversions
+  def convert({value, %Unit{name: :kilobyte}}, byte_unit = %Unit{name: :byte}) do
+    converted_value = multiply_by_thousands_of_bytes(value, 1)
+    {converted_value, byte_unit}
+  end
+  def convert({value, %Unit{name: :kilobyte}}, megabyte_unit = %Unit{name: :megabyte}) do
+    converted_value = divide_by_thousands_of_bytes(value, 1)
+    {converted_value, megabyte_unit}
+  end
+  def convert({value, %Unit{name: :kilobyte}}, gigabyte_unit = %Unit{name: :gigabyte}) do
+    converted_value = divide_by_thousands_of_bytes(value, 2)
+    {converted_value, gigabyte_unit}
+  end
+  def convert({value, %Unit{name: :kilobyte}}, terabyte_unit = %Unit{name: :terabyte}) do
+    converted_value = divide_by_thousands_of_bytes(value, 3)
+    {converted_value, terabyte_unit}
+  end
+
+  # Megabytes conversions
+  def convert({value, %Unit{name: :megabyte}}, byte_unit = %Unit{name: :byte}) do
+    converted_value = multiply_by_thousands_of_bytes(value, 2)
+    {converted_value, byte_unit}
+  end
+  def convert({value, %Unit{name: :megabyte}}, kilobyte_unit = %Unit{name: :kilobyte}) do
+    converted_value = multiply_by_thousands_of_bytes(value, 1)
+    {converted_value, kilobyte_unit}
+  end
+  def convert({value, %Unit{name: :megabyte}}, gigabyte_unit = %Unit{name: :gigabyte}) do
+    converted_value = divide_by_thousands_of_bytes(value, 1)
+    {converted_value, gigabyte_unit}
+  end
+  def convert({value, %Unit{name: :megabyte}}, terabyte_unit = %Unit{name: :terabyte}) do
+    converted_value = divide_by_thousands_of_bytes(value, 2)
+    {converted_value, terabyte_unit}
+  end
+
+  # Gigabytes conversions
+  def convert({value, %Unit{name: :gigabyte}}, byte_unit = %Unit{name: :byte}) do
+    converted_value = multiply_by_thousands_of_bytes(value, 3)
+    {converted_value, byte_unit}
+  end
+  def convert({value, %Unit{name: :gigabyte}}, kilobyte_unit = %Unit{name: :kilobyte}) do
+    converted_value = multiply_by_thousands_of_bytes(value, 2)
+    {converted_value, kilobyte_unit}
+  end
+  def convert({value, %Unit{name: :gigabyte}}, megabyte_unit = %Unit{name: :megabyte}) do
+    converted_value = multiply_by_thousands_of_bytes(value, 1)
+    {converted_value, megabyte_unit}
+  end
+  def convert({value, %Unit{name: :gigabyte}}, terabyte_unit = %Unit{name: :terabyte}) do
+    converted_value = divide_by_thousands_of_bytes(value, 1)
+    {converted_value, terabyte_unit}
+  end
+
+  # Terabytes conversions
+  def convert({value, %Unit{name: :terabyte}}, byte_unit = %Unit{name: :byte}) do
+    converted_value = multiply_by_thousands_of_bytes(value, 4)
+    {converted_value, byte_unit}
+  end
+  def convert({value, %Unit{name: :terabyte}}, kilobyte_unit = %Unit{name: :kilobyte}) do
+    converted_value = multiply_by_thousands_of_bytes(value, 3)
+    {converted_value, kilobyte_unit}
+  end
+  def convert({value, %Unit{name: :terabyte}}, megabyte_unit = %Unit{name: :megabyte}) do
+    converted_value = multiply_by_thousands_of_bytes(value, 2)
+    {converted_value, megabyte_unit}
+  end
+  def convert({value, %Unit{name: :terabyte}}, gigabyte_unit = %Unit{name: :gigabyte}) do
+    converted_value = multiply_by_thousands_of_bytes(value, 1)
+    {converted_value, gigabyte_unit}
+  end
+
+  defp multiply_by_thousands_of_bytes(value, amount) when amount > 0 do
+    value * @bytes_per_kilobyte * amount
+  end
+
+  defp divide_by_thousands_of_bytes(value, 0) do
+    value
+  end
+  defp divide_by_thousands_of_bytes(value, amount) when amount > 0 do
+    divide_by_thousands_of_bytes(value / @bytes_per_kilobyte, amount - 1)
+  end
+
+  # Scaling functions
+
   @doc """
   Scales a memory value in bytes into a larger unit if appropriate
 
