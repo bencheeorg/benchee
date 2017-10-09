@@ -10,9 +10,9 @@ defmodule Mix.Tasks.SafeCoveralls.Travis do
 
   def run(args) do
     try do
-      Mix.Tasks.Coveralls.do_run(args, [type: "travis"])
+      Mix.Tasks.Coveralls.do_run(args, type: "travis")
     rescue
-      ExCoveralls.ReportUploadError -> IO.puts "Upload to coveralls failed."
+      ExCoveralls.ReportUploadError -> IO.puts("Upload to coveralls failed.")
     end
   end
 end

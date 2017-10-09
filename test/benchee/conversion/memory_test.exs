@@ -1,15 +1,15 @@
 defmodule Benchee.Conversion.MemoryTest do
   use ExUnit.Case, async: true
   import Benchee.Conversion.Memory
-  doctest Benchee.Conversion.Memory
+  doctest(Benchee.Conversion.Memory)
 
   describe ".format" do
     test ".format(1_023)" do
-      assert format(1_023) == "1023 B"
+      assert format(1023) == "1023 B"
     end
 
     test ".format(1025)" do
-      assert format(1_025) == "1.00 KB"
+      assert format(1025) == "1.00 KB"
     end
 
     test ".format(876_543_219.8765)" do
@@ -33,7 +33,15 @@ defmodule Benchee.Conversion.MemoryTest do
     end
   end
 
-  @list_with_mostly_megabytes [1, 200, 3_000_000, 4_000_000, 50_000_000, 50_000_000, 77_000_000_000]
+  @list_with_mostly_megabytes [
+    1,
+    200,
+    3_000_000,
+    4_000_000,
+    50_000_000,
+    50_000_000,
+    77_000_000_000
+  ]
 
   describe ".best" do
     test "when list is mostly megabytes" do

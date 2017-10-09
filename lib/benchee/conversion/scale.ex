@@ -8,7 +8,7 @@ defmodule Benchee.Conversion.Scale do
 
   alias Benchee.Conversion.Unit
 
-  @type unit :: Unit.t
+  @type unit :: Unit.t()
   @type unit_atom :: atom
   @type any_unit :: unit | unit_atom
   @type scaled_number :: {number, unit}
@@ -60,8 +60,9 @@ defmodule Benchee.Conversion.Scale do
   def scale(value, unit = %Unit{}, _module) do
     scale(value, unit)
   end
+
   def scale(value, unit_atom, module) do
-    scale value, module.unit_for(unit_atom)
+    scale(value, module.unit_for(unit_atom))
   end
 
   @doc """
@@ -82,7 +83,7 @@ defmodule Benchee.Conversion.Scale do
   units. Used by `Benchee.Conversion.Duration` and `Benchee.Conversion.Count`.
   """
   def unit_for(units, unit) do
-    Map.fetch! units, unit
+    Map.fetch!(units, unit)
   end
 
   @doc """
@@ -119,10 +120,10 @@ defmodule Benchee.Conversion.Scale do
   """
   def best_unit(list, module, opts) do
     case Keyword.get(opts, :strategy, :best) do
-      :best     -> best_unit(list, module)
-      :largest  -> largest_unit(list, module)
+      :best -> best_unit(list, module)
+      :largest -> largest_unit(list, module)
       :smallest -> smallest_unit(list, module)
-      :none     -> module.base_unit
+      :none -> module.base_unit
     end
   end
 
@@ -167,6 +168,7 @@ defmodule Benchee.Conversion.Scale do
   defp by_frequency_and_magnitude({unit_a, frequency}, {unit_b, frequency}) do
     magnitude(unit_a) > magnitude(unit_b)
   end
+
   defp by_frequency_and_magnitude({_, frequency_a}, {_, frequency_b}) do
     frequency_a > frequency_b
   end

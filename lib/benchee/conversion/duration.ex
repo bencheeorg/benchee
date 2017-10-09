@@ -12,42 +12,41 @@ defmodule Benchee.Conversion.Duration do
   @milliseconds_per_second 1000
   @seconds_per_minute 60
   @minutes_per_hour 60
-  @microseconds_per_second @microseconds_per_millisecond *
-    @milliseconds_per_second
+  @microseconds_per_second @microseconds_per_millisecond * @milliseconds_per_second
   @microseconds_per_minute @microseconds_per_second * @seconds_per_minute
   @microseconds_per_hour @microseconds_per_minute * @minutes_per_hour
 
   @units %{
-    hour:        %Unit{
-                    name:      :hour,
-                    magnitude: @microseconds_per_hour,
-                    label:     "h",
-                    long:      "Hours"
-                 },
-    minute:      %Unit{
-                    name:      :minute,
-                    magnitude: @microseconds_per_minute,
-                    label:     "min",
-                    long:      "Minutes"
-                 },
-    second:      %Unit{
-                    name:      :second,
-                    magnitude: @microseconds_per_second,
-                    label:     "s",
-                    long:      "Seconds"
-                 },
+    hour: %Unit{
+      name: :hour,
+      magnitude: @microseconds_per_hour,
+      label: "h",
+      long: "Hours"
+    },
+    minute: %Unit{
+      name: :minute,
+      magnitude: @microseconds_per_minute,
+      label: "min",
+      long: "Minutes"
+    },
+    second: %Unit{
+      name: :second,
+      magnitude: @microseconds_per_second,
+      label: "s",
+      long: "Seconds"
+    },
     millisecond: %Unit{
-                    name:      :millisecond,
-                    magnitude: @microseconds_per_millisecond,
-                    label:     "ms",
-                    long:      "Milliseconds"
-                 },
+      name: :millisecond,
+      magnitude: @microseconds_per_millisecond,
+      label: "ms",
+      long: "Milliseconds"
+    },
     microsecond: %Unit{
-                    name:      :microsecond,
-                    magnitude: 1,
-                    label:     "μs",
-                    long:      "Microseconds"
-                 }
+      name: :microsecond,
+      magnitude: 1,
+      label: "μs",
+      long: "Microseconds"
+    }
   }
 
   @doc """
@@ -74,19 +73,23 @@ defmodule Benchee.Conversion.Duration do
       :hour
   """
   def scale(duration) when duration >= @microseconds_per_hour do
-    scale_with_unit duration, :hour
+    scale_with_unit(duration, :hour)
   end
+
   def scale(duration) when duration >= @microseconds_per_minute do
-    scale_with_unit duration, :minute
+    scale_with_unit(duration, :minute)
   end
+
   def scale(duration) when duration >= @microseconds_per_second do
-    scale_with_unit duration, :second
+    scale_with_unit(duration, :second)
   end
+
   def scale(duration) when duration >= @microseconds_per_millisecond do
-    scale_with_unit duration, :millisecond
+    scale_with_unit(duration, :millisecond)
   end
+
   def scale(duration) do
-    scale_with_unit duration, :microsecond
+    scale_with_unit(duration, :microsecond)
   end
 
   # Helper function for returning a tuple of {value, unit}
@@ -108,7 +111,7 @@ defmodule Benchee.Conversion.Duration do
       }
   """
   def unit_for(unit) do
-    Scale.unit_for @units, unit
+    Scale.unit_for(@units, unit)
   end
 
   @doc """
@@ -127,7 +130,7 @@ defmodule Benchee.Conversion.Duration do
 
   """
   def scale(count, unit) do
-    Scale.scale count, unit, __MODULE__
+    Scale.scale(count, unit, __MODULE__)
   end
 
   @doc """
@@ -148,8 +151,9 @@ defmodule Benchee.Conversion.Duration do
   def microseconds({duration, %Unit{magnitude: magnitude}}) do
     duration * magnitude
   end
+
   def microseconds({duration, unit_atom}) do
-    microseconds {duration, unit_for(unit_atom)}
+    microseconds({duration, unit_for(unit_atom)})
   end
 
   @doc """
@@ -174,6 +178,7 @@ defmodule Benchee.Conversion.Duration do
       :second
   """
   def best(list, opts \\ [strategy: :best])
+
   def best(list, opts) do
     Scale.best_unit(list, __MODULE__, opts)
   end

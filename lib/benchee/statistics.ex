@@ -6,26 +6,35 @@ defmodule Benchee.Statistics do
 
   alias Benchee.Statistics.Mode
 
-  defstruct [:average, :ips, :std_dev, :std_dev_ratio, :std_dev_ips, :median,
-             :mode, :minimum, :maximum, :sample_size]
+  defstruct [
+    :average,
+    :ips,
+    :std_dev,
+    :std_dev_ratio,
+    :std_dev_ips,
+    :median,
+    :mode,
+    :minimum,
+    :maximum,
+    :sample_size
+  ]
 
   @type t :: %__MODULE__{
-    average: float,
-    ips: float,
-    std_dev: float,
-    std_dev_ratio: float,
-    std_dev_ips: float,
-    median: number,
-    mode: number,
-    minimum: number,
-    maximum: number,
-    sample_size: integer
-  }
+          average: float,
+          ips: float,
+          std_dev: float,
+          std_dev_ratio: float,
+          std_dev_ips: float,
+          median: number,
+          mode: number,
+          minimum: number,
+          maximum: number,
+          sample_size: integer
+        }
 
   @type samples :: [number]
 
-  alias Benchee.{Statistics, Conversion.Duration, Suite, Benchmark.Scenario,
-                 Utility.Parallel}
+  alias Benchee.{Statistics, Conversion.Duration, Suite, Benchmark.Scenario, Utility.Parallel}
   require Integer
 
   @doc """
@@ -44,11 +53,9 @@ defmodule Benchee.Statistics do
   """
   @spec sort([%Scenario{}]) :: [%Scenario{}]
   def sort(scenarios) do
-    Enum.sort_by(scenarios,
-      fn(%Scenario{run_time_statistics: %Statistics{average: average}}) ->
-        average
-      end
-    )
+    Enum.sort_by(scenarios, fn %Scenario{run_time_statistics: %Statistics{average: average}} ->
+      average
+    end)
   end
 
   @doc """
@@ -118,12 +125,13 @@ defmodule Benchee.Statistics do
       }
 
   """
-  @spec statistics(Suite.t) :: Suite.t
+  @spec statistics(Suite.t()) :: Suite.t()
   def statistics(suite = %Suite{scenarios: scenarios}) do
-    new_scenarios = Parallel.map(scenarios, fn(scenario) ->
-      stats = job_statistics(scenario.run_times)
-      %Scenario{scenario | run_time_statistics: stats}
-    end)
+    new_scenarios =
+      Parallel.map(scenarios, fn scenario ->
+        stats = job_statistics(scenario.run_times)
+        %Scenario{scenario | run_time_statistics: stats}
+      end)
 
     %Suite{suite | scenarios: new_scenarios}
   end
@@ -150,31 +158,31 @@ defmodule Benchee.Statistics do
       }
 
   """
-  @spec job_statistics(samples) :: __MODULE__.t
+  @spec job_statistics(samples) :: __MODULE__.t()
   def job_statistics(run_times) do
-    total_time          = Enum.sum(run_times)
-    iterations          = Enum.count(run_times)
-    average             = total_time / iterations
-    ips                 = iterations_per_second(average)
-    deviation           = standard_deviation(run_times, average, iterations)
-    standard_dev_ratio  = deviation / average
-    standard_dev_ips    = ips * standard_dev_ratio
-    median              = compute_median(run_times, iterations)
-    mode                = Mode.mode(run_times)
-    minimum             = Enum.min run_times
-    maximum             = Enum.max run_times
+    total_time = Enum.sum(run_times)
+    iterations = Enum.count(run_times)
+    average = total_time / iterations
+    ips = iterations_per_second(average)
+    deviation = standard_deviation(run_times, average, iterations)
+    standard_dev_ratio = deviation / average
+    standard_dev_ips = ips * standard_dev_ratio
+    median = compute_median(run_times, iterations)
+    mode = Mode.mode(run_times)
+    minimum = Enum.min(run_times)
+    maximum = Enum.max(run_times)
 
     %__MODULE__{
-      average:       average,
-      ips:           ips,
-      std_dev:       deviation,
+      average: average,
+      ips: ips,
+      std_dev: deviation,
       std_dev_ratio: standard_dev_ratio,
-      std_dev_ips:   standard_dev_ips,
-      median:        median,
-      mode:          mode,
-      minimum:       minimum,
-      maximum:       maximum,
-      sample_size:   iterations
+      std_dev_ips: standard_dev_ips,
+      median: median,
+      mode: mode,
+      minimum: minimum,
+      maximum: maximum,
+      sample_size: iterations
     }
   end
 
@@ -183,11 +191,11 @@ defmodule Benchee.Statistics do
   end
 
   defp standard_deviation(samples, average, iterations) do
-    total_variance = Enum.reduce samples, 0,  fn(sample, total) ->
-      total + :math.pow((sample - average), 2)
-    end
+    total_variance =
+      Enum.reduce(samples, 0, fn sample, total -> total + :math.pow(sample - average, 2) end)
+
     variance = total_variance / iterations
-    :math.sqrt variance
+    :math.sqrt(variance)
   end
 
   defp compute_median(run_times, iterations) do
@@ -204,6 +212,6 @@ defmodule Benchee.Statistics do
   end
 
   defp to_float(maybe_integer) do
-    :erlang.float maybe_integer
+    :erlang.float(maybe_integer)
   end
 end

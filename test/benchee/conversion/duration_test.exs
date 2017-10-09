@@ -1,7 +1,7 @@
 defmodule Benchee.Conversion.DurationTest do
   use ExUnit.Case, async: true
   import Benchee.Conversion.Duration
-  doctest Benchee.Conversion.Duration
+  doctest(Benchee.Conversion.Duration)
 
   describe ".format" do
     test ".format(98.7654321)" do
@@ -13,11 +13,11 @@ defmodule Benchee.Conversion.DurationTest do
     end
 
     test ".format(9_876.54321)" do
-      assert format(9_876.54321) == "9.88 ms"
+      assert format(9876.54321) == "9.88 ms"
     end
 
     test ".format(98_765.4321)" do
-      assert format(98_765.4321) == "98.77 ms"
+      assert format(98765.4321) == "98.77 ms"
     end
 
     test ".format(987_654.321)" do
@@ -49,7 +49,7 @@ defmodule Benchee.Conversion.DurationTest do
     end
   end
 
-  @list_with_mostly_milliseconds [1, 200, 3_000, 4_000, 500_000, 6_000_000, 77_000_000_000]
+  @list_with_mostly_milliseconds [1, 200, 3000, 4000, 500_000, 6_000_000, 77_000_000_000]
 
   describe ".best" do
     test "when list is mostly milliseconds" do

@@ -32,23 +32,25 @@ defmodule Benchee.Utility.FileCreation do
         fn(file, content) -> IO.write(file, content) end)
   """
   def each(names_to_content, filename, function \\ &default_each/3) do
-    create_directory filename
-    Enum.each names_to_content, fn({input_name, content}) ->
+    create_directory(filename)
+
+    Enum.each(names_to_content, fn {input_name, content} ->
       input_filename = interleave(filename, input_name)
-      File.open input_filename, [:write, :utf8], fn(file) ->
+
+      File.open(input_filename, [:write, :utf8], fn file ->
         function.(file, content, input_filename)
-      end
-    end
+      end)
+    end)
   end
 
   defp default_each(file, content, input_filename) do
-    :ok = IO.write file, content
-    IO.puts "Generated #{input_filename}"
+    :ok = IO.write(file, content)
+    IO.puts("Generated #{input_filename}")
   end
 
   defp create_directory(filename) do
-    directory = Path.dirname filename
-    File.mkdir_p! directory
+    directory = Path.dirname(filename)
+    File.mkdir_p!(directory)
   end
 
   @doc """
@@ -100,13 +102,16 @@ defmodule Benchee.Utility.FileCreation do
       "abc_something_cool_comparison.csv"
   """
   def interleave(filename, names) when is_list(names) do
-    file_names = names
-                 |> Enum.map(&to_filename/1)
-                 |> prepend(Path.rootname(filename))
-                 |> Enum.reject(fn(string) -> String.length(string) < 1 end)
-                 |> Enum.join("_")
+    file_names =
+      names
+      |> Enum.map(&to_filename/1)
+      |> prepend(Path.rootname(filename))
+      |> Enum.reject(fn string -> String.length(string) < 1 end)
+      |> Enum.join("_")
+
     file_names <> Path.extname(filename)
   end
+
   def interleave(filename, name) do
     interleave(filename, [name])
   end
@@ -116,10 +121,13 @@ defmodule Benchee.Utility.FileCreation do
   end
 
   defp to_filename(name_string) do
-    no_input = Benchmark.no_input
+    no_input = Benchmark.no_input()
+
     case name_string do
-      ^no_input -> ""
-      _         ->
+      ^no_input ->
+        ""
+
+      _ ->
         String.downcase(String.replace(name_string, " ", "_"))
     end
   end

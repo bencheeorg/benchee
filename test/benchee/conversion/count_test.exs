@@ -1,7 +1,7 @@
 defmodule Benchee.Conversion.CountTest do
   use ExUnit.Case, async: true
   import Benchee.Conversion.Count
-  doctest Benchee.Conversion.Count
+  doctest(Benchee.Conversion.Count)
 
   describe ".scale" do
     test "123_456_789_012 scales to :billion" do
@@ -33,11 +33,11 @@ defmodule Benchee.Conversion.CountTest do
     end
 
     test "12_345.67 scales to :thousand" do
-      assert scale(12_345.67) == {12.34567, unit_for(:thousand)}
+      assert scale(12345.67) == {12.34567, unit_for(:thousand)}
     end
 
     test "1_234.567 scales to :thousand" do
-      assert scale(1_234.567) == {1.234567, unit_for(:thousand)}
+      assert scale(1234.567) == {1.234567, unit_for(:thousand)}
     end
 
     test "123.4567 scales to :one" do
@@ -63,7 +63,7 @@ defmodule Benchee.Conversion.CountTest do
     end
 
     test "1_000.1234" do
-      assert format(1_000.1234) == "1.00 K"
+      assert format(1000.1234) == "1.00 K"
     end
 
     test "123.4" do
@@ -76,7 +76,7 @@ defmodule Benchee.Conversion.CountTest do
   end
 
   describe ".best" do
-    @list_with_mostly_ones [1, 100, 1_000]
+    @list_with_mostly_ones [1, 100, 1000]
 
     test "when list is mostly ones" do
       assert best(@list_with_mostly_ones) == unit_for(:one)
@@ -90,21 +90,31 @@ defmodule Benchee.Conversion.CountTest do
       assert best(@list_with_mostly_ones, strategy: :largest) == unit_for(:thousand)
     end
 
-    @list_with_thousands_and_millions_tied_for_most [0.0001, 1, 1_000, 100_000, 1_000_000, 10_000_000, 1_000_000_000]
+    @list_with_thousands_and_millions_tied_for_most [
+      0.0001,
+      1,
+      1000,
+      100_000,
+      1_000_000,
+      10_000_000,
+      1_000_000_000
+    ]
 
     test "when list has thousands and millions tied for most, billions highest" do
       assert best(@list_with_thousands_and_millions_tied_for_most) == unit_for(:million)
     end
 
     test "when list has thousands and millions tied for most, billions highest, strategy: :smallest" do
-      assert best(@list_with_thousands_and_millions_tied_for_most, strategy: :smallest) == unit_for(:one)
+      assert best(@list_with_thousands_and_millions_tied_for_most, strategy: :smallest) ==
+               unit_for(:one)
     end
 
     test "when list has thousands and millions tied for most, billions highest, strategy: :largest" do
-      assert best(@list_with_thousands_and_millions_tied_for_most, strategy: :largest) == unit_for(:billion)
+      assert best(@list_with_thousands_and_millions_tied_for_most, strategy: :largest) ==
+               unit_for(:billion)
     end
 
-    @list_with_mostly_thousands [1_000, 2_000, 30_000, 999]
+    @list_with_mostly_thousands [1000, 2000, 30000, 999]
 
     test "when list is mostly thousands" do
       assert best(@list_with_mostly_thousands) == unit_for(:thousand)

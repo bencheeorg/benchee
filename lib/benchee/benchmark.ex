@@ -9,7 +9,7 @@ defmodule Benchee.Benchmark do
   alias Benchee.Benchmark.{Scenario, ScenarioContext, Runner}
   alias Benchee.Utility.DeepConvert
 
-  @type job_name :: String.t | atom
+  @type job_name :: String.t() | atom
   @no_input :__no_input
 
   @doc """
@@ -23,9 +23,10 @@ defmodule Benchee.Benchmark do
   suite's config, a scenario will be added for the given function for each
   input.
   """
-  @spec benchmark(Suite.t, job_name, fun, module) :: Suite.t
+  @spec benchmark(Suite.t(), job_name, fun, module) :: Suite.t()
   def benchmark(suite = %Suite{scenarios: scenarios}, job_name, function, printer \\ Printer) do
     normalized_name = to_string(job_name)
+
     if duplicated_job_name?(scenarios, normalized_name) do
       printer.duplicate_benchmark_warning(normalized_name)
       suite
@@ -35,28 +36,50 @@ defmodule Benchee.Benchmark do
   end
 
   defp duplicated_job_name?(scenarios, job_name) do
-    Enum.any?(scenarios, fn(scenario) -> scenario.job_name == job_name end)
+    Enum.any?(scenarios, fn scenario -> scenario.job_name == job_name end)
   end
 
-  defp add_scenario(suite = %Suite{scenarios: scenarios, configuration: config},
-                    job_name, function) do
+  defp add_scenario(
+         suite = %Suite{scenarios: scenarios, configuration: config},
+         job_name,
+         function
+       ) do
     new_scenarios = build_scenarios_for_job(job_name, function, config)
     %Suite{suite | scenarios: List.flatten([scenarios | new_scenarios])}
   end
 
   defp build_scenarios_for_job(job_name, function, config)
+
   defp build_scenarios_for_job(job_name, function, nil) do
-    [build_scenario(%{job_name: job_name, function: function, input: @no_input,
-                      input_name: @no_input})]
+    [
+      build_scenario(%{
+        job_name: job_name,
+        function: function,
+        input: @no_input,
+        input_name: @no_input
+      })
+    ]
   end
+
   defp build_scenarios_for_job(job_name, function, %{inputs: nil}) do
-    [build_scenario(%{job_name: job_name, function: function, input: @no_input,
-                     input_name: @no_input})]
+    [
+      build_scenario(%{
+        job_name: job_name,
+        function: function,
+        input: @no_input,
+        input_name: @no_input
+      })
+    ]
   end
+
   defp build_scenarios_for_job(job_name, function, %{inputs: inputs}) do
-    Enum.map(inputs, fn({input_name, input}) ->
-      build_scenario(%{job_name: job_name, function: function, input: input,
-                       input_name: input_name})
+    Enum.map(inputs, fn {input_name, input} ->
+      build_scenario(%{
+        job_name: job_name,
+        function: function,
+        input: input,
+        input_name: input_name
+      })
     end)
   end
 
@@ -66,6 +89,7 @@ defmodule Benchee.Benchmark do
     |> Map.merge(DeepConvert.to_map(options))
     |> build_scenario
   end
+
   defp build_scenario(scenario_data) do
     struct!(Scenario, scenario_data)
   end
@@ -76,10 +100,12 @@ defmodule Benchee.Benchmark do
   information on how bencharmks are actually run, see
   `Benchee.Benchmark.Runner.run_scenarios/2`.
   """
-  @spec measure(Suite.t, module, module) :: Suite.t
-  def measure(suite = %Suite{scenarios: scenarios, configuration: config},
-              printer \\ Printer,
-              runner \\ Runner) do
+  @spec measure(Suite.t(), module, module) :: Suite.t()
+  def measure(
+        suite = %Suite{scenarios: scenarios, configuration: config},
+        printer \\ Printer,
+        runner \\ Runner
+      ) do
     printer.configuration_information(suite)
     scenario_context = %ScenarioContext{config: config, printer: printer}
     scenarios = runner.run_scenarios(scenarios, scenario_context)

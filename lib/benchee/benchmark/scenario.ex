@@ -25,17 +25,17 @@ defmodule Benchee.Benchmark.Scenario do
   ]
 
   @type t :: %__MODULE__{
-    job_name: binary,
-    function: fun,
-    input_name: binary | nil,
-    input: any | nil,
-    run_times: [float] | [],
-    run_time_statistics: Benchee.Statistics.t | nil,
-    memory_usages: [non_neg_integer] | [],
-    memory_usage_statistics: Benchee.Statistics.t | nil,
-    before_each: fun | nil,
-    after_each: fun | nil,
-    before_scenario: fun | nil,
-    after_scenario: fun | nil
-  }
+          job_name: binary,
+          function: fun,
+          input_name: binary | nil,
+          input: any | nil,
+          run_times: [float] | [],
+          run_time_statistics: Benchee.Statistics.t() | nil,
+          memory_usages: [non_neg_integer] | [],
+          memory_usage_statistics: Benchee.Statistics.t() | nil,
+          before_each: fun | nil,
+          after_each: fun | nil,
+          before_scenario: fun | nil,
+          after_scenario: fun | nil
+        }
 end

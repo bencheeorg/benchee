@@ -12,11 +12,11 @@ defmodule Benchee.Benchmark.ScenarioContext do
   ]
 
   @type t :: %__MODULE__{
-    config:                Benchee.Configuration.t,
-    printer:               module,
-    current_time:          pos_integer | nil,
-    end_time:              pos_integer | nil,
-    benchmarking_function: (() -> any) | nil,
-    num_iterations:        pos_integer
-  }
+          config: Benchee.Configuration.t(),
+          printer: module,
+          current_time: pos_integer | nil,
+          end_time: pos_integer | nil,
+          benchmarking_function: (-> any) | nil,
+          num_iterations: pos_integer
+        }
 end

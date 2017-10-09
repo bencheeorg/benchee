@@ -6,8 +6,17 @@ defmodule Benchee.SystemTest do
 
   test ".system adds the content to a given suite" do
     system_info = Benchee.System.system(%Suite{})
-    assert %{system: %{elixir: _, erlang: _, num_cores: _, os: _,
-                       cpu_speed: _, available_memory: _}} = system_info
+
+    assert %{
+             system: %{
+               elixir: _,
+               erlang: _,
+               num_cores: _,
+               os: _,
+               cpu_speed: _,
+               available_memory: _
+             }
+           } = system_info
   end
 
   test ".elixir returns the current elixir version" do
@@ -62,25 +71,25 @@ defmodule Benchee.SystemTest do
 
   test ".available_memory returns the available memory on the computer" do
     {num, rest} = Float.parse(Benchee.System.available_memory())
-    decimal_part_of_available_memory = "#{num}"
-      |> String.split( ".")
+
+    decimal_part_of_available_memory =
+      "#{num}"
+      |> String.split(".")
       |> Enum.at(1)
       |> String.length()
+
     assert num > 0
     assert decimal_part_of_available_memory <= 2
     assert rest =~ ~r/GB/
   end
 
   test ".system_cmd handles errors gracefully" do
-    system_func = fn(_, _) -> {"ERROR", 1} end
-    captured_io = capture_io(fn ->
-      Benchee.System.system_cmd("cat", "dev/null", system_func)
-    end)
+    system_func = fn _, _ -> {"ERROR", 1} end
+    captured_io = capture_io(fn -> Benchee.System.system_cmd("cat", "dev/null", system_func) end)
 
     assert captured_io =~ "Something went wrong"
     assert captured_io =~ "ERROR"
-    capture_io fn ->
-      assert Benchee.System.system_cmd("cat", "dev/null", system_func) == "N/A"
-    end
+
+    capture_io(fn -> assert Benchee.System.system_cmd("cat", "dev/null", system_func) == "N/A" end)
   end
 end
