@@ -8,6 +8,7 @@ defmodule Benchee.Benchmark.ScenarioContext do
     :current_time,
     :end_time,
     :benchmarking_function,
+    :scenario_input, # before_scenario can alter the original input
     num_iterations: 1
   ]
 
@@ -17,6 +18,7 @@ defmodule Benchee.Benchmark.ScenarioContext do
     current_time:          pos_integer | nil,
     end_time:              pos_integer | nil,
     benchmarking_function: (() -> any) | nil,
+    scenario_input:        any,
     num_iterations:        pos_integer
   }
 end

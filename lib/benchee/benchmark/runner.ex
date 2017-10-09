@@ -26,8 +26,6 @@ defmodule Benchee.Benchmark.Runner do
   @spec run_scenarios([Scenario.t], ScenarioContext.t) :: [Scenario.t]
   def run_scenarios(scenarios, scenario_context) do
     Enum.flat_map(scenarios, fn(scenario) ->
-      scenario_context =
-        update_benchmarking_function(scenario_context, scenario)
       parallel_benchmark(scenario, scenario_context)
     end)
   end
@@ -58,16 +56,17 @@ defmodule Benchee.Benchmark.Runner do
   #   execution and hooks anymore and sadly we also measure the time of the
   #   hooks.
   defp build_benchmarking_function(
-      %Scenario{function: function, input: input},
-      %ScenarioContext{num_iterations: 1}) do
+      %Scenario{function: function},
+      %ScenarioContext{num_iterations: 1, scenario_input: input}) do
     main_function(function, input)
   end
   defp build_benchmarking_function(
         %Scenario{
-          function: function, input: input, before_each: nil, after_each: nil
+          function: function, before_each: nil, after_each: nil
         },
         %ScenarioContext{
           num_iterations: iterations,
+          scenario_input: input,
           config: %{after_each: nil, before_each: nil}
         })
         when iterations > 1 do
@@ -77,8 +76,11 @@ defmodule Benchee.Benchmark.Runner do
     fn -> RepeatN.repeat_n(main, iterations) end
   end
   defp build_benchmarking_function(
-        scenario = %Scenario{function: function, input: input},
-        scenario_context = %ScenarioContext{num_iterations: iterations})
+        scenario = %Scenario{function: function},
+        scenario_context = %ScenarioContext{
+          num_iterations: iterations,
+          scenario_input: input
+        })
         when iterations > 1 do
     main = main_function(function, input)
     fn ->
@@ -111,21 +113,35 @@ defmodule Benchee.Benchmark.Runner do
   end
 
   defp run_scenario(scenario, scenario_context) do
-    run_before_scenario(scenario, scenario_context)
+    scenario_input = run_before_scenario(scenario, scenario_context)
+    scenario_context =
+      %ScenarioContext{scenario_context | scenario_input: scenario_input}
+    scenario_context =
+      update_benchmarking_function(scenario_context, scenario)
     _ = run_warmup(scenario, scenario_context)
     measurements = run_benchmark(scenario, scenario_context)
     run_after_scenario(scenario, scenario_context)
     measurements
   end
 
-  defp run_before_scenario(%{
-                             before_scenario: local_before_scenario
+  defp run_before_scenario(%Scenario{
+                             before_scenario: local_before_scenario,
+                             input: input
                            },
-                           %{
+                           %ScenarioContext{
                              config: %{before_scenario: global_before_scenario}
                            }) do
-    if global_before_scenario, do: global_before_scenario.()
-    if local_before_scenario,  do: local_before_scenario.()
+    input
+    |> run_before_scenario_function(global_before_scenario)
+    |> run_before_scenario_function(local_before_scenario)
+  end
+
+  defp run_before_scenario_function(input, function) do
+    if function do
+      function.(input)
+    else
+      input
+    end
   end
 
   defp run_warmup(scenario, scenario_context = %ScenarioContext{
