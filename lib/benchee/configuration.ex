@@ -47,7 +47,7 @@ defmodule Benchee.Configuration do
     print:             map,
     inputs:            %{Suite.key => any} | nil,
     formatter_options: map,
-    unit_scaling:      Scale.best_unit_strategy,
+    unit_scaling:      Scale.scaling_strategy,
     assigns:           map,
     before_each:       fun | nil,
     after_each:        fun | nil,
