@@ -146,20 +146,23 @@ The available options are the following (also documented in [hexdocs](https://he
   * `:fast_warning` - warnings are displayed if functions are executed too fast leading to inaccurate measures
 * `console` - options for the built-in console formatter. Like the `print` options they are also enabled by default:
   * `:comparison` - if the comparison of the different benchmarking jobs (x times slower than) is shown
-  * `:unit_scaling` - the strategy for choosing a unit for durations and
-  counts. When scaling a value, Benchee finds the "best fit" unit (the
-  largest unit for which the result is at least 1). For example, 1_200_000
-  scales to `1.2 M`, while `800_000` scales to `800 K`. The `unit_scaling`
-  strategy determines how Benchee chooses the best fit unit for an entire
-  list of values, when the individual values in the list may have different
-  best fit units. There are four strategies, defaulting to `:best`:
-    * `:best`    - the most frequent best fit unit will be used, a tie will
-    result in the larger unit being selected.
+* `:unit_scaling` - the strategy for choosing a unit for durations and
+  counts. May or may not be implemented by a given formatter (The console
+  formatter implements it). When scaling a value, Benchee finds the "best fit"
+  unit (the largest unit for which the result is at least 1). For example,
+  1_200_000 scales to `1.2 M`, while `800_000` scales to `800 K`. The
+  `unit_scaling` strategy determines how Benchee chooses the best fit unit for
+  an entire list of values, when the individual values in the list may have
+  different best fit units. There are four strategies, defaulting to `:best`:
+    * `:best`     - the most frequent best fit unit will be used, a tie
+    will result in the larger unit being selected.
     * `:largest`  - the largest best fit unit will be used (i.e. thousand
-    and seconds if values are large enough)
-    * `:smallest` - the smallest best fit unit will be used (i.e. millisecond
-    and one)
-    * `:none`     - no unit scaling will occur. Durations will be displayed in microseconds, and counts will be displayed in ones (this is equivalent to the behaviour Benchee had pre 0.5.0)
+    and seconds if values are large enough).
+    * `:smallest` - the smallest best fit unit will be used (i.e.
+    millisecond and one)
+    * `:none`     - no unit scaling will occur. Durations will be displayed
+    in microseconds, and counts will be displayed in ones (this is
+    equivalent to the behaviour Benchee had pre 0.5.0)
 
 ### Inputs
 

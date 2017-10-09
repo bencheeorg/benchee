@@ -8,7 +8,9 @@ defmodule Benchee.Formatters.ConsoleTest do
   alias Benchee.{Suite, Statistics, Benchmark.Scenario}
 
   @console_config %{comparison: true, unit_scaling: :best}
-  @config %Benchee.Configuration{formatter_options: %{console: @console_config}}
+  @config %Benchee.Configuration{
+    formatter_options: %{console: %{comparison: true}}
+  }
   describe ".output" do
     test "formats and prints the results right to the console" do
       scenarios = [
