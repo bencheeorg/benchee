@@ -1,18 +1,17 @@
 defmodule Benchee.StatistcsTest do
   use ExUnit.Case, async: true
   alias Benchee.{Statistics, Suite, Benchmark.Scenario}
-  doctest Benchee.Statistics
+  doctest(Benchee.Statistics)
 
   @sample_1 [600, 470, 170, 430, 300]
   @sample_2 [17, 15, 23, 7, 9, 13]
   describe ".statistics" do
     test "computes the statistics for all jobs correctly" do
       scenarios = [
-        %Scenario{input: "Input", input_name: "Input", job_name: "Job 1",
-                  run_times: @sample_1},
-        %Scenario{input: "Input", input_name: "Input", job_name: "Job 2",
-                  run_times: @sample_2}
+        %Scenario{input: "Input", input_name: "Input", job_name: "Job 1", run_times: @sample_1},
+        %Scenario{input: "Input", input_name: "Input", job_name: "Job 2", run_times: @sample_2}
       ]
+
       suite = %Suite{scenarios: scenarios}
       new_suite = Statistics.statistics(suite)
 
@@ -25,11 +24,10 @@ defmodule Benchee.StatistcsTest do
 
     test "computes statistics correctly for multiple inputs" do
       scenarios = [
-        %Scenario{input: "Input 1", input_name: "Input 1", job_name: "Job",
-                  run_times: @sample_1},
-        %Scenario{input: "Input 2", input_name: "Input 2", job_name: "Job",
-                  run_times: @sample_2}
+        %Scenario{input: "Input 1", input_name: "Input 1", job_name: "Job", run_times: @sample_1},
+        %Scenario{input: "Input 2", input_name: "Input 2", job_name: "Job", run_times: @sample_2}
       ]
+
       suite = %Suite{scenarios: scenarios}
       new_suite = Statistics.statistics(suite)
 
@@ -43,8 +41,10 @@ defmodule Benchee.StatistcsTest do
     @mode_sample [55, 40, 67, 55, 44, 40, 10, 8, 55, 90, 67]
     test "mode is calculated correctly" do
       scenarios = [%Scenario{run_times: @mode_sample}]
-      suite = %Suite{scenarios: scenarios}
-              |> Statistics.statistics
+
+      suite =
+        %Suite{scenarios: scenarios}
+        |> Statistics.statistics()
 
       [%Scenario{run_time_statistics: stats}] = suite.scenarios
       assert stats.mode == 55
@@ -56,14 +56,15 @@ defmodule Benchee.StatistcsTest do
         configuration: %{formatters: []}
       }
 
-      assert %Suite{configuration: %{formatters: []}} =
-        Statistics.statistics suite
+      assert %Suite{configuration: %{formatters: []}} = Statistics.statistics(suite)
     end
 
     defp stats_for(suite, job_name, input_name) do
-      %Scenario{run_time_statistics: stats} = Enum.find(suite.scenarios, fn(scenario) ->
-        scenario.job_name == job_name && scenario.input_name == input_name
-      end)
+      %Scenario{run_time_statistics: stats} =
+        Enum.find(suite.scenarios, fn scenario ->
+          scenario.job_name == job_name && scenario.input_name == input_name
+        end)
+
       stats
     end
 

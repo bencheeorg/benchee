@@ -3,17 +3,18 @@ defmodule Benchee.Output.BenchmarkPrintertest do
   import ExUnit.CaptureIO
   import Benchee.Output.BenchmarkPrinter
   alias Benchee.Benchmark.Scenario
-  @system_info %{elixir: "1.4",
-                 erlang: "19.2",
-                 os: :macOS,
-                 num_cores: 4,
-                 cpu_speed: "Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz",
-                 available_memory: 8568392814}
+
+  @system_info %{
+    elixir: "1.4",
+    erlang: "19.2",
+    os: :macOS,
+    num_cores: 4,
+    cpu_speed: "Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz",
+    available_memory: 8_568_392_814
+  }
 
   test ".duplicate_benchmark_warning" do
-    output = capture_io fn ->
-      duplicate_benchmark_warning("Something")
-    end
+    output = capture_io(fn -> duplicate_benchmark_warning("Something") end)
 
     assert output =~ "same name"
     assert output =~ "Something"
@@ -21,14 +22,15 @@ defmodule Benchee.Output.BenchmarkPrintertest do
 
   describe ".configuration_information" do
     test "sys information" do
-      output = capture_io fn ->
-        %{
-          configuration: %{parallel: 2, time: 10_000, warmup: 0, inputs: nil},
-          scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
-          system: @system_info
-        }
-        |> configuration_information
-      end
+      output =
+        capture_io(fn ->
+          %{
+            configuration: %{parallel: 2, time: 10000, warmup: 0, inputs: nil},
+            scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
+            system: @system_info
+          }
+          |> configuration_information
+        end)
 
       assert output =~ "Erlang 19.2"
       assert output =~ "Elixir 1.4"
@@ -44,19 +46,20 @@ defmodule Benchee.Output.BenchmarkPrintertest do
     end
 
     test "it scales times appropriately" do
-      output = capture_io fn ->
-        %{
-          configuration: %Benchee.Configuration{
-            parallel: 1,
-            time: 60_000_000,
-            warmup: 10_000_000,
-            inputs: nil
-          },
-          scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
-          system: @system_info
-        }
-        |> configuration_information
-      end
+      output =
+        capture_io(fn ->
+          %{
+            configuration: %Benchee.Configuration{
+              parallel: 1,
+              time: 60_000_000,
+              warmup: 10_000_000,
+              inputs: nil
+            },
+            scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
+            system: @system_info
+          }
+          |> configuration_information
+        end)
 
       assert output =~ "warmup: 10 s"
       assert output =~ "time: 1 min"
@@ -66,14 +69,15 @@ defmodule Benchee.Output.BenchmarkPrintertest do
 
     @inputs %{"Arg 1" => "Argument 1", "Arg 2" => "Argument 2"}
     test "multiple inputs" do
-      output = capture_io fn ->
-        %{
-          configuration: %{parallel: 2, time: 10_000, warmup: 0, inputs: @inputs},
-          scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
-          system: @system_info
-        }
-        |> configuration_information
-      end
+      output =
+        capture_io(fn ->
+          %{
+            configuration: %{parallel: 2, time: 10000, warmup: 0, inputs: @inputs},
+            scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
+            system: @system_info
+          }
+          |> configuration_information
+        end)
 
       assert output =~ "time: 10 ms"
       assert output =~ "parallel: 2"
@@ -82,10 +86,11 @@ defmodule Benchee.Output.BenchmarkPrintertest do
     end
 
     test "does not print if disabled" do
-      output = capture_io fn ->
-        %{configuration: %{print: %{configuration: false}}}
-        |> configuration_information
-      end
+      output =
+        capture_io(fn ->
+          %{configuration: %{print: %{configuration: false}}}
+          |> configuration_information
+        end)
 
       assert output == ""
     end
@@ -93,17 +98,13 @@ defmodule Benchee.Output.BenchmarkPrintertest do
 
   describe ".benchmarking" do
     test "prints information that it's currently benchmarking" do
-      output = capture_io fn ->
-        benchmarking("Something", %{})
-      end
+      output = capture_io(fn -> benchmarking("Something", %{}) end)
 
       assert output =~ ~r/Benchmarking.+Something/i
     end
 
     test "doesn't print if it's deactivated" do
-      output = capture_io fn ->
-        benchmarking "A", %{print: %{benchmarking: false}}
-      end
+      output = capture_io(fn -> benchmarking("A", %{print: %{benchmarking: false}}) end)
 
       assert output == ""
     end
@@ -111,39 +112,31 @@ defmodule Benchee.Output.BenchmarkPrintertest do
 
   describe ".input_information" do
     test "notifies of the input being used" do
-      output = capture_io fn ->
-        input_information("Big List", %{})
-      end
+      output = capture_io(fn -> input_information("Big List", %{}) end)
 
       assert output =~ ~r/with input Big List/i
     end
 
     test "does nothing when it's the no input marker" do
-      marker = Benchee.Benchmark.no_input
-      output = capture_io fn ->
-        input_information marker, %{}
-      end
+      marker = Benchee.Benchmark.no_input()
+      output = capture_io(fn -> input_information(marker, %{}) end)
 
       assert output == ""
     end
 
     test "does not print if disabled" do
-      output = capture_io fn ->
-        input_information("Big List", %{print: %{benchmarking: false}})
-      end
+      output =
+        capture_io(fn -> input_information("Big List", %{print: %{benchmarking: false}}) end)
 
       assert output == ""
     end
   end
 
   test ".fast_warning warns with reference to more information" do
-    output = capture_io fn ->
-      fast_warning()
-    end
+    output = capture_io(fn -> fast_warning() end)
 
     assert output =~ ~r/fast/i
     assert output =~ ~r/unreliable/i
     assert output =~ "benchee/wiki"
-
   end
 end

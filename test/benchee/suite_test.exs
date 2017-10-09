@@ -16,10 +16,11 @@ defmodule Benchee.SuiteTest do
       }
 
       result = deep_merge(@original, override)
+
       assert %Suite{
-        system: %{elixir: "1.5.0-dev", erlang: "19.2"},
-        scenarios: []
-      } = result
+               system: %{elixir: "1.5.0-dev", erlang: "19.2"},
+               scenarios: []
+             } = result
     end
 
     test "merges with a map" do
@@ -30,14 +31,12 @@ defmodule Benchee.SuiteTest do
       result = deep_merge(@original, override)
 
       assert %Suite{
-        system: %{elixir: "1.5.0-dev", erlang: "19.2"}
-      } = result
+               system: %{elixir: "1.5.0-dev", erlang: "19.2"}
+             } = result
     end
 
     test "raises when anything else is tried" do
-      assert_raise FunctionClauseError, fn ->
-        deep_merge @original, "lol this doesn't fit"
-      end
+      assert_raise FunctionClauseError, fn -> deep_merge(@original, "lol this doesn't fit") end
     end
   end
 end

@@ -1,5 +1,4 @@
 defmodule Benchee.Conversion.DeviationPercent do
-
   @moduledoc """
   Helps with formattiong for the standard deviation ratio converting it into the
   more common percent form.

@@ -6,9 +6,11 @@ defmodule Benchee.TestHelpers do
   # retry tests that are doing actual benchmarking and are flaky
   # on overloaded and/or slower systems
   def retrying(asserting_function, n \\ @default_retries)
+
   def retrying(asserting_function, 1) do
     asserting_function.()
   end
+
   def retrying(asserting_function, n) do
     try do
       asserting_function.()
@@ -20,10 +22,10 @@ defmodule Benchee.TestHelpers do
 
   # assert we received eactly those messages of the contained types
   def assert_received_exactly(expected) do
-    Enum.each(expected, fn(message) -> assert_received ^message end)
+    Enum.each(expected, fn message -> assert_received ^message end)
 
     expected
-    |> Enum.uniq
-    |> Enum.each(fn(message) -> refute_received(^message) end)
+    |> Enum.uniq()
+    |> Enum.each(fn message -> refute_received ^message end)
   end
 end

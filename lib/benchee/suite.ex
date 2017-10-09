@@ -16,24 +16,26 @@ defmodule Benchee.Suite do
     scenarios: []
   ]
 
-  @type key :: atom | String.t
+  @type key :: atom | String.t()
   @type optional_map :: map | nil
   @type t :: %__MODULE__{
-    configuration: Benchee.Configuration.t | nil,
-    system: optional_map,
-    scenarios: [] | [Benchee.Benchmark.Scenario.t]
-  }
+          configuration: Benchee.Configuration.t() | nil,
+          system: optional_map,
+          scenarios: [] | [Benchee.Benchmark.Scenario.t()]
+        }
 end
 
 defimpl DeepMerge.Resolver, for: Benchee.Suite do
   def resolve(original, override = %Benchee.Suite{}, resolver) do
-    cleaned_override = override
-                       |> Map.from_struct
-                       |> Enum.reject(fn({_key, value}) -> is_nil(value) end)
-                       |> Map.new
+    cleaned_override =
+      override
+      |> Map.from_struct()
+      |> Enum.reject(fn {_key, value} -> is_nil(value) end)
+      |> Map.new()
 
     Map.merge(original, cleaned_override, resolver)
   end
+
   def resolve(original, override, resolver) when is_map(override) do
     Map.merge(original, override, resolver)
   end

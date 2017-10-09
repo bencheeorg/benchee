@@ -12,7 +12,7 @@ defmodule Benchee.Conversion.Format do
   Formats a number as a string, with a unit label. See `Benchee.Conversion.Count`
   and `Benchee.Conversion.Duration` for examples
   """
-  @callback format(number) :: String.t
+  @callback format(number) :: String.t()
 
   # Generic formatting functions
 
@@ -44,6 +44,7 @@ defmodule Benchee.Conversion.Format do
   def format({count, unit = %Unit{}}, module) do
     format(count, label(unit), separator(module))
   end
+
   def format({count, unit_atom}, module) do
     format({count, module.unit_for(unit_atom)}, module)
   end

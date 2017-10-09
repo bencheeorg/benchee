@@ -4,16 +4,17 @@ defmodule Benchee.BenchmarkTest do
   alias Benchee.Configuration
   alias Benchee.Benchmark.{Scenario, ScenarioContext}
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
-  alias Benchee.Test.FakeBenchmarkRunner,  as: TestRunner
+  alias Benchee.Test.FakeBenchmarkRunner, as: TestRunner
   alias Benchee.Suite
 
   describe ".benchmark" do
     test "can add jobs with atom keys but converts them to string" do
-      suite = %Suite{}
-              |> Benchmark.benchmark("one job", fn -> 1 end)
-              |> Benchmark.benchmark(:something, fn -> 2 end)
+      suite =
+        %Suite{}
+        |> Benchmark.benchmark("one job", fn -> 1 end)
+        |> Benchmark.benchmark(:something, fn -> 2 end)
 
-      job_names = Enum.map(suite.scenarios, fn(scenario) -> scenario.job_name end)
+      job_names = Enum.map(suite.scenarios, fn scenario -> scenario.job_name end)
       assert job_names == ["one job", "something"]
     end
 
@@ -33,9 +34,13 @@ defmodule Benchee.BenchmarkTest do
       function = fn -> 1 end
       config = %Configuration{inputs: nil}
       suite = Benchmark.benchmark(%Suite{configuration: config}, job_name, function)
-      expected_scenario =
-        %Scenario{job_name: job_name, function: function,
-                  input: Benchmark.no_input(), input_name: Benchmark.no_input()}
+
+      expected_scenario = %Scenario{
+        job_name: job_name,
+        function: function,
+        input: Benchmark.no_input(),
+        input_name: Benchmark.no_input()
+      }
 
       assert suite.scenarios == [expected_scenario]
     end
@@ -45,8 +50,8 @@ defmodule Benchee.BenchmarkTest do
       function = fn -> 1 end
       config = %Configuration{inputs: %{"large" => 100_000, "small" => 10}}
       suite = Benchmark.benchmark(%Suite{configuration: config}, job_name, function)
-      input_names = Enum.map(suite.scenarios, fn(scenario) -> scenario.input_name end)
-      inputs = Enum.map(suite.scenarios, fn(scenario) -> scenario.input end)
+      input_names = Enum.map(suite.scenarios, fn scenario -> scenario.input_name end)
+      inputs = Enum.map(suite.scenarios, fn scenario -> scenario.input end)
 
       assert length(suite.scenarios) == 2
       assert input_names == ["large", "small"]
@@ -54,20 +59,25 @@ defmodule Benchee.BenchmarkTest do
     end
 
     test "can deal with the options tuple" do
-      function       = fn -> 1 end
-      before         = fn -> 2 end
+      function = fn -> 1 end
+      before = fn -> 2 end
       after_scenario = fn -> 3 end
+
       suite =
         %Suite{}
         |> Benchmark.benchmark("job", {
-          function, before_each: before, after_scenario: after_scenario})
+             function,
+             before_each: before, after_scenario: after_scenario
+           })
 
       [scenario] = suite.scenarios
+
       assert %{
-        job_name: "job",
-        function: ^function,
-        before_each: ^before,
-        after_scenario: ^after_scenario } = scenario
+               job_name: "job",
+               function: ^function,
+               before_each: ^before,
+               after_scenario: ^after_scenario
+             } = scenario
     end
   end
 
@@ -90,16 +100,17 @@ defmodule Benchee.BenchmarkTest do
     end
 
     test "returns a suite with scenarios returned from the runner" do
-      scenarios = [%Scenario{job_name: "one", function: fn() -> 1 end}]
+      scenarios = [%Scenario{job_name: "one", function: fn -> 1 end}]
       suite = %Suite{scenarios: scenarios}
 
-      run_times = suite
-                  |> Benchmark.measure(TestPrinter, TestRunner)
-                  |> (fn(suite) -> suite.scenarios end).()
-                  |> Enum.map(fn(scenario) -> scenario.run_times end)
+      run_times =
+        suite
+        |> Benchmark.measure(TestPrinter, TestRunner)
+        |> (fn suite -> suite.scenarios end).()
+        |> Enum.map(fn scenario -> scenario.run_times end)
 
       assert length(run_times) == 1
-      refute Enum.any?(run_times, fn(run_time) -> Enum.empty?(run_time) end)
+      refute Enum.any?(run_times, fn run_time -> Enum.empty?(run_time) end)
     end
   end
 end

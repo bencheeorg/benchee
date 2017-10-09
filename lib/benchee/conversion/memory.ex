@@ -15,35 +15,35 @@ defmodule Benchee.Conversion.Memory do
 
   @units %{
     terabyte: %Unit{
-                name:      :terabyte,
-                magnitude: @bytes_per_terabyte,
-                label:     "TB",
-                long:      "Terabytes"
-              },
+      name: :terabyte,
+      magnitude: @bytes_per_terabyte,
+      label: "TB",
+      long: "Terabytes"
+    },
     gigabyte: %Unit{
-                name:      :gigabyte,
-                magnitude: @bytes_per_gigabyte,
-                label:     "GB",
-                long:      "Gigabytes"
-              },
+      name: :gigabyte,
+      magnitude: @bytes_per_gigabyte,
+      label: "GB",
+      long: "Gigabytes"
+    },
     megabyte: %Unit{
-                name:      :megabyte,
-                magnitude: @bytes_per_megabyte,
-                label:     "MB",
-                long:      "Megabytes"
-              },
+      name: :megabyte,
+      magnitude: @bytes_per_megabyte,
+      label: "MB",
+      long: "Megabytes"
+    },
     kilobyte: %Unit{
-                name:      :kilobyte,
-                magnitude: @bytes_per_kilobyte,
-                label:     "KB",
-                long:      "Kilobytes"
-              },
-    byte:     %Unit{
-                name:      :byte,
-                magnitude: 1,
-                label:     "B",
-                long:      "Bytes"
-              }
+      name: :kilobyte,
+      magnitude: @bytes_per_kilobyte,
+      label: "KB",
+      long: "Kilobytes"
+    },
+    byte: %Unit{
+      name: :byte,
+      magnitude: 1,
+      label: "B",
+      long: "Bytes"
+    }
   }
 
   @doc """
@@ -76,19 +76,23 @@ defmodule Benchee.Conversion.Memory do
     :terabyte
   """
   def scale(memory) when memory >= @bytes_per_terabyte do
-    scale_with_unit memory, :terabyte
+    scale_with_unit(memory, :terabyte)
   end
+
   def scale(memory) when memory >= @bytes_per_gigabyte do
-    scale_with_unit memory, :gigabyte
+    scale_with_unit(memory, :gigabyte)
   end
+
   def scale(memory) when memory >= @bytes_per_megabyte do
-    scale_with_unit memory, :megabyte
+    scale_with_unit(memory, :megabyte)
   end
+
   def scale(memory) when memory >= @bytes_per_kilobyte do
-    scale_with_unit memory, :kilobyte
+    scale_with_unit(memory, :kilobyte)
   end
+
   def scale(memory) do
-    scale_with_unit memory, :byte
+    scale_with_unit(memory, :byte)
   end
 
   # Helper function for returning a tuple of {value, unit}
@@ -110,7 +114,7 @@ defmodule Benchee.Conversion.Memory do
       }
   """
   def unit_for(unit) do
-    Scale.unit_for @units, unit
+    Scale.unit_for(@units, unit)
   end
 
   @doc """
@@ -129,7 +133,7 @@ defmodule Benchee.Conversion.Memory do
 
   """
   def scale(count, unit) do
-    Scale.scale count, unit, __MODULE__
+    Scale.scale(count, unit, __MODULE__)
   end
 
   @doc """
@@ -156,6 +160,7 @@ defmodule Benchee.Conversion.Memory do
       :megabyte
   """
   def best(list, opts \\ [strategy: :best])
+
   def best(list, opts) do
     Scale.best_unit(list, __MODULE__, opts)
   end
