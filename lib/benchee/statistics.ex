@@ -159,7 +159,7 @@ defmodule Benchee.Statistics do
     deviation           = standard_deviation(run_times, average, iterations)
     standard_dev_ratio  = deviation / average
     standard_dev_ips    = ips * standard_dev_ratio
-    median              = compute_median(run_times, iterations)
+    median              = Benchee.Statistics.Percentile.percentile(run_times, iterations, 50)
     mode                = Mode.mode(run_times)
     minimum             = Enum.min run_times
     maximum             = Enum.max run_times
@@ -188,22 +188,5 @@ defmodule Benchee.Statistics do
     end
     variance = total_variance / iterations
     :math.sqrt variance
-  end
-
-  defp compute_median(run_times, iterations) do
-    # this is rather inefficient, as O(log(n) * n + n) - there are
-    # O(n) algorithms to do compute this should it get to be a problem.
-    sorted = Enum.sort(run_times)
-    middle = div(iterations, 2)
-
-    if Integer.is_odd(iterations) do
-      sorted |> Enum.at(middle) |> to_float
-    else
-      (Enum.at(sorted, middle) + Enum.at(sorted, middle - 1)) / 2
-    end
-  end
-
-  defp to_float(maybe_integer) do
-    :erlang.float maybe_integer
   end
 end
