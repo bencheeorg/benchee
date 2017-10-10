@@ -72,9 +72,9 @@ defmodule Benchee.Statistics.Percentile do
   # particular sample). Of the 9 main strategies, (types 1-9), types 6, 7, and 8
   # are generally acceptable and give similar results.
   #
-  # See also:
-  # - [documentation from R language](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/quantile.html)
-  # - [NIST handbook](http://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm)
+  # For more information on interpolation strategies, see:
+  # - https://stat.ethz.ch/R-manual/R-devel/library/stats/html/quantile.html
+  # - http://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm
   defp interpolation_value(lower_bound, upper_bound, rank) do
     interpolation_weight = rank - trunc(rank)
     interpolation_weight * (upper_bound - lower_bound)
