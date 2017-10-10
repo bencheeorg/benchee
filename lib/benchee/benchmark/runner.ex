@@ -106,7 +106,7 @@ defmodule Benchee.Benchmark.Runner do
     {num_iterations, initial_run_time} =
       determine_n_times(scenario, scenario_context, fast_warning)
     new_context =
-      %ScenarioContext{scenario_context | 
+      %ScenarioContext{scenario_context |
         current_time: current_time(),
         end_time: end_time,
         num_iterations: num_iterations
