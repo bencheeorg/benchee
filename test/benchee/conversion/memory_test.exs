@@ -77,8 +77,6 @@ defmodule Benchee.Conversion.MemoryTest do
 
     test "convert kb to tb returns correct result" do
       actual_value = convert({800_000_000, @kilobyte_unit}, @terabyte_unit)
-
-      # Potentially set a limit to the precision?
       expected_value = 0.7450580596923828
       assert actual_value == {expected_value, @terabyte_unit}
     end
@@ -86,8 +84,6 @@ defmodule Benchee.Conversion.MemoryTest do
     test "convert mb to kb returns correct result for atom" do
       actual_value = convert({8, :megabyte}, :kilobyte)
       expected_value = 8 * 1024
-
-      # User supplied atom, should we return that instead of the full %Unit struct?
       assert actual_value == {expected_value, @kilobyte_unit}
     end
   end

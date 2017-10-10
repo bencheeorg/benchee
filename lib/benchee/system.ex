@@ -125,7 +125,10 @@ defmodule Benchee.System do
                   |> String.trim()
                   |> String.trim_trailing(" kB")
                   |> Integer.parse
-    {memory_in_bytes, _} = Memory.convert({memory_in_kilobytes, :kilobyte}, :byte) #memory_in_kilobytes * 1024
+
+    {memory_in_bytes, _} = {memory_in_kilobytes, :kilobyte}
+                  |> Memory.convert(:byte)
+
     Memory.format(memory_in_bytes)
   end
 
