@@ -1,8 +1,6 @@
 defmodule Benchee.Statistics.Percentile do
   @moduledoc false
 
-  alias Benchee.Statistics
-
   @doc """
   Calculates the value at the `percentile_number`-th percentile. Think of this as the
   value below which `percentile_number` percent of the samples lie. For example,
