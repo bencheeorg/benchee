@@ -9,16 +9,7 @@ defmodule Benchee.Statistics.Percentile do
 
   ## Examples
 
-  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 8, 100)
-  5.0
-
-  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 8, 150)
-  5.0
-
-  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 8, 0)
-  1.0
-
-  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 8, -1)
+  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 12.5)
   1.0
 
   iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 50)
@@ -26,22 +17,23 @@ defmodule Benchee.Statistics.Percentile do
 
   iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 75)
   4.75
+
+  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 99)
+  5.0
+
+  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 100)
+  ** (ArgumentError) percentile must be between 0 and 100, got: 100
+
+  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 0)
+  ** (ArgumentError) percentile must be between 0 and 100, got: 0
   """
   @spec percentile(list(number()), integer()) :: float()
+  def percentile(_, percentile_number) when percentile_number >= 100 or percentile_number <= 0 do
+    raise ArgumentError, "percentile must be between 0 and 100, got: #{inspect(percentile_number)}"
+  end
+
   def percentile(samples, percentile_number) do
-    percentile(samples, length(samples), percentile_number)
-  end
-
-  @spec percentile(list(number()), integer(), integer()) :: float()
-  def percentile(samples, number_of_samples, percentile_number) when percentile_number > 100 do
-    percentile(samples, number_of_samples, 100)
-  end
-
-  def percentile(samples, number_of_samples, percentile_number) when percentile_number < 0 do
-    percentile(samples, number_of_samples, 0)
-  end
-
-  def percentile(samples, number_of_samples, percentile_number) do
+    number_of_samples = length(samples)
     sorted = Enum.sort(samples)
     rank = (percentile_number / 100) * max(0, number_of_samples + 1)
     percentile_value(sorted, rank)

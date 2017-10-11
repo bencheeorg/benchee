@@ -160,7 +160,7 @@ defmodule Benchee.Statistics do
     deviation           = standard_deviation(run_times, average, iterations)
     standard_dev_ratio  = deviation / average
     standard_dev_ips    = ips * standard_dev_ratio
-    median              = Percentile.percentile(run_times, iterations, 50)
+    median              = Percentile.percentile(run_times, 50)
     mode                = Mode.mode(run_times)
     minimum             = Enum.min run_times
     maximum             = Enum.max run_times
