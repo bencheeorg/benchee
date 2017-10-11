@@ -21,7 +21,7 @@ defmodule Benchee.Statistics.PercentileTest do
   # Test data from:
   #   http://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm
   test "90th percentile" do
-    result = Percentile.percentile(@nist_sample_data, 90)
+    %{90 => result} = Percentile.percentiles(@nist_sample_data, 90)
     assert Float.round(result, 4) == 95.1981
   end
 end

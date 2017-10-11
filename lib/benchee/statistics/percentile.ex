@@ -17,40 +17,35 @@ defmodule Benchee.Statistics.Percentile do
 
   ## Examples
 
-  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 12.5)
-  1.0
+  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 12.5)
+  %{12.5 => 1.0}
 
-  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 50)
-  3.0
+  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [50])
+  %{50 => 3.0}
 
-  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 75)
-  4.75
+  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [75])
+  %{75 => 4.75}
 
-  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 99)
-  5.0
+  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 99)
+  %{99 => 5.0}
 
-  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], [50, 75, 99])
+  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [50, 75, 99])
   %{50 => 3.0, 75 => 4.75, 99 => 5.0}
 
-  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 100)
+  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 100)
   ** (ArgumentError) percentile must be between 0 and 100, got: 100
 
-  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 0)
+  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 0)
   ** (ArgumentError) percentile must be between 0 and 100, got: 0
   """
-  @spec percentile(list(number()), number() | list(number())) ::
-    percentile | percentiles
-  def percentile(samples, percentile_ranks) do
+  @spec percentiles([number()], number | [number()]) :: percentiles
+  def percentiles(samples, percentile_ranks) do
     number_of_samples = length(samples)
     sorted = Enum.sort(samples)
-    percentile(sorted, number_of_samples, percentile_ranks)
-  end
-
-  defp percentile(sorted_samples, number_of_samples, percentile_ranks)
-    when is_list(percentile_ranks) do
     percentile_ranks
+    |> List.wrap
     |> Enum.reduce(%{}, fn percentile_rank, acc ->
-      perc = percentile(sorted_samples, number_of_samples, percentile_rank)
+      perc = percentile(sorted, number_of_samples, percentile_rank)
       Map.put(acc, percentile_rank, perc)
     end)
   end
