@@ -41,11 +41,11 @@ defmodule Benchee.Statistics.Percentile do
   @spec percentiles([number()], number | [number()]) :: percentiles
   def percentiles(samples, percentile_ranks) do
     number_of_samples = length(samples)
-    sorted = Enum.sort(samples)
+    sorted_samples = Enum.sort(samples)
     percentile_ranks
     |> List.wrap
     |> Enum.reduce(%{}, fn percentile_rank, acc ->
-      perc = percentile(sorted, number_of_samples, percentile_rank)
+      perc = percentile(sorted_samples, number_of_samples, percentile_rank)
       Map.put(acc, percentile_rank, perc)
     end)
   end
@@ -54,33 +54,27 @@ defmodule Benchee.Statistics.Percentile do
     raise ArgumentError, "percentile must be between 0 and 100, got: #{inspect(percentile_rank)}"
   end
 
-  defp percentile([], _, _) do
-    raise ArgumentError, "can't calculate percentiles on an empty list"
-  end
-
   defp percentile(sorted_samples, number_of_samples, percentile_rank) do
     rank = (percentile_rank / 100) * max(0, number_of_samples + 1)
     percentile_value(sorted_samples, rank)
   end
 
-  defp percentile_value(sorted, rank) when trunc(rank) == 0 do
-    sorted
-    |> hd
-    |> to_float
-  end
-
-  defp percentile_value(sorted, rank) when trunc(rank) >= length(sorted) do
-    sorted
-    |> Enum.reverse
-    |> hd
-    |> to_float
-  end
-
-  defp percentile_value(sorted, rank) do
-    index = trunc(rank)
-    [lower_bound, upper_bound | _] = Enum.drop(sorted, index - 1)
-    interpolation_value = interpolation_value(lower_bound, upper_bound, rank)
-    lower_bound + interpolation_value
+  defp percentile_value(sorted_samples, rank) do
+    index = max(0, trunc(rank) - 1)
+    case Enum.split(sorted_samples, index) do
+      {_, [lower_bound, upper_bound | _]} ->
+        interpolation = interpolation_value(lower_bound, upper_bound, rank)
+        lower_bound + interpolation
+      {_, [lower_bound]} ->
+        to_float(lower_bound)
+      {[], []} ->
+        raise ArgumentError, "can't calculate percentile value on an empty list"
+      {previous_values, []} ->
+        previous_values
+        |> Enum.reverse
+        |> hd
+        |> to_float
+    end
   end
 
   # "Type 6" interpolation strategy. There are many ways to interpolate a value

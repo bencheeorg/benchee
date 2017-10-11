@@ -31,54 +31,54 @@ defmodule Benchee.Statistics.PercentileTest do
 
   describe "a list of one element" do
     setup do
-      {:ok, samples: [100]}
+      {:ok, samples: [300]}
     end
 
     test "1st percentile", %{samples: samples} do
       %{1 => result} = Percentile.percentiles(samples, [1])
-      assert result == 100.0
+      assert result == 300.0
     end
 
     test "50th percentile", %{samples: samples} do
       %{50 => result} = Percentile.percentiles(samples, [50])
-      assert result == 100.0
+      assert result == 300.0
     end
 
     test "99th percentile", %{samples: samples} do
       %{99 => result} = Percentile.percentiles(samples, [99])
-      assert result == 100.0
+      assert result == 300.0
     end
   end
 
   describe "a list of two elements" do
     setup do
-      {:ok, samples: [100, 200]}
+      {:ok, samples: [300, 200]}
     end
 
     test "1st percentile", %{samples: samples} do
       %{1 => result} = Percentile.percentiles(samples, [1])
-      assert result == 100.0
+      assert result == 203.0
     end
 
     test "50th percentile", %{samples: samples} do
       %{50 => result} = Percentile.percentiles(samples, [50])
-      assert result == 150.0
+      assert result == 250.0
     end
 
     test "99th percentile", %{samples: samples} do
       %{99 => result} = Percentile.percentiles(samples, [99])
-      assert result == 200.0
+      assert result == 300.0
     end
   end
 
   describe "a list of three elements" do
     setup do
-      {:ok, samples: [100, 200, 300]}
+      {:ok, samples: [100, 300, 200]}
     end
 
     test "1st percentile", %{samples: samples} do
       %{1 => result} = Percentile.percentiles(samples, [1])
-      assert result == 100.0
+      assert result == 104.0
     end
 
     test "50th percentile", %{samples: samples} do
