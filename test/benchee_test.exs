@@ -4,7 +4,7 @@ defmodule BencheeTest do
   import Benchee.TestHelpers
   doctest Benchee
 
-  @header_regex ~r/^Name.+ips.+average.+deviation.+median$/m
+  @header_regex ~r/^Name.+ips.+average.+deviation.+median.+P99$/m
   @test_times   [time: 0.01, warmup: 0.005]
   test "integration step by step" do
     capture_io fn ->

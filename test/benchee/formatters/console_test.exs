@@ -200,7 +200,7 @@ defmodule Benchee.Formatters.ConsoleTest do
   end
 
   describe ".format" do
-    @header_regex ~r/Name.+ips.+average.+deviation.+median.*/
+    @header_regex ~r/Name.+ips.+average.+deviation.+median.+P99.*/
     test "with multiple inputs and just one job" do
       scenarios = [
         %Scenario{job_name: "Job", input_name: "My Arg", input: "My Arg",
