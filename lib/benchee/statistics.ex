@@ -17,7 +17,7 @@ defmodule Benchee.Statistics do
     std_dev_ratio: float,
     std_dev_ips: float,
     median: number,
-    percentiles: %{number => number},
+    percentiles: %{number => float},
     mode: number,
     minimum: number,
     maximum: number,
