@@ -72,7 +72,7 @@ defmodule Benchee.Statistics do
       typical value you see.
     * percentiles   - a map of percentile ranks. These are the values below
       which x% of the run times lie. For example, 99% of run times are shorter
-      than the 99th percentile (P99) rank.
+      than the 99th percentile (99th %) rank.
       is a value for which 99% of the run times are shorter.
     * mode          - the run time(s) that occur the most. Often one value, but
       can be multiple values if they occur the same amount of times. If no value

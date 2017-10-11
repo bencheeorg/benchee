@@ -63,7 +63,7 @@ defmodule Benchee.Formatters.Console do
   ...>   }
   ...> }
   iex> Benchee.Formatters.Console.format(suite)
-  [["\n##### With input My input #####", "\nName             ips        average  deviation         median            P99\n",
+  [["\n##### With input My input #####", "\nName             ips        average  deviation         median         99th %\n",
   "My Job           5 K         200 μs    ±10.00%         190 μs\n",
   "Job 2         2.50 K         400 μs    ±20.00%         390 μs\n"]]
 
@@ -129,7 +129,7 @@ defmodule Benchee.Formatters.Console do
   ...> ]
   iex> configuration = %{comparison: false, unit_scaling: :best}
   iex> Benchee.Formatters.Console.format_scenarios(scenarios, configuration)
-  ["\nName             ips        average  deviation         median            P99\n",
+  ["\nName             ips        average  deviation         median         99th %\n",
   "My Job           5 K         200 μs    ±10.00%         190 μs\n",
   "Job 2         2.50 K         400 μs    ±20.00%         390 μs\n"]
 
@@ -152,7 +152,7 @@ defmodule Benchee.Formatters.Console do
     |> :io_lib.format([-label_width, "Name", @ips_width, "ips",
                        @average_width, "average",
                        @deviation_width, "deviation", @median_width, "median",
-                       @percentile_width, "P99"])
+                       @percentile_width, "99th %"])
     |> to_string
   end
 
