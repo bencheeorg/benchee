@@ -4,6 +4,5 @@
 erl_crash.dump
 *.ez
 elixir_build_*
-.tool-versions
 doc
 docs
