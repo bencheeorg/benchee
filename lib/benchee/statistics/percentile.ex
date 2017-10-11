@@ -54,6 +54,10 @@ defmodule Benchee.Statistics.Percentile do
     raise ArgumentError, "percentile must be between 0 and 100, got: #{inspect(percentile_rank)}"
   end
 
+  defp percentile([], _, _) do
+    raise ArgumentError, "can't calculate percentiles on an empty list"
+  end
+
   defp percentile(sorted_samples, number_of_samples, percentile_rank) do
     rank = (percentile_rank / 100) * max(0, number_of_samples + 1)
     percentile_value(sorted_samples, rank)
