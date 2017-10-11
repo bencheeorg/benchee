@@ -8,7 +8,7 @@ defmodule Benchee.Statistics do
   alias Benchee.Statistics.Percentile
 
   defstruct [:average, :ips, :std_dev, :std_dev_ratio, :std_dev_ips, :median,
-             :mode, :minimum, :maximum, :sample_size]
+             :percentiles, :mode, :minimum, :maximum, :sample_size]
 
   @type t :: %__MODULE__{
     average: float,
@@ -17,6 +17,7 @@ defmodule Benchee.Statistics do
     std_dev_ratio: float,
     std_dev_ips: float,
     median: number,
+    percentiles: %{number => number},
     mode: number,
     minimum: number,
     maximum: number,
@@ -68,7 +69,11 @@ defmodule Benchee.Statistics do
     * median        - when all measured times are sorted, this is the middle
       value (or average of the two middle values when the number of times is
       even). More stable than the average and somewhat more likely to be a
-      typical you see.
+      typical value you see.
+    * percentiles   - a map of percentile ranks. These are the values below
+      which x% of the run times lie. For example, 99% of run times are shorter
+      than the 99th percentile (P99) rank.
+      is a value for which 99% of the run times are shorter.
     * mode          - the run time(s) that occur the most. Often one value, but
       can be multiple values if they occur the same amount of times. If no value
       occures at least twice, this value will be nil.
@@ -107,6 +112,7 @@ defmodule Benchee.Statistics do
               std_dev_ratio: 0.4,
               std_dev_ips:   800.0,
               median:        450.0,
+              percentiles:   %{50 => 450.0, 99 => 900.0},
               mode:          400,
               minimum:       200,
               maximum:       900,
@@ -144,6 +150,7 @@ defmodule Benchee.Statistics do
         std_dev_ratio: 0.4,
         std_dev_ips:   800.0,
         median:        450.0,
+        percentiles:   %{50 => 450.0, 99 => 900.0},
         mode:          400,
         minimum:       200,
         maximum:       900,
@@ -160,7 +167,8 @@ defmodule Benchee.Statistics do
     deviation           = standard_deviation(run_times, average, iterations)
     standard_dev_ratio  = deviation / average
     standard_dev_ips    = ips * standard_dev_ratio
-    median              = Percentile.percentile(run_times, 50)
+    percentiles         = Percentile.percentile(run_times, [50, 99])
+    median              = Map.get(percentiles, 50)
     mode                = Mode.mode(run_times)
     minimum             = Enum.min run_times
     maximum             = Enum.max run_times
@@ -172,6 +180,7 @@ defmodule Benchee.Statistics do
       std_dev_ratio: standard_dev_ratio,
       std_dev_ips:   standard_dev_ips,
       median:        median,
+      percentiles:   percentiles,
       mode:          mode,
       minimum:       minimum,
       maximum:       maximum,

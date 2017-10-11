@@ -1,11 +1,19 @@
 defmodule Benchee.Statistics.Percentile do
   @moduledoc false
 
+  @type percentile :: float()
+  @type percentiles :: %{optional(number()) => percentile()}
+
   @doc """
-  Calculates the value at the `percentile_number`-th percentile. Think of this as the
-  value below which `percentile_number` percent of the samples lie. For example,
+  Calculates the value at the `percentile_rank`-th percentile. Think of this as the
+  value below which `percentile_rank` percent of the samples lie. For example,
   if `Benchee.Statistics.Percentile.percentile(samples, 99)` == 123.45,
   99% of samples are less than 123.45.
+
+  Passing a number for `percentile_rank` calculates a single percentile.
+  Passing a list of numbers calculates multiple percentiles, and returns them
+  as a map like %{90 => 45.6, 99 => 78.9}, where the keys are the percentile
+  numbers, and the values are the percentile values.
 
   ## Examples
 
@@ -21,22 +29,39 @@ defmodule Benchee.Statistics.Percentile do
   iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 99)
   5.0
 
+  iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], [50, 75, 99])
+  %{50 => 3.0, 75 => 4.75, 99 => 5.0}
+
   iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 100)
   ** (ArgumentError) percentile must be between 0 and 100, got: 100
 
   iex> Benchee.Statistics.Percentile.percentile([5, 3, 4, 5, 1, 3, 1, 3], 0)
   ** (ArgumentError) percentile must be between 0 and 100, got: 0
   """
-  @spec percentile(list(number()), integer()) :: float()
-  def percentile(_, percentile_number) when percentile_number >= 100 or percentile_number <= 0 do
-    raise ArgumentError, "percentile must be between 0 and 100, got: #{inspect(percentile_number)}"
-  end
-
-  def percentile(samples, percentile_number) do
+  @spec percentile(list(number()), number() | list(number())) ::
+    percentile | percentiles
+  def percentile(samples, percentile_ranks) do
     number_of_samples = length(samples)
     sorted = Enum.sort(samples)
-    rank = (percentile_number / 100) * max(0, number_of_samples + 1)
-    percentile_value(sorted, rank)
+    percentile(sorted, number_of_samples, percentile_ranks)
+  end
+
+  defp percentile(sorted_samples, number_of_samples, percentile_ranks)
+    when is_list(percentile_ranks) do
+    percentile_ranks
+    |> Enum.reduce(%{}, fn percentile_rank, acc ->
+      perc = percentile(sorted_samples, number_of_samples, percentile_rank)
+      Map.put(acc, percentile_rank, perc)
+    end)
+  end
+
+  defp percentile(_, _, percentile_rank) when percentile_rank >= 100 or percentile_rank <= 0 do
+    raise ArgumentError, "percentile must be between 0 and 100, got: #{inspect(percentile_rank)}"
+  end
+
+  defp percentile(sorted_samples, number_of_samples, percentile_rank) do
+    rank = (percentile_rank / 100) * max(0, number_of_samples + 1)
+    percentile_value(sorted_samples, rank)
   end
 
   defp percentile_value(sorted, rank) when trunc(rank) == 0 do
