@@ -63,7 +63,7 @@ defmodule Benchee.Conversion.Memory do
     iex> unit_atom
     :megabyte
   """
-  @spec convert(value_with_unit_atom, unit_atom) :: unit_atom
+  @spec convert(value_with_unit_atom, unit_atom) :: value_with_unit_atom
   def convert({value, current_unit_atom}, desired_unit_atom) when is_atom(current_unit_atom) and is_atom(desired_unit_atom) do
     current_value_unit = {value, unit_for(current_unit_atom)}
     desired_unit = unit_for(desired_unit_atom)
