@@ -59,24 +59,24 @@ defmodule Benchee.Conversion.MemoryTest do
 
   describe ".convert" do
     test "convert kb to kb returns same value" do
-      actual_value = convert({8, @kilobyte_unit}, @kilobyte_unit)
+      actual_value = convert_with_unit({8, @kilobyte_unit}, @kilobyte_unit)
       assert actual_value == {8, @kilobyte_unit}
     end
   
     test "convert kb to mb returns correct result" do
-      actual_value = convert({8, @kilobyte_unit}, @megabyte_unit)
+      actual_value = convert_with_unit({8, @kilobyte_unit}, @megabyte_unit)
       expected_value = 8 / 1024
       assert actual_value == {expected_value, @megabyte_unit}
     end
   
     test "convert mb to kb returns correct result" do
-      actual_value = convert({8, @megabyte_unit}, @kilobyte_unit)
+      actual_value = convert_with_unit({8, @megabyte_unit}, @kilobyte_unit)
       expected_value = 8 * 1024
       assert actual_value == {expected_value, @kilobyte_unit}
     end
 
     test "convert kb to tb returns correct result" do
-      actual_value = convert({800_000_000, @kilobyte_unit}, @terabyte_unit)
+      actual_value = convert_with_unit({800_000_000, @kilobyte_unit}, @terabyte_unit)
       expected_value = 0.7450580596923828
       assert actual_value == {expected_value, @terabyte_unit}
     end
@@ -84,7 +84,7 @@ defmodule Benchee.Conversion.MemoryTest do
     test "convert mb to kb returns correct result for atom" do
       actual_value = convert({8, :megabyte}, :kilobyte)
       expected_value = 8 * 1024
-      assert actual_value == {expected_value, @kilobyte_unit}
+      assert actual_value == {expected_value, :kilobyte}
     end
   end
 end
