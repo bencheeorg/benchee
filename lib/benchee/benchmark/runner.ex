@@ -92,10 +92,11 @@ defmodule Benchee.Benchmark.Runner do
                             after_scenario: local_after_scenario
                           },
                           %{
-                            config: %{after_scenario: global_after_scenario}
+                            config: %{after_scenario: global_after_scenario},
+                            scenario_input: input
                           }) do
-    if local_after_scenario,  do: local_after_scenario.()
-    if global_after_scenario, do: global_after_scenario.()
+    if local_after_scenario,  do: local_after_scenario.(input)
+    if global_after_scenario, do: global_after_scenario.(input)
   end
 
   defp measure_runtimes(scenario, context, run_time, fast_warning)

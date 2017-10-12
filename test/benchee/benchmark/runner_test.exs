@@ -275,7 +275,7 @@ defmodule Benchee.Benchmark.RunnerTest do
            before_each: fn(input) -> send(me, :before); input end,
            after_each: fn(_) -> send(me, :after) end,
            before_scenario: fn(input) -> send(me, :before_scenario); input end,
-           after_scenario: fn -> send(me, :after_scenario) end})
+           after_scenario: fn(_) -> send(me, :after_scenario) end})
       |> Benchmark.measure(TestPrinter)
 
       assert_received_exactly [
@@ -297,7 +297,7 @@ defmodule Benchee.Benchmark.RunnerTest do
            before_each: fn(input) -> send(me, :before); input end,
            after_each: fn(_) -> send(me, :after) end,
            before_scenario: fn(input) -> send(me, :before_scenario); input end,
-           after_scenario: fn -> send(me, :after_scenario) end})
+           after_scenario: fn(_) -> send(me, :after_scenario) end})
       |> Benchmark.measure(TestPrinter)
 
       assert_received_exactly [
@@ -317,7 +317,7 @@ defmodule Benchee.Benchmark.RunnerTest do
             send(me, :global_before_scenario)
             input
           end,
-          after_scenario:  fn -> send me, :global_after_scenario end,
+          after_scenario:  fn(_) -> send me, :global_after_scenario end,
           inputs: %{"one" => 1, "two" => 2}
         }
       }
@@ -330,7 +330,7 @@ defmodule Benchee.Benchmark.RunnerTest do
              send(me, :local_before_scenario)
              input
            end,
-           after_scenario: fn -> send(me, :local_after_scenario) end})
+           after_scenario: fn(_) -> send(me, :local_after_scenario) end})
       |> Benchmark.measure(TestPrinter)
 
       assert_received_exactly [
@@ -349,7 +349,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           time: 100,
           before_each: fn(input) -> send(me, :global_before); input end,
           after_each:  fn(_) -> send me, :global_after end,
-          after_scenario: fn -> send me, :global_after_scenario end
+          after_scenario: fn(_) -> send me, :global_after_scenario end
         }
       }
       |> test_suite
@@ -393,7 +393,7 @@ defmodule Benchee.Benchmark.RunnerTest do
            fn -> :timer.sleep 1 end,
            before_each: fn(input) -> send(me, :local_2_before); input end,
            after_each:  fn(_) -> send me, :local_2_after end,
-           after_scenario: fn -> send me, :local_2_after_scenario end})
+           after_scenario: fn(_) -> send me, :local_2_after_scenario end})
       |> Benchmark.measure(TestPrinter)
 
       assert_received_exactly [
@@ -416,7 +416,7 @@ defmodule Benchee.Benchmark.RunnerTest do
                     send me, :global_before_scenario
                     input
                   end,
-                  after_scenario: fn -> send me, :global_after_scenario end,
+                  after_scenario: fn(_) -> send me, :global_after_scenario end,
                 }
               }
       result =
@@ -430,7 +430,7 @@ defmodule Benchee.Benchmark.RunnerTest do
                send(me, :local_before_scenario)
                input
              end,
-             after_scenario: fn -> send(me, :local_after_scenario) end})
+             after_scenario: fn(_) -> send(me, :local_after_scenario) end})
         |> Benchmark.measure(TestPrinter)
 
       {:messages, messages} = Process.info self(), :messages
@@ -563,7 +563,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert_received {:local, :value}
     end
 
-    test "before_* is passed the input and can adapt it to pass it on" do 
+    test "hooks dealing with inputs can adapt it and pass it on" do
       me = self()
       %Suite{
         configuration: %{
@@ -576,6 +576,9 @@ defmodule Benchee.Benchmark.RunnerTest do
           before_each: fn(input) ->
             send(me, {:global_each, input})
             input + 1
+          end,
+          after_scenario: fn(input) ->
+            send(me, {:global_after_scenario, input})
           end,
           inputs: %{"basic input" => 0}
         }
@@ -591,19 +594,23 @@ defmodule Benchee.Benchmark.RunnerTest do
            input + 1
          end,
          before_each: fn(input) ->
-          send(me, {:local_each, input})
-          input + 1
-        end})
+           send(me, {:local_each, input})
+           input + 1
+         end,
+         after_scenario: fn(input) ->
+           send(me, {:local_after_scenario, input})
+         end})
       |> Benchmark.measure(TestPrinter)
 
       assert_received_exactly [
         {:global_scenario, 0}, {:local_scenario, 1},
         {:global_each, 2}, {:local_each, 3}, {:runner, 4},
-        {:global_each, 2}, {:local_each, 3}, {:runner, 4}
+        {:global_each, 2}, {:local_each, 3}, {:runner, 4},
+        {:local_after_scenario, 2}, {:global_after_scenario, 2}
       ]
     end
 
-    test "before_* still works when there is no input given" do 
+    test "hooks dealing with inputs still work when there is no input given" do
       me = self()
       %Suite{
         configuration: %{
@@ -616,6 +623,9 @@ defmodule Benchee.Benchmark.RunnerTest do
           before_each: fn(input) ->
             send(me, {:global_each, input})
             input
+          end,
+          after_scenario: fn(input) ->
+            send(me, {:global_after_scenario, input})
           end
         }
       }
@@ -631,6 +641,9 @@ defmodule Benchee.Benchmark.RunnerTest do
          before_each: fn(input) ->
            send(me, {:local_each, input})
            input
+         end,
+         after_scenario: fn(input) ->
+           send(me, {:local_after_scenario, input})
          end})
       |> Benchmark.measure(TestPrinter)
 
@@ -639,7 +652,8 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert_received_exactly [
         {:global_scenario, no_input}, {:local_scenario, no_input},
         {:global_each, no_input}, {:local_each, no_input},
-        {:global_each, no_input}, {:local_each, no_input}
+        {:global_each, no_input}, {:local_each, no_input},
+        {:local_after_scenario, no_input}, {:global_after_scenario, no_input}
       ]
     end
 
