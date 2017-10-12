@@ -46,6 +46,36 @@ defmodule Benchee.Conversion.Memory do
               }
   }
 
+  # Unit conversion functions
+
+  @type unit_atom :: :byte | :kilobyte | :megabyte | :gigabyte | :terabyte
+  @type value_unit :: {number, Unit.t}
+  @type value_unit_atom :: {number, unit_atom}
+
+  @doc """
+  Converts a value for a specified %Unit or unit atom and converts it to the equivalent of another unit of measure.
+
+  ## Examples
+
+    iex> {value, unit} = Benchee.Conversion.Memory.convert({1024, :kilobyte}, :megabyte)
+    iex> value
+    1.0
+    iex> unit.name
+    :megabyte
+  """
+  @spec convert(value_unit | value_unit_atom, Unit.t | unit_atom) :: value_unit
+  def convert({value, %Unit{magnitude: current_magnitude}}, desired_unit = %Unit{magnitude: desired_magnitude}) do
+    multiplier = current_magnitude / desired_magnitude
+    {value * multiplier, desired_unit}
+  end
+  def convert({value, current_unit_atom}, desired_unit_atom) when is_atom(current_unit_atom) and is_atom(desired_unit_atom) do
+    current_value_unit = {value, unit_for(current_unit_atom)}
+    desired_unit = unit_for(desired_unit_atom)
+    convert(current_value_unit, desired_unit)
+  end
+
+  # Scaling functions
+
   @doc """
   Scales a memory value in bytes into a larger unit if appropriate
 
