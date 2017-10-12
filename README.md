@@ -217,9 +217,23 @@ Benchee.run(%{
 
 ```
 
-### Setup and teardown
+### Hooks (Setup, Teardown etc.)
 
-If you want to do setup and teardown, i.e. do something before or after the benchmarking suite executes this is very easy in benchee. As benchee is just plain old functions just do it before/after you call benchee:
+If you want to do something before or after something happens in benchee, we got you coverd! In general, there are 3 distrinct times where you might want to do something before/after it happened:
+
+* the whole suite (aka before everything/after everything) - done by just running code before/after benchee
+* an individual benchmarking scenario (one result reported you, combination of a benchmarking function and possibly an input) - `before_scenario`/`after_scenario`
+* each individual invocation of a benchmarking function - `before_each`/`after_each`
+
+benchee covers all these cases (well the first one doesn't need any specific support) and each of them will be discussed here followed by a little overview when what actually happens.
+
+Of course, **hooks are not included in the measured run times**. So they are there espacially if you want to do something and want it to **not be included in the measured times**. Sadly there is the notable exception of _too_fast_functions_ (the ones that execute in less than 10 microseconds). As we need to measure their repeated invocations to get halfway good measurements `before_each` and `after_each` hooks are included there
+
+Before you dig deep into these, **most of the times you shouldn't actually need these**. When you are just benchmarking plain old immutable functions no hooks whatsoever should be needed. Hooks are mostly needed when you need side effects to happen, randomize something or whatever.
+
+#### Before/After everything happens
+
+If you want to do setup and teardown for the whole benchmarking, i.e. do something before or after the benchmarking suite executes this is very easy in benchee (think: "before all" and "after all"). As benchee is just plain old functions just do it before/after you call benchee:
 
 ```elixir
 your_setup()
@@ -227,6 +241,253 @@ your_setup()
 Benchee.run %{"Awesome stuff" => fn -> magic end }
 
 your_teardown()
+```
+
+When might this be useful?
+* Seeding the database with data to be used by all benchmarking functions
+* Starting/shutting down a server, process, other dependencies
+
+#### What is a scenario?
+
+For the following discussions, it's important to know what benchee considers a "benchmarking scenario". It's the combination of one benchmarking function you specify and an input. So, given this benchmark:
+
+```elixr
+Benchee.run %{
+  "foo" => fn(input) -> ... end,
+  "bar" => fn(input) -> ... end
+}, inputs: %{
+  "input 1" => 1,
+  "input 2" => 2
+}
+```
+
+there are 4 scenarios: foo with input 1, foo with input 2, bar with input 1 and bar with input 2. A scenario entails the whole thing - warmup and actual run time.
+
+
+#### Hook configuration: global versus local
+
+So, how do we get going? Hooks can be defined either _globally_ as part of the configuration and will then be executed for every scenario or _locally_ for a specific benchmarking function. When defined _locally_ the scenarios will only be executed for the scenarios of that benchmarking function.
+
+**Global hooks**
+
+Global hooks are specified as part of the general benchee configuration:
+
+```elixr
+Benchee.run %{
+  "foo" => fn(input) -> ... end,
+  "bar" => fn(input) -> ... end
+}, inputs: %{
+  "input 1" => 1,
+  "input 2" => 2,
+  before_scenario: fn(input) -> ... end
+}
+```
+
+Here the `before_scenario` function will be executed for all 4 scenarios present in this benchmarking suite.
+
+**Local hooks**
+
+Local hooks are defined as part of the definition of the benchmarking function. Therefore in the initial map instead of just a single function a tuple can be provided where the bencharking function comes first and then a list of keyword options follows specifying the hooks to run:
+
+```elixr
+Benchee.run %{
+  "foo" => {fn(input) -> ... end, before_scenario: fn(input) -> ... end},
+  "bar" => fn(input) -> ... end
+}, inputs: %{
+  "input 1" => 1,
+  "input 2" => 2
+}
+```
+
+Here `before_scenario` is only run for the 2 scenarios associated with `"foo"`, i.e. foo with input 1 and foo with input 2. It is _not_ run for any `"bar"` benchmarks.
+
+#### before_scenario
+
+Is executed before every [scenario](#what-is-a-scenario) that it applies to considering global/local configuration. `before_scenario` takes the input of the scenario as an argument.
+
+If you haven't defined `inputs`, it is still called with an argument albeit the special input which is returned by `Benchee.Benchmark.no_input()`. This also holds true for `before_each` and `after_scenario`.
+
+The defined function **must return whatever it wants following hooks and the benchmarking function to consider the input**. This means, that there usually are 3 kinds of before_scenarios:
+
+* you just want to invoke a side effect, in that case return the given input unchanged
+* you want to alter the given input, in that case alter the given input
+* you want to keep the given input but add some other data, in that case just return a tuple like `{original_input, new_fancy_data}`
+
+First the _global_ `before_scenario` is invoked, then the local one. This also means that the return value of the _global_ `before_scenario` is passed on into its _local_ sibling. That return value is then passed into `before_each` (if present) or the benchmarking function (if no `before_each` is present).
+
+Usage:
+
+```elixir
+Benchee.run %{
+  "foo" =>
+    {
+      fn(input) -> foo(input) end, # input is 3 here
+      before_scenario: fn(input) -> input + 1 end # input is 2 here
+    },
+  "bar" =>
+    fn(input) -> bar(input) end # input is 2 here (only global ran)
+}, inputs: %{
+  "input 1" => 1,
+  before_scenario: fn(input) -> input + 1 end # input is 1 here
+}
+```
+
+When might this be useful?
+* You want to start a process to be used in your scenario
+* Something that you want to use in the benchmark starts a process associated with the PID of `self()` (each scenario is executed in its own process so these can't be started before all)
+* Clearing the cache before a scenario
+
+#### before_each
+
+Is executed before each invocation of the benchmarking function/before every measurement. The input for `before_each` is either the `input` or what was returned by `before_scenario`. It works much like [`before_scenario`](#before_scenario), the only major difference being that it is invoked at another time. Most importantly, the function needs to return what the benchmarking function should receive as input.
+
+```elixir
+Benchee.run %{
+  "bar" => fn(input) -> bar(input) end # input will be 2 here
+}, inputs: %{
+  "input 1" => 1,
+  before_each: fn(input) -> input + 1 end
+}
+```
+
+When might this be useful?
+* Retrieving a record from the database and passing it on to the benchmarking function to do something(tm) without the retrieval from the database adding to the benchmark measurement
+* Busting caches so that all measurements are taken in an uncached state
+* Picking a random value from a collection and passing it to the benchmarking function for measuring performance with a wider spread of values
+
+### after_each
+
+Is executed directly after the invocation of the benchmarking function. It is passed the return value of the benchmarking function. Unlike the `before_*` functions the return value does not matter and isn't passed on. Both _global_ and _local_ `after_each` get the return value of the function.
+
+For `after_*` functions, the _local_ hook is invoked first, then the _global_ hook is invoked.
+
+```elixir
+Benchee.run %{
+  "bar" => fn(input) -> bar(input) end
+}, inputs: %{
+  "input 1" => 1,
+  after_each: fn(result) -> assert result == 42 end
+}
+```
+
+When might this be useful?
+* You can use this to run assertions that whatever your benchmarking function returns is truly what it should be (i.e. all "contestants" work as expected)
+* Busting caches/terminating processes setup in `before_each` or elsewhere
+
+### after_scenario
+
+Is executed after a scenario completed and is passed whatever the return value of the last `before_scenario` was, if there was none it is passed the specified `input`. Otherwise it works much like [`after_each`](#after_each).
+
+```elixir
+Benchee.run %{
+  "bar" => fn(input) -> bar(input) end
+}, inputs: %{
+  "input 1" => 1,
+  after_each: fn(_input) -> some_magic() end
+}
+```
+
+When might this be useful?
+* Bursting caches after a scenario completed
+* Deleting all the records in the database that the scenario just created
+* Terminating whatever was setup by `before_scenario`
+
+#### When does a hook happen? (Complete Example)
+
+Yes the whole hooks system is quite a lot to take in. Here is an overview when what hook is executed with what input depending on its previous hooks. In general, if some hook isn't specified it is safe to assume that instead just the value of the _previous_ hook is passed on.
+
+Given the following code:
+
+```elixir
+
+suite_set_up()
+
+Benchee.run %{
+  "foo" =>
+    {
+      fn(input) -> foo(input) end,
+      before_scenario: fn(input) ->
+        local_before_scenario(input)
+        input + 1
+      end,
+      before_each: fn(input) ->
+        local_before_each(input)
+        input + 1
+      end,
+      after_each: fn(value) ->
+        local_after_each(value)
+      end,
+      after_scenario: fn(input) ->
+        local_after_scenario(input)
+      end
+    },
+  "bar" =>
+    fn(input) -> bar(input) end
+}, inputs: %{
+  "input 1" => 1,
+  before_scenario: fn(input) ->
+    global_before_scenario(input)
+    input + 1
+  end,
+  before_each: fn(input) ->
+    global_before_each(input)
+    input + 1
+  end,
+  after_each: fn(value) ->
+    global_after_each(value)
+  end,
+  after_scenario: fn(input) ->
+    global_after_scenario(input)
+  end
+}
+
+suite_tear_down()
+```
+
+What happens (foo/bar might happen in differnet order) is:
+
+```
+suite_set_up
+
+# starting with the foo scenario
+global_before_scenario(1)
+local_before_scenario(2) # as before_scenario incremented it
+
+global_before_each(3)
+local_before_each(4)
+foo(5) # let's sayy foo(5) returns 6
+local_after_each(6)
+global_after_each(6)
+
+global_before_each(3)
+local_before_each(4)
+foo(5) # let's sayy foo(5) returns 6
+local_after_each(6)
+global_after_each(6)
+
+# ... this block is repeated as many times as benchee has time
+
+local_after_scenario(3)
+global_after_scenario(3)
+
+# now it's time for the bar scenario, it has no hooks specified for itself
+# so only the global hooks are run
+
+global_before_scenario(1)
+
+global_before_each(2)
+foo(3) # let's sayy foo(3) returns 4
+global_after_each(4)
+
+global_before_each(2)
+foo(3) # let's sayy foo(3) returns 4
+global_after_each(4)
+
+# ... this block is repeated as many times as benchee has time
+
+global_after_scenario(2
+
+suite_tear_down
 ```
 
 ### More verbose usage
