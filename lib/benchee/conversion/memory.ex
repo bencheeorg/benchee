@@ -46,11 +46,8 @@ defmodule Benchee.Conversion.Memory do
               }
   }
 
-  # Unit conversion functions
-
   @type unit_atom :: :byte | :kilobyte | :megabyte | :gigabyte | :terabyte
-  @type value_unit :: {number, Unit.t}
-  @type value_unit_atom :: {number, unit_atom}
+  @type any_unit :: unit_atom | Unit.t
 
   @doc """
   Converts a value for a specified %Unit or unit atom and converts it to the equivalent of another unit of measure.
@@ -63,15 +60,9 @@ defmodule Benchee.Conversion.Memory do
     iex> unit.name
     :megabyte
   """
-  @spec convert(value_unit | value_unit_atom, Unit.t | unit_atom) :: value_unit
-  def convert({value, %Unit{magnitude: current_magnitude}}, desired_unit = %Unit{magnitude: desired_magnitude}) do
-    multiplier = current_magnitude / desired_magnitude
-    {value * multiplier, desired_unit}
-  end
-  def convert({value, current_unit_atom}, desired_unit_atom) when is_atom(current_unit_atom) and is_atom(desired_unit_atom) do
-    current_value_unit = {value, unit_for(current_unit_atom)}
-    desired_unit = unit_for(desired_unit_atom)
-    convert(current_value_unit, desired_unit)
+  @spec convert({number, any_unit}, any_unit) :: Scale.scaled_number
+  def convert(number_and_unit, desired_unit) do
+    Scale.convert number_and_unit, desired_unit, __MODULE__
   end
 
   # Scaling functions
@@ -215,7 +206,7 @@ defmodule Benchee.Conversion.Memory do
 
       iex> Benchee.Conversion.Memory.format({45.6789, :kilobyte})
       "45.68 KB"
-      
+
       iex> Benchee.Conversion.Memory.format {45.6789,
       ...>   %Benchee.Conversion.Unit{
       ...>     long: "Kilobytes", magnitude: 1024, label: "KB"}

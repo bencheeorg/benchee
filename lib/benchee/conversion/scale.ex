@@ -47,6 +47,12 @@ defmodule Benchee.Conversion.Scale do
   """
   @callback unit_for(unit_atom) :: unit
 
+  @doc """
+  Takes a tuple of a number and a unit and a unit to be converted to, returning
+  the the number scaled to the new unit and the new unit.
+  """
+  @callback convert({number, any_unit}, any_unit) :: scaled_number
+
   # Generic scaling functions
 
   @doc """
@@ -82,8 +88,22 @@ defmodule Benchee.Conversion.Scale do
   Lookup a unit by its `atom` presentation for the representation of supported
   units. Used by `Benchee.Conversion.Duration` and `Benchee.Conversion.Count`.
   """
-  def unit_for(units, unit) do
-    Map.fetch! units, unit
+  def unit_for(_units, unit = %Unit{}), do: unit
+  def unit_for(units, unit), do: Map.fetch! units, unit
+
+  @doc """
+  Used internally to implement scaling in the modules without duplication.
+  """
+  def convert({value, current_unit}, desired_unit, module) do
+    current_unit = module.unit_for(current_unit)
+    desired_unit = module.unit_for(desired_unit)
+    do_convert({value, current_unit}, desired_unit)
+  end
+
+  defp do_convert({value, %Unit{magnitude: current_magnitude}},
+                  desired_unit = %Unit{magnitude: desired_magnitude}) do
+    multiplier = current_magnitude / desired_magnitude
+    {value * multiplier, desired_unit}
   end
 
   @doc """
