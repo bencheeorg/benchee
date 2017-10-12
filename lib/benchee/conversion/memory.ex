@@ -59,6 +59,13 @@ defmodule Benchee.Conversion.Memory do
     1.0
     iex> unit.name
     :megabyte
+
+    iex> current_unit = Benchee.Conversion.Memory.unit_for :kilobyte
+    iex> {value, unit} = Benchee.Conversion.Memory.convert({1024, current_unit}, :megabyte)
+    iex> value
+    1.0
+    iex> unit.name
+    :megabyte
   """
   @spec convert({number, any_unit}, any_unit) :: Scale.scaled_number
   def convert(number_and_unit, desired_unit) do
