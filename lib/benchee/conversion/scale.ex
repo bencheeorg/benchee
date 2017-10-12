@@ -45,7 +45,7 @@ defmodule Benchee.Conversion.Scale do
   Given the atom representation of a unit (`:hour`) return the appropriate
   `Benchee.Conversion.Unit` struct.
   """
-  @callback unit_for(unit_atom) :: unit
+  @callback unit_for(any_unit) :: unit
 
   @doc """
   Takes a tuple of a number and a unit and a unit to be converted to, returning

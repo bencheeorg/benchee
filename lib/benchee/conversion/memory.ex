@@ -118,11 +118,25 @@ defmodule Benchee.Conversion.Memory do
   end
 
   @doc """
-  Get a unit by its atom representation.
+  Get a unit by its atom representation. If handed already a %Unit{} struct it
+  just returns it.
 
   ## Examples
 
       iex> Benchee.Conversion.Memory.unit_for :gigabyte
+      %Benchee.Conversion.Unit{
+          name:      :gigabyte,
+          magnitude: 1_073_741_824,
+          label:     "GB",
+          long:      "Gigabytes"
+      }
+
+      iex> Benchee.Conversion.Memory.unit_for(%Benchee.Conversion.Unit{
+      ...>   name:      :gigabyte,
+      ...>   magnitude: 1_073_741_824,
+      ...>   label:     "GB",
+      ...>   long:      "Gigabytes"
+      ...>})
       %Benchee.Conversion.Unit{
           name:      :gigabyte,
           magnitude: 1_073_741_824,

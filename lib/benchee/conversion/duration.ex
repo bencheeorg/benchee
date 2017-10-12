@@ -95,11 +95,25 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
-  Get a unit by its atom representation.
+  Get a unit by its atom representation. If handed already a %Unit{} struct it
+  just returns it.
 
   ## Examples
 
       iex> Benchee.Conversion.Duration.unit_for :hour
+      %Benchee.Conversion.Unit{
+        name:      :hour,
+        magnitude: 3_600_000_000,
+        label:     "h",
+        long:      "Hours"
+      }
+
+      iex> Benchee.Conversion.Duration.unit_for(%Benchee.Conversion.Unit{
+      ...>   name:      :hour,
+      ...>   magnitude: 3_600_000_000,
+      ...>   label:     "h",
+      ...>   long:      "Hours"
+      ...>})
       %Benchee.Conversion.Unit{
         name:      :hour,
         magnitude: 3_600_000_000,

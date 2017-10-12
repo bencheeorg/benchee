@@ -76,11 +76,25 @@ defmodule Benchee.Conversion.Count do
   end
 
   @doc """
-  Get a unit by its atom representation.
+  Get a unit by its atom representation. If handed already a %Unit{} struct it
+  just returns it.
 
   ## Examples
 
       iex> Benchee.Conversion.Count.unit_for :thousand
+      %Benchee.Conversion.Unit{
+        name:      :thousand,
+        magnitude: 1_000,
+        label:     "K",
+        long:      "Thousand"
+      }
+
+      iex> Benchee.Conversion.Count.unit_for(%Benchee.Conversion.Unit{
+      ...>   name:      :thousand,
+      ...>   magnitude: 1_000,
+      ...>   label:     "K",
+      ...>   long:      "Thousand"
+      ...>})
       %Benchee.Conversion.Unit{
         name:      :thousand,
         magnitude: 1_000,
