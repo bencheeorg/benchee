@@ -61,20 +61,31 @@ defmodule Benchee.Statistics.Percentile do
 
   defp percentile_value(sorted_samples, rank) do
     index = max(0, trunc(rank) - 1)
-    case Enum.split(sorted_samples, index) do
-      {_, [lower_bound, upper_bound | _]} ->
-        interpolation = interpolation_value(lower_bound, upper_bound, rank)
-        lower_bound + interpolation
-      {_, [lower_bound]} ->
-        to_float(lower_bound)
-      {[], []} ->
-        raise ArgumentError, "can't calculate percentile value on an empty list"
-      {previous_values, []} ->
-        previous_values
-        |> Enum.reverse
-        |> hd
-        |> to_float
-    end
+    {pre_index, post_index} = Enum.split(sorted_samples, index)
+    calculate_percentile_value(rank, pre_index, post_index)
+  end
+
+  # The common case: interpolate between the two values after the split
+  defp calculate_percentile_value(rank, _, [lower_bound, upper_bound | _]) do
+    lower_bound + interpolation_value(lower_bound, upper_bound, rank)
+  end
+
+  # Nothing to interpolate toward: use the first value after the split
+  defp calculate_percentile_value(_, _, [lower_bound]) do
+    to_float(lower_bound)
+  end
+
+  # Nothing at all: error
+  defp calculate_percentile_value(_, [], []) do
+    raise ArgumentError, "can't calculate percentile value on an empty list"
+  end
+
+  # Nothing beyond the split: use the last value before the split
+  defp calculate_percentile_value(_, previous_values, []) do
+    previous_values
+    |> Enum.reverse
+    |> hd
+    |> to_float
   end
 
   # "Type 6" interpolation strategy. There are many ways to interpolate a value
