@@ -16,6 +16,7 @@ defmodule Benchee.Formatters.Console do
   @average_width 15
   @deviation_width 11
   @median_width 15
+  @percentile_width 15
 
   @doc """
   Formats the benchmark statistics using `Benchee.Formatters.Console.format/1`
@@ -43,12 +44,12 @@ defmodule Benchee.Formatters.Console do
   iex> scenarios = [
   ...>   %Benchee.Benchmark.Scenario{
   ...>     job_name: "My Job", input_name: "My input", run_time_statistics: %Benchee.Statistics{
-  ...>       average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0
+  ...>       average: 200.0,ips: 5000.0,std_dev_ratio: 0.1, median: 190.0, percentiles: %{99 => 300.1}
   ...>     }
   ...>   },
   ...>   %Benchee.Benchmark.Scenario{
   ...>     job_name: "Job 2", input_name: "My input", run_time_statistics: %Benchee.Statistics{
-  ...>       average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0
+  ...>       average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0, percentiles: %{99 => 500.1}
   ...>     }
   ...>   }
   ...> ]
@@ -62,9 +63,9 @@ defmodule Benchee.Formatters.Console do
   ...>   }
   ...> }
   iex> Benchee.Formatters.Console.format(suite)
-  [["\n##### With input My input #####", "\nName             ips        average  deviation         median\n",
-  "My Job           5 K         200 μs    ±10.00%         190 μs\n",
-  "Job 2         2.50 K         400 μs    ±20.00%         390 μs\n"]]
+  [["\n##### With input My input #####", "\nName             ips        average  deviation         median         99th %\n",
+  "My Job           5 K         200 μs    ±10.00%         190 μs      300.10 μs\n",
+  "Job 2         2.50 K         400 μs    ±20.00%         390 μs      500.10 μs\n"]]
 
   ```
 
@@ -117,20 +118,20 @@ defmodule Benchee.Formatters.Console do
   iex> scenarios = [
   ...>   %Benchee.Benchmark.Scenario{
   ...>     job_name: "My Job", run_time_statistics: %Benchee.Statistics{
-  ...>       average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0
+  ...>       average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0, percentiles: %{99 => 300.1}
   ...>     }
   ...>   },
   ...>   %Benchee.Benchmark.Scenario{
   ...>     job_name: "Job 2", run_time_statistics: %Benchee.Statistics{
-  ...>       average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0
+  ...>       average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0, percentiles: %{99 => 500.1}
   ...>     }
   ...>   }
   ...> ]
   iex> configuration = %{comparison: false, unit_scaling: :best}
   iex> Benchee.Formatters.Console.format_scenarios(scenarios, configuration)
-  ["\nName             ips        average  deviation         median\n",
-  "My Job           5 K         200 μs    ±10.00%         190 μs\n",
-  "Job 2         2.50 K         400 μs    ±20.00%         390 μs\n"]
+  ["\nName             ips        average  deviation         median         99th %\n",
+  "My Job           5 K         200 μs    ±10.00%         190 μs      300.10 μs\n",
+  "Job 2         2.50 K         400 μs    ±20.00%         390 μs      500.10 μs\n"]
 
   ```
 
@@ -147,10 +148,11 @@ defmodule Benchee.Formatters.Console do
   end
 
   defp column_descriptors(label_width) do
-    "\n~*s~*s~*s~*s~*s\n"
+    "\n~*s~*s~*s~*s~*s~*s\n"
     |> :io_lib.format([-label_width, "Name", @ips_width, "ips",
                        @average_width, "average",
-                       @deviation_width, "deviation", @median_width, "median"])
+                       @deviation_width, "deviation", @median_width, "median",
+                       @percentile_width, "99th %"])
     |> to_string
   end
 
@@ -192,17 +194,21 @@ defmodule Benchee.Formatters.Console do
                            average:       average,
                            ips:           ips,
                            std_dev_ratio: std_dev_ratio,
-                           median:        median
+                           median:        median,
+                           percentiles:   %{99 => percentile_99}
                          }
                        },
                        %{run_time: run_time_unit,
                          ips:      ips_unit,
                        }, label_width) do
-    "~*s~*ts~*ts~*ts~*ts\n"
-    |> :io_lib.format([-label_width, name, @ips_width, ips_out(ips, ips_unit),
-                       @average_width, run_time_out(average, run_time_unit),
-                       @deviation_width, deviation_out(std_dev_ratio),
-                       @median_width, run_time_out(median, run_time_unit)])
+    "~*s~*ts~*ts~*ts~*ts~*ts\n"
+    |> :io_lib.format([
+      -label_width, name,
+      @ips_width, ips_out(ips, ips_unit),
+      @average_width, run_time_out(average, run_time_unit),
+      @deviation_width, deviation_out(std_dev_ratio),
+      @median_width, run_time_out(median, run_time_unit),
+      @percentile_width, run_time_out(percentile_99, run_time_unit)])
     |> to_string
   end
 

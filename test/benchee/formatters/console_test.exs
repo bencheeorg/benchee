@@ -14,14 +14,28 @@ defmodule Benchee.Formatters.ConsoleTest do
   describe ".output" do
     test "formats and prints the results right to the console" do
       scenarios = [
-        %Scenario{job_name: "Second", input_name: no_input(), input: no_input(),
+        %Scenario{
+          job_name: "Second",
+          input_name: no_input(),
+          input: no_input(),
           run_time_statistics: %Statistics{
-            average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 400.1}
           }
         },
-        %Scenario{job_name: "First", input_name: no_input(), input: no_input(),
-           run_time_statistics: %Statistics{
-            average: 100.0, ips: 10_000.0, std_dev_ratio: 0.1, median: 90.0
+        %Scenario{
+          job_name: "First",
+          input_name: no_input(),
+          input: no_input(),
+          run_time_statistics: %Statistics{
+             average: 100.0,
+             ips: 10_000.0,
+             std_dev_ratio: 0.1,
+             median: 90.0,
+             percentiles: %{99 => 300.1}
            }
         }
       ]
@@ -36,21 +50,44 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert output =~ ~r/5 K/
       assert output =~ ~r/10.00%/
       assert output =~ ~r/195.5/
+      assert output =~ ~r/300.1/
+      assert output =~ ~r/400.1/
     end
   end
 
   describe ".format_scenarios" do
     test "sorts the the given stats fastest to slowest" do
       scenarios = [
-        %Scenario{job_name: "Second", run_time_statistics: %Statistics{
-          average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
-        }},
-        %Scenario{job_name: "Third", run_time_statistics: %Statistics{
-          average: 400.0, ips: 2_500.0, std_dev_ratio: 0.1, median: 375.0
-        }},
-        %Scenario{job_name: "First", run_time_statistics: %Statistics{
-          average: 100.0, ips: 10_000.0, std_dev_ratio: 0.1, median: 90.0
-        }},
+        %Scenario{
+          job_name: "Second",
+          run_time_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1}
+          }
+        },
+        %Scenario{
+          job_name: "Third",
+          run_time_statistics: %Statistics{
+            average: 400.0,
+            ips: 2_500.0,
+            std_dev_ratio: 0.1,
+            median: 375.0,
+            percentiles: %{99 => 400.1}
+          }
+        },
+        %Scenario{
+          job_name: "First",
+          run_time_statistics: %Statistics{
+            average: 100.0,
+            ips: 10_000.0,
+            std_dev_ratio: 0.1,
+            median: 90.0,
+            percentiles: %{99 => 200.1}
+          }
+        },
       ]
 
       [_header, result_1, result_2, result_3 | _dont_care] =
@@ -63,12 +100,26 @@ defmodule Benchee.Formatters.ConsoleTest do
 
     test "adjusts the label width to longest name" do
       scenarios = [
-        %Scenario{job_name: "Second", run_time_statistics: %Statistics{
-          average: 400.0, ips: 2_500.0, std_dev_ratio: 0.1, median: 375.0
-        }},
-        %Scenario{job_name: "First", run_time_statistics: %Statistics{
-          average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
-        }}
+        %Scenario{
+          job_name: "Second",
+          run_time_statistics: %Statistics{
+            average: 400.0,
+            ips: 2_500.0,
+            std_dev_ratio: 0.1,
+            median: 375.0,
+            percentiles: %{99 => 400.1}
+          }
+        },
+        %Scenario{
+          job_name: "First",
+          run_time_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1}
+          }
+        }
       ]
 
       expected_width = String.length "Second"
@@ -82,9 +133,15 @@ defmodule Benchee.Formatters.ConsoleTest do
       third_length = 40
       third_name = String.duplicate("a", third_length)
       long_scenario = %Scenario{
-        job_name: third_name, run_time_statistics: %Statistics{
-          average: 400.1, ips: 2_500.0, std_dev_ratio: 0.1, median: 375.0
-      }}
+        job_name: third_name,
+        run_time_statistics: %Statistics{
+          average: 400.1,
+          ips: 2_500.0,
+          std_dev_ratio: 0.1,
+          median: 375.0,
+          percentiles: %{99 => 500.1}
+        }
+      }
       longer_scenarios = scenarios ++ [long_scenario]
 
       # Include extra long name, expect width of 40 characters
@@ -99,12 +156,26 @@ defmodule Benchee.Formatters.ConsoleTest do
 
     test "creates comparisons" do
       scenarios = [
-        %Scenario{job_name: "Second", run_time_statistics: %Statistics{
-          average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
-        }},
-        %Scenario{job_name: "First", run_time_statistics: %Statistics{
-          average: 100.0, ips: 10_000.0, std_dev_ratio: 0.1, median: 90.0
-        }}
+        %Scenario{
+          job_name: "Second",
+          run_time_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 500.1}
+          }
+        },
+        %Scenario{
+          job_name: "First",
+          run_time_statistics: %Statistics{
+            average: 100.0,
+            ips: 10_000.0,
+            std_dev_ratio: 0.1,
+            median: 90.0,
+            percentiles: %{99 => 500.1}
+          }
+        }
       ]
 
       [_, _, _, comp_header, reference, slower] =
@@ -117,12 +188,26 @@ defmodule Benchee.Formatters.ConsoleTest do
 
     test "can omit the comparisons" do
       scenarios = [
-        %Scenario{job_name: "Second", run_time_statistics: %Statistics{
-          average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
-        }},
-        %Scenario{job_name: "First", run_time_statistics: %Statistics{
-          average: 100.0, ips: 10_000.0, std_dev_ratio: 0.1, median: 90.0
-        }}
+        %Scenario{
+          job_name: "Second",
+          run_time_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1}
+          }
+        },
+        %Scenario{
+          job_name: "First",
+          run_time_statistics: %Statistics{
+            average: 100.0,
+            ips: 10_000.0,
+            std_dev_ratio: 0.1,
+            median: 90.0,
+            percentiles: %{99 => 200.1}
+          }
+        }
       ]
 
       output =  Enum.join Console.format_scenarios(
@@ -140,12 +225,26 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "adjusts the label width to longest name for comparisons" do
       second_name = String.duplicate("a", 40)
       scenarios = [
-        %Scenario{job_name: second_name, run_time_statistics: %Statistics{
-          average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
-        }},
-        %Scenario{job_name: "First", run_time_statistics: %Statistics{
-          average: 100.0, ips: 10_000.0, std_dev_ratio: 0.1, median: 90.0
-        }}
+        %Scenario{
+          job_name: second_name,
+          run_time_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1}
+          }
+        },
+        %Scenario{
+          job_name: "First",
+          run_time_statistics: %Statistics{
+            average: 100.0,
+            ips: 10_000.0,
+            std_dev_ratio: 0.1,
+            median: 90.0,
+            percentiles: %{99 => 200.1}
+          }
+        }
       ]
 
       expected_width = String.length(second_name)
@@ -158,35 +257,54 @@ defmodule Benchee.Formatters.ConsoleTest do
 
     test "doesn't create comparisons with only one benchmark run" do
       scenarios = [
-        %Scenario{job_name: "First", run_time_statistics: %Statistics{
-          average: 100.0, ips: 10_000.0, std_dev_ratio: 0.1, median: 90.0
-        }}
+        %Scenario{
+          job_name: "First",
+          run_time_statistics: %Statistics{
+            average: 100.0,
+            ips: 10_000.0,
+            std_dev_ratio: 0.1,
+            median: 90.0,
+            percentiles: %{99 => 200.1}
+          }
+        }
       ]
 
       assert [header, result] = Console.format_scenarios(scenarios, @console_config)
       refute Regex.match? ~r/(Comparison|x slower)/, Enum.join([header, result])
     end
 
-    test "formats small averages and medians more precisely" do
+    test "formats small averages, medians, and percentiles more precisely" do
       scenarios = [
-        %Scenario{job_name: "First", run_time_statistics: %Statistics{
-          average: 0.15, ips: 10_000.0, std_dev_ratio: 0.1, median: 0.0125
-        }}
+        %Scenario{
+          job_name: "First",
+          run_time_statistics: %Statistics{
+            average: 0.15,
+            ips: 10_000.0,
+            std_dev_ratio: 0.1,
+            median: 0.0125,
+            percentiles: %{99 => 0.0234}
+          }
+        }
       ]
 
       assert [_, result] = Console.format_scenarios(scenarios, @console_config)
       assert Regex.match? ~r/0.150\s?μs/, result
       assert Regex.match? ~r/0.0125\s?μs/, result
+      assert Regex.match? ~r/0.0234\s?μs/, result
     end
 
     test "doesn't output weird 'e' formats" do
       scenarios = [
-        %Scenario{job_name: "Job", run_time_statistics: %Statistics{
-          average: 11000.0,
-          ips: 12000.0,
-          std_dev_ratio: 13000.0,
-          median: 140000.0
-        }}
+        %Scenario{
+          job_name: "Job",
+          run_time_statistics: %Statistics{
+            average: 11000.0,
+            ips: 12000.0,
+            std_dev_ratio: 13000.0,
+            median: 140000.0,
+            percentiles: %{99 => 200000.1}
+          }
+        }
       ]
 
       assert [_, result] = Console.format_scenarios(scenarios, @console_config)
@@ -196,21 +314,36 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert result =~ "12 K"
       assert result =~ "13000"
       assert result =~ "140 ms"
+      assert result =~ "200.00 ms"
     end
   end
 
   describe ".format" do
-    @header_regex ~r/Name.+ips.+average.+deviation.+median.*/
+    @header_regex ~r/Name.+ips.+average.+deviation.+median.+99th %.*/
     test "with multiple inputs and just one job" do
       scenarios = [
-        %Scenario{job_name: "Job", input_name: "My Arg", input: "My Arg",
+        %Scenario{
+          job_name: "Job",
+          input_name: "My Arg",
+          input: "My Arg",
           run_time_statistics: %Statistics{
-            average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 400.1}
           }
         },
-        %Scenario{job_name: "Job", input_name: "Other Arg", input: "Other Arg",
+        %Scenario{
+          job_name: "Job",
+          input_name: "Other Arg",
+          input: "Other Arg",
           run_time_statistics: %Statistics{
-            average: 400.0, ips: 2_500.0, std_dev_ratio: 0.15, median: 395.0
+            average: 400.0,
+            ips: 2_500.0,
+            std_dev_ratio: 0.15,
+            median: 395.0,
+            percentiles: %{99 => 500.1}
           }
         }
       ]
@@ -221,34 +354,62 @@ defmodule Benchee.Formatters.ConsoleTest do
       [input_header, header, result] = my_arg
       assert input_header =~ "My Arg"
       assert header =~ @header_regex
-      assert result =~ ~r/Job.+5.+200.+10\.00%.+195\.5/
+      assert result =~ ~r/Job.+5.+200.+10\.00%.+195\.5.+400\.1/
 
       [input_header_2, header_2, result_2] = other_arg
       assert input_header_2 =~ "Other Arg"
       assert header_2 =~ @header_regex
-      assert result_2 =~ ~r/Job.+2\.5.+400.+15\.00%.+395/
+      assert result_2 =~ ~r/Job.+2\.5.+400.+15\.00%.+395.+500\.1/
     end
 
     test "with multiple inputs and two jobs" do
       scenarios = [
-        %Scenario{job_name: "Job", input_name: "My Arg", input: "My Arg",
+        %Scenario{
+          job_name: "Job",
+          input_name: "My Arg",
+          input: "My Arg",
           run_time_statistics: %Statistics{
-            average: 200.0, ips: 5_000.0, std_dev_ratio: 0.1, median: 195.5
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1}
           }
         },
-        %Scenario{job_name: "Other Job", input_name: "My Arg", input: "My Arg",
+        %Scenario{
+          job_name: "Other Job",
+          input_name: "My Arg",
+          input: "My Arg",
           run_time_statistics: %Statistics{
-            average: 100.0, ips: 10_000.0, std_dev_ratio: 0.3, median: 98.0
+            average: 100.0,
+            ips: 10_000.0,
+            std_dev_ratio: 0.3,
+            median: 98.0,
+            percentiles: %{99 => 200.1}
           }
         },
-        %Scenario{job_name: "Job", input_name: "Other Arg", input: "Other Arg",
+        %Scenario{
+          job_name: "Job",
+          input_name: "Other Arg",
+          input: "Other Arg",
           run_time_statistics: %Statistics{
-            average: 400.0, ips: 2_500.0, std_dev_ratio: 0.15, median: 395.0
+            average: 400.0,
+            ips: 2_500.0,
+            std_dev_ratio: 0.15,
+            median: 395.0,
+            percentiles: %{99 => 500.1}
           }
         },
-        %Scenario{job_name: "Other Job", input_name: "Other Arg", input: "Other Arg",
+        %Scenario{
+          job_name: "Other Job",
+          input_name: "Other Arg",
+          input: "Other Arg",
           run_time_statistics: %Statistics{
-            average: 250.0, ips: 4_000.0, std_dev_ratio: 0.31, median: 225.5
+            average: 250.0,
+            ips: 4_000.0,
+            std_dev_ratio: 0.31,
+            median: 225.5,
+            percentiles: %{99 => 300.1}
           }
         }
       ]
@@ -258,14 +419,14 @@ defmodule Benchee.Formatters.ConsoleTest do
 
       [input_header, _header, other_job, job, _comp, ref, slower] = my_arg
       assert input_header =~ "My Arg"
-      assert other_job =~ ~r/Other Job.+10.+100.+30\.00%.+98/
+      assert other_job =~ ~r/Other Job.+10.+100.+30\.00%.+98.+200\.1/
       assert job =~ ~r/Job.+5.+200.+10\.00%.+195\.5/
       ref =~ ~r/Other Job/
       slower =~ ~r/Job.+slower/
 
       [input_header_2, _, other_job_2, job_2, _, ref_2, slower_2] = other_arg
       assert input_header_2 =~ "Other Arg"
-      assert other_job_2 =~ ~r/Other Job.+4.+250.+31\.00%.+225\.5/
+      assert other_job_2 =~ ~r/Other Job.+4.+250.+31\.00%.+225\.5.+300\.1/
       assert job_2 =~ ~r/Job.+2\.5.+400.+15\.00%.+395/
       ref_2 =~ ~r/Other Job/
       slower_2 =~ ~r/Job.+slower/
