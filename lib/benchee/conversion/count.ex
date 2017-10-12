@@ -115,6 +115,21 @@ defmodule Benchee.Conversion.Count do
   end
 
   @doc """
+  Converts a value for a specified %Unit or unit atom and converts it to the equivalent of another unit of measure.
+
+  ## Examples
+
+    iex> {value, unit} = Benchee.Conversion.Count.convert({2500, :thousand}, :million)
+    iex> value
+    2.5
+    iex> unit.name
+    :million
+  """
+  def convert(number_and_unit, desired_unit) do
+    Scale.convert number_and_unit, desired_unit, __MODULE__
+  end
+
+  @doc """
   Finds the best unit for a list of counts. By default, chooses the most common
   unit. In case of tie, chooses the largest of the most common units.
 

@@ -131,6 +131,21 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
+  Converts a value for a specified %Unit or unit atom and converts it to the equivalent of another unit of measure.
+
+  ## Examples
+
+    iex> {value, unit} = Benchee.Conversion.Duration.convert({90, :minute}, :hour)
+    iex> value
+    1.5
+    iex> unit.name
+    :hour
+  """
+  def convert(number_and_unit, desired_unit) do
+    Scale.convert number_and_unit, desired_unit, __MODULE__
+  end
+
+  @doc """
   Converts a value of the given unit into microseconds
 
   ## Examples
