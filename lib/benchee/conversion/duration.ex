@@ -95,11 +95,25 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
-  Get a unit by its atom representation.
+  Get a unit by its atom representation. If handed already a %Unit{} struct it
+  just returns it.
 
   ## Examples
 
       iex> Benchee.Conversion.Duration.unit_for :hour
+      %Benchee.Conversion.Unit{
+        name:      :hour,
+        magnitude: 3_600_000_000,
+        label:     "h",
+        long:      "Hours"
+      }
+
+      iex> Benchee.Conversion.Duration.unit_for(%Benchee.Conversion.Unit{
+      ...>   name:      :hour,
+      ...>   magnitude: 3_600_000_000,
+      ...>   label:     "h",
+      ...>   long:      "Hours"
+      ...>})
       %Benchee.Conversion.Unit{
         name:      :hour,
         magnitude: 3_600_000_000,
@@ -128,6 +142,21 @@ defmodule Benchee.Conversion.Duration do
   """
   def scale(count, unit) do
     Scale.scale count, unit, __MODULE__
+  end
+
+  @doc """
+  Converts a value for a specified %Unit or unit atom and converts it to the equivalent of another unit of measure.
+
+  ## Examples
+
+    iex> {value, unit} = Benchee.Conversion.Duration.convert({90, :minute}, :hour)
+    iex> value
+    1.5
+    iex> unit.name
+    :hour
+  """
+  def convert(number_and_unit, desired_unit) do
+    Scale.convert number_and_unit, desired_unit, __MODULE__
   end
 
   @doc """

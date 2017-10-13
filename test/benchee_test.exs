@@ -112,12 +112,12 @@ defmodule BencheeTest do
 
   test "integration super fast function print warnings" do
     output = capture_io fn ->
-      Benchee.run(%{"Sleeps" => fn -> 0 end}, time: 0.001, warmup: 0)
+      Benchee.run(%{"Constant" => fn -> 0 end}, time: 0.001, warmup: 0)
     end
 
     assert output =~ ~r/fast/
     assert output =~ ~r/unreliable/
-    assert output =~ ~r/^Sleeps\s+\d+.+\s+0\.\d+ μs/m
+    assert output =~ ~r/^Constant\s+\d+.+\s+[0-2]\.\d+ μs/m
   end
 
   test "integration super fast function warning is printed once per job" do

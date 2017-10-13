@@ -76,11 +76,25 @@ defmodule Benchee.Conversion.Count do
   end
 
   @doc """
-  Get a unit by its atom representation.
+  Get a unit by its atom representation. If handed already a %Unit{} struct it
+  just returns it.
 
   ## Examples
 
       iex> Benchee.Conversion.Count.unit_for :thousand
+      %Benchee.Conversion.Unit{
+        name:      :thousand,
+        magnitude: 1_000,
+        label:     "K",
+        long:      "Thousand"
+      }
+
+      iex> Benchee.Conversion.Count.unit_for(%Benchee.Conversion.Unit{
+      ...>   name:      :thousand,
+      ...>   magnitude: 1_000,
+      ...>   label:     "K",
+      ...>   long:      "Thousand"
+      ...>})
       %Benchee.Conversion.Unit{
         name:      :thousand,
         magnitude: 1_000,
@@ -112,6 +126,21 @@ defmodule Benchee.Conversion.Count do
   """
   def scale(count, unit) do
     Scale.scale count, unit, __MODULE__
+  end
+
+  @doc """
+  Converts a value for a specified %Unit or unit atom and converts it to the equivalent of another unit of measure.
+
+  ## Examples
+
+    iex> {value, unit} = Benchee.Conversion.Count.convert({2500, :thousand}, :million)
+    iex> value
+    2.5
+    iex> unit.name
+    :million
+  """
+  def convert(number_and_unit, desired_unit) do
+    Scale.convert number_and_unit, desired_unit, __MODULE__
   end
 
   @doc """
