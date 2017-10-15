@@ -3,6 +3,8 @@ defmodule Benchee.Output.BenchmarkPrintertest do
   import ExUnit.CaptureIO
   import Benchee.Output.BenchmarkPrinter
   alias Benchee.Benchmark.Scenario
+  alias Benchee.Benchmark
+
   @system_info %{elixir: "1.4",
                  erlang: "19.2",
                  os: :macOS,
@@ -92,44 +94,27 @@ defmodule Benchee.Output.BenchmarkPrintertest do
   end
 
   describe ".benchmarking" do
-    test "prints information that it's currently benchmarking" do
+
+    @no_input Benchmark.no_input()
+    test "prints information that it's currently benchmarking without input" do
       output = capture_io fn ->
-        benchmarking("Something", %{})
+        benchmarking("Something", @no_input, %{})
       end
 
       assert output =~ ~r/Benchmarking.+Something/i
     end
 
+    test "prints information that it's currently benchmarking with input" do
+      output = capture_io fn ->
+        benchmarking("Something", "great input", %{})
+      end
+
+      assert output =~ ~r/Benchmarking.+Something with input great input/i
+    end
+
     test "doesn't print if it's deactivated" do
       output = capture_io fn ->
-        benchmarking "A", %{print: %{benchmarking: false}}
-      end
-
-      assert output == ""
-    end
-  end
-
-  describe ".input_information" do
-    test "notifies of the input being used" do
-      output = capture_io fn ->
-        input_information("Big List", %{})
-      end
-
-      assert output =~ ~r/with input Big List/i
-    end
-
-    test "does nothing when it's the no input marker" do
-      marker = Benchee.Benchmark.no_input
-      output = capture_io fn ->
-        input_information marker, %{}
-      end
-
-      assert output == ""
-    end
-
-    test "does not print if disabled" do
-      output = capture_io fn ->
-        input_information("Big List", %{print: %{benchmarking: false}})
+        benchmarking "A", "some", %{print: %{benchmarking: false}}
       end
 
       assert output == ""

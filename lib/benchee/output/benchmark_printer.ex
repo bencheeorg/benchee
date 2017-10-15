@@ -70,10 +70,14 @@ defmodule Benchee.Output.BenchmarkPrinter do
   @doc """
   Prints a notice which job is currently being benchmarked.
   """
-  def benchmarking(_, %{print: %{benchmarking: false}}), do: nil
-  def benchmarking(name, _config) do
-    IO.puts "Benchmarking #{name}..."
+  def benchmarking(_, _, %{print: %{benchmarking: false}}), do: nil
+  def benchmarking(name, input_name, _config) do
+    IO.puts "Benchmarking #{name}#{input_information(input_name)}..."
   end
+
+  @no_input Benchmark.no_input
+  defp input_information(@no_input),  do: ""
+  defp input_information(input_name), do: " with input #{input_name}"
 
   @doc """
   Prints a warning about accuracy of benchmarks when the function is super fast.
@@ -85,18 +89,4 @@ defmodule Benchee.Output.BenchmarkPrinter do
     You may disable this warning by passing print: [fast_warning: false] as configuration options.
     """
   end
-
-  @doc """
-  Prints an informative message about which input is currently being
-  benchmarked, when multiple inputs were specified.
-  """
-  def input_information(_, %{print: %{benchmarking: false}}) do
-    nil
-  end
-  def input_information(input_name, _config) do
-    if input_name != Benchmark.no_input do
-      IO.puts "\nBenchmarking with input #{input_name}:"
-    end
-  end
-
 end
