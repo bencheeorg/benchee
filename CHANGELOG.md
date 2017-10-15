@@ -1,6 +1,7 @@
 ## 0.10.0 - unreleased
 
 ### Features (User Facing)
+* Hooks system - basically you can now do something before/after a benchmarking scenario or the benchmarking function, too much to explain it in a Changelog, check the [README](https://github.com/PragTob/benchee#hooks-setup-teardown-etc)
 * Don't show more precision than we have - i.e. 234.00 microseconds (measurements are in microseconds and .00 doesn't gain you anything)
 * Limit precision of available memory displayed, you don't need to know 7.45678932 GB. Thanks to `@elpikel`.
 * Display the 99th percentile runtime. Thanks to `@wasnotrice`.
