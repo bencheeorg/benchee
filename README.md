@@ -282,7 +282,6 @@ Since the return value of a `before_scenario` becomes the input for next steps (
 
 * you just want to invoke a side effect: in that case return the given input unchanged
 * you want to alter the given input: in that case alter the given input
-
 * you want to keep the given input but add some other data: in that case return a tuple like `{original_input, new_fancy_data}`
 
 For before scenario hooks, the _global_ hook is invoked first, then the _local_ (see [when does a hook happen?](#when-does-a-hook-happen-complete-example)).
@@ -310,7 +309,7 @@ _When might this be useful?_
 
 ##### after_scenario
 
-Is executed after a scenario has completed. After scenario hooks receive the return value of their `before_scenario` counterpart as an argument. The return value is discarded (see [hook arguments and return values](#hook-arguments-and-return-values)).
+Is executed after a scenario has completed. After scenario hooks receive the return value of the last `before_scenario` that ran as an argument. The return value is discarded (see [hook arguments and return values](#hook-arguments-and-return-values)).
 
 For after scenario hooks, the _local_ hook is invoked first, then the _global_ (see [when does a hook happen?](#when-does-a-hook-happen-complete-example)).
 
@@ -378,7 +377,7 @@ _When might this be useful?_
 
 Before hooks form a chain, where the return value of the previous hook becomes the argument for the next one. The first defined `before` hook receives the scenario input as an argument, and returns a value that becomes the argument of the next in the chain. The benchmarking function receives the value of the last `before` hook as its argument (or the scenario input if there are no `before` hooks).
 
-After hooks do not form a chain, and their return values are discarded. An `after_each` hook receives the return value of the benchmarking function as its argument. An `after_scenario` function receives the return value of its `before_scenario` counterpart (or the scenario's input if there is no `before_scenario` hook).
+After hooks do not form a chain, and their return values are discarded. An `after_each` hook receives the return value of the benchmarking function as its argument. An `after_scenario` function receives the return value of the last `before_scenario` that ran (or the scenario's input if there is no `before_scenario` hook).
 
 If you haven't defined any inputs, the hook chain is started with the special input argument returned by `Benchee.Benchmark.no_input()`.
 
@@ -422,7 +421,7 @@ Here `before_scenario` is only run for the 2 scenarios associated with `"foo"`, 
 
 #### When does a hook happen? (Complete Example)
 
-Yes the whole hooks system is quite a lot to take in. Here is an overview showing the order of hook execution, along with the argument each hook receives (see [hook arguments and return values](#hook-arguments-and-return-values)).
+Yes the whole hooks system is quite a lot to take in. Here is an overview showing the order of hook execution, along with the argument each hook receives (see [hook arguments and return values](#hook-arguments-and-return-values)). The guiding principle whether _local_ or _global_ is run first is that _local_ always executes closer to the benchmarking function.
 
 Given the following code:
 
