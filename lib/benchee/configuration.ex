@@ -132,7 +132,7 @@ defmodule Benchee.Configuration do
             time: 5_000_000,
             warmup: 2_000_000,
             inputs: nil,
-            formatters: [&Benchee.Formatters.Console.output/1],
+            formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
               fast_warning: true,
@@ -160,7 +160,7 @@ defmodule Benchee.Configuration do
             time: 1_000_000,
             warmup: 200_000.0,
             inputs: nil,
-            formatters: [&Benchee.Formatters.Console.output/1],
+            formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
               fast_warning: true,
@@ -188,7 +188,7 @@ defmodule Benchee.Configuration do
             time: 1_000_000,
             warmup: 200_000.0,
             inputs: nil,
-            formatters: [&Benchee.Formatters.Console.output/1],
+            formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
               fast_warning: true,
