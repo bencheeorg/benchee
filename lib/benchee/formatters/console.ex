@@ -142,7 +142,7 @@ defmodule Benchee.Formatters.Console do
   def format_scenarios(scenarios, config) do
     sorted_scenarios = Statistics.sort(scenarios)
     %{unit_scaling: scaling_strategy} = config
-    units = Conversion.run_time_units(sorted_scenarios, scaling_strategy)
+    units = Conversion.units(sorted_scenarios, scaling_strategy)
     label_width = label_width(sorted_scenarios)
 
     [column_descriptors(label_width) |

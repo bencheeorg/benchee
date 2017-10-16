@@ -18,7 +18,7 @@ defmodule Benchee.Conversion do
 
       iex> statistics = %Benchee.Statistics{average: 1000.0, ips: 1000.0}
       iex> scenario = %Benchee.Benchmark.Scenario{run_time_statistics: statistics}
-      iex> Benchee.Conversion.run_time_units([scenario], :best)
+      iex> Benchee.Conversion.units([scenario], :best)
       %{
         ips:      %Benchee.Conversion.Unit{
                     label: "K",
@@ -31,10 +31,10 @@ defmodule Benchee.Conversion do
                     long: "Milliseconds",
                     magnitude: 1000,
                     name: :millisecond
-                    }
+                  }
       }
   """
-  def run_time_units(scenarios, scaling_strategy) do
+  def units(scenarios, scaling_strategy) do
     # Produces a map like
     #   %{run_time: [12345, 15431, 13222], ips: [1, 2, 3]}
     measurements =
