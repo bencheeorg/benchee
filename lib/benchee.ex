@@ -17,6 +17,8 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
   defmodule module do
     @moduledoc moduledoc
 
+    alias Benchee.Formatter
+
     @doc """
     Run benchmark jobs defined by a map and optionally provide configuration
     options.
@@ -60,11 +62,21 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     end
 
     defp output_results(suite = %{configuration: %{formatters: formatters}}) do
-      Enum.each formatters, fn(output_function) ->
+      {parallelizable, serial} = Enum.split_with(formatters, &is_module?/1)
+
+      Formatter.parallel_output(suite, parallelizable)
+      Enum.each serial, fn(output_function) ->
         output_function.(suite)
       end
 
       suite
+    end
+
+    defp is_module?(formatter) do
+      # There is no better check if something is a module to my knowledge,
+      # would also love to check if the formatter implements the formatter
+      # behaviour. Afaik, we can't.
+      is_atom(formatter)
     end
 
     defp add_benchmarking_jobs(suite, jobs) do

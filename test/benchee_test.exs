@@ -2,6 +2,7 @@ defmodule BencheeTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureIO
   import Benchee.TestHelpers
+  alias Benchee.Test.FakeFormatter
   doctest Benchee
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median.+99th %$/m
@@ -166,6 +167,42 @@ defmodule BencheeTest do
 
     assert output =~ "Formatter one"
     assert output =~ "Formatter two"
+  end
+
+  test "formatters can be supplied as just the module name" do
+    output = capture_io fn ->
+      list = Enum.to_list(1..10_000)
+      map_fun = fn(i) -> [i, i * i] end
+
+      Benchee.run(%{
+        "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
+        "map.flatten" =>
+          fn -> list |> Enum.map(map_fun) |> List.flatten end
+      }, time: 0.01,
+         warmup: 0.005,
+         formatters: [Benchee.Formatters.Console])
+    end
+
+    readme_sample_asserts output
+  end
+
+  test "for formatters specified as modules format/1 and write/1 are called" do
+    capture_io fn ->
+      Benchee.run(%{
+        "Sleeps" => fn -> :timer.sleep(10) end},
+        time:       0.01,
+        warmup:     0,
+        formatters: [
+          FakeFormatter,
+          FakeFormatter,
+          fn(_) -> send self(), :other end
+        ]
+      )
+    end
+
+    assert_received_exactly [
+      {:write, "output of `format/1`"}, {:write, "output of `format/1`"}, :other
+    ]
   end
 
   @rough_10_milli_s "((8|9|10|11|12|13|14)\\.\\d{2} ms)"

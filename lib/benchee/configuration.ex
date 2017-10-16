@@ -16,7 +16,7 @@ defmodule Benchee.Configuration do
     parallel:          1,
     time:              5,
     warmup:            2,
-    formatters:        [&Console.output/1],
+    formatters:        [Console],
     print: %{
       benchmarking:    true,
       configuration:   true,
