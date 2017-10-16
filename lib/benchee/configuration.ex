@@ -120,6 +120,7 @@ defmodule Benchee.Configuration do
       * `:none`     - no unit scaling will occur. Durations will be displayed
       in microseconds, and counts will be displayed in ones (this is
       equivalent to the behaviour Benchee had pre 0.5.0)
+    * `:before_scenario`/`after_scenario`/`before_each`/`after_each` - read up on them in the hooks section in the README
 
   ## Examples
 
