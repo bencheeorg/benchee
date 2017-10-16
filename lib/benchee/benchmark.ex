@@ -1,7 +1,7 @@
 defmodule Benchee.Benchmark do
   @moduledoc """
   Functions related to building and running benchmarking scenarios.
-  Exposes `benchmark/4` and `measure/4` functions.
+  Exposes `benchmark/4` and `measure/3` functions.
   """
 
   alias Benchee.Output.BenchmarkPrinter, as: Printer

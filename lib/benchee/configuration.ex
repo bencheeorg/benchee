@@ -1,6 +1,6 @@
 defmodule Benchee.Configuration do
   @moduledoc """
-  Functions to handle the configuration of Benchee, exposes `init` function.
+  Functions to handle the configuration of Benchee, exposes `init/1` function.
   """
 
   alias Benchee.{
