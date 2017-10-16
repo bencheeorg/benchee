@@ -6,7 +6,9 @@ defmodule Benchee.Formatters.Console do
 
   @behaviour Benchee.Formatter
 
-  alias Benchee.{Statistics, Suite, Benchmark.Scenario, Configuration}
+  alias Benchee.{
+    Statistics, Suite, Benchmark.Scenario, Configuration, Conversion
+  }
   alias Benchee.Conversion.{Count, Duration, Unit, DeviationPercent}
 
   @type unit_per_statistic :: %{atom => Unit.t}
@@ -139,7 +141,8 @@ defmodule Benchee.Formatters.Console do
   @spec format_scenarios([Scenario.t], map) :: [any, ...]
   def format_scenarios(scenarios, config) do
     sorted_scenarios = Statistics.sort(scenarios)
-    units = units(sorted_scenarios, config)
+    %{unit_scaling: scaling_strategy} = config
+    units = Conversion.units(sorted_scenarios, scaling_strategy)
     label_width = label_width(sorted_scenarios)
 
     [column_descriptors(label_width) |
@@ -168,23 +171,6 @@ defmodule Benchee.Formatters.Console do
   defp scenario_reports(scenarios, units, label_width) do
     Enum.map(scenarios,
              fn(scenario) -> format_scenario(scenario, units, label_width) end)
-  end
-
-  defp units(scenarios, %{unit_scaling: scaling_strategy}) do
-    # Produces a map like
-    #   %{run_time: [12345, 15431, 13222], ips: [1, 2, 3]}
-    measurements =
-      scenarios
-      |> Enum.flat_map(fn(scenario) ->
-           Map.to_list(scenario.run_time_statistics)
-         end)
-      |> Enum.group_by(fn({stat_name, _}) -> stat_name end,
-                       fn({_, value}) -> value end)
-
-    %{
-      run_time: Duration.best(measurements.average, strategy: scaling_strategy),
-      ips:      Count.best(measurements.ips, strategy: scaling_strategy),
-    }
   end
 
   @spec format_scenario(Scenario.t, unit_per_statistic, integer) :: String.t
