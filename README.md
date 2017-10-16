@@ -139,7 +139,7 @@ The available options are the following (also documented in [hexdocs](https://he
 * `time` - the time in seconds for how long each individual benchmarking job should be run and measured. Defaults to 5.
 * `inputs` - a map from descriptive input names to some different input, your benchmarking jobs will then be run with each of these inputs. For this to work your benchmarking function gets the current input passed in as an argument into the function. Defaults to `nil`, aka no input specified and functions are called without an argument. See [Inputs](#inputs).
 * `parallel` - the function of each benchmarking job will be executed in `parallel` number processes. If `parallel: 4` then 4 processes will be spawned that all execute the _same_ function for the given time. When these finish/the time is up 4 new processes will be spawned for the next job/function. This gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking). Defaults to 1 (no parallel execution).
-* `formatters` - list of formatter functions you'd like to run to output the benchmarking results of the suite when using `Benchee.run/2`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter calling `Benchee.Formatters.Console.output/1`. See [Formatters](#formatters).
+* `formatters` - list of formatters either as module implementing the formatter behaviour or formatter functions. They are run when using `Benchee.run/2`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter `Benchee.Formatters.Console`. See [Formatters](#formatters).
 * `print`      - a map from atoms to `true` or `false` to configure if the output identified by the atom will be printed during the standard Benchee benchmarking process. All options are enabled by default (true). Options are:
   * `:benchmarking`  - print when Benchee starts benchmarking a new job (Benchmarking name ..)
   * `:configuration` - a summary of configured benchmarking options including estimated total run time is printed before benchmarking starts
@@ -196,7 +196,11 @@ Therefore, I **highly recommend** using this feature and checking different real
 
 ### Formatters
 
-Among all the configuration options, one that you probably want to use are the formatters. Formatters are functions that take one argument (the benchmarking suite with all its results) and then generate some output. You can specify multiple formatters to run for the benchmarking run.
+Among all the configuration options, one that you probably want to use are the formatters. They format and print out the results of the benchmarking suite.
+
+The `:formatters` option is specified a list of:
+* modules implementing the `Benchee.Formatter` behaviour, or...
+* functions that take one argument (the benchmarking suite with all its results) and then do whatever you want them to
 
 So if you are using the [HTML plugin](https://github.com/PragTob/benchee_html) and you want to run both the console formatter and the HTML formatter this looks like this (after you installed it of course):
 
@@ -209,10 +213,10 @@ Benchee.run(%{
   "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
 },
   formatters: [
-    &Benchee.Formatters.HTML.output/1,
-    &Benchee.Formatters.Console.output/1
+    Benchee.Formatters.HTML,
+    Benchee.Formatters.Console
   ],
-  formatter_options: [html: [file: "samples_output/my.html"]],
+  formatter_options: [html: [file: "samples_output/my.html"]]
 )
 
 ```
