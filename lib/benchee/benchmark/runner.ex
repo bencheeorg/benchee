@@ -36,8 +36,7 @@ defmodule Benchee.Benchmark.Runner do
            printer: printer,
            config: config
          }) do
-    printer.input_information(input_name, config)
-    printer.benchmarking(job_name, config)
+    printer.benchmarking(job_name, input_name, config)
     Parallel.map(1..config.parallel, fn(_task_number) ->
       run_scenario(scenario, scenario_context)
     end)

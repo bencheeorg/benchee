@@ -7,15 +7,11 @@ defmodule Benchee.Test.FakeBenchmarkPrinter do
     send self(), :configuration_information
   end
 
-  def benchmarking(name, _) do
-    send self(), {:benchmarking, name}
+  def benchmarking(name, input_information, _) do
+    send self(), {:benchmarking, name, input_information}
   end
 
   def fast_warning do
     send self(), :fast_warning
-  end
-
-  def input_information(name, _config) do
-    send self(), {:input_information, name}
   end
 end

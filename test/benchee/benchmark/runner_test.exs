@@ -153,12 +153,13 @@ defmodule Benchee.Benchmark.RunnerTest do
       refute_receive :called
     end
 
+    @no_input Benchmark.no_input()
     test "asks to print what is currently benchmarking" do
       test_suite()
       |> Benchmark.benchmark("Something", fn -> :timer.sleep 10 end)
       |> Benchmark.measure(TestPrinter)
 
-      assert_receive {:benchmarking, "Something"}
+      assert_receive {:benchmarking, "Something", @no_input}
     end
 
     @inputs %{"Arg 1" => "Argument 1", "Arg 2" => "Argument 2"}
@@ -185,7 +186,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> Benchmark.measure(TestPrinter)
 
       Enum.each @inputs, fn({name, _value}) ->
-        assert_receive {:input_information, ^name}
+        assert_received {:benchmarking, "one", ^name}
       end
     end
 
