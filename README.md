@@ -1,10 +1,10 @@
 # Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee) [![docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/) [![Inline docs](http://inch-ci.org/github/PragTob/benchee.svg)](http://inch-ci.org/github/PragTob/benchee) [![Build Status](https://travis-ci.org/PragTob/benchee.svg?branch=master)](https://travis-ci.org/PragTob/benchee) [![Coverage Status](https://coveralls.io/repos/github/PragTob/benchee/badge.svg?branch=master)](https://coveralls.io/github/PragTob/benchee?branch=master)
 
-Library for easy and nice (micro) benchmarking in Elixir. It allows you to compare the performance of different pieces of code at a glance. Benchee is also versatile and extensible, relying only on functions - no macros! There are also a bunch of [plugins](#plugins) to draw pretty graphs and more!
+Library for easy and nice (micro) benchmarking in Elixir. It allows you to compare the performance of different pieces of code at a glance. Benchee is also versatile and extensible, relying only on functions! There are also a bunch of [plugins](#plugins) to draw pretty graphs and more!
 
-Benchee runs each of your functions for a given amount of time after an initial warmup. It uses the raw run times it could gather in that time to show different statistical values like average, iterations per second and the standard deviation.
+Benchee runs each of your functions for a given amount of time after an initial warmup. It then shows different statistical values like average, iterations per second and the standard deviation.
 
-Benchee has a nice and concise main interface, and its behavior can be altered through lots of [configuration options](#configuration):
+Benchee has a nice and concise main interface, its behavior can be altered through lots of [configuration options](#configuration):
 
 ```elixir
 list = Enum.to_list(1..10_000)
@@ -61,12 +61,11 @@ Provides you with the following **statistical data**:
 * **ips**       - iterations per second, aka how often can the given function be executed within one second (the higher the better)
 * **deviation** - standard deviation (how much do the results vary), given as a percentage of the average (raw absolute values also available)
 * **median**    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of samples is even). More stable than the average and somewhat more likely to be a typical value you see. (the lower the better)
+* **99th %**    - 99th percentile, 99% of all run times are less than this
 
 Benchee does not:
 
 * Keep results of previous runs and compare them (yet), if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark) until benchee gets that feature :)
-
-Benchee only has a small runtime dependency on `deep_merge` for merging configuration and is aimed at being the core benchmarking logic. Further functionality is provided through plugins that then pull in dependencies, such as HTML generation and CSV export. Check out the [available plugins](#plugins)!
 
 ## Installation
 
@@ -79,6 +78,8 @@ end
 ```
 
 Install via `mix deps.get` and then happy benchmarking as described in [Usage](#usage) :)
+
+Elixir versions supported are 1.3+.
 
 ## Usage
 
@@ -127,7 +128,9 @@ If you're looking to see how to make something specific work, please refer to th
 
 ### Configuration
 
-Benchee takes a wealth of configuration options, in the most common `Benchee.run/2` interface these are passed as the second argument in the form of an optional keyword list:
+Benchee takes a wealth of configuration options, however those are entirely optional. Benchee ships with sensible defaults for all of these.
+
+In the most common `Benchee.run/2` interface configuration options are passed as the second argument in the form of an optional keyword list:
 
 ```elixir
 Benchee.run(%{"some function" => fn -> magic end}, print: [benchmarking: false])
@@ -163,6 +166,7 @@ The available options are the following (also documented in [hexdocs](https://he
     * `:none`     - no unit scaling will occur. Durations will be displayed
     in microseconds, and counts will be displayed in ones (this is
     equivalent to the behaviour Benchee had pre 0.5.0)
+* `:before_scenario`/`after_scenario`/`before_each`/`after_each` - read up on them in the [hooks section](#hooks-setup-teardown-etc)
 
 ### Inputs
 
@@ -292,13 +296,19 @@ Usage:
 Benchee.run %{
   "foo" =>
     {
-      fn(input) -> foo(input) end, # input is 3 here
-      before_scenario: fn(input) -> input + 1 end # input is 2 here
+      fn({input, resource}) -> foo(input, resource) end,
+      before_scenario: fn({input, resource}) ->
+        resource = alter_resource(resource)
+        {input, resource}
+      end
     },
   "bar" =>
-    fn(input) -> bar(input) end # input is 2 here (only global ran)
+    fn({input, resource}) -> bar(input, resource) end
 }, inputs: %{"input 1" => 1},
-   before_scenario: fn(input) -> input + 1 end # input is 1 here
+   before_scenario: fn(input) ->
+     resource = start_expensive_resource()
+     {input, resource}
+   end
 ```
 
 _When might this be useful?_
@@ -341,9 +351,9 @@ Usage:
 
 ```elixir
 Benchee.run %{
-  "bar" => fn(input) -> bar(input) end # input will be 2 here
-}, inputs: %{ "input 1" => 1},
-   before_each: fn(input) -> input + 1 end
+  "bar" => fn(record) -> bar(record) end
+}, inputs: %{ "record id" => 1},
+   before_each: fn(input) -> get_from_db(input) end
 ```
 
 _When might this be useful?_
@@ -517,7 +527,7 @@ suite_tear_down
 
 ### More verbose usage
 
-It is important to note that the benchmarking code shown before is the convenience interface. The same benchmark in its more verbose form looks like this:
+It is important to note that the benchmarking code shown in the beginning is the convenience interface. The same benchmark in its more verbose form looks like this:
 
 ```elixir
 list = Enum.to_list(1..10_000)
@@ -533,23 +543,24 @@ Benchee.init(time: 3)
 |> Benchee.Formatters.Console.output
 ```
 
-This is a take on the _functional transformation_ of data applied to benchmarks here:
+This is a take on the _functional transformation_ of data applied to benchmarks:
 
 1. Configure the benchmarking suite to be run
 2. Gather System data
 3. Define the functions to be benchmarked
-4. Run n benchmarks with the given configuration gathering raw run times per function
+4. Run benchmarks with the given configuration gathering raw run times per function
 5. Generate statistics based on the raw run times
-6. Format the statistics in a suitable way
-7. Output the formatted statistics
+6. Format the statistics in a suitable way and print them out
 
 This is also part of the **official API** and allows for more **fine grained control**. (It's also what benchee does internally when you use `Benchee.run/2`).
 
-Do you just want to have all the raw run times? Just work with the result of `Benchee.measure/1`! Just want to have the calculated statistics and use your own formatting? Grab the result of `Benchee.statistics/1`! Or, maybe you want to write to a file or send an HTTP post to some online service? Just use the `Benchee.Formatters.Console.format/1` and then send the result where you want.
+Do you just want to have all the raw run times? Just work with the result of `Benchee.measure/1`! Just want to have the calculated statistics and use your own formatting? Grab the result of `Benchee.statistics/1`! Or, maybe you want to write to a file or send an HTTP post to some online service? Just grab the complete suite after statistics were generated.
 
 This way Benchee should be flexible enough to suit your needs and be extended at will. Have a look at the [available plugins](#plugins).
 
 ### Usage from Erlang
+
+Before you dig deep into this, it is inherently easier to setup a small elixir project, add a dependency to your erlang project and then run the benchmarks from elixir. The reason is easy - mix knows about rebar3 and knows how to work with it. The reverse isn't true so the road ahead is somewhat bumpy.
 
 There is an [example project](https://github.com/PragTob/benchee_erlang_try) to check out.
 
@@ -611,7 +622,7 @@ This doesn't seem to be too reliable right now, so suggestions and input are ver
 
 ## Plugins
 
-Packages that work with benchee to provide additional functionality.
+Benchee only has small runtime dependencies that were initially extracted from it. Further functionality is provided through plugins that then pull in dependencies, such as HTML generation and CSV export. They help provide excellent visualization or interoperability.
 
 * [benchee_html](//github.com/PragTob/benchee_html) - generate HTML including a data table and many different graphs with the possibility to export individual graphs as PNG :)
 * [benchee_csv](//github.com/PragTob/benchee_csv) - generate CSV from your Benchee benchmark results so you can import them into your favorite spreadsheet tool and make fancy graphs
@@ -644,7 +655,7 @@ A couple of (hopefully) helpful points:
 * Feel free to ask for help and guidance on an issue/PR ("How can I implement this?", "How could I test this?", ...)
 * Feel free to open early/not yet complete pull requests to get some early feedback
 * When in doubt if something is a good idea open an issue first to discuss it
-* In case I don't respond feel free to bump the issue/PR or ping me on other places
+* In case I don't respond feel free to bump the issue/PR or ping me in other places
 
 If you're on the [elixir-lang slack](https://elixir-lang.slack.com) also feel free to drop by in `#benchee` and say hi!
 
@@ -653,4 +664,4 @@ If you're on the [elixir-lang slack](https://elixir-lang.slack.com) also feel fr
 * `mix deps.get` to install dependencies
 * `mix test` to run tests or `mix test.watch` to run them continuously while you change files
 * `mix dialyzer` to run dialyzer for type checking, might take a while on the first invocation (try building plts first with `mix dialyzer --plt`)
-* `mix credo` or `mix credo --strict` to find code style problems (not too strict with the 80 width limit for sample output in the docs)
+* `mix credo --strict` to find code style problems
