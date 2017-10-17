@@ -16,7 +16,7 @@ defmodule Benchee.Configuration do
     parallel:          1,
     time:              5,
     warmup:            2,
-    formatters:        [&Console.output/1],
+    formatters:        [Console],
     print: %{
       benchmarking:    true,
       configuration:   true,
@@ -85,11 +85,12 @@ defmodule Benchee.Configuration do
     and cons of parallel benchmarking [check the
     wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking).
     Defaults to 1 (no parallel execution).
-    * `formatters` - list of formatter functions you'd like to run to output the
-    benchmarking results of the suite when using `Benchee.run/2`. Functions need
-    to accept one argument (which is the benchmarking suite with all data) and
-    then use that to produce output. Used for plugins. Defaults to the builtin
-    console formatter calling `Benchee.Formatters.Console.output/1`.
+    * `formatters` - list of formatters either as module implementing the
+    formatter behaviour or formatter functions. They are run when using
+    `Benchee.run/2`. Functions need to accept one argument (which is the
+    benchmarking suite with all data) and then use that to produce output. Used
+    for plugins. Defaults to the builtin console formatter
+    Benchee.Formatters.Console`. See [Formatters](#formatters).
     * `print`      - a map from atoms to `true` or `false` to configure if the
     output identified by the atom will be printed. All options are enabled by
     default (true). Options are:
@@ -132,7 +133,7 @@ defmodule Benchee.Configuration do
             time: 5_000_000,
             warmup: 2_000_000,
             inputs: nil,
-            formatters: [&Benchee.Formatters.Console.output/1],
+            formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
               fast_warning: true,
@@ -160,7 +161,7 @@ defmodule Benchee.Configuration do
             time: 1_000_000,
             warmup: 200_000.0,
             inputs: nil,
-            formatters: [&Benchee.Formatters.Console.output/1],
+            formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
               fast_warning: true,
@@ -188,7 +189,7 @@ defmodule Benchee.Configuration do
             time: 1_000_000,
             warmup: 200_000.0,
             inputs: nil,
-            formatters: [&Benchee.Formatters.Console.output/1],
+            formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
               fast_warning: true,

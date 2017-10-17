@@ -2,13 +2,34 @@ defmodule Benchee.Formatter do
   @moduledoc """
   Defines a behaviour for formatters in Benchee, and also defines functions to
   handle invoking that defined behavior.
+
+  When implementing a benchee formatter as a behaviour please adopt this
+  behaviour, as it helps with uniformity and also allows at least the `.format`
+  function of formatters to be run in parallel.
   """
 
   alias Benchee.{Suite, Utility.Parallel}
 
-  @callback output(Suite.t) :: Suite.t
+  @doc """
+  Takes the suite and returns whatever representation the formatter wants to use
+  to output that information. It is important that this function **needs to be
+  pure** (aka have no side effects) as benchee will run `format/1` functions
+  of multiple formatters in parallel. The result will then be passed to
+  `write/1`.
+  """
   @callback format(Suite.t) :: any
+
+  @doc """
+  Takes the return value of `format/1` and then performs some I/O for the user
+  to actually see the formatted data (UI, File IO, HTTP, ...)
+  """
   @callback write(any) :: :ok | {:error, String.t}
+
+  @doc """
+  Combines `format/1` and `write/1` into a single convenience function that is
+  also chainable (as it takes a suite and returns a suite).
+  """
+  @callback output(Suite.t) :: Suite.t
 
   @doc """
   Invokes `format/1` and `write/1` as defined by the `Benchee.Formatter`

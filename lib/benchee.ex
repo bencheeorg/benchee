@@ -17,6 +17,8 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
   defmodule module do
     @moduledoc moduledoc
 
+    alias Benchee.Formatter
+
     @doc """
     Run benchmark jobs defined by a map and optionally provide configuration
     options.
@@ -60,12 +62,27 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     end
 
     defp output_results(suite = %{configuration: %{formatters: formatters}}) do
-      Enum.each formatters, fn(output_function) ->
+      # Can be replaced with `split_with` once we deprecate elixir 1.3
+      {parallelizable, serial} =
+        Enum.partition(formatters, &is_formatter_module?/1)
+
+      # why do we ignore this suite? It shouldn't be changed anyway.
+      _suite = Formatter.parallel_output(suite, parallelizable)
+      Enum.each serial, fn(output_function) ->
         output_function.(suite)
       end
 
       suite
     end
+
+    defp is_formatter_module?(formatter) when is_atom(formatter) do
+      module_attributes = formatter.module_info(:attributes)
+
+      module_attributes
+      |> Keyword.get(:behaviour, [])
+      |> Enum.member?(Benchee.Formatter)
+    end
+    defp is_formatter_module?(_), do: false
 
     defp add_benchmarking_jobs(suite, jobs) do
       Enum.reduce jobs, suite, fn({key, function}, suite_acc) ->
