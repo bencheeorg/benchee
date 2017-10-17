@@ -66,7 +66,8 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
       {parallelizable, serial} =
         Enum.partition(formatters, &is_formatter_module?/1)
 
-      Formatter.parallel_output(suite, parallelizable)
+      # why do we ignore this suite? It shouldn't be changed anyway.
+      _suite = Formatter.parallel_output(suite, parallelizable)
       Enum.each serial, fn(output_function) ->
         output_function.(suite)
       end
