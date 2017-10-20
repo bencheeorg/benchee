@@ -7,9 +7,18 @@ defmodule Benchee.Formatters.ConsoleTest do
   alias Benchee.Formatters.Console
   alias Benchee.{Suite, Statistics, Benchmark.Scenario}
 
-  @console_config %{comparison: true, unit_scaling: :best}
+  @console_config %{
+    comparison: true,
+    unit_scaling: :best,
+    extended_options: false
+  }
+  @console_config_extended_params %{
+    comparison: true,
+    unit_scaling: :best,
+    extended_options: true
+  }
   @config %Benchee.Configuration{
-    formatter_options: %{console: %{comparison: true}}
+    formatter_options: %{console: %{comparison: true, extended_options: false}}
   }
   describe ".output" do
     test "formats and prints the results right to the console" do
@@ -56,6 +65,73 @@ defmodule Benchee.Formatters.ConsoleTest do
   end
 
   describe ".format_scenarios" do
+    test "displays extended options" do
+      scenarios = [
+        %Scenario{
+          job_name: "First job",
+          run_time_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1},
+            minimum: 111.1,
+            maximum: 333.3,
+            mode: 201.2,
+            sample_size: 50_000
+          }
+        }
+      ]
+
+      [_header1, _result1, descriptor1, descriptor2, result2] =
+        Console.format_scenarios(scenarios, @console_config_extended_params)
+
+        assert descriptor1 =~ ~r/Extended options: /
+        assert descriptor2 =~ ~r/minimum/
+        assert descriptor2 =~ ~r/maximum/
+        assert descriptor2 =~ ~r/sample size/
+        assert descriptor2 =~ ~r/mode/
+        assert result2 =~ ~r/First job/
+        assert result2 =~ ~r/111.10/
+        assert result2 =~ ~r/333.30/
+        assert result2 =~ ~r/50000/
+        assert result2 =~ ~r/201.20/
+    end
+
+    test "displays extended options with multiple mode ouput" do
+      scenarios = [
+        %Scenario{
+          job_name: "First job",
+          run_time_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1},
+            minimum: 111.1,
+            maximum: 333.3,
+            mode: [201.2, 205.55],
+            sample_size: 50_000
+          }
+        }
+      ]
+
+      [_header1, _result1, descriptor1, descriptor2, result2] =
+        Console.format_scenarios(scenarios, @console_config_extended_params)
+
+        assert descriptor1 =~ ~r/Extended options: /
+        assert descriptor2 =~ ~r/minimum/
+        assert descriptor2 =~ ~r/maximum/
+        assert descriptor2 =~ ~r/sample size/
+        assert descriptor2 =~ ~r/mode/
+        assert result2 =~ ~r/First job/
+        assert result2 =~ ~r/111.10/
+        assert result2 =~ ~r/333.30/
+        assert result2 =~ ~r/50000/
+        assert result2 =~ ~r/201.20/
+        assert result2 =~ ~r/205.55/
+    end
+
     test "sorts the the given stats fastest to slowest" do
       scenarios = [
         %Scenario{
@@ -213,8 +289,9 @@ defmodule Benchee.Formatters.ConsoleTest do
       output =  Enum.join Console.format_scenarios(
                   scenarios,
                   %{
-                    comparison:   false,
-                    unit_scaling: :best
+                    comparison:       false,
+                    unit_scaling:     :best,
+                    extended_options: false
                   })
 
       refute Regex.match? ~r/Comparison/i, output

@@ -63,6 +63,12 @@ Provides you with the following **statistical data**:
 * **median**    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of samples is even). More stable than the average and somewhat more likely to be a typical value you see. (the lower the better)
 * **99th %**    - 99th percentile, 99% of all run times are less than this
 
+In addition, you can optionally output an extended set of statistics.
+* **minimum**     - the smallest (fastest) run time measured for the job
+* **maximum**     - the biggest (slowest) run time measured for the job
+* **sample size** - the number of run time measurements taken
+* **mode**        - the run time(s) that occur the most. Often one value, but can be multiple values if they occur the same amount of times. If no value occurs at least twice, this value will be nil.
+
 Benchee does not:
 
 * Keep results of previous runs and compare them (yet), if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark) until benchee gets that feature :)

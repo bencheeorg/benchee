@@ -13,30 +13,31 @@ defmodule Benchee.Configuration do
   }
 
   defstruct [
-    parallel:          1,
-    time:              5,
-    warmup:            2,
-    formatters:        [Console],
+    parallel:             1,
+    time:                 5,
+    warmup:               2,
+    formatters:           [Console],
     print: %{
-      benchmarking:    true,
-      configuration:   true,
-      fast_warning:    true
+      benchmarking:       true,
+      configuration:      true,
+      fast_warning:       true
     },
-    inputs:            nil,
+    inputs:               nil,
     # formatters should end up here but known once are still picked up at
     # the top level for now
     formatter_options: %{
       console: %{
-        comparison:    true
+        comparison:       true,
+        extended_options: false
       }
     },
-    unit_scaling:     :best,
+    unit_scaling:         :best,
     # If you/your plugin/whatever needs it your data can go here
-    assigns:           %{},
-    before_each:       nil,
-    after_each:        nil,
-    before_scenario:   nil,
-    after_scenario:    nil
+    assigns:              %{},
+    before_each:          nil,
+    after_each:           nil,
+    before_scenario:      nil,
+    after_scenario:       nil
   ]
 
   @type t :: %__MODULE__{
@@ -140,7 +141,7 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: true}
+              console: %{comparison: true, extended_options: false}
             },
             unit_scaling: :best,
             assigns: %{},
@@ -168,7 +169,7 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: true}
+              console: %{comparison: true, extended_options: false}
             },
             unit_scaling: :best,
             assigns: %{},
@@ -196,7 +197,7 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: true}
+              console: %{comparison: true, extended_options: false}
             },
             unit_scaling: :best,
             assigns: %{},
@@ -233,7 +234,7 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: false},
+              console: %{comparison: false, extended_options: false},
               some: "option"
             },
             unit_scaling: :smallest,
