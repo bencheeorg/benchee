@@ -654,7 +654,7 @@ Keep in mind that the [plugins](#plugins) live in their own repositories with th
 
 Please respect the [Code of Conduct](//github.com/PragTob/benchee/blob/master/CODE_OF_CONDUCT.md).
 
-You can get started with a look at the [open issues](https://github.com/PragTob/benchee/issues).
+You can get started with a look at the [open issues](https://github.com/PragTob/benchee/issues). There are `help wanted` and `good first issue` labels - those are meant as guidance, of course other issues can be tackled :)
 
 A couple of (hopefully) helpful points:
 
