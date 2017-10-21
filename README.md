@@ -648,7 +648,9 @@ If you're into watching videos of conference talks and also want to learn more a
 
 ## Contributing
 
-Contributions to benchee are very welcome! Bug reports, documentation, spelling corrections, whole features, feature ideas, bugfixes, new plugins, fancy graphics... all of those (and probably more) are much appreciated contributions!
+Contributions to benchee are **very welcome**! Bug reports, documentation, spelling corrections, whole features, feature ideas, bugfixes, new plugins, fancy graphics... all of those (and probably more) are much appreciated contributions!
+
+Keep in mind that the [plugins](#plugins) live in their own repositories with their own issue tracker and they also like to get contributions :)
 
 Please respect the [Code of Conduct](//github.com/PragTob/benchee/blob/master/CODE_OF_CONDUCT.md).
 
