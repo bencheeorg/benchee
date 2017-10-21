@@ -4,7 +4,7 @@ defmodule Benchee.Formatters.Console do
   output through `IO.write` on the console.
   """
 
-  @behaviour Benchee.Formatter
+  use Benchee.Formatter
 
   alias Benchee.{
     Statistics, Suite, Benchmark.Scenario, Configuration, Conversion
@@ -19,19 +19,6 @@ defmodule Benchee.Formatters.Console do
   @deviation_width 11
   @median_width 15
   @percentile_width 15
-
-  @doc """
-  Formats the benchmark statistics using `Benchee.Formatters.Console.format/1`
-  and then prints it out directly to the console using `IO.write/1`
-  """
-  @spec output(Suite.t) :: Suite.t
-  def output(suite = %Suite{}) do
-    :ok = suite
-          |> format
-          |> write
-
-    suite
-  end
 
   @doc """
   Formats the benchmark statistics to a report suitable for output on the CLI.
