@@ -28,7 +28,7 @@ defmodule Benchee.Configuration do
     formatter_options: %{
       console: %{
         comparison:       true,
-        extended_options: false
+        extended_statistics: false
       }
     },
     unit_scaling:         :best,
@@ -141,7 +141,7 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: true, extended_options: false}
+              console: %{comparison: true, extended_statistics: false}
             },
             unit_scaling: :best,
             assigns: %{},
@@ -169,7 +169,7 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: true, extended_options: false}
+              console: %{comparison: true, extended_statistics: false}
             },
             unit_scaling: :best,
             assigns: %{},
@@ -197,7 +197,7 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: true, extended_options: false}
+              console: %{comparison: true, extended_statistics: false}
             },
             unit_scaling: :best,
             assigns: %{},
@@ -234,7 +234,7 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: false, extended_options: false},
+              console: %{comparison: false, extended_statistics: false},
               some: "option"
             },
             unit_scaling: :smallest,

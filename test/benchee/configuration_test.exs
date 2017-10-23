@@ -38,7 +38,7 @@ defmodule Benchee.ConfigurationTest do
         time: 10,
         formatter_options: %{
           custom: %{option: true},
-          console: %{extended_options: true}
+          console: %{extended_statistics: true}
         }
       }
 
@@ -48,7 +48,7 @@ defmodule Benchee.ConfigurationTest do
         time: 10,
         formatter_options: %{
           custom: %{option: true},
-          console: %{comparison: true, extended_options: true}
+          console: %{comparison: true, extended_statistics: true}
         }
       }
 
