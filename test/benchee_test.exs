@@ -186,6 +186,23 @@ defmodule BencheeTest do
     readme_sample_asserts output
   end
 
+  test "formatters can be supplied as the output/1 function" do
+    output = capture_io fn ->
+      list = Enum.to_list(1..10_000)
+      map_fun = fn(i) -> [i, i * i] end
+
+      Benchee.run(%{
+        "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
+        "map.flatten" =>
+          fn -> list |> Enum.map(map_fun) |> List.flatten end
+      }, time: 0.01,
+         warmup: 0.005,
+         formatters: [&Benchee.Formatters.Console.output/1])
+    end
+
+    readme_sample_asserts output
+  end
+
   test "for formatters specified as modules format/1 and write/1 are called" do
     capture_io fn ->
       Benchee.run(%{

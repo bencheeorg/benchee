@@ -31,6 +31,25 @@ defmodule Benchee.Formatter do
   """
   @callback output(Suite.t) :: Suite.t
 
+  defmacro __using__(_) do
+    quote location: :keep do
+      @behaviour Benchee.Formatter
+
+      @doc """
+      Combines `format/1` and `write/1` into a single convenience function that
+      is also chainable (as it takes a suite and returns a suite).
+      """
+      @spec output(Benchee.Suite.t) :: Benchee.Suite.t
+      def output(suite) do
+        :ok = suite
+              |> format
+              |> write
+
+        suite
+      end
+    end
+  end
+
   @doc """
   Invokes `format/1` and `write/1` as defined by the `Benchee.Formatter`
   behaviour. The output for all formatters are generated in parallel, and then
