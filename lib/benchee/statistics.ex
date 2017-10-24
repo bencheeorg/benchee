@@ -188,6 +188,59 @@ defmodule Benchee.Statistics do
     }
   end
 
+  @doc """
+  Calculate additional percentiles and add them to the `run_time_statistics`.
+  Should only be used after `statistics/1`, to calculate extra values that
+  may be needed for reporting.
+
+  ## Examples
+
+  iex> scenarios = [
+  ...>   %Benchee.Benchmark.Scenario{
+  ...>     job_name: "My Job",
+  ...>     run_times: [200, 400, 400, 400, 500, 500, 700, 900],
+  ...>     input_name: "Input",
+  ...>     input: "Input"
+  ...>   }
+  ...> ]
+  iex> %Benchee.Suite{scenarios: scenarios}
+  ...> |> Benchee.Statistics.statistics
+  ...> |> Benchee.Statistics.add_percentiles([25, 75])
+  %Benchee.Suite{
+    scenarios: [
+      %Benchee.Benchmark.Scenario{
+        job_name: "My Job",
+        run_times: [200, 400, 400, 400, 500, 500, 700, 900],
+        input_name: "Input",
+        input: "Input",
+        run_time_statistics: %Benchee.Statistics{
+          average:       500.0,
+          ips:           2000.0,
+          std_dev:       200.0,
+          std_dev_ratio: 0.4,
+          std_dev_ips:   800.0,
+          median:        450.0,
+          percentiles:   %{25 => 400.0, 50 => 450.0, 75 => 650.0, 99 => 900.0},
+          mode:          400,
+          minimum:       200,
+          maximum:       900,
+          sample_size:   8
+        }
+      }
+    ]
+  }
+  """
+  def add_percentiles(suite = %Suite{scenarios: scenarios}, percentile_ranks) do
+    new_scenarios = Parallel.map(scenarios, fn scenario ->
+      update_in(scenario.run_time_statistics.percentiles, fn existing ->
+        new = Percentile.percentiles(scenario.run_times, percentile_ranks)
+        Map.merge(existing, new)
+      end)
+    end)
+
+    %Suite{suite | scenarios: new_scenarios}
+  end
+
   defp iterations_per_second(average_microseconds) do
     Duration.microseconds({1, :second}) / average_microseconds
   end
