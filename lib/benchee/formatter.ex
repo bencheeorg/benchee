@@ -6,6 +6,11 @@ defmodule Benchee.Formatter do
   When implementing a benchee formatter as a behaviour please adopt this
   behaviour, as it helps with uniformity and also allows at least the `.format`
   function of formatters to be run in parallel.
+
+  Even better, do `use Benchee.Formatter` which will already implement
+  the `output/1` function for you. This is recommended as `output/1`
+  really shouldn't have any more logic than that, logic/features should
+  be in either `format/1` or `write/1`.
   """
 
   alias Benchee.{Suite, Utility.Parallel}

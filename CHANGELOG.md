@@ -1,20 +1,23 @@
 ## 0.10.0 (2017-10-24)
 
+This release focuses on 2 main things: the internal restructuring to use _scenarios_ and the new _hooks_ system. Other than that we also have some nice convenience features and formatters can be generated in parallel now.
+
 ### Features (User Facing)
 * Hooks system - basically you can now do something before/after a benchmarking scenario or the benchmarking function, too much to explain it in a Changelog, check the [README](https://github.com/PragTob/benchee#hooks-setup-teardown-etc)
 * Don't show more precision than we have - i.e. 234.00 microseconds (measurements are in microseconds and .00 doesn't gain you anything)
 * Limit precision of available memory displayed, you don't need to know 7.45678932 GB. Thanks to `@elpikel`.
 * Display the 99th percentile runtime. Thanks to `@wasnotrice`.
 * `:unit_scaling` is now a top level configuration option that can now also be used and picked up by formatters, like the HTML formatter
+* formatters can now be specified as a module (which should implement the `Benchee.Formatter` behaviour) - this makes specifying them nice and now at least their `format/1` functions can be executed in parallel
 
 ### Bugfixes (User Facing)
-* Determining CPUs was toos trict/too assuming of a specific pattern breaking in certain environments (like Semaphore CI). That is more relaxed now thanks to `@predrag-rakic`!
+* Determining CPUs was too strict/too assuming of a specific pattern breaking in certain environments (like Semaphore CI). That is more relaxed now thanks to `@predrag-rakic`!
 * Memory is now correctly converted using the binary (1024) interpreation, instead of the decimal one (1000)
 
 
 ### Features (Plugins)
-* the statistics now also provide the mode of the samples
-* There is a new `Benchee.Formatter` behaviour to adopt and enforce a uniform format for formatters
+* the statistics now also provide the mode of the samples as well as the 99th percentile
+* There is a new `Benchee.Formatter` behaviour to adopt and enforce a uniform format for formatters, best to do `use Benchee.Formatter`
 
 ### Breakin Changes (Plugins)
 * `:run_times`, `:statistics` and `:jobs` have been removed and folded together into `:scenarios` - a scenario holds the benchmarking function, porentially the input, the raw run times measures and the computed statistics. With this data structure, all the relevant data for one scenario is one place although it takes a lot to change, this seems to be the best way going forward. Huge thanks to `@devonestes`!
