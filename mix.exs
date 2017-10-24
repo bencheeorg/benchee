@@ -1,7 +1,7 @@
 defmodule Benchee.Mixfile do
   use Mix.Project
 
-  @version "0.9.0"
+  @version "0.10.0"
 
   def project do
     [
@@ -50,8 +50,8 @@ defmodule Benchee.Mixfile do
       {:mix_test_watch, "~> 0.2",   only: :dev},
       {:credo,          "~> 0.4",   only: :dev},
       {:ex_doc,         "~> 0.11",  only: :dev},
-      {:earmark,        "~> 1.0", only: :dev},
-      {:excoveralls,    "~> 0.7", only: :test},
+      {:earmark,        "~> 1.0",   only: :dev},
+      {:excoveralls,    "~> 0.7",   only: :test},
       {:inch_ex,        "~> 0.5",   only: :docs},
       {:dialyxir,       "~> 0.5",   only: :dev, runtime: false}
     ]

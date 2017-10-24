@@ -1,4 +1,4 @@
-## 0.10.0 - unreleased
+## 0.10.0 (2017-10-24)
 
 ### Features (User Facing)
 * Hooks system - basically you can now do something before/after a benchmarking scenario or the benchmarking function, too much to explain it in a Changelog, check the [README](https://github.com/PragTob/benchee#hooks-setup-teardown-etc)
@@ -8,7 +8,7 @@
 * `:unit_scaling` is now a top level configuration option that can now also be used and picked up by formatters, like the HTML formatter
 
 ### Bugfixes (User Facing)
-* Determining CPUs was toos trict/too assuming of a specific pattern breaking in certain environments (like Semaphore CI). That is more relaxed now thanks to `@predrag-rakic`! 
+* Determining CPUs was toos trict/too assuming of a specific pattern breaking in certain environments (like Semaphore CI). That is more relaxed now thanks to `@predrag-rakic`!
 * Memory is now correctly converted using the binary (1024) interpreation, instead of the decimal one (1000)
 
 
