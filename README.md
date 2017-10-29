@@ -63,6 +63,12 @@ Provides you with the following **statistical data**:
 * **median**    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of samples is even). More stable than the average and somewhat more likely to be a typical value you see. (the lower the better)
 * **99th %**    - 99th percentile, 99% of all run times are less than this
 
+In addition, you can optionally output an extended set of statistics.
+* **minimum**     - the smallest (fastest) run time measured for the job
+* **maximum**     - the biggest (slowest) run time measured for the job
+* **sample size** - the number of run time measurements taken
+* **mode**        - the run time(s) that occur the most. Often one value, but can be multiple values if they occur the same amount of times. If no value occurs at least twice, this value will be nil.
+
 Benchee does not:
 
 * Keep results of previous runs and compare them (yet), if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark) until benchee gets that feature :)
@@ -147,8 +153,9 @@ The available options are the following (also documented in [hexdocs](https://he
   * `:benchmarking`  - print when Benchee starts benchmarking a new job (Benchmarking name ..)
   * `:configuration` - a summary of configured benchmarking options including estimated total run time is printed before benchmarking starts
   * `:fast_warning` - warnings are displayed if functions are executed too fast leading to inaccurate measures
-* `console` - options for the built-in console formatter. Like the `print` options they are also enabled by default:
-  * `:comparison` - if the comparison of the different benchmarking jobs (x times slower than) is shown
+* `console` - options for the built-in console formatter:
+  * `:comparison` - if the comparison of the different benchmarking jobs (x times slower than) is shown. Enabled by default.
+  * `extended_statistics` - display more statistics, aka `minimum`, `maximum`, `sample_size` and `mode`. Disabled by default.
 * `:unit_scaling` - the strategy for choosing a unit for durations and
   counts. May or may not be implemented by a given formatter (The console
   formatter implements it). When scaling a value, Benchee finds the "best fit"
@@ -224,6 +231,33 @@ Benchee.run(%{
 )
 
 ```
+
+### Extended Console Formatter Statistics
+
+Showing more statistics such as `minimum`, `maximum`, `sample_size` and `mode` is as simple as passing `extended_statistics: true` to the console formatter.
+
+```elixir
+list = Enum.to_list(1..10_000)
+map_fun = fn(i) -> [i, i * i] end
+
+Benchee.run(%{
+  "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
+  "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
+}, time: 10, formatter_options: %{console: %{extended_statistics: true}})
+```
+
+Which produces:
+
+```
+# your normal output...
+
+Extended statistics:
+Name                minimum        maximum    sample size                     mode
+flat_map             365 μs        1371 μs        22.88 K                   430 μs
+map.flatten          514 μs        1926 μs        13.01 K                   517 μs
+```
+
+(Btw. notice how the modes of both are much closer and for `map.flatten` much less than the average of `766.99`, see `samples/run_extended_statistics`)
 
 ### Hooks (Setup, Teardown etc.)
 

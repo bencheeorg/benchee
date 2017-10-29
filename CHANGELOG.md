@@ -1,3 +1,9 @@
+## unreleased
+
+### Features (User Facing)
+
+* the console formatter accepts a new `extended_statistics` options that shows you additional statistics such as `minimum`, `maximum`, `sample_size` and the `mode`. Thanks `@lwalter`
+
 ## 0.10.0 (2017-10-24)
 
 This release focuses on 2 main things: the internal restructuring to use _scenarios_ and the new _hooks_ system. Other than that we also have some nice convenience features and formatters can be generated in parallel now.

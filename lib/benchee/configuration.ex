@@ -13,30 +13,31 @@ defmodule Benchee.Configuration do
   }
 
   defstruct [
-    parallel:          1,
-    time:              5,
-    warmup:            2,
-    formatters:        [Console],
+    parallel:             1,
+    time:                 5,
+    warmup:               2,
+    formatters:           [Console],
     print: %{
-      benchmarking:    true,
-      configuration:   true,
-      fast_warning:    true
+      benchmarking:       true,
+      configuration:      true,
+      fast_warning:       true
     },
-    inputs:            nil,
+    inputs:               nil,
     # formatters should end up here but known once are still picked up at
     # the top level for now
     formatter_options: %{
       console: %{
-        comparison:    true
+        comparison:          true,
+        extended_statistics: false
       }
     },
-    unit_scaling:     :best,
+    unit_scaling:         :best,
     # If you/your plugin/whatever needs it your data can go here
-    assigns:           %{},
-    before_each:       nil,
-    after_each:        nil,
-    before_scenario:   nil,
-    after_scenario:    nil
+    assigns:              %{},
+    before_each:          nil,
+    after_each:           nil,
+    before_scenario:      nil,
+    after_scenario:       nil
   ]
 
   @type t :: %__MODULE__{
@@ -100,10 +101,11 @@ defmodule Benchee.Configuration do
       including estimated total run time is printed before benchmarking starts
       * `:fast_warning`  - warnings are displayed if functions are executed
       too fast leading to inaccurate measures
-    * `console` - options for the built-in console formatter. Like the
-    `print` options the boolean options are also enabled by default:
+    * `console` - options for the built-in console formatter:
       * `:comparison`   - if the comparison of the different benchmarking jobs
-      (x times slower than) is shown (true/false)
+      (x times slower than) is shown (true/false). Enabled by default.
+      * `extended_statistics` - display more statistics, aka `minimum`,
+      `maximum`, `sample_size` and `mode`. Disabled by default.
     * `:unit_scaling` - the strategy for choosing a unit for durations and
     counts. May or may not be implemented by a given formatter (The console
     formatter implements it). When scaling a value, Benchee finds the "best fit"
@@ -140,7 +142,7 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: true}
+              console: %{comparison: true, extended_statistics: false}
             },
             unit_scaling: :best,
             assigns: %{},
@@ -168,7 +170,7 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: true}
+              console: %{comparison: true, extended_statistics: false}
             },
             unit_scaling: :best,
             assigns: %{},
@@ -196,7 +198,7 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: true}
+              console: %{comparison: true, extended_statistics: false}
             },
             unit_scaling: :best,
             assigns: %{},
@@ -233,7 +235,7 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: false},
+              console: %{comparison: false, extended_statistics: false},
               some: "option"
             },
             unit_scaling: :smallest,

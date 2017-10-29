@@ -7,8 +7,19 @@ defmodule Benchee.Statistics do
   alias Benchee.Statistics.Mode
   alias Benchee.Statistics.Percentile
 
-  defstruct [:average, :ips, :std_dev, :std_dev_ratio, :std_dev_ips, :median,
-             :percentiles, :mode, :minimum, :maximum, :sample_size]
+  defstruct [
+    :average,
+    :ips,
+    :std_dev,
+    :std_dev_ratio,
+    :std_dev_ips,
+    :median,
+    :percentiles,
+    :mode,
+    :minimum,
+    :maximum,
+    :sample_size
+  ]
 
   @type t :: %__MODULE__{
     average: float,

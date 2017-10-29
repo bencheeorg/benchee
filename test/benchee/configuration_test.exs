@@ -36,7 +36,10 @@ defmodule Benchee.ConfigurationTest do
     test "it can be adjusted with a map" do
       user_options = %{
         time: 10,
-        formatter_options: %{custom: %{option: true}}
+        formatter_options: %{
+          custom: %{option: true},
+          console: %{extended_statistics: true}
+        }
       }
 
       result = deep_merge(@default_config, user_options)
@@ -45,7 +48,7 @@ defmodule Benchee.ConfigurationTest do
         time: 10,
         formatter_options: %{
           custom: %{option: true},
-          console: %{comparison: true}
+          console: %{comparison: true, extended_statistics: true}
         }
       }
 
