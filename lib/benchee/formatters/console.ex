@@ -170,6 +170,8 @@ defmodule Benchee.Formatters.Console do
     end)
   end
 
+  @spec format_scenario_extended(Scenario.t, unit_per_statistic, integer)
+    :: String.t
   defp format_scenario_extended(%Scenario{
                                   job_name: name,
                                   run_time_statistics: %Statistics{
@@ -191,7 +193,7 @@ defmodule Benchee.Formatters.Console do
     |> to_string
   end
 
-  @spec mode_out([number], Benchee.Conversion.Unit.t) :: String.t
+  @spec mode_out(Statistics.mode, Benchee.Conversion.Unit.t) :: String.t
   defp mode_out(modes, _run_time_unit) when is_nil(modes) do
     "None"
   end

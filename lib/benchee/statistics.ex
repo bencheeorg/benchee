@@ -21,6 +21,8 @@ defmodule Benchee.Statistics do
     :sample_size
   ]
 
+  @type mode :: [number] | number | nil
+
   @type t :: %__MODULE__{
     average: float,
     ips: float,
@@ -29,7 +31,7 @@ defmodule Benchee.Statistics do
     std_dev_ips: float,
     median: number,
     percentiles: %{number => float},
-    mode: number,
+    mode: mode,
     minimum: number,
     maximum: number,
     sample_size: integer
