@@ -27,7 +27,7 @@ defmodule Benchee.Configuration do
     # the top level for now
     formatter_options: %{
       console: %{
-        comparison:       true,
+        comparison:          true,
         extended_statistics: false
       }
     },

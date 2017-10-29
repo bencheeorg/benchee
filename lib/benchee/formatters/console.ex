@@ -166,8 +166,8 @@ defmodule Benchee.Formatters.Console do
     :: [String.t]
   defp extended_statistics(scenarios, units, label_width) do
     Enum.map(scenarios, fn(scenario) ->
-              format_scenario_extended(scenario, units, label_width)
-            end)
+      format_scenario_extended(scenario, units, label_width)
+    end)
   end
 
   @spec format_scenario_extended(Scenario.t, unit_per_statistic, integer)
@@ -232,9 +232,11 @@ defmodule Benchee.Formatters.Console do
     max_label_width + 1
   end
 
+  @spec scenario_reports([Scenario.t], unit_per_statistic, integer) :: [String.t]
   defp scenario_reports(scenarios, units, label_width) do
-    Enum.map(scenarios,
-             fn(scenario) -> format_scenario(scenario, units, label_width) end)
+    Enum.map(scenarios, fn(scenario) ->
+      format_scenario(scenario, units, label_width)
+    end)
   end
 
   @spec format_scenario(Scenario.t, unit_per_statistic, integer) :: String.t
