@@ -135,7 +135,7 @@ defmodule Benchee.Formatters.Console do
   ```
 
   """
-  @spec format_scenarios([Scenario.t], map) :: [any, ...]
+  @spec format_scenarios([Scenario.t], map) :: [String.t, ...]
   def format_scenarios(scenarios, config) do
     sorted_scenarios = Statistics.sort(scenarios)
     %{unit_scaling: scaling_strategy} = config
