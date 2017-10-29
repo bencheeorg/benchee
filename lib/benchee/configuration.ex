@@ -101,10 +101,11 @@ defmodule Benchee.Configuration do
       including estimated total run time is printed before benchmarking starts
       * `:fast_warning`  - warnings are displayed if functions are executed
       too fast leading to inaccurate measures
-    * `console` - options for the built-in console formatter. Like the
-    `print` options the boolean options are also enabled by default:
+    * `console` - options for the built-in console formatter:
       * `:comparison`   - if the comparison of the different benchmarking jobs
-      (x times slower than) is shown (true/false)
+      (x times slower than) is shown (true/false). Enabled by default.
+      * `extended_statistics` - display more statistics, aka `minimum`,
+      `maximum`, `sample_size` and `mode`. Disabled by default.
     * `:unit_scaling` - the strategy for choosing a unit for durations and
     counts. May or may not be implemented by a given formatter (The console
     formatter implements it). When scaling a value, Benchee finds the "best fit"
