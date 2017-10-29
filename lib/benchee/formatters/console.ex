@@ -19,6 +19,10 @@ defmodule Benchee.Formatters.Console do
   @deviation_width 11
   @median_width 15
   @percentile_width 15
+  @minimum_width 15
+  @maximum_width 15
+  @sample_size_width 15
+  @mode_width 25
 
   @doc """
   Formats the benchmark statistics to a report suitable for output on the CLI.
@@ -46,7 +50,7 @@ defmodule Benchee.Formatters.Console do
   ...>   scenarios: scenarios,
   ...>   configuration: %Benchee.Configuration{
   ...>     formatter_options: %{
-  ...>       console: %{comparison: false}
+  ...>       console: %{comparison: false, extended_statistics: false}
   ...>     },
   ...>     unit_scaling: :best
   ...>   }
@@ -107,20 +111,26 @@ defmodule Benchee.Formatters.Console do
   iex> scenarios = [
   ...>   %Benchee.Benchmark.Scenario{
   ...>     job_name: "My Job", run_time_statistics: %Benchee.Statistics{
-  ...>       average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0, percentiles: %{99 => 300.1}
+  ...>       average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0, percentiles: %{99 => 300.1},
+  ...>       minimum: 100.1, maximum: 200.2, sample_size: 10_101, mode: 333.2
   ...>     }
   ...>   },
   ...>   %Benchee.Benchmark.Scenario{
   ...>     job_name: "Job 2", run_time_statistics: %Benchee.Statistics{
-  ...>       average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0, percentiles: %{99 => 500.1}
+  ...>       average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0, percentiles: %{99 => 500.1},
+  ...>       minimum: 200.2, maximum: 400.4, sample_size: 20_202, mode: [612.3, 554.1]
   ...>     }
   ...>   }
   ...> ]
-  iex> configuration = %{comparison: false, unit_scaling: :best}
+  iex> configuration = %{comparison: false, unit_scaling: :best, extended_statistics: true}
   iex> Benchee.Formatters.Console.format_scenarios(scenarios, configuration)
   ["\nName             ips        average  deviation         median         99th %\n",
   "My Job           5 K         200 μs    ±10.00%         190 μs      300.10 μs\n",
-  "Job 2         2.50 K         400 μs    ±20.00%         390 μs      500.10 μs\n"]
+  "Job 2         2.50 K         400 μs    ±20.00%         390 μs      500.10 μs\n",
+  "\nExtended statistics: \n",
+  "\nName           minimum        maximum    sample size                     mode\n",
+  "My Job       100.10 μs      200.20 μs        10.10 K                333.20 μs\n",
+  "Job 2        200.20 μs      400.40 μs        20.20 K     612.30 μs, 554.10 μs\n"]
 
   ```
 
@@ -134,9 +144,76 @@ defmodule Benchee.Formatters.Console do
 
     [column_descriptors(label_width) |
       scenario_reports(sorted_scenarios, units, label_width)
-      ++ comparison_report(sorted_scenarios, units, label_width, config)]
+      ++ comparison_report(sorted_scenarios, units, label_width, config)
+      ++ extended_statistics_report(
+          sorted_scenarios, units, label_width, config)]
   end
 
+  @spec extended_statistics_report(
+    [Scenario.t], unit_per_statistic, integer, map) :: [String.t]
+  defp extended_statistics_report(_, _, _, %{extended_statistics: false}) do
+    []
+  end
+  defp extended_statistics_report(scenarios, units, label_width, _config) do
+    [
+      descriptor("Extended statistics"),
+      extended_column_descriptors(label_width) |
+      extended_statistics(scenarios, units, label_width)
+    ]
+  end
+
+  @spec extended_statistics([Scenario.t], unit_per_statistic, integer)
+    :: [String.t]
+  defp extended_statistics(scenarios, units, label_width) do
+    Enum.map(scenarios, fn(scenario) ->
+              format_scenario_extended(scenario, units, label_width)
+            end)
+  end
+
+  @spec format_scenario_extended(Scenario.t, unit_per_statistic, integer)
+    :: String.t
+  defp format_scenario_extended(%Scenario{
+                                  job_name: name,
+                                  run_time_statistics: %Statistics{
+                                    minimum:     minimum,
+                                    maximum:     maximum,
+                                    sample_size: sample_size,
+                                    mode:        mode
+                                  }
+                                },
+                                %{run_time: run_time_unit},
+                                label_width) do
+    "~*s~*ts~*ts~*ts~*ts\n"
+    |> :io_lib.format([
+      -label_width, name,
+      @minimum_width, run_time_out(minimum, run_time_unit),
+      @maximum_width, run_time_out(maximum, run_time_unit),
+      @sample_size_width, Count.format(sample_size),
+      @mode_width, mode_out(mode, run_time_unit)])
+    |> to_string
+  end
+
+  @spec mode_out([number], Benchee.Conversion.Unit.t) :: String.t
+  defp mode_out(modes, _run_time_unit) when is_nil(modes) do
+    "None"
+  end
+  defp mode_out(modes, run_time_unit) when is_list(modes) do
+    Enum.map_join(modes, ", ", fn(mode) -> run_time_out(mode, run_time_unit) end)
+  end
+  defp mode_out(mode, run_time_unit) when is_number(mode) do
+    run_time_out(mode, run_time_unit)
+  end
+
+  @spec extended_column_descriptors(integer) :: String.t
+  defp extended_column_descriptors(label_width) do
+    "\n~*s~*s~*s~*s~*s\n"
+    |> :io_lib.format([-label_width, "Name", @minimum_width, "minimum",
+                       @maximum_width, "maximum", @sample_size_width, "sample size",
+                       @mode_width, "mode"])
+    |> to_string
+  end
+
+  @spec column_descriptors(integer) :: String.t
   defp column_descriptors(label_width) do
     "\n~*s~*s~*s~*s~*s~*s\n"
     |> :io_lib.format([-label_width, "Name", @ips_width, "ips",
@@ -189,8 +266,8 @@ defmodule Benchee.Formatters.Console do
     Count.format({Count.scale(ips, unit), unit})
   end
 
-  defp run_time_out(average, unit) do
-    Duration.format({Duration.scale(average, unit), unit})
+  defp run_time_out(run_time, unit) do
+    Duration.format({Duration.scale(run_time, unit), unit})
   end
 
   defp deviation_out(std_dev_ratio) do
@@ -208,7 +285,7 @@ defmodule Benchee.Formatters.Console do
   end
   defp comparison_report([scenario | other_scenarios], units, label_width, _) do
     [
-      comparison_descriptor(),
+      descriptor("Comparison"),
       reference_report(scenario, units, label_width) |
       comparisons(scenario, units, label_width, other_scenarios)
     ]
@@ -243,7 +320,8 @@ defmodule Benchee.Formatters.Console do
     |> to_string
   end
 
-  defp comparison_descriptor do
-    "\nComparison: \n"
+  @spec descriptor(String.t) :: String.t
+  defp descriptor(header_str) do
+    "\n#{header_str}: \n"
   end
 end
