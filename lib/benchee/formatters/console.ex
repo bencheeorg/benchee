@@ -170,6 +170,8 @@ defmodule Benchee.Formatters.Console do
     end)
   end
 
+  @spec format_scenario_extended(Scenario.t, unit_per_statistic, integer)
+    :: String.t
   defp format_scenario_extended(%Scenario{
                                   job_name: name,
                                   run_time_statistics: %Statistics{
