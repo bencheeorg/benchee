@@ -193,7 +193,7 @@ defmodule Benchee.Formatters.Console do
     |> to_string
   end
 
-  @spec mode_out([number], Benchee.Conversion.Unit.t) :: String.t
+  @spec mode_out(Statistics.mode, Benchee.Conversion.Unit.t) :: String.t
   defp mode_out(modes, _run_time_unit) when is_nil(modes) do
     "None"
   end
