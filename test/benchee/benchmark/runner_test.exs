@@ -2,6 +2,7 @@ defmodule Benchee.Benchmark.RunnerTest do
   use ExUnit.Case, async: true
   import Benchee.TestHelpers
   alias Benchee.{Suite, Benchmark, Configuration, Statistics}
+  alias Benchee.Benchmark.Scenario
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
 
   @config %Configuration{parallel: 1,
@@ -154,6 +155,26 @@ defmodule Benchee.Benchmark.RunnerTest do
     end
 
     @no_input Benchmark.no_input()
+    test "never calls the function if it already has run times associated" do
+      ref = self()
+
+      suite = %Suite{
+        scenarios: [
+          %Scenario{
+            run_times: [1, 2, 3],
+            function: fn -> send(ref, :called) end,
+            input: @no_input
+          }
+        ]
+      }
+
+      suite
+      |> test_suite
+      |> Benchmark.measure(TestPrinter)
+
+      refute_received :called
+    end
+
     test "asks to print what is currently benchmarking" do
       test_suite()
       |> Benchmark.benchmark("Something", fn -> :timer.sleep 10 end)
