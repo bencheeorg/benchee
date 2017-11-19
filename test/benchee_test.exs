@@ -395,7 +395,11 @@ defmodule BencheeTest do
           }, configuration)
 
           content = File.read! expected_file
-          assert :erlang.binary_to_term(content) == suite
+          untagged_suite = content
+                           |> :erlang.binary_to_term
+                           |> suite_without_scenario_tags
+
+          assert untagged_suite == suite
         after
           if File.exists?(expected_file) do
             File.rm!(expected_file)

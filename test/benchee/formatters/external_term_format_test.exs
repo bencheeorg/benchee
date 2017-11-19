@@ -6,8 +6,10 @@ defmodule Benchee.Formatters.ExternalTermFormatTest do
   import Benchee.Formatters.ExternalTermFormat
   import Benchee.Benchmark, only: [no_input: 0]
   import ExUnit.CaptureIO
+  import Benchee.TestHelpers, only: [suite_without_scenario_tags: 1]
 
   @filename "test/tmp/some_file.etf"
+  @benchee_tag "benchee-tag"
   @suite %Suite{
     scenarios: [
       %Scenario{
@@ -36,7 +38,12 @@ defmodule Benchee.Formatters.ExternalTermFormatTest do
       }
     ],
     configuration: %Benchee.Configuration{
-      formatter_options: %{external_term_format: %{file: @filename}}
+      formatter_options: %{
+        external_term_format: %{
+          file: @filename,
+          tag: @benchee_tag
+        }
+      }
     }
   }
 
@@ -45,8 +52,38 @@ defmodule Benchee.Formatters.ExternalTermFormatTest do
     test "able to restore the original just fine" do
       {binary, path} = format(@suite)
 
-      assert :erlang.binary_to_term(binary) == @suite
+      loaded_suite = binary
+                     |> :erlang.binary_to_term
+                     |> suite_without_scenario_tags
+
+      assert loaded_suite == @suite
       assert path == @filename
+    end
+
+    test "tags the scenarios" do
+      {binary, _path} = format(@suite)
+
+      loaded_suite = :erlang.binary_to_term(binary)
+
+      Enum.each loaded_suite.scenarios, fn(scenario) ->
+        assert scenario.tag == @benchee_tag
+      end
+    end
+
+    test "doesn't tag scenarios that already had a tag" do
+      tagged_scenario = %Scenario{tag: "some-tag"}
+      suite = %Suite{@suite | scenarios: [tagged_scenario | @suite.scenarios]}
+
+      {binary, _path} = format(suite)
+      loaded_suite = :erlang.binary_to_term(binary)
+      loaded_scenarios = loaded_suite.scenarios
+
+      tags = loaded_scenarios
+             |> Enum.map(fn(scenario) -> scenario.tag end)
+             |> Enum.uniq
+             |> Enum.sort
+
+      assert tags == [@benchee_tag, "some-tag"]
     end
   end
 
@@ -57,7 +94,11 @@ defmodule Benchee.Formatters.ExternalTermFormatTest do
 
         etf_data = File.read!(@filename)
 
-        assert :erlang.binary_to_term(etf_data) == @suite
+        loaded_suite = etf_data
+                       |> :erlang.binary_to_term
+                       |> suite_without_scenario_tags
+
+        assert loaded_suite == @suite
       after
         if File.exists?(@filename), do: File.rm!(@filename)
       end

@@ -21,7 +21,8 @@ defmodule Benchee.Benchmark.Scenario do
     before_each: nil,
     after_each: nil,
     before_scenario: nil,
-    after_scenario: nil
+    after_scenario: nil,
+    tag: nil
   ]
 
   @type t :: %__MODULE__{
@@ -36,6 +37,7 @@ defmodule Benchee.Benchmark.Scenario do
     before_each: fun | nil,
     after_each: fun | nil,
     before_scenario: fun | nil,
-    after_scenario: fun | nil
+    after_scenario: fun | nil,
+    tag: String.t | nil
   }
 end

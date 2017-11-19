@@ -7,13 +7,29 @@ defmodule Benchee.Formatters.ExternalTermFormat do
   use Benchee.Formatter
 
   alias Benchee.Suite
+  alias Benchee.Benchmark.Scenario
   alias Benchee.Utility.FileCreation
 
   @spec format(Suite.t) :: {binary, String.t}
-  def format(suite = %Suite{configuration: configuration}) do
-    file_name = configuration.formatter_options.external_term_format.file
+  def format(suite = %Suite{configuration: config, scenarios: scenarios}) do
+    formatter_config = config.formatter_options.external_term_format
+    tagged_scenarios = tag_scenarios(scenarios, formatter_config)
+    tagged_suite = %Suite{suite | scenarios: tagged_scenarios}
 
-    {:erlang.term_to_binary(suite), file_name}
+    {:erlang.term_to_binary(tagged_suite), formatter_config.file}
+  end
+
+  defp tag_scenarios(scenarios, %{tag: tag}) do
+    Enum.map scenarios, fn(scenario) ->
+      tagged_scenario(scenario, tag)
+    end
+  end
+
+  defp tagged_scenario(scenario = %Scenario{tag: nil}, desired_tag) do
+    %Scenario{scenario | tag: desired_tag}
+  end
+  defp tagged_scenario(scenario, _desired_tag) do
+    scenario
   end
 
   @spec write({binary, String.t}) :: :ok
