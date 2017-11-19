@@ -316,7 +316,7 @@ defmodule Benchee.Configuration do
       file: FileCreation.interleave(save_options.file, save_options.tag)
     }
 
-    %__MODULE__{ config |
+    %__MODULE__{config |
       formatters: config.formatters ++ [Benchee.Formatters.ExternalTermFormat],
       formatter_options:
         Map.put(config.formatter_options, :external_term_format, etf_options)
