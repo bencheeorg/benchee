@@ -377,17 +377,17 @@ defmodule BencheeTest do
     assert length(occurences) == 2
   end
 
-  describe "save option" do
+  describe "save & load" do
     test "saving the suite to disk and restoring it" do
-      capture_io fn ->
-        save = [save: [file: "save.benchee", tag: "master"]]
-        expected_file = "save_master.benchee"
+      save = [save: [file: "save.benchee", tag: "master"]]
+      expected_file = "save_master.benchee"
 
-        try do
-          configuration = Keyword.merge @test_times, save
-          map_fun = fn(i) -> [i, i * i] end
-          list = Enum.to_list(1..100)
+      try do
+        configuration = Keyword.merge @test_times, save
+        map_fun = fn(i) -> [i, i * i] end
+        list = Enum.to_list(1..10_000)
 
+        capture_io fn ->
           suite = Benchee.run(%{
             "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
             "map.flatten" =>
@@ -400,10 +400,16 @@ defmodule BencheeTest do
                            |> suite_without_scenario_tags
 
           assert untagged_suite == suite
-        after
-          if File.exists?(expected_file) do
-            File.rm!(expected_file)
-          end
+        end
+
+        loaded_output = capture_io fn ->
+          Benchee.run(%{}, Keyword.merge(@test_times, load: expected_file))
+        end
+
+        readme_sample_asserts(loaded_output)
+      after
+        if File.exists?(expected_file) do
+          File.rm!(expected_file)
         end
       end
     end

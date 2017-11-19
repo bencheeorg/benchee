@@ -3,6 +3,7 @@ defmodule Benchee.ConfigurationTest do
   doctest Benchee.Configuration
 
   alias Benchee.{Configuration, Suite}
+  alias Benchee.Benchmark.Scenario
 
   import DeepMerge
   import Benchee.Configuration
@@ -50,6 +51,20 @@ defmodule Benchee.ConfigurationTest do
 
       assert etf_options.tag =~ ~r/\d\d\d\d-\d\d?-\d\d?--\d\d?-\d\d?-\d\d?/
       assert String.contains?(etf_options.file, etf_options.tag)
+    end
+
+    test ":load indeed loads scenarios into the suite" do
+      scenarios = [%Scenario{tag: "old"}]
+      suite = %Suite{scenarios: scenarios}
+
+      try do
+        File.write! "save.benchee", :erlang.term_to_binary(suite)
+        suite = init load: "save.benchee"
+
+        assert suite.scenarios == scenarios
+      after
+        if File.exists?("save.benchee"), do: File.rm! "save.benchee"
+      end
     end
   end
 

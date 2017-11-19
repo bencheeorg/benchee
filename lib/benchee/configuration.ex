@@ -25,6 +25,7 @@ defmodule Benchee.Configuration do
     },
     inputs:               nil,
     save:                 false,
+    load:                 false,
     # formatters should end up here but known once are still picked up at
     # the top level for now
     formatter_options: %{
@@ -49,7 +50,8 @@ defmodule Benchee.Configuration do
     formatters:        [((Suite.t) -> Suite.t)],
     print:             map,
     inputs:            %{Suite.key => any} | nil,
-    save:              map | boolean,
+    save:              map | false,
+    load:              String.t | [String.t] | false,
     formatter_options: map,
     unit_scaling:      Scale.scaling_strategy,
     assigns:           map,
@@ -139,6 +141,7 @@ defmodule Benchee.Configuration do
             warmup: 2_000_000,
             inputs: nil,
             save: false,
+            load: false,
             formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
@@ -168,6 +171,7 @@ defmodule Benchee.Configuration do
             warmup: 200_000.0,
             inputs: nil,
             save: false,
+            load: false,
             formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
@@ -197,6 +201,7 @@ defmodule Benchee.Configuration do
             warmup: 200_000.0,
             inputs: nil,
             save: false,
+            load: false,
             formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
@@ -235,6 +240,7 @@ defmodule Benchee.Configuration do
             warmup: 200_000.0,
             inputs: %{"Small" => 5, "Big" => 9999},
             save: false,
+            load: false,
             formatters: [&IO.puts/2],
             print: %{
               benchmarking: true,
@@ -266,7 +272,7 @@ defmodule Benchee.Configuration do
              |> convert_time_to_micro_s
              |> save_option_conversion
 
-    %Suite{configuration: config}
+    %Suite{configuration: config, scenarios: load_scenarios(config.load)}
   end
 
   defp standardized_user_configuration(config) do
@@ -329,6 +335,22 @@ defmodule Benchee.Configuration do
       tag: "#{now.year}-#{now.month}-#{now.day}--#{now.hour}-#{now.minute}-#{now.second}-utc",
       filename: "benchmark.benchee"
     }
+  end
+
+  defp load_scenarios(false), do: []
+  defp load_scenarios(path) when is_binary(path), do: load_scenarios([path])
+  defp load_scenarios(paths) do
+    Enum.flat_map paths, fn(path_or_glob) ->
+      Enum.flat_map Path.wildcard(path_or_glob), &load_scenario/1
+    end
+  end
+
+  defp load_scenario(path) do
+    loaded_suite = path
+                   |> File.read!
+                   |> :erlang.binary_to_term
+
+    loaded_suite.scenarios
   end
 end
 
