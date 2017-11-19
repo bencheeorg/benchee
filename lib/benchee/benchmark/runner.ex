@@ -25,7 +25,7 @@ defmodule Benchee.Benchmark.Runner do
   """
   @spec run_scenarios([Scenario.t], ScenarioContext.t) :: [Scenario.t]
   def run_scenarios(scenarios, scenario_context) do
-    {need_to_run, loaded} = Enum.split_with(scenarios, &needs_benchmarking?/1)
+    {need_to_run, loaded} = Enum.partition(scenarios, &needs_benchmarking?/1)
 
     results = Enum.flat_map(need_to_run, fn(scenario) ->
       parallel_benchmark(scenario, scenario_context)
