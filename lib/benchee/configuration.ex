@@ -317,7 +317,7 @@ defmodule Benchee.Configuration do
     }
 
     %__MODULE__{config |
-      formatters: config.formatters ++ [Benchee.Formatters.ExternalTermFormat],
+      formatters: config.formatters ++ [Benchee.Formatters.TaggedSave],
       formatter_options:
         Map.put(config.formatter_options, :external_term_format, etf_options)
     }

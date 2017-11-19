@@ -1,7 +1,11 @@
-defmodule Benchee.Formatters.ExternalTermFormat do
+defmodule Benchee.Formatters.TaggedSave do
   @moduledoc """
-  Store the whole suite in the Erlang `ExternalTermFormat` - can be used for
-  storing and loading the results of previous runs.
+  Store the whole suite in the Erlang `ExternalTermFormat` while tagging the
+  scenarios of the current run with a specified tag - can be used for storing
+  and loading the results of previous runs.
+
+  Automatically invoked and appended when specifiying the `save` option in the
+  configuration.
   """
 
   use Benchee.Formatter

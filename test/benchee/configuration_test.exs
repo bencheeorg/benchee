@@ -35,7 +35,7 @@ defmodule Benchee.ConfigurationTest do
       suite = init save: [file: "save_one.benchee", tag: "master"]
 
       assert suite.configuration.formatters == [
-        Benchee.Formatters.Console, Benchee.Formatters.ExternalTermFormat
+        Benchee.Formatters.Console, Benchee.Formatters.TaggedSave
       ]
       assert suite.configuration.formatter_options.external_term_format == %{
         file: "save_one_master.benchee",
