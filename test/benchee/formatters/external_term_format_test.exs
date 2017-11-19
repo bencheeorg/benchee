@@ -7,7 +7,7 @@ defmodule Benchee.Formatters.ExternalTermFormatTest do
   import Benchee.Benchmark, only: [no_input: 0]
   import ExUnit.CaptureIO
 
-  @filename "some_file.etf"
+  @filename "test/tmp/some_file.etf"
   @suite %Suite{
     scenarios: [
       %Scenario{

@@ -32,7 +32,7 @@ defmodule Benchee.Utility.FileCreation do
         fn(file, content) -> IO.write(file, content) end)
   """
   def each(names_to_content, filename, function \\ &default_each/3) do
-    create_directory filename
+    ensure_directory_exists filename
     Enum.each names_to_content, fn({input_name, content}) ->
       input_filename = interleave(filename, input_name)
       File.open input_filename, [:write, :utf8], fn(file) ->
@@ -46,7 +46,10 @@ defmodule Benchee.Utility.FileCreation do
     IO.puts "Generated #{input_filename}"
   end
 
-  defp create_directory(filename) do
+  @doc """
+  Make sure the directory for the given file name exists.
+  """
+  def ensure_directory_exists(filename) do
     directory = Path.dirname filename
     File.mkdir_p! directory
   end
