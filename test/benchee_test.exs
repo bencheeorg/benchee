@@ -377,6 +377,34 @@ defmodule BencheeTest do
     assert length(occurences) == 2
   end
 
+  describe "save option" do
+    test "saving the suite to disk and restoring it" do
+      capture_io fn ->
+        save = [save: [file: "save.benchee", tag: "master"]]
+        expected_file = "save_master.benchee"
+
+        try do
+          configuration = Keyword.merge @test_times, save
+          map_fun = fn(i) -> [i, i * i] end
+          list = Enum.to_list(1..100)
+
+          suite = Benchee.run(%{
+            "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
+            "map.flatten" =>
+              fn -> list |> Enum.map(map_fun) |> List.flatten end
+          }, configuration)
+
+          content = File.read! expected_file
+          assert :erlang.binary_to_term(content) == suite
+        after
+          if File.exists?(expected_file) do
+            File.rm!(expected_file)
+          end
+        end
+      end
+    end
+  end
+
   describe "hooks" do
     test "it runs all of them" do
       capture_io fn ->
