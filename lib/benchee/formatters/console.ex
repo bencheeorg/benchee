@@ -172,8 +172,7 @@ defmodule Benchee.Formatters.Console do
 
   @spec format_scenario_extended(Scenario.t, unit_per_statistic, integer)
     :: String.t
-  defp format_scenario_extended(%Scenario{
-                                  job_name: name,
+  defp format_scenario_extended(scenario = %Scenario{
                                   run_time_statistics: %Statistics{
                                     minimum:     minimum,
                                     maximum:     maximum,
@@ -185,7 +184,7 @@ defmodule Benchee.Formatters.Console do
                                 label_width) do
     "~*s~*ts~*ts~*ts~*ts\n"
     |> :io_lib.format([
-      -label_width, name,
+      -label_width, Scenario.display_name(scenario),
       @minimum_width, run_time_out(minimum, run_time_unit),
       @maximum_width, run_time_out(maximum, run_time_unit),
       @sample_size_width, Count.format(sample_size),
@@ -226,7 +225,8 @@ defmodule Benchee.Formatters.Console do
   defp label_width(scenarios) do
     max_label_width =
       scenarios
-      |> Enum.map(fn(scenario) -> String.length(scenario.job_name) end)
+      |> Enum.map(&Scenario.display_name/1)
+      |> Enum.map(&String.length/1)
       |> Stream.concat([@default_label_width])
       |> Enum.max
     max_label_width + 1
@@ -241,8 +241,7 @@ defmodule Benchee.Formatters.Console do
   end
 
   @spec format_scenario(Scenario.t, unit_per_statistic, integer) :: String.t
-  defp format_scenario(%Scenario{
-                         job_name: name,
+  defp format_scenario(scenario = %Scenario{
                          run_time_statistics: %Statistics{
                            average:       average,
                            ips:           ips,
@@ -256,7 +255,7 @@ defmodule Benchee.Formatters.Console do
                        }, label_width) do
     "~*s~*ts~*ts~*ts~*ts~*ts\n"
     |> :io_lib.format([
-      -label_width, name,
+      -label_width, Scenario.display_name(scenario),
       @ips_width, ips_out(ips, ips_unit),
       @average_width, run_time_out(average, run_time_unit),
       @deviation_width, deviation_out(std_dev_ratio),
@@ -294,11 +293,14 @@ defmodule Benchee.Formatters.Console do
     ]
   end
 
-  defp reference_report(%Scenario{job_name: name,
-                                  run_time_statistics: %Statistics{ips: ips}},
+  defp reference_report(scenario = %Scenario{
+                          run_time_statistics: %Statistics{ips: ips}
+                        },
                         %{ips: ips_unit}, label_width) do
     "~*s~*s\n"
-    |> :io_lib.format([-label_width, name, @ips_width, ips_out(ips, ips_unit)])
+    |> :io_lib.format([
+         -label_width, Scenario.display_name(scenario),
+         @ips_width, ips_out(ips, ips_unit)])
     |> to_string
   end
 
@@ -314,12 +316,14 @@ defmodule Benchee.Formatters.Console do
     )
   end
 
-  defp format_comparison(%Scenario{job_name: name,
-                                   run_time_statistics: %Statistics{ips: ips}},
+  defp format_comparison(scenario = %Scenario{
+                           run_time_statistics: %Statistics{ips: ips}},
                          %{ips: ips_unit}, label_width, slower) do
     ips_format = ips_out(ips, ips_unit)
     "~*s~*s - ~.2fx slower\n"
-    |> :io_lib.format([-label_width, name, @ips_width, ips_format, slower])
+    |> :io_lib.format([
+         -label_width, Scenario.display_name(scenario),
+         @ips_width, ips_format, slower])
     |> to_string
   end
 

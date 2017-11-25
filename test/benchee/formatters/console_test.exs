@@ -527,6 +527,43 @@ defmodule Benchee.Formatters.ConsoleTest do
       ref_2 =~ ~r/Other Job/
       slower_2 =~ ~r/Job.+slower/
     end
+
+    test "with and without a tag" do
+      scenarios = [
+        %Scenario{
+          job_name: "job",
+          input_name: no_input(),
+          input: no_input(),
+          run_time_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1}
+          }
+        },
+        %Scenario{
+          job_name: "job",
+          tag: "improved",
+          input_name: no_input(),
+          input: no_input(),
+          run_time_statistics: %Statistics{
+            average: 100.0,
+            ips: 10_000.0,
+            std_dev_ratio: 0.1,
+            median: 90.0,
+            percentiles: %{99 => 200.1}
+          }
+        }
+      ]
+
+      [result] = Console.format(%Suite{scenarios: scenarios, configuration: @config})
+      [_, _header, job_with_tag, job, _, comparison, _slower] = result
+
+      assert job_with_tag =~ ~r/job \(improved\)\s+10 K/
+      assert job          =~ ~r/job\s+5 K/
+      assert comparison   =~ ~r/job \(improved\)\s+ 10 K/
+    end
   end
 
   defp assert_column_width(name, string, expected_width) do

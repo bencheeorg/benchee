@@ -406,7 +406,7 @@ defmodule BencheeTest do
           Benchee.run(%{}, Keyword.merge(@test_times, load: expected_file))
         end
 
-        readme_sample_asserts(loaded_output)
+        readme_sample_asserts(loaded_output, " (master)")
       after
         if File.exists?(expected_file) do
           File.rm!(expected_file)
@@ -454,19 +454,20 @@ defmodule BencheeTest do
   end
 
   @slower_regex "\\s+- \\d+\\.\\d+x slower"
-  defp readme_sample_asserts(output) do
+  defp readme_sample_asserts(output, tag_string \\ "") do
+    tag_regex = Regex.escape(tag_string)
     assert output =~ @header_regex
-    assert output =~ body_regex("flat_map")
-    assert output =~ body_regex("map.flatten")
+    assert output =~ body_regex("flat_map", tag_regex)
+    assert output =~ body_regex("map.flatten", tag_regex)
     assert output =~ ~r/Comparison/, output
-    assert output =~ ~r/^map.flatten\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
-    assert output =~ ~r/^flat_map\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
+    assert output =~ ~r/^map.flatten#{tag_regex}\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
+    assert output =~ ~r/^flat_map#{tag_regex}\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
     assert output =~ ~r/#{@slower_regex}/m
 
     refute Regex.match?(~r/fast/i, output)
   end
 
-  defp body_regex(benchmark_name) do
-    ~r/^#{benchmark_name}\s+\d+.+\s+\d+\.?\d*.+\s+.+\d+\.?\d*.+\s+\d+\.?\d*.+/m
+  defp body_regex(benchmark_name, tag_regex \\ "") do
+    ~r/^#{benchmark_name}#{tag_regex}\s+\d+.+\s+\d+\.?\d*.+\s+.+\d+\.?\d*.+\s+\d+\.?\d*.+/m
   end
 end

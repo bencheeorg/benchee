@@ -40,4 +40,21 @@ defmodule Benchee.Benchmark.Scenario do
     after_scenario: fun | nil,
     tag: String.t | nil
   }
+
+  @doc """
+  Returns the correct name to display of the given scenario.
+
+  In the normal case this is `job_name`, however when scenarios are loaded they
+  are tagged and these tags should be shown for disambiguation.
+
+  ## Examples
+
+      iex> alias Benchee.Benchmark.Scenario
+      iex> Scenario.display_name(%Scenario{job_name: "flat_map"})
+      "flat_map"
+      iex> Scenario.display_name(%Scenario{job_name: "flat_map", tag: "master"})
+      "flat_map (master)"
+  """
+  def display_name(%{job_name: job_name, tag: nil}), do: job_name
+  def display_name(%{job_name: job_name, tag: tag}), do: "#{job_name} (#{tag})"
 end
