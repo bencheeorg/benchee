@@ -35,7 +35,9 @@ defmodule Benchee.Benchmark do
   end
 
   defp duplicated_job_name?(scenarios, job_name) do
-    Enum.any?(scenarios, fn(scenario) -> scenario.job_name == job_name end)
+    scenarios
+    |> Enum.reject(fn(scenario) -> scenario.tag end)
+    |> Enum.any?(fn(scenario) -> scenario.job_name == job_name end)
   end
 
   defp add_scenario(suite = %Suite{scenarios: scenarios, configuration: config},

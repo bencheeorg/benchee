@@ -69,6 +69,16 @@ defmodule Benchee.BenchmarkTest do
         before_each: ^before,
         after_scenario: ^after_scenario } = scenario
     end
+
+    test "doesn't treat tagged scenarios as duplicates" do
+      suite =
+        %Suite{
+          scenarios: [%Scenario{job_name: "job", tag: "what"}]
+        }
+        |> Benchmark.benchmark("job", fn -> 1 end)
+
+      assert length(suite.scenarios) == 2
+    end
   end
 
   describe ".measure" do
