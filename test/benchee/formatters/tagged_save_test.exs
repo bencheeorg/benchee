@@ -13,6 +13,7 @@ defmodule Benchee.Formatters.TaggedSaveTest do
   @suite %Suite{
     scenarios: [
       %Scenario{
+        name: "Second",
         job_name: "Second",
         input_name: no_input(),
         input: no_input(),
@@ -25,6 +26,7 @@ defmodule Benchee.Formatters.TaggedSaveTest do
         }
       },
       %Scenario{
+        name: "First",
         job_name: "First",
         input_name: no_input(),
         input: no_input(),
@@ -60,13 +62,14 @@ defmodule Benchee.Formatters.TaggedSaveTest do
       assert path == @filename
     end
 
-    test "tags the scenarios" do
+    test "tags the scenarios and adds it to the name" do
       {binary, _path} = format(@suite)
 
       loaded_suite = :erlang.binary_to_term(binary)
 
       Enum.each loaded_suite.scenarios, fn(scenario) ->
         assert scenario.tag == @benchee_tag
+        assert scenario.name =~ ~r/#{@benchee_tag}/
       end
     end
 

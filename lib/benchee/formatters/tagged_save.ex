@@ -25,7 +25,9 @@ defmodule Benchee.Formatters.TaggedSave do
 
   defp tag_scenarios(scenarios, %{tag: tag}) do
     Enum.map scenarios, fn(scenario) ->
-      tagged_scenario(scenario, tag)
+      scenario
+      |> tagged_scenario(tag)
+      |> update_name
     end
   end
 
@@ -34,6 +36,10 @@ defmodule Benchee.Formatters.TaggedSave do
   end
   defp tagged_scenario(scenario, _desired_tag) do
     scenario
+  end
+
+  defp update_name(scenario) do
+    %Scenario{scenario | name: Scenario.display_name(scenario)}
   end
 
   @spec write({binary, String.t}) :: :ok

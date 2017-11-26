@@ -69,7 +69,11 @@ defmodule Benchee.Benchmark do
     |> build_scenario
   end
   defp build_scenario(scenario_data) do
-    struct!(Scenario, scenario_data)
+    struct!(Scenario, add_scenario_name(scenario_data))
+  end
+
+  defp add_scenario_name(scenario_data) do
+    Map.put(scenario_data, :name, Scenario.display_name(scenario_data))
   end
 
   @doc """
