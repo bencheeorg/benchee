@@ -66,12 +66,17 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       assert output =~ "Estimated total run time: 2.33 min"
     end
 
-    @inputs %{"Arg 1" => "Argument 1", "Arg 2" => "Argument 2"}
+    @inputs %{"Arg 1" => 1, "Arg 2" => 2}
     test "multiple inputs" do
       output = capture_io fn ->
         %{
           configuration: %{parallel: 2, time: 10_000, warmup: 0, inputs: @inputs},
-          scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
+          scenarios: [
+            %Scenario{job_name: "one", input_name: "Arg 1", input: 1},
+            %Scenario{job_name: "one", input_name: "Arg 2", input: 2},
+            %Scenario{job_name: "two", input_name: "Arg 1", input: 1},
+            %Scenario{job_name: "two", input_name: "Arg 2", input: 2}
+          ],
           system: @system_info
         }
         |> configuration_information
