@@ -1,4 +1,10 @@
-## unreleased
+## 0.11.0 (2017-11-30)
+
+A tiny little release with a bugfix and MOARE statistics for the console formatter.
+
+### Bugfixes (User Facing)
+
+* estimated run times should be correct again, they were too high when inputs were used
 
 ### Features (User Facing)
 
