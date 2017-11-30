@@ -42,9 +42,9 @@ defmodule Benchee.Output.BenchmarkPrinter do
                                  time:     time,
                                  warmup:   warmup,
                                  inputs:   inputs}) do
-    job_count      = length(scenarios)
+    scenario_count = length(scenarios)
     exec_time      = warmup + time
-    total_time     = job_count * inputs_count(inputs) * exec_time
+    total_time     = scenario_count * exec_time
 
     IO.puts """
     Benchmark suite executing with the following configuration:
@@ -56,9 +56,6 @@ defmodule Benchee.Output.BenchmarkPrinter do
 
     """
   end
-
-  defp inputs_count(nil),    do: 1 # no input specified still executes
-  defp inputs_count(inputs), do: map_size(inputs)
 
   defp inputs_out(nil), do: "none specified"
   defp inputs_out(inputs) do
