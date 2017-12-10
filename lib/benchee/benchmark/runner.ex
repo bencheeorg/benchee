@@ -25,18 +25,10 @@ defmodule Benchee.Benchmark.Runner do
   """
   @spec run_scenarios([Scenario.t], ScenarioContext.t) :: [Scenario.t]
   def run_scenarios(scenarios, scenario_context) do
-    {need_to_run, loaded} = Enum.partition(scenarios, &needs_benchmarking?/1)
-
-    results = Enum.flat_map(need_to_run, fn(scenario) ->
+    Enum.flat_map(scenarios, fn(scenario) ->
       parallel_benchmark(scenario, scenario_context)
     end)
-
-    results ++ loaded
   end
-
-  # When we load scenarios we mustn't run them again they already have values
-  defp needs_benchmarking?(%Scenario{run_times: [_measure | _ments]}), do: false
-  defp needs_benchmarking?(_), do: true
 
   defp parallel_benchmark(
          scenario = %Scenario{job_name: job_name, input_name: input_name},

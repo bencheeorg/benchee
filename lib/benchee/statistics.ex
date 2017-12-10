@@ -140,12 +140,12 @@ defmodule Benchee.Statistics do
   """
   @spec statistics(Suite.t) :: Suite.t
   def statistics(suite = %Suite{scenarios: scenarios}) do
-    new_scenarios = Parallel.map(scenarios, fn(scenario) ->
+    scenarios_with_statistics = Parallel.map(scenarios, fn(scenario) ->
       stats = job_statistics(scenario.run_times)
       %Scenario{scenario | run_time_statistics: stats}
     end)
 
-    %Suite{suite | scenarios: new_scenarios}
+    %Suite{suite | scenarios: scenarios_with_statistics}
   end
 
   @doc """
