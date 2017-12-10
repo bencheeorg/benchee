@@ -2,6 +2,7 @@ defmodule Benchee.Benchmark.RunnerTest do
   use ExUnit.Case, async: true
   import Benchee.TestHelpers
   alias Benchee.{Suite, Benchmark, Configuration, Statistics}
+  alias Benchee.Benchmark.Scenario
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
 
   @config %Configuration{parallel: 1,
@@ -243,6 +244,29 @@ defmodule Benchee.Benchmark.RunnerTest do
         # as if sorted ascending
         assert run_times == Enum.sort(run_times)
       end
+    end
+
+    # important for when we load scenarios but want them to run again and not
+    # keep or add to them (adding to them makes no sense as they were run on a
+    # different machine, just keeping them can be accomplished by loading them
+    # after `measure`)
+    test "completely overrides existing runtimes" do
+      suite = %Suite{
+        scenarios: [
+          %Scenario{
+            run_times: [1_000_000],
+            function: fn -> 1 + 1 end,
+            input: @no_input
+          }
+        ]
+      }
+
+      %Suite{scenarios: [scenario]} = suite
+                                 |> test_suite
+                                 |> Benchmark.measure(TestPrinter)
+
+      # our previous run time isn't there anymore
+      refute Enum.member?(scenario.run_times, 1_000_000)
     end
 
     test "global hooks triggers" do
