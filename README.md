@@ -69,10 +69,6 @@ In addition, you can optionally output an extended set of statistics.
 * **sample size** - the number of run time measurements taken
 * **mode**        - the run time(s) that occur the most. Often one value, but can be multiple values if they occur the same amount of times. If no value occurs at least twice, this value will be nil.
 
-Benchee does not:
-
-* Keep results of previous runs and compare them (yet), if you want that have a look at [benchfella](https://github.com/alco/benchfella) or [bmark](https://github.com/joekain/bmark) until benchee gets that feature :)
-
 ## Installation
 
 Add benchee to your list of dependencies in `mix.exs`:
@@ -561,6 +557,29 @@ global_after_each(4)
 global_after_scenario(2)
 
 suite_tear_down
+```
+
+### Saving runs, Loading & comparing previous runs
+
+Benchee can store the results of previous runs in a file and then load them
+again to compare for example what was recorded against a branch with performance
+improvements.
+
+**Saving** is done through the `save` configuration specifying a `path`,
+where to save the results defaulting to `"benchmark.benchee"`, and a `tag`, to annotate these results (for instance with a branch name) defaulting to a time
+stamp.
+
+**Loading** is done through the `load` option specifying a path to the files to
+load which can also be a list or a glob expression (`"run*.benchee"`).
+
+```elixir
+Benchee.run(%{
+  "something_great" => fn -> cool_stuff end
+},
+  save: [path: "save.benchee", tag: "first-try"]
+)
+
+Benchee.run(%{}, load: "save_first-try.benchee")
 ```
 
 ### More verbose usage
