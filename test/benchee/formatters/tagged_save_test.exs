@@ -49,7 +49,6 @@ defmodule Benchee.Formatters.TaggedSaveTest do
     }
   }
 
-
   describe ".format/1" do
     test "able to restore the original just fine" do
       {binary, path} = format(@suite)
