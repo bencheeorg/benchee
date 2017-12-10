@@ -379,7 +379,7 @@ defmodule BencheeTest do
 
   describe "save & load" do
     test "saving the suite to disk and restoring it" do
-      save = [save: [file: "save.benchee", tag: "master"]]
+      save = [save: [path: "save.benchee", tag: "master"]]
       expected_file = "save_master.benchee"
 
       try do

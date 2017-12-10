@@ -42,7 +42,7 @@ defmodule Benchee.Formatters.TaggedSaveTest do
     configuration: %Benchee.Configuration{
       formatter_options: %{
         tagged_save: %{
-          file: @filename,
+          path: @filename,
           tag: @benchee_tag
         }
       }

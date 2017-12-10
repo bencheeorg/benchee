@@ -20,7 +20,7 @@ defmodule Benchee.Formatters.TaggedSave do
     tagged_scenarios = tag_scenarios(scenarios, formatter_config)
     tagged_suite = %Suite{suite | scenarios: tagged_scenarios}
 
-    {:erlang.term_to_binary(tagged_suite), formatter_config.file}
+    {:erlang.term_to_binary(tagged_suite), formatter_config.path}
   end
 
   defp tag_scenarios(scenarios, %{tag: tag}) do

@@ -32,24 +32,24 @@ defmodule Benchee.ConfigurationTest do
     end
 
     test "uses information from :save to setup the external term formattter" do
-      suite = init save: [file: "save_one.benchee", tag: "master"]
+      suite = init save: [path: "save_one.benchee", tag: "master"]
 
       assert suite.configuration.formatters == [
         Benchee.Formatters.Console, Benchee.Formatters.TaggedSave
       ]
       assert suite.configuration.formatter_options.tagged_save == %{
-        file: "save_one_master.benchee",
+        path: "save_one_master.benchee",
         tag:  "master"
       }
     end
 
     test ":save tag defaults to date" do
-      suite = init save: [file: "save_one.benchee"]
+      suite = init save: [path: "save_one.benchee"]
 
       etf_options = suite.configuration.formatter_options.tagged_save
 
       assert etf_options.tag =~ ~r/\d\d\d\d-\d\d?-\d\d?--\d\d?-\d\d?-\d\d?/
-      assert String.contains?(etf_options.file, etf_options.tag)
+      assert String.contains?(etf_options.path, etf_options.tag)
     end
   end
 

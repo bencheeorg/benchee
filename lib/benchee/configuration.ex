@@ -319,7 +319,7 @@ defmodule Benchee.Configuration do
 
     tagged_save_options = %{
       tag: save_options.tag,
-      file: FileCreation.interleave(save_options.file, save_options.tag)
+      path: FileCreation.interleave(save_options.path, save_options.tag)
     }
 
     %__MODULE__{config |
@@ -333,7 +333,7 @@ defmodule Benchee.Configuration do
     now = DateTime.utc_now
     %{
       tag: "#{now.year}-#{now.month}-#{now.day}--#{now.hour}-#{now.minute}-#{now.second}-utc",
-      filename: "benchmark.benchee"
+      path: "benchmark.benchee"
     }
   end
 end
