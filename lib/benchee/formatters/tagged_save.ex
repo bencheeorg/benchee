@@ -16,7 +16,7 @@ defmodule Benchee.Formatters.TaggedSave do
 
   @spec format(Suite.t) :: {binary, String.t}
   def format(suite = %Suite{configuration: config, scenarios: scenarios}) do
-    formatter_config = config.formatter_options.external_term_format
+    formatter_config = config.formatter_options.tagged_save
     tagged_scenarios = tag_scenarios(scenarios, formatter_config)
     tagged_suite = %Suite{suite | scenarios: tagged_scenarios}
 

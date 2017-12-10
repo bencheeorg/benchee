@@ -59,6 +59,7 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
       |> add_benchmarking_jobs(jobs)
       |> Benchee.measure
       |> Benchee.statistics
+      |> Benchee.load
     end
 
     defp output_results(suite = %{configuration: %{formatters: formatters}}) do
@@ -97,6 +98,7 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     defdelegate measure(suite, printer),          to: Benchee.Benchmark
     defdelegate benchmark(suite, name, function), to: Benchee.Benchmark
     defdelegate statistics(suite),                to: Benchee.Statistics
+    defdelegate load(suite),                      to: Benchee.ScenarioLoader
     defdelegate benchmark(suite, name, function, printer), to: Benchee.Benchmark
   end
 end

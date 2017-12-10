@@ -41,7 +41,7 @@ defmodule Benchee.Formatters.TaggedSaveTest do
     ],
     configuration: %Benchee.Configuration{
       formatter_options: %{
-        external_term_format: %{
+        tagged_save: %{
           file: @filename,
           tag: @benchee_tag
         }

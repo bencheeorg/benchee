@@ -272,7 +272,7 @@ defmodule Benchee.Configuration do
              |> convert_time_to_micro_s
              |> save_option_conversion
 
-    %Suite{configuration: config, scenarios: load_scenarios(config.load)}
+    %Suite{configuration: config}
   end
 
   defp standardized_user_configuration(config) do
@@ -317,7 +317,7 @@ defmodule Benchee.Configuration do
   defp save_option_conversion(config = %{save: save_values}) do
     save_options = Map.merge(save_defaults(), save_values)
 
-    etf_options = %{
+    tagged_save_options = %{
       tag: save_options.tag,
       file: FileCreation.interleave(save_options.file, save_options.tag)
     }
@@ -325,7 +325,7 @@ defmodule Benchee.Configuration do
     %__MODULE__{config |
       formatters: config.formatters ++ [Benchee.Formatters.TaggedSave],
       formatter_options:
-        Map.put(config.formatter_options, :external_term_format, etf_options)
+        Map.put(config.formatter_options, :tagged_save, tagged_save_options)
     }
   end
 
@@ -335,22 +335,6 @@ defmodule Benchee.Configuration do
       tag: "#{now.year}-#{now.month}-#{now.day}--#{now.hour}-#{now.minute}-#{now.second}-utc",
       filename: "benchmark.benchee"
     }
-  end
-
-  defp load_scenarios(false), do: []
-  defp load_scenarios(path) when is_binary(path), do: load_scenarios([path])
-  defp load_scenarios(paths) do
-    Enum.flat_map paths, fn(path_or_glob) ->
-      Enum.flat_map Path.wildcard(path_or_glob), &load_scenario/1
-    end
-  end
-
-  defp load_scenario(path) do
-    loaded_suite = path
-                   |> File.read!
-                   |> :erlang.binary_to_term
-
-    loaded_suite.scenarios
   end
 end
 
