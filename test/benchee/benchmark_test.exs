@@ -21,7 +21,7 @@ defmodule Benchee.BenchmarkTest do
 
     test "warns when adding the same job again even if it's atom and string" do
       one_fun = fn -> 1 end
-      scenario = %Scenario{job_name: "one", function: one_fun}
+      scenario = %Scenario{job_name: "one", function: one_fun, name: "one"}
       suite = %Suite{scenarios: [scenario]}
       new_suite = Benchmark.benchmark(suite, :one, fn -> 42 end, TestPrinter)
 

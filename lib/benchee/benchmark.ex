@@ -26,7 +26,7 @@ defmodule Benchee.Benchmark do
   @spec benchmark(Suite.t, job_name, fun, module) :: Suite.t
   def benchmark(suite = %Suite{scenarios: scenarios}, job_name, function, printer \\ Printer) do
     normalized_name = to_string(job_name)
-    if duplicated_job_name?(scenarios, normalized_name) do
+    if duplicate?(scenarios, normalized_name) do
       printer.duplicate_benchmark_warning(normalized_name)
       suite
     else
@@ -34,10 +34,8 @@ defmodule Benchee.Benchmark do
     end
   end
 
-  defp duplicated_job_name?(scenarios, job_name) do
-    scenarios
-    |> Enum.reject(fn(scenario) -> scenario.tag end)
-    |> Enum.any?(fn(scenario) -> scenario.job_name == job_name end)
+  defp duplicate?(scenarios, job_name) do
+    Enum.any?(scenarios, fn(scenario) -> scenario.name == job_name end)
   end
 
   defp add_scenario(suite = %Suite{scenarios: scenarios, configuration: config},

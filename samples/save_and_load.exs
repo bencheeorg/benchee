@@ -6,7 +6,7 @@ Benchee.run(%{
   "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
 },
   time: 5,
-  save: [file: "save.benchee", tag: "first-try"]
+  save: [path: "save.benchee", tag: "first-try"]
 )
 
 IO.puts "----------------------------------------------"
@@ -20,7 +20,7 @@ Benchee.run(%{
   console: [extended_statistics: true]
 )
 
-# tobi@speedy ~/github/benchee $ mix run samples/save_and_load.exs 
+# tobi@speedy ~/github/benchee $ mix run samples/save_and_load.exs
 # Operating System: Linux
 # CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
 # Number of Available Cores: 8
