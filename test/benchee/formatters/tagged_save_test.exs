@@ -91,19 +91,17 @@ defmodule Benchee.Formatters.TaggedSaveTest do
 
   describe ".output/1" do
     test "able to restore fully from file" do
-      try do
-        capture_io fn -> output(@suite) end
+      capture_io fn -> output(@suite) end
 
-        etf_data = File.read!(@filename)
+      etf_data = File.read!(@filename)
 
-        loaded_suite = etf_data
-                       |> :erlang.binary_to_term
-                       |> suite_without_scenario_tags
+      loaded_suite = etf_data
+                     |> :erlang.binary_to_term
+                     |> suite_without_scenario_tags
 
-        assert loaded_suite == @suite
-      after
-        if File.exists?(@filename), do: File.rm!(@filename)
-      end
+      assert loaded_suite == @suite
+    after
+      if File.exists?(@filename), do: File.rm!(@filename)
     end
   end
 end
