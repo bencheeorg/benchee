@@ -9,7 +9,6 @@ defmodule Benchee.Configuration do
     Conversion.Duration,
     Conversion.Scale,
     Utility.DeepConvert,
-    Utility.FileCreation,
     Formatters.Console
   }
 
@@ -319,7 +318,7 @@ defmodule Benchee.Configuration do
 
     tagged_save_options = %{
       tag: save_options.tag,
-      path: FileCreation.interleave(save_options.path, save_options.tag)
+      path: save_options.path
     }
 
     %__MODULE__{config |

@@ -38,7 +38,7 @@ defmodule Benchee.ConfigurationTest do
         Benchee.Formatters.Console, Benchee.Formatters.TaggedSave
       ]
       assert suite.configuration.formatter_options.tagged_save == %{
-        path: "save_one_master.benchee",
+        path: "save_one.benchee",
         tag:  "master"
       }
     end
@@ -49,7 +49,7 @@ defmodule Benchee.ConfigurationTest do
       etf_options = suite.configuration.formatter_options.tagged_save
 
       assert etf_options.tag =~ ~r/\d\d\d\d-\d\d?-\d\d?--\d\d?-\d\d?-\d\d?/
-      assert String.contains?(etf_options.path, etf_options.tag)
+      assert etf_options.path == "save_one.benchee"
     end
   end
 

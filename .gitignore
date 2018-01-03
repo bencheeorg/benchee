@@ -7,3 +7,4 @@ elixir_build_*
 doc
 docs
 /test/tmp
+save.benchee

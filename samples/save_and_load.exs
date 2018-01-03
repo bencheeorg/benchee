@@ -16,7 +16,7 @@ Benchee.run(%{
   "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
 },
   time: 5,
-  load: "save_first-try.benchee",
+  load: "save.benchee",
   console: [extended_statistics: true]
 )
 

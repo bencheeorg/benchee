@@ -380,7 +380,7 @@ defmodule BencheeTest do
   describe "save & load" do
     test "saving the suite to disk and restoring it" do
       save = [save: [path: "save.benchee", tag: "master"]]
-      expected_file = "save_master.benchee"
+      expected_file = "save.benchee"
 
       try do
         configuration = Keyword.merge @test_times, save
