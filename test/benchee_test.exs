@@ -377,6 +377,44 @@ defmodule BencheeTest do
     assert length(occurences) == 2
   end
 
+  describe "save & load" do
+    test "saving the suite to disk and restoring it" do
+      save = [save: [path: "save.benchee", tag: "master"]]
+      expected_file = "save.benchee"
+
+      try do
+        configuration = Keyword.merge @test_times, save
+        map_fun = fn(i) -> [i, i * i] end
+        list = Enum.to_list(1..10_000)
+
+        capture_io fn ->
+          suite = Benchee.run(%{
+            "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
+            "map.flatten" =>
+              fn -> list |> Enum.map(map_fun) |> List.flatten end
+          }, configuration)
+
+          content = File.read! expected_file
+          untagged_suite = content
+                           |> :erlang.binary_to_term
+                           |> suite_without_scenario_tags
+
+          assert untagged_suite == suite
+        end
+
+        loaded_output = capture_io fn ->
+          Benchee.run(%{}, Keyword.merge(@test_times, load: expected_file))
+        end
+
+        readme_sample_asserts(loaded_output, " (master)")
+      after
+        if File.exists?(expected_file) do
+          File.rm!(expected_file)
+        end
+      end
+    end
+  end
+
   describe "hooks" do
     test "it runs all of them" do
       capture_io fn ->
@@ -416,19 +454,20 @@ defmodule BencheeTest do
   end
 
   @slower_regex "\\s+- \\d+\\.\\d+x slower"
-  defp readme_sample_asserts(output) do
+  defp readme_sample_asserts(output, tag_string \\ "") do
+    tag_regex = Regex.escape(tag_string)
     assert output =~ @header_regex
-    assert output =~ body_regex("flat_map")
-    assert output =~ body_regex("map.flatten")
+    assert output =~ body_regex("flat_map", tag_regex)
+    assert output =~ body_regex("map.flatten", tag_regex)
     assert output =~ ~r/Comparison/, output
-    assert output =~ ~r/^map.flatten\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
-    assert output =~ ~r/^flat_map\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
+    assert output =~ ~r/^map.flatten#{tag_regex}\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
+    assert output =~ ~r/^flat_map#{tag_regex}\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
     assert output =~ ~r/#{@slower_regex}/m
 
     refute Regex.match?(~r/fast/i, output)
   end
 
-  defp body_regex(benchmark_name) do
-    ~r/^#{benchmark_name}\s+\d+.+\s+\d+\.?\d*.+\s+.+\d+\.?\d*.+\s+\d+\.?\d*.+/m
+  defp body_regex(benchmark_name, tag_regex \\ "") do
+    ~r/^#{benchmark_name}#{tag_regex}\s+\d+.+\s+\d+\.?\d*.+\s+.+\d+\.?\d*.+\s+\d+\.?\d*.+/m
   end
 end

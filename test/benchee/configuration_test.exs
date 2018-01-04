@@ -30,6 +30,27 @@ defmodule Benchee.ConfigurationTest do
       assert %Suite{configuration: %{inputs: inputs}} = suite
       assert %{"map" => %{}} == inputs
     end
+
+    test "uses information from :save to setup the external term formattter" do
+      suite = init save: [path: "save_one.benchee", tag: "master"]
+
+      assert suite.configuration.formatters == [
+        Benchee.Formatters.Console, Benchee.Formatters.TaggedSave
+      ]
+      assert suite.configuration.formatter_options.tagged_save == %{
+        path: "save_one.benchee",
+        tag:  "master"
+      }
+    end
+
+    test ":save tag defaults to date" do
+      suite = init save: [path: "save_one.benchee"]
+
+      etf_options = suite.configuration.formatter_options.tagged_save
+
+      assert etf_options.tag =~ ~r/\d\d\d\d-\d\d?-\d\d?--\d\d?-\d\d?-\d\d?/
+      assert etf_options.path == "save_one.benchee"
+    end
   end
 
   describe ".deep_merge behaviour" do

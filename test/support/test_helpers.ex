@@ -18,12 +18,19 @@ defmodule Benchee.TestHelpers do
     end
   end
 
-  # assert we received eactly those messages of the contained types
   def assert_received_exactly(expected) do
     Enum.each(expected, fn(message) -> assert_received ^message end)
 
     expected
     |> Enum.uniq
     |> Enum.each(fn(message) -> refute_received(^message) end)
+  end
+
+  def suite_without_scenario_tags(suite) do
+    scenarios = Enum.map suite.scenarios, fn(scenario) ->
+      %Benchee.Benchmark.Scenario{scenario | tag: nil, name: scenario.job_name}
+    end
+
+    %Benchee.Suite{suite | scenarios: scenarios}
   end
 end

@@ -29,7 +29,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "formats and prints the results right to the console" do
       scenarios = [
         %Scenario{
-          job_name: "Second",
+          name: "Second",
           input_name: no_input(),
           input: no_input(),
           run_time_statistics: %Statistics{
@@ -41,7 +41,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           }
         },
         %Scenario{
-          job_name: "First",
+          name: "First",
           input_name: no_input(),
           input: no_input(),
           run_time_statistics: %Statistics{
@@ -73,7 +73,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "displays extended statistics" do
       scenarios = [
         %Scenario{
-          job_name: "First job",
+          name: "First job",
           run_time_statistics: %Statistics{
             average: 200.0,
             ips: 5_000.0,
@@ -106,7 +106,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "displays extended statistics with multiple mode ouput" do
       scenarios = [
         %Scenario{
-          job_name: "First job",
+          name: "First job",
           run_time_statistics: %Statistics{
             average: 200.0,
             ips: 5_000.0,
@@ -131,7 +131,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "displays N/A when no mode exists" do
       scenarios = [
         %Scenario{
-          job_name: "First job",
+          name: "First job",
           run_time_statistics: %Statistics{
             average: 200.0,
             ips: 5_000.0,
@@ -154,7 +154,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "sorts the the given stats fastest to slowest" do
       scenarios = [
         %Scenario{
-          job_name: "Second",
+          name: "Second",
           run_time_statistics: %Statistics{
             average: 200.0,
             ips: 5_000.0,
@@ -164,7 +164,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           }
         },
         %Scenario{
-          job_name: "Third",
+          name: "Third",
           run_time_statistics: %Statistics{
             average: 400.0,
             ips: 2_500.0,
@@ -174,7 +174,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           }
         },
         %Scenario{
-          job_name: "First",
+          name: "First",
           run_time_statistics: %Statistics{
             average: 100.0,
             ips: 10_000.0,
@@ -196,7 +196,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "adjusts the label width to longest name" do
       scenarios = [
         %Scenario{
-          job_name: "Second",
+          name: "Second",
           run_time_statistics: %Statistics{
             average: 400.0,
             ips: 2_500.0,
@@ -206,7 +206,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           }
         },
         %Scenario{
-          job_name: "First",
+          name: "First",
           run_time_statistics: %Statistics{
             average: 200.0,
             ips: 5_000.0,
@@ -228,7 +228,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       third_length = 40
       third_name = String.duplicate("a", third_length)
       long_scenario = %Scenario{
-        job_name: third_name,
+        name: third_name,
         run_time_statistics: %Statistics{
           average: 400.1,
           ips: 2_500.0,
@@ -252,7 +252,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "creates comparisons" do
       scenarios = [
         %Scenario{
-          job_name: "Second",
+          name: "Second",
           run_time_statistics: %Statistics{
             average: 200.0,
             ips: 5_000.0,
@@ -262,7 +262,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           }
         },
         %Scenario{
-          job_name: "First",
+          name: "First",
           run_time_statistics: %Statistics{
             average: 100.0,
             ips: 10_000.0,
@@ -284,7 +284,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "can omit the comparisons" do
       scenarios = [
         %Scenario{
-          job_name: "Second",
+          name: "Second",
           run_time_statistics: %Statistics{
             average: 200.0,
             ips: 5_000.0,
@@ -294,7 +294,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           }
         },
         %Scenario{
-          job_name: "First",
+          name: "First",
           run_time_statistics: %Statistics{
             average: 100.0,
             ips: 10_000.0,
@@ -322,7 +322,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       second_name = String.duplicate("a", 40)
       scenarios = [
         %Scenario{
-          job_name: second_name,
+          name: second_name,
           run_time_statistics: %Statistics{
             average: 200.0,
             ips: 5_000.0,
@@ -332,7 +332,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           }
         },
         %Scenario{
-          job_name: "First",
+          name: "First",
           run_time_statistics: %Statistics{
             average: 100.0,
             ips: 10_000.0,
@@ -354,7 +354,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "doesn't create comparisons with only one benchmark run" do
       scenarios = [
         %Scenario{
-          job_name: "First",
+          name: "First",
           run_time_statistics: %Statistics{
             average: 100.0,
             ips: 10_000.0,
@@ -372,7 +372,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "formats small averages, medians, and percentiles more precisely" do
       scenarios = [
         %Scenario{
-          job_name: "First",
+          name: "First",
           run_time_statistics: %Statistics{
             average: 0.15,
             ips: 10_000.0,
@@ -392,7 +392,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "doesn't output weird 'e' formats" do
       scenarios = [
         %Scenario{
-          job_name: "Job",
+          name: "Job",
           run_time_statistics: %Statistics{
             average: 11000.0,
             ips: 12000.0,
@@ -419,7 +419,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "with multiple inputs and just one job" do
       scenarios = [
         %Scenario{
-          job_name: "Job",
+          name: "Job",
           input_name: "My Arg",
           input: "My Arg",
           run_time_statistics: %Statistics{
@@ -431,7 +431,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           }
         },
         %Scenario{
-          job_name: "Job",
+          name: "Job",
           input_name: "Other Arg",
           input: "Other Arg",
           run_time_statistics: %Statistics{
@@ -461,7 +461,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "with multiple inputs and two jobs" do
       scenarios = [
         %Scenario{
-          job_name: "Job",
+          name: "Job",
           input_name: "My Arg",
           input: "My Arg",
           run_time_statistics: %Statistics{
@@ -473,7 +473,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           }
         },
         %Scenario{
-          job_name: "Other Job",
+          name: "Other Job",
           input_name: "My Arg",
           input: "My Arg",
           run_time_statistics: %Statistics{
@@ -485,7 +485,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           }
         },
         %Scenario{
-          job_name: "Job",
+          name: "Job",
           input_name: "Other Arg",
           input: "Other Arg",
           run_time_statistics: %Statistics{
@@ -497,7 +497,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           }
         },
         %Scenario{
-          job_name: "Other Job",
+          name: "Other Job",
           input_name: "Other Arg",
           input: "Other Arg",
           run_time_statistics: %Statistics{
@@ -526,6 +526,42 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert job_2 =~ ~r/Job.+2\.5.+400.+15\.00%.+395/
       ref_2 =~ ~r/Other Job/
       slower_2 =~ ~r/Job.+slower/
+    end
+
+    test "with and without a tag" do
+      scenarios = [
+        %Scenario{
+          name: "job",
+          input_name: no_input(),
+          input: no_input(),
+          run_time_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1}
+          }
+        },
+        %Scenario{
+          name: "job (improved)",
+          input_name: no_input(),
+          input: no_input(),
+          run_time_statistics: %Statistics{
+            average: 100.0,
+            ips: 10_000.0,
+            std_dev_ratio: 0.1,
+            median: 90.0,
+            percentiles: %{99 => 200.1}
+          }
+        }
+      ]
+
+      [result] = Console.format(%Suite{scenarios: scenarios, configuration: @config})
+      [_, _header, job_with_tag, job, _, comparison, _slower] = result
+
+      assert job_with_tag =~ ~r/job \(improved\)\s+10 K/
+      assert job          =~ ~r/job\s+5 K/
+      assert comparison   =~ ~r/job \(improved\)\s+ 10 K/
     end
   end
 

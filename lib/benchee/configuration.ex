@@ -23,6 +23,8 @@ defmodule Benchee.Configuration do
       fast_warning:       true
     },
     inputs:               nil,
+    save:                 false,
+    load:                 false,
     # formatters should end up here but known once are still picked up at
     # the top level for now
     formatter_options: %{
@@ -47,6 +49,8 @@ defmodule Benchee.Configuration do
     formatters:        [((Suite.t) -> Suite.t)],
     print:             map,
     inputs:            %{Suite.key => any} | nil,
+    save:              map | false,
+    load:              String.t | [String.t] | false,
     formatter_options: map,
     unit_scaling:      Scale.scaling_strategy,
     assigns:           map,
@@ -135,6 +139,8 @@ defmodule Benchee.Configuration do
             time: 5_000_000,
             warmup: 2_000_000,
             inputs: nil,
+            save: false,
+            load: false,
             formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
@@ -163,6 +169,8 @@ defmodule Benchee.Configuration do
             time: 1_000_000,
             warmup: 200_000.0,
             inputs: nil,
+            save: false,
+            load: false,
             formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
@@ -191,6 +199,8 @@ defmodule Benchee.Configuration do
             time: 1_000_000,
             warmup: 200_000.0,
             inputs: nil,
+            save: false,
+            load: false,
             formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
@@ -228,6 +238,8 @@ defmodule Benchee.Configuration do
             time: 1_000_000,
             warmup: 200_000.0,
             inputs: %{"Small" => 5, "Big" => 9999},
+            save: false,
+            load: false,
             formatters: [&IO.puts/2],
             print: %{
               benchmarking: true,
@@ -251,12 +263,13 @@ defmodule Benchee.Configuration do
   """
   @spec init(user_configuration) :: Suite.t
   def init(config \\ %{}) do
-    :ok    = :timer.start
+    :ok = :timer.start
 
     config = config
              |> standardized_user_configuration
              |> merge_with_defaults
              |> convert_time_to_micro_s
+             |> save_option_conversion
 
     %Suite{configuration: config}
   end
@@ -295,6 +308,32 @@ defmodule Benchee.Configuration do
       end
       new_config
     end
+  end
+
+  defp save_option_conversion(config = %{save: false}) do
+    config
+  end
+  defp save_option_conversion(config = %{save: save_values}) do
+    save_options = Map.merge(save_defaults(), save_values)
+
+    tagged_save_options = %{
+      tag: save_options.tag,
+      path: save_options.path
+    }
+
+    %__MODULE__{config |
+      formatters: config.formatters ++ [Benchee.Formatters.TaggedSave],
+      formatter_options:
+        Map.put(config.formatter_options, :tagged_save, tagged_save_options)
+    }
+  end
+
+  defp save_defaults do
+    now = DateTime.utc_now
+    %{
+      tag: "#{now.year}-#{now.month}-#{now.day}--#{now.hour}-#{now.minute}-#{now.second}-utc",
+      path: "benchmark.benchee"
+    }
   end
 end
 

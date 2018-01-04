@@ -15,11 +15,13 @@ defmodule Benchee.BenchmarkTest do
 
       job_names = Enum.map(suite.scenarios, fn(scenario) -> scenario.job_name end)
       assert job_names == ["one job", "something"]
+      names = Enum.map(suite.scenarios, fn(scenario) -> scenario.job_name end)
+      assert names == ["one job", "something"]
     end
 
     test "warns when adding the same job again even if it's atom and string" do
       one_fun = fn -> 1 end
-      scenario = %Scenario{job_name: "one", function: one_fun}
+      scenario = %Scenario{job_name: "one", function: one_fun, name: "one"}
       suite = %Suite{scenarios: [scenario]}
       new_suite = Benchmark.benchmark(suite, :one, fn -> 42 end, TestPrinter)
 
@@ -34,8 +36,13 @@ defmodule Benchee.BenchmarkTest do
       config = %Configuration{inputs: nil}
       suite = Benchmark.benchmark(%Suite{configuration: config}, job_name, function)
       expected_scenario =
-        %Scenario{job_name: job_name, function: function,
-                  input: Benchmark.no_input(), input_name: Benchmark.no_input()}
+        %Scenario{
+          name: job_name,
+          job_name: job_name,
+          function: function,
+          input: Benchmark.no_input(),
+          input_name: Benchmark.no_input()
+        }
 
       assert suite.scenarios == [expected_scenario]
     end
@@ -68,6 +75,14 @@ defmodule Benchee.BenchmarkTest do
         function: ^function,
         before_each: ^before,
         after_scenario: ^after_scenario } = scenario
+    end
+
+    test "doesn't treat tagged scenarios as duplicates" do
+      suite =
+        %Suite{scenarios: [%Scenario{job_name: "job", tag: "what"}]}
+        |> Benchmark.benchmark("job", fn -> 1 end)
+
+      assert length(suite.scenarios) == 2
     end
   end
 
