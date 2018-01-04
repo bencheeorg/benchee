@@ -562,16 +562,12 @@ suite_tear_down
 
 ### Saving runs, Loading & comparing previous runs
 
-Benchee can store the results of previous runs in a file and then load them
-again to compare for example what was recorded against a branch with performance
-improvements.
+Benchee can store the results of previous runs in a file and then load them again to compare them. For example this is useful to compare what was recorded on the master branch against a branch with performance improvements.
 
-**Saving** is done through the `save` configuration specifying a `path`,
-where to save the results defaulting to `"benchmark.benchee"`, and a `tag`, to annotate these results (for instance with a branch name) defaulting to a time
-stamp.
+**Saving** is done through the `save` configuration specifying a `path`, where to save the results defaulting to `"benchmark.benchee"`, and a `tag`, to annotate these results (for instance with a branch name) defaulting to a time stamp.
 
-**Loading** is done through the `load` option specifying a path to the files to
-load which can also be a list or a glob expression (`"run*.benchee"`).
+**Loading** is done through the `load` option specifying a path to the file to
+load (for instance `benchmark.benchee`). You can also specify multiple files to load through a list of paths (`["my.benchee", "master_save.benchee"]`) - each one of those can also be a glob expression to match even more files glob (`"save_number*.benchee"`).
 
 ```elixir
 Benchee.run(%{
@@ -580,8 +576,10 @@ Benchee.run(%{
   save: [path: "save.benchee", tag: "first-try"]
 )
 
-Benchee.run(%{}, load: "save_first-try.benchee")
+Benchee.run(%{}, load: "save.benchee")
 ```
+
+In the more verbose API this is triggered via `Benchee.load/1`.
 
 ### More verbose usage
 
@@ -598,6 +596,7 @@ Benchee.init(time: 3)
                      fn -> list |> Enum.map(map_fun) |> List.flatten end)
 |> Benchee.measure
 |> Benchee.statistics
+|> Benchee.load # can be omitted when you don't want to/need to load scenarios
 |> Benchee.Formatters.Console.output
 ```
 
@@ -613,6 +612,8 @@ This is a take on the _functional transformation_ of data applied to benchmarks:
 This is also part of the **official API** and allows for more **fine grained control**. (It's also what benchee does internally when you use `Benchee.run/2`).
 
 Do you just want to have all the raw run times? Just work with the result of `Benchee.measure/1`! Just want to have the calculated statistics and use your own formatting? Grab the result of `Benchee.statistics/1`! Or, maybe you want to write to a file or send an HTTP post to some online service? Just grab the complete suite after statistics were generated.
+
+It also allows you to alter behaviour, normally `Benchee.load/1` is called right before the formatters so that neither the benchmarks are run again or statistics are computed again. However, you might want to run the benchmarks again or recompute the statistics. Then you can call `Benchee.load/1` right at the start.
 
 This way Benchee should be flexible enough to suit your needs and be extended at will. Have a look at the [available plugins](#plugins).
 
