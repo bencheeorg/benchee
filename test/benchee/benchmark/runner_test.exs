@@ -78,6 +78,17 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert length(run_times_for(new_suite, "")) >= 12
     end
 
+    test "combines results for parallel benchmarks into a single scenario" do
+      suite = test_suite(%Suite{configuration: %{parallel: 4, time: 60_000}})
+
+      new_suite =
+        suite
+        |> Benchmark.benchmark("", fn -> :timer.sleep(10) end)
+        |> Benchmark.measure(TestPrinter)
+
+      assert length(new_suite.scenarios) == 1
+    end
+
     test "very fast functions print a warning" do
       output = ExUnit.CaptureIO.capture_io fn ->
         %Suite{configuration: %{print: %{fast_warning: true}}}

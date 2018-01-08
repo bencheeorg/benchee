@@ -37,8 +37,16 @@ defmodule Benchee.Benchmark.Runner do
            config: config
          }) do
     printer.benchmarking(job_name, input_name, config)
-    Parallel.map(1..config.parallel, fn(_task_number) ->
+    1..config.parallel
+    |> Parallel.map(fn(_task_number) ->
       run_scenario(scenario, scenario_context)
+    end)
+    |> Enum.group_by(fn scenario -> {scenario.function, scenario.input} end)
+    |> Enum.map(fn {_, like_results} ->
+      consolidated_results =
+        Enum.flat_map(like_results, fn scenario -> scenario.run_times end)
+      [scenario | _] = like_results
+      %Benchee.Benchmark.Scenario{scenario | run_times: consolidated_results}
     end)
   end
 
