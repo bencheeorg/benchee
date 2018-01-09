@@ -564,7 +564,7 @@ suite_tear_down
 
 Benchee can store the results of previous runs in a file and then load them again to compare them. For example this is useful to compare what was recorded on the master branch against a branch with performance improvements.
 
-**Saving** is done through the `save` configuration specifying a `path`, where to save the results defaulting to `"benchmark.benchee"`, and a `tag`, to annotate these results (for instance with a branch name) defaulting to a time stamp.
+**Saving** is done through the `save` configuration option. You can specify a `path` where results are saved, or you can use the default option of`"benchmark.benchee"` if you don't pass a `path`. You can also pass a `tag` option which annotates these results (for instance with a branch name). The default option for the `tag` is a timestamp of when the benchmark was run.
 
 **Loading** is done through the `load` option specifying a path to the file to
 load (for instance `benchmark.benchee`). You can also specify multiple files to load through a list of paths (`["my.benchee", "master_save.benchee"]`) - each one of those can also be a glob expression to match even more files glob (`"save_number*.benchee"`).
