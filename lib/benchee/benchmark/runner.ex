@@ -142,6 +142,11 @@ defmodule Benchee.Benchmark.Runner do
     end
   end
 
+  # `run_times` is kept separately from the `Scenario` so that for the
+  # `parallel` execution case we can easily concatenate and flatten the results
+  # of all processes. That's why we add them to the scenario once after
+  # measuring has finished. `scenario` is still needed in general for the
+  # benchmarking function, hooks etc.
   defp do_benchmark(_scenario,
                     %ScenarioContext{
                       current_time: current_time, end_time: end_time
