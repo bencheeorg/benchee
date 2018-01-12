@@ -25,7 +25,7 @@ defmodule Benchee.Benchmark.Runner do
   """
   @spec run_scenarios([Scenario.t], ScenarioContext.t) :: [Scenario.t]
   def run_scenarios(scenarios, scenario_context) do
-    Enum.flat_map(scenarios, fn(scenario) ->
+    Enum.map(scenarios, fn(scenario) ->
       parallel_benchmark(scenario, scenario_context)
     end)
   end
@@ -37,12 +37,14 @@ defmodule Benchee.Benchmark.Runner do
            config: config
          }) do
     printer.benchmarking(job_name, input_name, config)
-    Parallel.map(1..config.parallel, fn(_task_number) ->
-      run_scenario(scenario, scenario_context)
-    end)
+    measurements =
+      1..config.parallel
+      |> Parallel.map(fn(_) -> measure_scenario(scenario, scenario_context) end)
+      |> List.flatten
+    %Scenario{scenario | run_times: measurements}
   end
 
-  defp run_scenario(scenario, scenario_context) do
+  defp measure_scenario(scenario, scenario_context) do
     scenario_input = run_before_scenario(scenario, scenario_context)
     scenario_context =
       %ScenarioContext{scenario_context | scenario_input: scenario_input}
@@ -112,8 +114,7 @@ defmodule Benchee.Benchmark.Runner do
         num_iterations: num_iterations
       }
 
-    updated_scenario = %Scenario{scenario | run_times: [initial_run_time]}
-    do_benchmark(updated_scenario, new_context)
+    do_benchmark(scenario, new_context, [initial_run_time])
   end
 
   defp current_time do
@@ -141,20 +142,18 @@ defmodule Benchee.Benchmark.Runner do
     end
   end
 
-  defp do_benchmark(scenario = %Scenario{run_times: run_times},
+  defp do_benchmark(_scenario,
                     %ScenarioContext{
                       current_time: current_time, end_time: end_time
-                    }) when current_time > end_time do
+                    }, run_times) when current_time > end_time do
     # restore correct order - important for graphing
-    %Scenario{scenario | run_times: Enum.reverse(run_times)}
+    Enum.reverse(run_times)
   end
-  defp do_benchmark(scenario = %Scenario{run_times: run_times},
-                    scenario_context) do
+  defp do_benchmark(scenario, scenario_context, run_times) do
     run_time = iteration_time(scenario, scenario_context)
-    updated_scenario = %Scenario{scenario | run_times: [run_time | run_times]}
     updated_context =
       %ScenarioContext{scenario_context | current_time: current_time()}
-    do_benchmark(updated_scenario, updated_context)
+    do_benchmark(scenario, updated_context, [run_time | run_times])
   end
 
   defp iteration_time(scenario, scenario_context = %ScenarioContext{
