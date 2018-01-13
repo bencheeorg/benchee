@@ -1,3 +1,15 @@
+## 0.12.0 (2018-01-11)
+
+A small release fixing a somewhat nasty bug involving running benchmarks in
+parallel.
+
+### Bugfixes (User Facing)
+
+* If you were running benchmarks in parallel, you would see results for each
+parallel process you were running. So, if you were running **two** jobs, and
+setting your configuration to `parallel: 2`, you would see **four** results in the
+formatter. This is now correctly showing only the **two** jobs.
+
 ## 0.11.0 (2017-11-30)
 
 A tiny little release with a bugfix and MOARE statistics for the console formatter.
