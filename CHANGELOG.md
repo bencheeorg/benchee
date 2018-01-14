@@ -3,6 +3,12 @@
 A small release fixing a somewhat nasty bug involving running benchmarks in
 parallel.
 
+### Breaking Changes (User Facing)
+* Dropped Support for elixir 1.3, new support is elixir 1.4+
+
+### Features (User Facing)
+* runs warning free with elixir 1.6 (well the rcs at least)
+
 ### Bugfixes (User Facing)
 
 * If you were running benchmarks in parallel, you would see results for each
