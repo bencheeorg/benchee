@@ -6,15 +6,15 @@ defmodule Benchee.Test.FakeFormatter do
   end
 
   def write(output) do
-    send self(), {:write, output}
+    send(self(), {:write, output})
   end
 
   def output(suite) do
-    :ok = suite
-          |> format
-          |> write
+    :ok =
+      suite
+      |> format
+      |> write
 
     suite
   end
-
 end

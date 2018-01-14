@@ -12,39 +12,41 @@ defmodule Benchee.ConfigurationTest do
   describe ".init/1" do
     test "it crashes for values that are going to be ignored" do
       assert_raise KeyError, fn ->
-        init runntime: 2
+        init(runntime: 2)
       end
     end
 
     test "it converts input keys to strings" do
-      suite = init inputs: %{"map" => %{}, list: []}
+      suite = init(inputs: %{"map" => %{}, list: []})
 
       assert %Suite{
-        configuration: %{inputs: %{"list" => [], "map" => %{}}}
-      } = suite
+               configuration: %{inputs: %{"list" => [], "map" => %{}}}
+             } = suite
     end
 
     test "it loses duplicated inputs keys after normalization" do
-      suite = init inputs: %{"map" => %{}, map: %{}}
+      suite = init(inputs: %{"map" => %{}, map: %{}})
 
       assert %Suite{configuration: %{inputs: inputs}} = suite
       assert %{"map" => %{}} == inputs
     end
 
     test "uses information from :save to setup the external term formattter" do
-      suite = init save: [path: "save_one.benchee", tag: "master"]
+      suite = init(save: [path: "save_one.benchee", tag: "master"])
 
       assert suite.configuration.formatters == [
-        Benchee.Formatters.Console, Benchee.Formatters.TaggedSave
-      ]
+               Benchee.Formatters.Console,
+               Benchee.Formatters.TaggedSave
+             ]
+
       assert suite.configuration.formatter_options.tagged_save == %{
-        path: "save_one.benchee",
-        tag:  "master"
-      }
+               path: "save_one.benchee",
+               tag: "master"
+             }
     end
 
     test ":save tag defaults to date" do
-      suite = init save: [path: "save_one.benchee"]
+      suite = init(save: [path: "save_one.benchee"])
 
       etf_options = suite.configuration.formatter_options.tagged_save
 
@@ -81,7 +83,7 @@ defmodule Benchee.ConfigurationTest do
       result = deep_merge(@default_config, other_config)
       expected = %Configuration{formatter_options: %{some: %{value: true}}}
 
-      assert  ^expected = result
+      assert ^expected = result
     end
   end
 end
