@@ -101,7 +101,7 @@ defmodule Benchee.Benchmark.Runner do
   end
 
   defp measure_runtimes(scenario, context, run_time, fast_warning)
-  defp measure_runtimes(scenario, _, 0, _), do: scenario
+  defp measure_runtimes(_, _, 0, _), do: []
   defp measure_runtimes(scenario, scenario_context, run_time, fast_warning) do
     end_time = current_time() + run_time
     :erlang.garbage_collect
