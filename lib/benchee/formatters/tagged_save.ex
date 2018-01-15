@@ -17,13 +17,42 @@ defmodule Benchee.Formatters.TaggedSave do
   @spec format(Suite.t) :: {binary, String.t}
   def format(suite = %Suite{configuration: config, scenarios: scenarios}) do
     formatter_config = config.formatter_options.tagged_save
-    tagged_scenarios = tag_scenarios(scenarios, formatter_config)
+    tag = determine_tag(scenarios, formatter_config)
+    tagged_scenarios = tag_scenarios(scenarios, tag)
     tagged_suite = %Suite{suite | scenarios: tagged_scenarios}
 
     {:erlang.term_to_binary(tagged_suite), formatter_config.path}
   end
 
-  defp tag_scenarios(scenarios, %{tag: tag}) do
+  defp determine_tag(scenarios, %{tag: desired_tag}) do
+    scenarios
+    |> Enum.map(fn scenario -> scenario.tag end)
+    |> Enum.uniq()
+    |> Enum.filter(fn tag ->
+         tag != nil && tag =~ ~r/#{Regex.escape(desired_tag)}/
+       end)
+    |> choose_tag(desired_tag)
+  end
+
+  defp choose_tag([], desired_tag), do: desired_tag
+
+  defp choose_tag(tags, desired_tag) do
+    if Enum.all?(tags, fn tag -> tag == desired_tag end) do
+      "#{desired_tag}-2"
+    else
+      max = get_maximum_tag_increaser(tags, desired_tag)
+      "#{desired_tag}-#{max + 1}"
+    end
+  end
+
+  defp get_maximum_tag_increaser(tags, desired_tag) do
+    tags
+    |> Enum.map(fn tag -> String.replace(tag, desired_tag <> "-", "") end)
+    |> Enum.map(&String.to_integer/1)
+    |> Enum.max
+  end
+
+  defp tag_scenarios(scenarios, tag) do
     Enum.map scenarios, fn(scenario) ->
       scenario
       |> tagged_scenario(tag)
