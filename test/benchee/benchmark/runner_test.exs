@@ -165,6 +165,16 @@ defmodule Benchee.Benchmark.RunnerTest do
       refute_receive :called
     end
 
+    test "run times of the scenarios are empty when nothing runs" do
+      %{scenarios: [scenario]} = 
+        %Suite{configuration: %{time: 0, warmup: 0}}
+        |> test_suite
+        |> Benchmark.benchmark("don't care", fn -> 0 end)
+        |> Benchmark.measure(TestPrinter)
+
+      assert scenario.run_times == []
+    end
+
     @no_input Benchmark.no_input()
     test "asks to print what is currently benchmarking" do
       test_suite()
