@@ -1,17 +1,17 @@
 defmodule Benchee.Test.FakeBenchmarkPrinter do
   def duplicate_benchmark_warning(name) do
-    send self(), {:duplicate, name}
+    send(self(), {:duplicate, name})
   end
 
   def configuration_information(_) do
-    send self(), :configuration_information
+    send(self(), :configuration_information)
   end
 
   def benchmarking(name, input_information, _) do
-    send self(), {:benchmarking, name, input_information}
+    send(self(), {:benchmarking, name, input_information})
   end
 
   def fast_warning do
-    send self(), :fast_warning
+    send(self(), :fast_warning)
   end
 end
