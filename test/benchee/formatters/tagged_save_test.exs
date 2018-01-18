@@ -31,12 +31,12 @@ defmodule Benchee.Formatters.TaggedSaveTest do
         input_name: no_input(),
         input: no_input(),
         run_time_statistics: %Statistics{
-           average: 100.0,
-           ips: 10_000.0,
-           std_dev_ratio: 0.1,
-           median: 90.0,
-           percentiles: %{99 => 300.1}
-         }
+          average: 100.0,
+          ips: 10_000.0,
+          std_dev_ratio: 0.1,
+          median: 90.0,
+          percentiles: %{99 => 300.1}
+        }
       }
     ],
     configuration: %Benchee.Configuration{
@@ -53,9 +53,10 @@ defmodule Benchee.Formatters.TaggedSaveTest do
     test "able to restore the original just fine" do
       {binary, path} = format(@suite)
 
-      loaded_suite = binary
-                     |> :erlang.binary_to_term
-                     |> suite_without_scenario_tags
+      loaded_suite =
+        binary
+        |> :erlang.binary_to_term()
+        |> suite_without_scenario_tags
 
       assert loaded_suite == @suite
       assert path == @filename
@@ -66,10 +67,10 @@ defmodule Benchee.Formatters.TaggedSaveTest do
 
       loaded_suite = :erlang.binary_to_term(binary)
 
-      Enum.each loaded_suite.scenarios, fn(scenario) ->
+      Enum.each(loaded_suite.scenarios, fn scenario ->
         assert scenario.tag == @benchee_tag
         assert scenario.name =~ ~r/#{@benchee_tag}/
-      end
+      end)
     end
 
     test "doesn't tag scenarios that already have a tag" do
@@ -108,12 +109,10 @@ defmodule Benchee.Formatters.TaggedSaveTest do
       tags = sorted_tags(scenarios)
       names = sorted_names(scenarios)
 
-      assert tags ==
-        [@benchee_tag <> "-2", @benchee_tag <> "-3", @benchee_tag <> "-4"]
+      assert tags == [@benchee_tag <> "-2", @benchee_tag <> "-3", @benchee_tag <> "-4"]
+
       assert names ==
-        ["foo (#{@benchee_tag}-2)",
-         "foo (#{@benchee_tag}-3)",
-         "foo (#{@benchee_tag}-4)"]
+               ["foo (#{@benchee_tag}-2)", "foo (#{@benchee_tag}-3)", "foo (#{@benchee_tag}-4)"]
     end
 
     defp scenarios_from_formatted(suite) do
@@ -124,28 +123,29 @@ defmodule Benchee.Formatters.TaggedSaveTest do
 
     defp sorted_tags(scenarios) do
       scenarios
-      |> Enum.map(fn(scenario) -> scenario.tag end)
-      |> Enum.uniq
-      |> Enum.sort
+      |> Enum.map(fn scenario -> scenario.tag end)
+      |> Enum.uniq()
+      |> Enum.sort()
     end
 
     defp sorted_names(scenarios) do
       scenarios
-      |> Enum.map(fn(scenario) -> scenario.name end)
-      |> Enum.uniq
-      |> Enum.sort
+      |> Enum.map(fn scenario -> scenario.name end)
+      |> Enum.uniq()
+      |> Enum.sort()
     end
   end
 
   describe ".output/1" do
     test "able to restore fully from file" do
-      capture_io fn -> output(@suite) end
+      capture_io(fn -> output(@suite) end)
 
       etf_data = File.read!(@filename)
 
-      loaded_suite = etf_data
-                     |> :erlang.binary_to_term
-                     |> suite_without_scenario_tags
+      loaded_suite =
+        etf_data
+        |> :erlang.binary_to_term()
+        |> suite_without_scenario_tags
 
       assert loaded_suite == @suite
     after

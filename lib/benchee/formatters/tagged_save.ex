@@ -14,7 +14,7 @@ defmodule Benchee.Formatters.TaggedSave do
   alias Benchee.Benchmark.Scenario
   alias Benchee.Utility.FileCreation
 
-  @spec format(Suite.t) :: {binary, String.t}
+  @spec format(Suite.t()) :: {binary, String.t()}
   def format(suite = %Suite{configuration: config, scenarios: scenarios}) do
     formatter_config = config.formatter_options.tagged_save
     tag = determine_tag(scenarios, formatter_config)
@@ -29,8 +29,8 @@ defmodule Benchee.Formatters.TaggedSave do
     |> Enum.map(fn scenario -> scenario.tag end)
     |> Enum.uniq()
     |> Enum.filter(fn tag ->
-         tag != nil && tag =~ ~r/#{Regex.escape(desired_tag)}/
-       end)
+      tag != nil && tag =~ ~r/#{Regex.escape(desired_tag)}/
+    end)
     |> choose_tag(desired_tag)
   end
 
@@ -49,20 +49,21 @@ defmodule Benchee.Formatters.TaggedSave do
     tags
     |> Enum.map(fn tag -> String.replace(tag, desired_tag <> "-", "") end)
     |> Enum.map(&String.to_integer/1)
-    |> Enum.max
+    |> Enum.max()
   end
 
   defp tag_scenarios(scenarios, tag) do
-    Enum.map scenarios, fn(scenario) ->
+    Enum.map(scenarios, fn scenario ->
       scenario
       |> tagged_scenario(tag)
       |> update_name
-    end
+    end)
   end
 
   defp tagged_scenario(scenario = %Scenario{tag: nil}, desired_tag) do
     %Scenario{scenario | tag: desired_tag}
   end
+
   defp tagged_scenario(scenario, _desired_tag) do
     scenario
   end
@@ -71,12 +72,12 @@ defmodule Benchee.Formatters.TaggedSave do
     %Scenario{scenario | name: Scenario.display_name(scenario)}
   end
 
-  @spec write({binary, String.t}) :: :ok
+  @spec write({binary, String.t()}) :: :ok
   def write({term_binary, filename}) do
     FileCreation.ensure_directory_exists(filename)
     return_value = File.write(filename, term_binary)
 
-    IO.puts "Suite saved in external term format at #{filename}"
+    IO.puts("Suite saved in external term format at #{filename}")
 
     return_value
   end
