@@ -95,8 +95,12 @@ defmodule Benchee.Configuration do
     `Benchee.run/2`. Functions need to accept one argument (which is the
     benchmarking suite with all data) and then use that to produce output. Used
     for plugins. Defaults to the builtin console formatter
-    Benchee.Formatters.Console`. See [Formatters](#formatters).
-    * `print`      - a map from atoms to `true` or `false` to configure if the
+    `Benchee.Formatters.Console`.
+    * `save` - specify a `path` where to store the results of the current
+    benchmarking suite, tagged with the specified `tag`.
+    * `load` - load saved suit or suits to compare your current benchmarks
+    against. Can be a string or a list of strings or patterns.
+    * `print` - a map from atoms to `true` or `false` to configure if the
     output identified by the atom will be printed. All options are enabled by
     default (true). Options are:
       * `:benchmarking`  - print when Benchee starts benchmarking a new job
