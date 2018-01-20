@@ -1,13 +1,16 @@
-## 0.12.0 (2018-01-11)
+## 0.12.0 (2018-01-20)
 
-A small release fixing a somewhat nasty bug involving running benchmarks in
-parallel.
+Adds the ability to save benchmarking results and load them again to compare
+against. Also fixes a bug for running benchmarks in parallel.
 
 ### Breaking Changes (User Facing)
 * Dropped Support for elixir 1.3, new support is elixir 1.4+
 
 ### Features (User Facing)
-* runs warning free with elixir 1.6 (well the rcs at least)
+* new `save` option specifying a path and a tag to save the results and tag them
+(for instance with `"master"`) and a `load` option to load those results again
+and compare them against your current results.
+* runs warning free with elixir 1.6
 
 ### Bugfixes (User Facing)
 
@@ -15,6 +18,10 @@ parallel.
 parallel process you were running. So, if you were running **two** jobs, and
 setting your configuration to `parallel: 2`, you would see **four** results in the
 formatter. This is now correctly showing only the **two** jobs.
+
+### Features (Plugins)
+* `Scenario` has a new `name` field to be adopted for displaying the scenario names,
+as it includes the tag name and potential future additions.
 
 ## 0.11.0 (2017-11-30)
 
