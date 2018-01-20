@@ -59,7 +59,7 @@ defmodule Benchee.Mixfile do
 
   defp package do
     [
-      maintainers: ["Tobias Pfeiffer"],
+      maintainers: ["Tobias Pfeiffer", "Devon Estes"],
       licenses: ["MIT"],
       links: %{
         "github"     => "https://github.com/PragTob/benchee",
