@@ -1,3 +1,13 @@
+## 0.13.0 (2018-??-??)
+
+Adds the ability to run a `dry_run` of your benchmarks if you want to make sure
+everything will run without error before running the full set of benchmarks.
+
+### Features (User Facing)
+* new `dry_run` configuration option which allows users to add a dry run of all
+  benchmarks with each input before running the actual suite. This should save
+time while actually writing the code for your benchmarks.
+
 ## 0.12.0 (2018-01-20)
 
 Adds the ability to save benchmarking results and load them again to compare
