@@ -12,53 +12,52 @@ defmodule Benchee.Configuration do
     Formatters.Console
   }
 
-  defstruct [
-    parallel:             1,
-    time:                 5,
-    warmup:               2,
-    formatters:           [Console],
-    print: %{
-      benchmarking:       true,
-      configuration:      true,
-      fast_warning:       true
-    },
-    inputs:               nil,
-    save:                 false,
-    load:                 false,
-    # formatters should end up here but known once are still picked up at
-    # the top level for now
-    formatter_options: %{
-      console: %{
-        comparison:          true,
-        extended_statistics: false
-      }
-    },
-    unit_scaling:         :best,
-    # If you/your plugin/whatever needs it your data can go here
-    assigns:              %{},
-    before_each:          nil,
-    after_each:           nil,
-    before_scenario:      nil,
-    after_scenario:       nil
-  ]
+  defstruct parallel: 1,
+            time: 5,
+            warmup: 2,
+            dry_run: false,
+            formatters: [Console],
+            print: %{
+              benchmarking: true,
+              configuration: true,
+              fast_warning: true
+            },
+            inputs: nil,
+            save: false,
+            load: false,
+            # formatters should end up here but known once are still picked up at
+            # the top level for now
+            formatter_options: %{
+              console: %{
+                comparison: true,
+                extended_statistics: false
+              }
+            },
+            unit_scaling: :best,
+            # If you/your plugin/whatever needs it your data can go here
+            assigns: %{},
+            before_each: nil,
+            after_each: nil,
+            before_scenario: nil,
+            after_scenario: nil
 
   @type t :: %__MODULE__{
-    parallel:          integer,
-    time:              number,
-    warmup:            number,
-    formatters:        [((Suite.t) -> Suite.t)],
-    print:             map,
-    inputs:            %{Suite.key => any} | nil,
-    save:              map | false,
-    load:              String.t | [String.t] | false,
-    formatter_options: map,
-    unit_scaling:      Scale.scaling_strategy,
-    assigns:           map,
-    before_each:       fun | nil,
-    after_each:        fun | nil,
-    before_scenario:   fun | nil,
-    after_scenario:    fun | nil
-  }
+          parallel: integer,
+          time: number,
+          warmup: number,
+          formatters: [(Suite.t() -> Suite.t())],
+          print: map,
+          inputs: %{Suite.key() => any} | nil,
+          save: map | false,
+          load: String.t() | [String.t()] | false,
+          formatter_options: map,
+          unit_scaling: Scale.scaling_strategy(),
+          assigns: map,
+          before_each: fun | nil,
+          after_each: fun | nil,
+          before_scenario: fun | nil,
+          after_scenario: fun | nil
+        }
 
   @type user_configuration :: map | keyword
   @time_keys [:time, :warmup]
@@ -265,22 +264,23 @@ defmodule Benchee.Configuration do
         scenarios: []
       }
   """
-  @spec init(user_configuration) :: Suite.t
+  @spec init(user_configuration) :: Suite.t()
   def init(config \\ %{}) do
-    :ok = :timer.start
+    :ok = :timer.start()
 
-    config = config
-             |> standardized_user_configuration
-             |> merge_with_defaults
-             |> convert_time_to_micro_s
-             |> save_option_conversion
+    config =
+      config
+      |> standardized_user_configuration
+      |> merge_with_defaults
+      |> convert_time_to_micro_s
+      |> save_option_conversion
 
     %Suite{configuration: config}
   end
 
   defp standardized_user_configuration(config) do
     config
-    |> DeepConvert.to_map
+    |> DeepConvert.to_map()
     |> translate_formatter_keys
     |> force_string_input_keys
   end
@@ -289,16 +289,19 @@ defmodule Benchee.Configuration do
   # formatter_options now
   @formatter_keys [:console, :csv, :json, :html]
   defp translate_formatter_keys(config) do
-      {formatter_options, config} = Map.split(config, @formatter_keys)
+    {formatter_options, config} = Map.split(config, @formatter_keys)
     DeepMerge.deep_merge(%{formatter_options: formatter_options}, config)
   end
 
   defp force_string_input_keys(config = %{inputs: inputs}) do
-    standardized_inputs = for {name, value} <- inputs, into: %{} do
-                            {to_string(name), value}
-                          end
+    standardized_inputs =
+      for {name, value} <- inputs, into: %{} do
+        {to_string(name), value}
+      end
+
     %{config | inputs: standardized_inputs}
   end
+
   defp force_string_input_keys(config), do: config
 
   defp merge_with_defaults(user_config) do
@@ -306,17 +309,20 @@ defmodule Benchee.Configuration do
   end
 
   defp convert_time_to_micro_s(config) do
-    Enum.reduce @time_keys, config, fn(key, new_config) ->
-      {_, new_config} = Map.get_and_update! new_config, key, fn(seconds) ->
-        {seconds, Duration.microseconds({seconds, :second})}
-      end
+    Enum.reduce(@time_keys, config, fn key, new_config ->
+      {_, new_config} =
+        Map.get_and_update!(new_config, key, fn seconds ->
+          {seconds, Duration.microseconds({seconds, :second})}
+        end)
+
       new_config
-    end
+    end)
   end
 
   defp save_option_conversion(config = %{save: false}) do
     config
   end
+
   defp save_option_conversion(config = %{save: save_values}) do
     save_options = Map.merge(save_defaults(), save_values)
 
@@ -325,15 +331,16 @@ defmodule Benchee.Configuration do
       path: save_options.path
     }
 
-    %__MODULE__{config |
-      formatters: config.formatters ++ [Benchee.Formatters.TaggedSave],
-      formatter_options:
-        Map.put(config.formatter_options, :tagged_save, tagged_save_options)
+    %__MODULE__{
+      config
+      | formatters: config.formatters ++ [Benchee.Formatters.TaggedSave],
+        formatter_options: Map.put(config.formatter_options, :tagged_save, tagged_save_options)
     }
   end
 
   defp save_defaults do
-    now = DateTime.utc_now
+    now = DateTime.utc_now()
+
     %{
       tag: "#{now.year}-#{now.month}-#{now.day}--#{now.hour}-#{now.minute}-#{now.second}-utc",
       path: "benchmark.benchee"
@@ -345,8 +352,9 @@ defimpl DeepMerge.Resolver, for: Benchee.Configuration do
   def resolve(_original, override = %{__struct__: Benchee.Configuration}, _) do
     override
   end
+
   def resolve(original, override, resolver) when is_map(override) do
     merged = Map.merge(original, override, resolver)
-    struct! Benchee.Configuration, Map.to_list(merged)
+    struct!(Benchee.Configuration, Map.to_list(merged))
   end
 end
