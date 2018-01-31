@@ -45,6 +45,7 @@ defmodule Benchee.Configuration do
           parallel: integer,
           time: number,
           warmup: number,
+          dry_run: boolean,
           formatters: [(Suite.t() -> Suite.t())],
           print: map,
           inputs: %{Suite.key() => any} | nil,
@@ -75,6 +76,10 @@ defmodule Benchee.Configuration do
     how often it is executed). Defaults to 5.
     * `warmup`     - the time in seconds for which the benchmarking function
     should be run without gathering results. Defaults to 2.
+    * `dry_run` - whether or not to run each job with each input - including all
+    given before or after scenario or each hooks - before the benchmarks are
+    measured to ensure that your code executes without error. This can save time
+    while developing your suites. Defaults to `false`.
     * `inputs` - a map from descriptive input names to some different input,
     your benchmarking jobs will then be run with each of these inputs. For this
     to work your benchmarking function gets the current input passed in as an

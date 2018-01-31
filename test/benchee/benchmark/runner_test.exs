@@ -357,12 +357,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       )
       |> Benchmark.measure(TestPrinter)
 
-      assert_received_exactly([
-        :before_scenario,
-        :before,
-        :after,
-        :after_scenario
-      ])
+      assert_received_exactly([:before_scenario, :before, :after, :after_scenario])
     end
 
     test "hooks trigger during warmup and runtime but scenarios once" do
@@ -839,7 +834,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     end
 
     test "runs all benchmarks with all inputs exactly once as a dry run" do
-      ref = self()
+      me = self()
 
       inputs = %{"small" => 1, "big" => 100}
 
@@ -847,11 +842,45 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       %Suite{configuration: config}
       |> test_suite
-      |> Benchmark.benchmark("first", fn input -> send(ref, {:first, input}) end)
-      |> Benchmark.benchmark("second", fn input -> send(ref, {:second, input}) end)
+      |> Benchmark.benchmark("first", fn input -> send(me, {:first, input}) end)
+      |> Benchmark.benchmark("second", fn input -> send(me, {:second, input}) end)
       |> Benchmark.measure(TestPrinter)
 
       assert_received_exactly([{:first, 100}, {:first, 1}, {:second, 100}, {:second, 1}])
+    end
+
+    test "runs all hooks as part of a dry run" do
+      me = self()
+
+      config = %{time: 100, warmup: 100, dry_run: true}
+
+      try do
+        %Suite{configuration: config}
+        |> test_suite
+        |> Benchmark.benchmark("first", fn -> send(me, :first) end)
+        |> Benchmark.benchmark(
+          "job",
+          {fn -> send(me, :second) end,
+           before_each: fn input ->
+             send(me, :before)
+             input
+           end,
+           after_each: fn _ -> send(me, :after) end,
+           before_scenario: fn input ->
+             send(me, :before_scenario)
+             input
+           end,
+           after_scenario: fn _ ->
+             send(me, :after_scenario)
+             raise "This fails!"
+           end}
+        )
+        |> Benchmark.measure(TestPrinter)
+      rescue
+        RuntimeError -> nil
+      end
+
+      assert_received_exactly([:first, :before_scenario, :before, :second, :after, :after_scenario])
     end
   end
 end

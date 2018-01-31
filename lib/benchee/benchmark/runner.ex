@@ -25,9 +25,8 @@ defmodule Benchee.Benchmark.Runner do
   """
   @spec run_scenarios([Scenario.t()], ScenarioContext.t()) :: [Scenario.t()]
   def run_scenarios(scenarios, scenario_context) do
-    Enum.map(scenarios, fn scenario ->
-      parallel_benchmark(scenario, scenario_context)
-    end)
+    Enum.each(scenarios, fn scenario -> dry_run(scenario, scenario_context) end)
+    Enum.map(scenarios, fn scenario -> parallel_benchmark(scenario, scenario_context) end)
   end
 
   defp parallel_benchmark(
@@ -38,7 +37,6 @@ defmodule Benchee.Benchmark.Runner do
          }
        ) do
     printer.benchmarking(job_name, input_name, config)
-    dry_run(scenario, scenario_context)
 
     measurements =
       1..config.parallel
