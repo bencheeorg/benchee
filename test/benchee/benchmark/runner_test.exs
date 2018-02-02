@@ -10,7 +10,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     time: 40_000,
     warmup: 20_000,
     inputs: nil,
-    dry_run: false,
+    pre_check: false,
     print: %{fast_warning: false, configuration: true}
   }
   @system %{
@@ -833,12 +833,12 @@ defmodule Benchee.Benchmark.RunnerTest do
       ])
     end
 
-    test "runs all benchmarks with all inputs exactly once as a dry run" do
+    test "runs all benchmarks with all inputs exactly once as a pre check" do
       me = self()
 
       inputs = %{"small" => 1, "big" => 100}
 
-      config = %{time: 0, warmup: 0, inputs: inputs, dry_run: true}
+      config = %{time: 0, warmup: 0, inputs: inputs, pre_check: true}
 
       %Suite{configuration: config}
       |> test_suite
@@ -849,10 +849,10 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert_received_exactly([{:first, 100}, {:first, 1}, {:second, 100}, {:second, 1}])
     end
 
-    test "runs all hooks as part of a dry run" do
+    test "runs all hooks as part of a pre check" do
       me = self()
 
-      config = %{time: 100, warmup: 100, dry_run: true}
+      config = %{time: 100, warmup: 100, pre_check: true}
 
       try do
         %Suite{configuration: config}

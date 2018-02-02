@@ -25,7 +25,7 @@ defmodule Benchee.Benchmark.Runner do
   """
   @spec run_scenarios([Scenario.t()], ScenarioContext.t()) :: [Scenario.t()]
   def run_scenarios(scenarios, scenario_context) do
-    Enum.each(scenarios, fn scenario -> dry_run(scenario, scenario_context) end)
+    Enum.each(scenarios, fn scenario -> pre_check(scenario, scenario_context) end)
     Enum.map(scenarios, fn scenario -> parallel_benchmark(scenario, scenario_context) end)
   end
 
@@ -48,7 +48,7 @@ defmodule Benchee.Benchmark.Runner do
 
   # This will run the given scenario exactly once, including the before and
   # after hooks, to ensure the function can execute without raising an error.
-  defp dry_run(scenario, scenario_context = %ScenarioContext{config: %{dry_run: true}}) do
+  defp pre_check(scenario, scenario_context = %ScenarioContext{config: %{pre_check: true}}) do
     scenario_input = run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
     measure_iteration(scenario, scenario_context)
@@ -56,7 +56,7 @@ defmodule Benchee.Benchmark.Runner do
     nil
   end
 
-  defp dry_run(_, _), do: nil
+  defp pre_check(_, _), do: nil
 
   defp measure_scenario(scenario, scenario_context) do
     scenario_input = run_before_scenario(scenario, scenario_context)
