@@ -191,7 +191,7 @@ defmodule Benchee.Benchmark.Runner do
        )
        when current_time > end_time do
     # restore correct order - important for graphing
-    {Enum.reverse(run_times), memory_usages}
+    {Enum.reverse(run_times), Enum.reverse(memory_usages)}
   end
 
   defp do_benchmark(scenario, scenario_context, {run_times, memory_usages}) do
