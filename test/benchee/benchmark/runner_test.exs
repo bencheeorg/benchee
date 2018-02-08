@@ -96,6 +96,24 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       assert length(new_suite.scenarios) == 1
     end
+    test "measures the memory usage of a scenario" do
+      suite = test_suite(%Suite{configuration: %{time: 60_000, warmup: 10_000}})
+      new_suite =
+        suite
+        |> Benchmark.benchmark("Name", fn ->
+          Enum.map(0..1000, fn _ -> [12.23, 30.536, 30.632, 7398.3295] end)
+        end)
+        |> Benchmark.measure(TestPrinter)
+
+      memory_usages = List.first(new_suite.scenarios).memory_usages
+
+      assert length(memory_usages) > 0
+
+      negative_memory_usages =
+        Enum.filter(memory_usages, fn memory -> memory < 0 end)
+
+      assert negative_memory_usages == []
+    end
 
     test "very fast functions print a warning" do
       output =
