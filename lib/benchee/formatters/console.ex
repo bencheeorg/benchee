@@ -77,11 +77,10 @@ defmodule Benchee.Formatters.Console do
     |> Enum.group_by(fn scenario -> scenario.input_name end)
     |> Enum.map(fn {input, scenarios} ->
       [
-        "Run time statistics:\n",
         input_header(input),
+        "\nRun time statistics:\n",
         format_scenarios(scenarios, config),
         "\nMemory usage statistics:\n",
-        input_header(input),
         format_scenarios_for_memory(scenarios, config)
       ]
     end)
@@ -167,11 +166,10 @@ defmodule Benchee.Formatters.Console do
     ]
   end
 
-
   def format_scenarios_for_memory(scenarios, config) do
     sorted_scenarios = Statistics.sort(scenarios)
-    #%{unit_scaling: scaling_strategy} = config
-    units = %{memory: %Unit{label: "b", long: "byte", magnitude: 1, name: :byte}}
+     %{unit_scaling: scaling_strategy} = config
+    units = Conversion.units(sorted_scenarios, scaling_strategy, :memory)
     label_width = label_width(sorted_scenarios)
 
     [
@@ -368,7 +366,7 @@ defmodule Benchee.Formatters.Console do
              percentiles: %{99 => percentile_99}
            }
          },
-         %{memory: memory_unit},
+         %{memory: memory_unit, ninety_ninth: ninety_ninth},
          label_width
        ) do
     "~*ts~*ts~*ts~*ts~*ts\n"
@@ -382,7 +380,7 @@ defmodule Benchee.Formatters.Console do
       @median_width,
       run_time_out(median, memory_unit),
       @percentile_width,
-      run_time_out(percentile_99, memory_unit)
+      run_time_out(percentile_99, ninety_ninth)
     ])
     |> to_string
   end
@@ -484,11 +482,13 @@ defmodule Benchee.Formatters.Console do
          scenarios_to_compare
        ) do
     Enum.map(scenarios_to_compare, fn scenario = %Scenario{memory_usage_statistics: job_stats} ->
-      slower = if job_stats.median == 0 do
-                 0.0
-               else
-                 reference_stats.median / job_stats.median
-               end
+      slower =
+        if job_stats.median == 0 do
+          0.0
+        else
+          reference_stats.median / job_stats.median
+        end
+
       format_comparison_for_memory(scenario, units, label_width, slower)
     end)
   end
