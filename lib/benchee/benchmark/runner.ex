@@ -218,12 +218,13 @@ defmodule Benchee.Benchmark.Runner do
   defp measure_iteration(
          scenario = %Scenario{function: function},
          scenario_context = %ScenarioContext{
-           num_iterations: 1
+           num_iterations: 1,
+           config: %{measure_memory: measure_memory}
          }
        ) do
     new_input = run_before_each(scenario, scenario_context)
-    {microseconds, return_value} = :timer.tc(main_function(function, new_input))
-    {_, memory_usage} = MemoryMeasure.apply(main_function(function, new_input))
+    function = main_function(function, new_input)
+    {microseconds, memory_usage, return_value} = measure_time_and_memory(function, measure_memory)
     run_after_each(return_value, scenario, scenario_context)
     {microseconds, memory_usage}
   end
@@ -231,7 +232,8 @@ defmodule Benchee.Benchmark.Runner do
   defp measure_iteration(
          scenario,
          scenario_context = %ScenarioContext{
-           num_iterations: iterations
+           num_iterations: iterations,
+           config: %{measure_memory: measure_memory}
          }
        )
        when iterations > 1 do
@@ -239,9 +241,22 @@ defmodule Benchee.Benchmark.Runner do
     # of hooks is already included in the function, for reference/reasoning see
     # `build_benchmarking_function/2`
     function = build_benchmarking_function(scenario, scenario_context)
-    {microseconds, _return_value} = :timer.tc(function)
-    {_, memory_usage} = MemoryMeasure.apply(function)
+
+    {microseconds, memory_usage, _return_value} =
+      measure_time_and_memory(function, measure_memory)
+
     {microseconds, memory_usage}
+  end
+
+  defp measure_time_and_memory(function, true) do
+    {microseconds, return_value} = :timer.tc(function)
+    {_, memory_usage} = MemoryMeasure.apply(function)
+    {microseconds, memory_usage, return_value}
+  end
+
+  defp measure_time_and_memory(function, false) do
+    {microseconds, return_value} = :timer.tc(function)
+    {microseconds, 1, return_value}
   end
 
   @no_input Benchmark.no_input()

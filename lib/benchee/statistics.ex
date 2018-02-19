@@ -102,6 +102,7 @@ defmodule Benchee.Statistics do
       ...>   %Benchee.Benchmark.Scenario{
       ...>     job_name: "My Job",
       ...>     run_times: [200, 400, 400, 400, 500, 500, 700, 900],
+      ...>     memory_usages: [200, 400, 400, 400, 500, 500, 700, 900],
       ...>     input_name: "Input",
       ...>     input: "Input"
       ...>   }
@@ -113,9 +114,23 @@ defmodule Benchee.Statistics do
           %Benchee.Benchmark.Scenario{
             job_name: "My Job",
             run_times: [200, 400, 400, 400, 500, 500, 700, 900],
+            memory_usages: [200, 400, 400, 400, 500, 500, 700, 900],
             input_name: "Input",
             input: "Input",
             run_time_statistics: %Benchee.Statistics{
+              average:       500.0,
+              ips:           2000.0,
+              std_dev:       200.0,
+              std_dev_ratio: 0.4,
+              std_dev_ips:   800.0,
+              median:        450.0,
+              percentiles:   %{50 => 450.0, 99 => 900.0},
+              mode:          400,
+              minimum:       200,
+              maximum:       900,
+              sample_size:   8
+            },
+            memory_usage_statistics: %Benchee.Statistics{
               average:       500.0,
               ips:           2000.0,
               std_dev:       200.0,
@@ -136,11 +151,15 @@ defmodule Benchee.Statistics do
 
   """
   @spec statistics(Suite.t()) :: Suite.t()
-  def statistics(suite = %Suite{scenarios: scenarios}) do
+  def statistics(suite = %Suite{scenarios: scenarios, configuration: %{measure_memory: measure_memory}}) do
     scenarios_with_statistics =
       Parallel.map(scenarios, fn scenario ->
         run_time_stats = job_statistics(scenario.run_times)
-        memory_stats = job_statistics(scenario.memory_usages)
+        memory_stats = if measure_memory do
+          job_statistics(scenario.memory_usages)
+        else
+          nil
+        end
 
         %Scenario{
           scenario
@@ -216,6 +235,7 @@ defmodule Benchee.Statistics do
   ...>   %Benchee.Benchmark.Scenario{
   ...>     job_name: "My Job",
   ...>     run_times: [200, 400, 400, 400, 500, 500, 700, 900],
+  ...>     memory_usages: [200, 400, 400, 400, 500, 500, 700, 900],
   ...>     input_name: "Input",
   ...>     input: "Input"
   ...>   }
@@ -228,6 +248,7 @@ defmodule Benchee.Statistics do
       %Benchee.Benchmark.Scenario{
         job_name: "My Job",
         run_times: [200, 400, 400, 400, 500, 500, 700, 900],
+        memory_usages: [200, 400, 400, 400, 500, 500, 700, 900],
         input_name: "Input",
         input: "Input",
         run_time_statistics: %Benchee.Statistics{
@@ -238,6 +259,19 @@ defmodule Benchee.Statistics do
           std_dev_ips:   800.0,
           median:        450.0,
           percentiles:   %{25 => 400.0, 50 => 450.0, 75 => 650.0, 99 => 900.0},
+          mode:          400,
+          minimum:       200,
+          maximum:       900,
+          sample_size:   8
+        },
+        memory_usage_statistics: %Benchee.Statistics{
+          average:       500.0,
+          ips:           2000.0,
+          std_dev:       200.0,
+          std_dev_ratio: 0.4,
+          std_dev_ips:   800.0,
+          median:        450.0,
+          percentiles:   %{50 => 450.0, 99 => 900.0},
           mode:          400,
           minimum:       200,
           maximum:       900,

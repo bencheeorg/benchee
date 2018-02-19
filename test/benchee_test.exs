@@ -3,6 +3,8 @@ defmodule BencheeTest do
   import ExUnit.CaptureIO
   import Benchee.TestHelpers
   alias Benchee.Test.FakeFormatter
+  alias Benchee.Statistics
+  alias Benchee.Formatters.Console
   doctest Benchee
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median.+99th %$/m
@@ -10,12 +12,13 @@ defmodule BencheeTest do
   test "integration step by step" do
     capture_io fn ->
       result =
-        Benchee.init(@test_times)
+        @test_times
+        |> Benchee.init
         |> Benchee.system
         |> Benchee.benchmark("Sleeps", fn -> :timer.sleep(10) end)
         |> Benchee.measure
-        |> Benchee.Statistics.statistics
-        |> Benchee.Formatters.Console.format
+        |> Statistics.statistics
+        |> Console.format
 
       [[_input_name, header, benchmark_stats]] = result
       assert Regex.match?(@header_regex, header)

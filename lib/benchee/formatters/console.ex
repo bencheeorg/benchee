@@ -71,18 +71,23 @@ defmodule Benchee.Formatters.Console do
   """
   @spec format(Suite.t()) :: [any]
   def format(%Suite{scenarios: scenarios, configuration: config}) do
+    measure_memory = config.measure_memory
     config = console_configuration(config)
 
     scenarios
     |> Enum.group_by(fn scenario -> scenario.input_name end)
     |> Enum.map(fn {input, scenarios} ->
-      [
-        input_header(input),
-        "\nRun time statistics:\n",
-        format_scenarios(scenarios, config),
-        "\nMemory usage statistics:\n",
-        format_scenarios_for_memory(scenarios, config)
-      ]
+      if measure_memory do
+        [
+          input_header(input),
+          "\nRun time statistics:\n",
+          format_scenarios(scenarios, config),
+          "\nMemory usage statistics:\n",
+          format_scenarios_for_memory(scenarios, config)
+        ]
+      else
+        [input_header(input) | format_scenarios(scenarios, config)]
+      end
     end)
   end
 

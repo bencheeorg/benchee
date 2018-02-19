@@ -1,4 +1,9 @@
 defmodule Benchee.MemoryMeasure do
+  @moduledoc """
+  This exposes two functions, apply/1 and apply/3. Both execute a given function
+  and report on the memory used by monitoring the garbage collection process for
+  a single process.
+  """
   import Kernel, except: [apply: 3, apply: 2]
 
   def apply(f) do
@@ -18,7 +23,10 @@ defmodule Benchee.MemoryMeasure do
         result = Kernel.apply(m, f, a)
         {:garbage_collection_info, info_after} = Process.info(self(), :garbage_collection_info)
         mem_collected = get_collected_memory(tracer)
-        final = {result, (info_after[:heap_size] - info_before[:heap_size] + mem_collected) * word_size}
+
+        final =
+          {result, (info_after[:heap_size] - info_before[:heap_size] + mem_collected) * word_size}
+
         send(parent, {ref, final})
       after
         send(tracer, :done)

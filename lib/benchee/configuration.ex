@@ -13,6 +13,7 @@ defmodule Benchee.Configuration do
   }
 
   defstruct parallel: 1,
+            measure_memory: false,
             time: 5,
             warmup: 2,
             pre_check: false,
@@ -43,6 +44,7 @@ defmodule Benchee.Configuration do
 
   @type t :: %__MODULE__{
           parallel: integer,
+          measure_memory: boolean,
           time: number,
           warmup: number,
           pre_check: boolean,
