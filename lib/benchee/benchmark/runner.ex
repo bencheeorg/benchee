@@ -4,7 +4,7 @@ defmodule Benchee.Benchmark.Runner do
   run time and memory usage to each scenario.
   """
 
-  alias Benchee.Benchmark
+  alias Benchee.{Benchmark, MemoryMeasure}
   alias Benchee.Benchmark.{Scenario, ScenarioContext}
   alias Benchee.Utility.{RepeatN, Parallel}
   alias Benchee.Configuration
@@ -222,11 +222,10 @@ defmodule Benchee.Benchmark.Runner do
          }
        ) do
     new_input = run_before_each(scenario, scenario_context)
-    {:memory, memory_usage_before} = :erlang.process_info(self(), :memory)
     {microseconds, return_value} = :timer.tc(main_function(function, new_input))
-    {:memory, memory_usage_after} = :erlang.process_info(self(), :memory)
+    {_, memory_usage} = MemoryMeasure.apply(main_function(function, new_input))
     run_after_each(return_value, scenario, scenario_context)
-    {microseconds, memory_usage_after - memory_usage_before}
+    {microseconds, memory_usage}
   end
 
   defp measure_iteration(
@@ -240,10 +239,9 @@ defmodule Benchee.Benchmark.Runner do
     # of hooks is already included in the function, for reference/reasoning see
     # `build_benchmarking_function/2`
     function = build_benchmarking_function(scenario, scenario_context)
-    {:memory, memory_usage_before} = :erlang.process_info(self(), :memory)
     {microseconds, _return_value} = :timer.tc(function)
-    {:memory, memory_usage_after} = :erlang.process_info(self(), :memory)
-    {microseconds, memory_usage_after - memory_usage_before}
+    {_, memory_usage} = MemoryMeasure.apply(function)
+    {microseconds, memory_usage}
   end
 
   @no_input Benchmark.no_input()
