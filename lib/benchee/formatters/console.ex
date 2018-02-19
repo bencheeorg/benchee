@@ -168,16 +168,32 @@ defmodule Benchee.Formatters.Console do
 
   def format_scenarios_for_memory(scenarios, config) do
     sorted_scenarios = Statistics.sort(scenarios)
-     %{unit_scaling: scaling_strategy} = config
+    %{unit_scaling: scaling_strategy} = config
     units = Conversion.units(sorted_scenarios, scaling_strategy, :memory)
     label_width = label_width(sorted_scenarios)
 
-    [
-      column_descriptors_for_memory(label_width)
-      | scenario_reports_for_memory(sorted_scenarios, units, label_width) ++
-          comparison_report_for_memory(sorted_scenarios, units, label_width, config) ++
-          extended_statistics_report(sorted_scenarios, units, label_width, config)
-    ]
+    if all_have_deviation_of_0?(scenarios) do
+      [
+        column_descriptors_for_memory_same(label_width)
+        | scenario_reports_for_memory_same(sorted_scenarios, units, label_width) ++
+            comparison_report_for_memory(sorted_scenarios, units, label_width, config) ++
+            extended_statistics_report(sorted_scenarios, units, label_width, config) ++
+            "\n**All measurements for memory usage were the same, so no metrics could be calculated**\n"
+      ]
+    else
+      [
+        column_descriptors_for_memory(label_width)
+        | scenario_reports_for_memory(sorted_scenarios, units, label_width) ++
+            comparison_report_for_memory(sorted_scenarios, units, label_width, config) ++
+            extended_statistics_report(sorted_scenarios, units, label_width, config)
+      ]
+    end
+  end
+
+  defp all_have_deviation_of_0?(scenarios) do
+    Enum.all?(scenarios, fn scenario ->
+      scenario.memory_usage_statistics.std_dev == 0.0
+    end)
   end
 
   @spec extended_statistics_report([Scenario.t()], unit_per_statistic, integer, map) :: [
@@ -300,6 +316,17 @@ defmodule Benchee.Formatters.Console do
     |> to_string
   end
 
+  defp column_descriptors_for_memory_same(label_width) do
+    "\n~*s~*s\n"
+    |> :io_lib.format([
+      -label_width,
+      "Name",
+      @average_width,
+      "Memory usage"
+    ])
+    |> to_string
+  end
+
   defp label_width(scenarios) do
     max_label_width =
       scenarios
@@ -320,6 +347,12 @@ defmodule Benchee.Formatters.Console do
   defp scenario_reports_for_memory(scenarios, units, label_width) do
     Enum.map(scenarios, fn scenario ->
       format_scenario_for_memory(scenario, units, label_width)
+    end)
+  end
+
+  defp scenario_reports_for_memory_same(scenarios, units, label_width) do
+    Enum.map(scenarios, fn scenario ->
+      format_scenario_for_memory_same(scenario, units, label_width)
     end)
   end
 
@@ -381,6 +414,26 @@ defmodule Benchee.Formatters.Console do
       run_time_out(median, memory_unit),
       @percentile_width,
       run_time_out(percentile_99, ninety_ninth)
+    ])
+    |> to_string
+  end
+
+  defp format_scenario_for_memory_same(
+         %Scenario{
+           name: name,
+           memory_usage_statistics: %Statistics{
+             average: average
+           }
+         },
+         %{memory: memory_unit},
+         label_width
+       ) do
+    "~*ts~*ts\n"
+    |> :io_lib.format([
+      -label_width,
+      name,
+      @average_width,
+      run_time_out(average, memory_unit)
     ])
     |> to_string
   end

@@ -8,6 +8,7 @@ defmodule Benchee.MemoryMeasure do
   def apply(m, f, a) do
     parent = self()
     ref = make_ref()
+    word_size = :erlang.system_info(:wordsize)
 
     spawn_link(fn ->
       tracer = start_tracer(self())
@@ -17,7 +18,7 @@ defmodule Benchee.MemoryMeasure do
         result = Kernel.apply(m, f, a)
         {:garbage_collection_info, info_after} = Process.info(self(), :garbage_collection_info)
         mem_collected = get_collected_memory(tracer)
-        final = {result, info_after[:heap_size] - info_before[:heap_size] + mem_collected}
+        final = {result, (info_after[:heap_size] - info_before[:heap_size] + mem_collected) * word_size}
         send(parent, {ref, final})
       after
         send(tracer, :done)
