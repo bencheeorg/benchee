@@ -464,7 +464,7 @@ defmodule BencheeTest do
       end
 
       assert Regex.match?(~r/Memory usage statistics:/, output)
-      assert Regex.match?(~r/To List           616 B/, output)
+      assert Regex.match?(~r/To List\s+[0-9.]{3,} K*B{1}/, output)
     end
   end
 

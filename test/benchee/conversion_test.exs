@@ -1,4 +1,4 @@
 defmodule Benchee.ConversionTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Benchee.Conversion
 end

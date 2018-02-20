@@ -60,7 +60,6 @@ defmodule Benchee.Conversion do
     %{memory: Memory.best(measurements.average, strategy: scaling_strategy)}
   end
 
-  @deprecated "0.13"
   @doc """
   This is the old way of calling this function, which assumed that we were only
   dealing with run times and not memory units. After we have some time to update
