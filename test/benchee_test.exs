@@ -456,15 +456,23 @@ defmodule BencheeTest do
     end
   end
 
-  describe "memory measurement" do
-    test "measures memory usage when instructed to do so" do
-      output = capture_io fn ->
-        Benchee.run(%{"To List" => fn -> Enum.to_list(1..100) end},
-                    time: 0.01, warmup: 0.005, measure_memory: true)
-      end
+  {otp_version, _} =
+    :otp_release
+    |> :erlang.system_info()
+    |> to_string
+    |> Integer.parse()
 
-      assert Regex.match?(~r/Memory usage statistics:/, output)
-      assert Regex.match?(~r/To List\s+[0-9.]{3,} K*B{1}/, output)
+  if otp_version > 18 do
+    describe "memory measurement" do
+      test "measures memory usage when instructed to do so" do
+        output = capture_io fn ->
+          Benchee.run(%{"To List" => fn -> Enum.to_list(1..100) end},
+                      time: 0.01, warmup: 0.005, measure_memory: true)
+        end
+
+        assert Regex.match?(~r/Memory usage statistics:/, output)
+        assert Regex.match?(~r/To List\s+[0-9.]{3,} K*B{1}/, output)
+      end
     end
   end
 

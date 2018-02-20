@@ -224,7 +224,16 @@ defmodule Benchee.Benchmark.Runner do
        ) do
     new_input = run_before_each(scenario, scenario_context)
     function = main_function(function, new_input)
-    {microseconds, memory_usage, return_value} = measure_time_and_memory(function, measure_memory)
+
+    {otp_version, _} =
+      :otp_release
+      |> :erlang.system_info()
+      |> to_string
+      |> Integer.parse()
+
+    {microseconds, memory_usage, return_value} =
+      measure_time_and_memory(function, measure_memory && otp_version > 18)
+
     run_after_each(return_value, scenario, scenario_context)
     {microseconds, memory_usage}
   end
