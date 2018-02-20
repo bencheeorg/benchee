@@ -107,9 +107,10 @@ defmodule Benchee.Statistics do
       ...>     input: "Input"
       ...>   }
       ...> ]
-      iex> suite = %Benchee.Suite{scenarios: scenarios}
+      iex> suite = %Benchee.Suite{scenarios: scenarios, configuration: %{measure_memory: true}}
       iex> Benchee.Statistics.statistics(suite)
       %Benchee.Suite{
+        configuration: %{measure_memory: true},
         scenarios: [
           %Benchee.Benchmark.Scenario{
             job_name: "My Job",
@@ -145,7 +146,6 @@ defmodule Benchee.Statistics do
             }
           }
         ],
-        configuration: nil,
         system: nil
       }
 
@@ -240,10 +240,11 @@ defmodule Benchee.Statistics do
   ...>     input: "Input"
   ...>   }
   ...> ]
-  iex> %Benchee.Suite{scenarios: scenarios}
+  iex> %Benchee.Suite{scenarios: scenarios, configuration: %{measure_memory: true}}
   ...> |> Benchee.Statistics.statistics
   ...> |> Benchee.Statistics.add_percentiles([25, 75])
   %Benchee.Suite{
+    configuration: %{measure_memory: true},
     scenarios: [
       %Benchee.Benchmark.Scenario{
         job_name: "My Job",
