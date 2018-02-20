@@ -36,10 +36,10 @@ defmodule Benchee.Formatters.Console.Memory do
     hide_statistics = all_have_deviation_of_0?(scenarios)
 
     [
-      "Memory usage statistics:\n",
-      column_descriptors(label_width, hide_statistics) |
-        scenario_reports(scenarios, units, label_width, hide_statistics) ++
-        comparison_report(scenarios, units, label_width, config)
+      "\nMemory usage statistics:\n",
+      column_descriptors(label_width, hide_statistics)
+      | scenario_reports(scenarios, units, label_width, hide_statistics) ++
+          comparison_report(scenarios, units, label_width, config, hide_statistics)
     ]
   end
 
@@ -78,6 +78,14 @@ defmodule Benchee.Formatters.Console.Memory do
   end
 
   @spec scenario_reports([Scenario.t()], unit_per_statistic, integer, boolean) :: [String.t()]
+  defp scenario_reports([scenario | other_scenarios], units, label_width, true) do
+    [
+      reference_report(scenario, units, label_width),
+      comparisons(scenario, units, label_width, other_scenarios),
+      "\n**All measurements for memory usage were the same**\n"
+    ]
+  end
+
   defp scenario_reports(scenarios, units, label_width, hide_statistics) do
     Enum.map(scenarios, fn scenario ->
       format_scenario(scenario, units, label_width, hide_statistics)
@@ -130,14 +138,17 @@ defmodule Benchee.Formatters.Console.Memory do
     |> to_string
   end
 
-  @spec comparison_report([Scenario.t()], unit_per_statistic, integer, map) :: [String.t()]
-  defp comparison_report(scenarios, units, label_width, config)
+  @spec comparison_report([Scenario.t()], unit_per_statistic, integer, map, boolean) :: [
+          String.t()
+        ]
+  defp comparison_report(scenarios, units, label_width, config, hide_statistics)
 
   # No need for a comparison when only one benchmark was run
-  defp comparison_report([_scenario], _, _, _), do: []
-  defp comparison_report(_, _, _, %{comparison: false}), do: []
+  defp comparison_report([_scenario], _, _, _, _), do: []
+  defp comparison_report(_, _, _, %{comparison: false}, _), do: []
+  defp comparison_report(_, _, _, _, true), do: []
 
-  defp comparison_report([scenario | other_scenarios], units, label_width, _) do
+  defp comparison_report([scenario | other_scenarios], units, label_width, _, _) do
     [
       Helpers.descriptor("Comparison"),
       reference_report(scenario, units, label_width),
