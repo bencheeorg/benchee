@@ -181,7 +181,7 @@ defmodule Benchee.Formatters.Console.Memory do
         if job_stats.median == 0 do
           0.0
         else
-          reference_stats.median / job_stats.median
+          job_stats.median / reference_stats.median
         end
 
       format_comparison(scenario, units, label_width, slower)
@@ -192,7 +192,7 @@ defmodule Benchee.Formatters.Console.Memory do
     %Scenario{name: name, memory_usage_statistics: %Statistics{median: median}} = scenario
     median_format = Helpers.run_time_out(median, memory_unit)
 
-    "~*s~*s - ~.2fx more memory\n"
+    "~*s~*s - ~.2fx memory usage\n"
     |> :io_lib.format([-label_width, name, @median_width, median_format, slower])
     |> to_string
   end
