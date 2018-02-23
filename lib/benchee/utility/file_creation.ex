@@ -35,7 +35,7 @@ defmodule Benchee.Utility.FileCreation do
     ensure_directory_exists filename
     Enum.each names_to_content, fn({input_name, content}) ->
       input_filename = interleave(filename, input_name)
-      File.open input_filename, [:write, :utf8], fn(file) ->
+      File.open! input_filename, [:write, :utf8], fn(file) ->
         function.(file, content, input_filename)
       end
     end
@@ -67,6 +67,9 @@ defmodule Benchee.Utility.FileCreation do
 
       iex> Benchee.Utility.FileCreation.interleave("abc.csv", "Big Input")
       "abc_big_input.csv"
+
+      iex> Benchee.Utility.FileCreation.interleave("abc.csv", "String.length/1")
+      "abc_string_length_1.csv"
 
       iex> Benchee.Utility.FileCreation.interleave("bench/abc.csv", "Big Input")
       "bench/abc_big_input.csv"
@@ -123,7 +126,7 @@ defmodule Benchee.Utility.FileCreation do
     case name_string do
       ^no_input -> ""
       _         ->
-        String.downcase(String.replace(name_string, " ", "_"))
+        String.downcase(String.replace(name_string, ~r/[^0-9A-Z]/i, "_"))
     end
   end
 end
