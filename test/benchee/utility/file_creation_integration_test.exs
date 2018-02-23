@@ -24,7 +24,7 @@ defmodule Benchee.Utility.FileCreationIntegrationTest do
       end
     end
 
-    test "by default writes writes files" do
+    test "by default writes files" do
       try do
         capture_io fn -> each @input_to_contents, @filename end
         assert_correct_files()
@@ -42,6 +42,16 @@ defmodule Benchee.Utility.FileCreationIntegrationTest do
       after
         File.rm_rf! @directory
       end
+    end
+
+    test "with String.length/1 as a name it writes the correct file" do
+      to_contents = %{
+        "String.length/1" => "abc"
+      }
+      capture_io fn -> each to_contents, @filename end
+      assert File.exists? "#{@directory}/test_string_length_1.txt"
+    after
+      File.rm_rf! @directory
     end
 
     defp assert_correct_files do
