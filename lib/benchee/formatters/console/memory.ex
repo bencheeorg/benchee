@@ -151,7 +151,7 @@ defmodule Benchee.Formatters.Console.Memory do
   defp comparison_report([scenario | other_scenarios], units, label_width, _, _) do
     [
       Helpers.descriptor("Comparison"),
-      reference_report(scenario, units, label_width),
+      reference_report(scenario, units, label_width) |
       comparisons(scenario, units, label_width, other_scenarios)
     ]
   end
@@ -178,7 +178,7 @@ defmodule Benchee.Formatters.Console.Memory do
 
     Enum.map(scenarios_to_compare, fn scenario = %Scenario{memory_usage_statistics: job_stats} ->
       slower =
-        if job_stats.median == 0 do
+        if job_stats.median == 0 || reference_stats.median == 0 do
           0.0
         else
           job_stats.median / reference_stats.median

@@ -11,8 +11,18 @@ defmodule Benchee.MemoryMeasure do
   end
 
   def apply(m, f, a) do
-    parent = self()
     ref = make_ref()
+    Process.flag(:trap_exit, true)
+    start_runner(m, f, a, ref)
+
+    receive do
+      {^ref, final} -> final
+      :shutdown -> nil
+    end
+  end
+
+  defp start_runner(m, f, a, ref) do
+    parent = self()
     word_size = :erlang.system_info(:wordsize)
 
     spawn_link(fn ->
@@ -28,14 +38,28 @@ defmodule Benchee.MemoryMeasure do
           {result, (info_after[:heap_size] - info_before[:heap_size] + mem_collected) * word_size}
 
         send(parent, {ref, final})
+      rescue
+        exception ->
+          :error
+          |> Exception.format(exception)
+          |> IO.puts()
+
+          safe_exit(tracer, parent)
+      catch
+        action, argument ->
+          IO.puts("Received `#{action}` with the argument `#{argument}`")
+
+          safe_exit(tracer, parent)
       after
         send(tracer, :done)
       end
     end)
+  end
 
-    receive do
-      {^ref, final} -> final
-    end
+  defp safe_exit(tracer, parent) do
+    send(tracer, :done)
+    send(parent, :shutdown)
+    exit(:normal)
   end
 
   defp get_collected_memory(tracer) do
