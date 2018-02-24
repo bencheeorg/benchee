@@ -6,10 +6,12 @@ defmodule Benchee.MemoryMeasure do
   """
   import Kernel, except: [apply: 3, apply: 2]
 
+  @spec apply(fun) :: no_return() | tuple()
   def apply(f) do
     apply(:erlang, :apply, [f, []])
   end
 
+  @spec apply(atom, atom, list) :: no_return() | tuple()
   def apply(m, f, a) do
     ref = make_ref()
     Process.flag(:trap_exit, true)
@@ -56,6 +58,7 @@ defmodule Benchee.MemoryMeasure do
     end)
   end
 
+  @spec safe_exit(pid, pid) :: no_return()
   defp safe_exit(tracer, parent) do
     send(tracer, :done)
     send(parent, :shutdown)
