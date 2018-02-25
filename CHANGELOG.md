@@ -8,6 +8,11 @@ everything will run without error before running the full set of benchmarks.
 benchmarks with each input before running the actual suite. This should save
 time while actually writing the code for your benchmarks.
 
+### Bugfixes (User Facing)
+* Formatters that use `FileCreation.each` will no longer silently fail on file
+creation and now also sanitizes `/` and other file name characters to be `_`.
+Thanks @gfvcastro
+
 ## 0.12.0 (2018-01-20)
 
 Adds the ability to save benchmarking results and load them again to compare
