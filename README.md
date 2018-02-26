@@ -704,7 +704,7 @@ If you're into watching videos of conference talks and also want to learn more a
 
 [![Benchee Video](http://www.pragtob.info/images/elixir_live_slide.png)](https://www.youtube.com/watch?v=7-mE5CKXjkw)
 
-## Contributing
+## Contributing [![Open Source Helpers](https://www.codetriage.com/pragtob/benchee/badges/users.svg)](https://www.codetriage.com/pragtob/benchee)
 
 Contributions to benchee are **very welcome**! Bug reports, documentation, spelling corrections, whole features, feature ideas, bugfixes, new plugins, fancy graphics... all of those (and probably more) are much appreciated contributions!
 
@@ -712,7 +712,9 @@ Keep in mind that the [plugins](#plugins) live in their own repositories with th
 
 Please respect the [Code of Conduct](//github.com/PragTob/benchee/blob/master/CODE_OF_CONDUCT.md).
 
-You can get started with a look at the [open issues](https://github.com/PragTob/benchee/issues). There are `help wanted` and `good first issue` labels - those are meant as guidance, of course other issues can be tackled :)
+In addition to contributing code, you can help to triage issues. This can include reproducing bug reports, or asking for vital information such as version numbers or reproduction instructions. If you would like to start triaging issues, one easy way to get started is to [subscribe to pragtob/benchee on CodeTriage](https://www.codetriage.com/pragtob/benchee).
+
+You can also look directly at the [open issues](https://github.com/PragTob/benchee/issues). There are `help wanted` and `good first issue` labels - those are meant as guidance, of course other issues can be tackled :)
 
 A couple of (hopefully) helpful points:
 
