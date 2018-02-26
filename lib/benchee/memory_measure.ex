@@ -37,32 +37,20 @@ defmodule Benchee.MemoryMeasure do
         mem_collected = get_collected_memory(tracer)
 
         final =
-          {result, (info_after[:heap_size] - info_before[:heap_size] + mem_collected) * word_size}
+          {(info_after[:heap_size] - info_before[:heap_size] + mem_collected) * word_size, result}
 
         send(parent, {ref, final})
-      rescue
-        exception ->
-          :error
-          |> Exception.format(exception)
-          |> IO.puts()
-
-          safe_exit(tracer, parent)
       catch
-        action, argument ->
-          IO.puts("Received `#{action}` with the argument `#{argument}`")
-
-          safe_exit(tracer, parent)
+        kind, reason ->
+          send(tracer, :done)
+          send(parent, :shutdown)
+          stacktrace = System.stacktrace()
+          IO.puts(Exception.format(kind, reason, stacktrace))
+          exit(:normal)
       after
         send(tracer, :done)
       end
     end)
-  end
-
-  @spec safe_exit(pid, pid) :: no_return()
-  defp safe_exit(tracer, parent) do
-    send(tracer, :done)
-    send(parent, :shutdown)
-    exit(:normal)
   end
 
   defp get_collected_memory(tracer) do
