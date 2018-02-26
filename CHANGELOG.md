@@ -1,3 +1,10 @@
+## 0.12.1 (2018-02-26)
+
+### Bugfixes (User Facing)
+* Formatters that use `FileCreation.each` will no longer silently fail on file
+creation and now also sanitizes `/` and other file name characters to be `_`.
+Thanks @gfvcastro
+
 ## 0.12.0 (2018-01-20)
 
 Adds the ability to save benchmarking results and load them again to compare
