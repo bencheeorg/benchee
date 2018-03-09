@@ -31,16 +31,16 @@ defmodule Benchee.Formatters.Console.Memory do
   @spec format_scenarios([Scenario.t()], map) :: [String.t(), ...]
   def format_scenarios(scenarios, config) do
     %{unit_scaling: scaling_strategy} = config
-    units = Conversion.units(scenarios, scaling_strategy, :memory)
+    units = Conversion.units(scenarios, scaling_strategy)
     label_width = Helpers.label_width(scenarios)
     hide_statistics = all_have_deviation_of_0?(scenarios)
 
-    [
+    List.flatten([
       "\nMemory usage statistics:\n",
-      column_descriptors(label_width, hide_statistics)
-      | scenario_reports(scenarios, units, label_width, hide_statistics) ++
-          comparison_report(scenarios, units, label_width, config, hide_statistics)
-    ]
+      column_descriptors(label_width, hide_statistics),
+      scenario_reports(scenarios, units, label_width, hide_statistics),
+      comparison_report(scenarios, units, label_width, config, hide_statistics)
+    ])
   end
 
   defp all_have_deviation_of_0?(scenarios) do
@@ -109,13 +109,13 @@ defmodule Benchee.Formatters.Console.Memory do
       -label_width,
       name,
       @average_width,
-      Helpers.run_time_out(average, memory_unit),
+      Helpers.duration_output(average, memory_unit),
       @deviation_width,
-      Helpers.deviation_out(std_dev_ratio),
+      Helpers.deviation_output(std_dev_ratio),
       @median_width,
-      Helpers.run_time_out(median, memory_unit),
+      Helpers.duration_output(median, memory_unit),
       @percentile_width,
-      Helpers.run_time_out(percentile_99, memory_unit)
+      Helpers.duration_output(percentile_99, memory_unit)
     ])
     |> to_string
   end
@@ -133,7 +133,7 @@ defmodule Benchee.Formatters.Console.Memory do
       -label_width,
       name,
       @average_width,
-      Helpers.run_time_out(average, memory_unit)
+      Helpers.duration_output(average, memory_unit)
     ])
     |> to_string
   end
@@ -151,8 +151,8 @@ defmodule Benchee.Formatters.Console.Memory do
   defp comparison_report([scenario | other_scenarios], units, label_width, _, _) do
     [
       Helpers.descriptor("Comparison"),
-      reference_report(scenario, units, label_width) |
-      comparisons(scenario, units, label_width, other_scenarios)
+      reference_report(scenario, units, label_width)
+      | comparisons(scenario, units, label_width, other_scenarios)
     ]
   end
 
@@ -167,7 +167,7 @@ defmodule Benchee.Formatters.Console.Memory do
       -label_width,
       name,
       @median_width,
-      Helpers.run_time_out(median, memory_unit)
+      Helpers.duration_output(median, memory_unit)
     ])
     |> to_string
   end
@@ -177,20 +177,28 @@ defmodule Benchee.Formatters.Console.Memory do
     %Scenario{memory_usage_statistics: reference_stats} = scenario
 
     Enum.map(scenarios_to_compare, fn scenario = %Scenario{memory_usage_statistics: job_stats} ->
-      slower =
-        if job_stats.median == 0 || reference_stats.median == 0 do
-          0.0
-        else
-          job_stats.median / reference_stats.median
-        end
+      slower = calculate_slower_value(job_stats.median, reference_stats.median)
 
       format_comparison(scenario, units, label_width, slower)
     end)
   end
 
+  defp calculate_slower_value(0, _), do: "N/A"
+  defp calculate_slower_value(_, 0), do: "N/A"
+  defp calculate_slower_value(job_median, reference_median), do: job_median / reference_median
+
+  defp format_comparison(scenario, %{memory: memory_unit}, label_width, "N/A") do
+    %Scenario{name: name, memory_usage_statistics: %Statistics{median: median}} = scenario
+    median_format = Helpers.duration_output(median, memory_unit)
+
+    "~*s~*s\n"
+    |> :io_lib.format([-label_width, name, @median_width, median_format])
+    |> to_string
+  end
+
   defp format_comparison(scenario, %{memory: memory_unit}, label_width, slower) do
     %Scenario{name: name, memory_usage_statistics: %Statistics{median: median}} = scenario
-    median_format = Helpers.run_time_out(median, memory_unit)
+    median_format = Helpers.duration_output(median, memory_unit)
 
     "~*s~*s - ~.2fx memory usage\n"
     |> :io_lib.format([-label_width, name, @median_width, median_format, slower])

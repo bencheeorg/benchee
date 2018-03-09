@@ -30,7 +30,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             maximum: 333.3,
             mode: 201.2,
             sample_size: 50_000
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         }
       ]
 
@@ -63,7 +64,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             maximum: 333.3,
             mode: [201.2, 205.55],
             sample_size: 50_000
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         }
       ]
 
@@ -87,7 +89,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             minimum: 111.1,
             maximum: 333.3,
             sample_size: 50_000
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         }
       ]
 
@@ -107,7 +110,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 300.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         },
         %Scenario{
           name: "Second",
@@ -117,7 +121,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 375.0,
             percentiles: %{99 => 400.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         }
       ]
 
@@ -141,7 +146,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
           std_dev_ratio: 0.1,
           median: 375.0,
           percentiles: %{99 => 500.1}
-        }
+        },
+        memory_usage_statistics: %Statistics{average: 150.0}
       }
 
       longer_scenarios = scenarios ++ [long_scenario]
@@ -166,7 +172,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 90.0,
             percentiles: %{99 => 500.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         },
         %Scenario{
           name: "Second",
@@ -176,7 +183,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 500.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         }
       ]
 
@@ -198,7 +206,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 300.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         },
         %Scenario{
           name: "First",
@@ -208,7 +217,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 90.0,
             percentiles: %{99 => 200.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         }
       ]
 
@@ -238,7 +248,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 90.0,
             percentiles: %{99 => 200.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         },
         %Scenario{
           name: second_name,
@@ -248,7 +259,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 300.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         }
       ]
 
@@ -271,7 +283,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 90.0,
             percentiles: %{99 => 200.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         }
       ]
 
@@ -289,7 +302,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 0.0125,
             percentiles: %{99 => 0.0234}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         }
       ]
 
@@ -309,7 +323,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 13000.0,
             median: 140_000.0,
             percentiles: %{99 => 200_000.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 150.0}
         }
       ]
 

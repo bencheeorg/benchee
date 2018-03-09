@@ -7,50 +7,56 @@ defmodule Benchee.MemoryMeasure do
   import Kernel, except: [apply: 3, apply: 2]
 
   @spec apply(fun) :: no_return() | tuple()
-  def apply(f) do
-    apply(:erlang, :apply, [f, []])
+  def apply(fun) do
+    apply(:erlang, :apply, [fun, []])
   end
 
   @spec apply(atom, atom, list) :: no_return() | tuple()
-  def apply(m, f, a) do
+  def apply(module, function, arguments) do
     ref = make_ref()
     Process.flag(:trap_exit, true)
-    start_runner(m, f, a, ref)
+    start_runner(module, function, arguments, ref)
 
     receive do
-      {^ref, final} -> final
+      {^ref, memory_usage_info} -> memory_usage_info
       :shutdown -> nil
     end
   end
 
-  defp start_runner(m, f, a, ref) do
+  defp start_runner(module, function, arguments, ref) do
     parent = self()
-    word_size = :erlang.system_info(:wordsize)
 
     spawn_link(fn ->
       tracer = start_tracer(self())
 
       try do
-        {:garbage_collection_info, info_before} = Process.info(self(), :garbage_collection_info)
-        result = Kernel.apply(m, f, a)
-        {:garbage_collection_info, info_after} = Process.info(self(), :garbage_collection_info)
-        mem_collected = get_collected_memory(tracer)
-
-        final =
-          {(info_after[:heap_size] - info_before[:heap_size] + mem_collected) * word_size, result}
-
-        send(parent, {ref, final})
+        memory_usage_info = measure_memory(module, function, arguments, tracer)
+        send(parent, {ref, memory_usage_info})
       catch
-        kind, reason ->
-          send(tracer, :done)
-          send(parent, :shutdown)
-          stacktrace = System.stacktrace()
-          IO.puts(Exception.format(kind, reason, stacktrace))
-          exit(:normal)
+        kind, reason -> graceful_exit(kind, reason, tracer, parent)
       after
         send(tracer, :done)
       end
     end)
+  end
+
+  defp measure_memory(module, function, arguments, tracer) do
+    word_size = :erlang.system_info(:wordsize)
+    {:garbage_collection_info, info_before} = Process.info(self(), :garbage_collection_info)
+    result = Kernel.apply(module, function, arguments)
+    {:garbage_collection_info, info_after} = Process.info(self(), :garbage_collection_info)
+    mem_collected = get_collected_memory(tracer)
+
+    {(info_after[:heap_size] - info_before[:heap_size] + mem_collected) * word_size, result}
+  end
+
+  @spec graceful_exit(Exception.kind(), any(), pid(), pid()) :: no_return
+  defp graceful_exit(kind, reason, tracer, parent) do
+    send(tracer, :done)
+    send(parent, :shutdown)
+    stacktrace = System.stacktrace()
+    IO.puts(Exception.format(kind, reason, stacktrace))
+    exit(:normal)
   end
 
   defp get_collected_memory(tracer) do

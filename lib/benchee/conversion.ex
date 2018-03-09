@@ -6,6 +6,7 @@ defmodule Benchee.Conversion do
   """
 
   alias Benchee.Conversion.{Duration, Count, Memory}
+  alias Benchee.Benchmark.Scenario
 
   @doc """
   Takes scenarios and a given scaling_strategy, returns the best units for the
@@ -18,8 +19,11 @@ defmodule Benchee.Conversion do
   ## Examples
 
       iex> statistics = %Benchee.Statistics{average: 1000.0, ips: 1000.0}
-      iex> scenario = %Benchee.Benchmark.Scenario{run_time_statistics: statistics}
-      iex> Benchee.Conversion.units([scenario], :best, :run_time)
+      iex> scenario = %Benchee.Benchmark.Scenario{
+      ...>   run_time_statistics: statistics,
+      ...>   memory_usage_statistics: statistics
+      ...> }
+      iex> Benchee.Conversion.units([scenario], :best)
       %{
         ips:      %Benchee.Conversion.Unit{
                     label: "K",
@@ -32,40 +36,42 @@ defmodule Benchee.Conversion do
                     long: "Milliseconds",
                     magnitude: 1000,
                     name: :millisecond
+                  },
+        memory:   %Benchee.Conversion.Unit{
+                    label: "B",
+                    long: "Bytes",
+                    magnitude: 1,
+                    name: :byte
                   }
       }
   """
-  def units(scenarios, scaling_strategy, :run_time) do
-    measurements =
+  def units(scenarios, scaling_strategy) do
+    run_time_measurements =
       scenarios
-      |> Enum.flat_map(fn scenario ->
-        Map.to_list(scenario.run_time_statistics)
+      |> Enum.flat_map(fn scenario -> Map.to_list(scenario.run_time_statistics) end)
+      |> Enum.group_by(fn {stat_name, _} -> stat_name end, fn {_, value} -> value end)
+
+    memory_measurements =
+      scenarios
+      |> Enum.flat_map(fn
+        %Scenario{memory_usage_statistics: nil} ->
+          []
+
+        %Scenario{memory_usage_statistics: memory_usage_statistics} ->
+          Map.to_list(memory_usage_statistics)
       end)
       |> Enum.group_by(fn {stat_name, _} -> stat_name end, fn {_, value} -> value end)
+
+    memory_average =
+      case memory_measurements do
+        map when map_size(map) == 0 -> []
+        _ -> memory_measurements.average
+      end
 
     %{
-      run_time: Duration.best(measurements.average, strategy: scaling_strategy),
-      ips: Count.best(measurements.ips, strategy: scaling_strategy)
+      run_time: Duration.best(run_time_measurements.average, strategy: scaling_strategy),
+      ips: Count.best(run_time_measurements.ips, strategy: scaling_strategy),
+      memory: Memory.best(memory_average, strategy: scaling_strategy)
     }
-  end
-
-  def units(scenarios, scaling_strategy, :memory) do
-    measurements =
-      scenarios
-      |> Enum.flat_map(fn scenario ->
-        Map.to_list(scenario.memory_usage_statistics)
-      end)
-      |> Enum.group_by(fn {stat_name, _} -> stat_name end, fn {_, value} -> value end)
-
-    %{memory: Memory.best(measurements.average, strategy: scaling_strategy)}
-  end
-
-  @doc """
-  This is the old way of calling this function, which assumed that we were only
-  dealing with run times and not memory units. After we have some time to update
-  the formatters then we can remove this, but for now we'll just deprecate it.
-  """
-  def units(scenarios, scaling_strategy) do
-    units(scenarios, scaling_strategy, :run_time)
   end
 end

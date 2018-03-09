@@ -28,7 +28,8 @@ defmodule Benchee.Formatters.ConsoleTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 400.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 200.0}
         },
         %Scenario{
           name: "First",
@@ -40,7 +41,8 @@ defmodule Benchee.Formatters.ConsoleTest do
             std_dev_ratio: 0.1,
             median: 90.0,
             percentiles: %{99 => 300.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 200.0}
         }
       ]
 
@@ -74,7 +76,8 @@ defmodule Benchee.Formatters.ConsoleTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 400.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 200.0}
         },
         %Scenario{
           name: "Job",
@@ -86,7 +89,8 @@ defmodule Benchee.Formatters.ConsoleTest do
             std_dev_ratio: 0.15,
             median: 395.0,
             percentiles: %{99 => 500.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 200.0}
         }
       ]
 
@@ -115,7 +119,8 @@ defmodule Benchee.Formatters.ConsoleTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 300.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 200.0}
         },
         %Scenario{
           name: "Other Job",
@@ -127,7 +132,8 @@ defmodule Benchee.Formatters.ConsoleTest do
             std_dev_ratio: 0.3,
             median: 98.0,
             percentiles: %{99 => 200.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 200.0}
         },
         %Scenario{
           name: "Job",
@@ -139,7 +145,8 @@ defmodule Benchee.Formatters.ConsoleTest do
             std_dev_ratio: 0.15,
             median: 395.0,
             percentiles: %{99 => 500.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 200.0}
         },
         %Scenario{
           name: "Other Job",
@@ -151,7 +158,8 @@ defmodule Benchee.Formatters.ConsoleTest do
             std_dev_ratio: 0.31,
             median: 225.5,
             percentiles: %{99 => 300.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 200.0}
         }
       ]
 
@@ -184,7 +192,8 @@ defmodule Benchee.Formatters.ConsoleTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 300.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 200.0}
         },
         %Scenario{
           name: "job (improved)",
@@ -196,7 +205,8 @@ defmodule Benchee.Formatters.ConsoleTest do
             std_dev_ratio: 0.1,
             median: 90.0,
             percentiles: %{99 => 200.1}
-          }
+          },
+          memory_usage_statistics: %Statistics{average: 200.0}
         }
       ]
 

@@ -18,11 +18,11 @@ defmodule Benchee.Formatters.Console.Helpers do
   end
 
   def mode_out(modes, run_time_unit) when is_list(modes) do
-    Enum.map_join(modes, ", ", fn mode -> run_time_out(mode, run_time_unit) end)
+    Enum.map_join(modes, ", ", fn mode -> duration_output(mode, run_time_unit) end)
   end
 
   def mode_out(mode, run_time_unit) when is_number(mode) do
-    run_time_out(mode, run_time_unit)
+    duration_output(mode, run_time_unit)
   end
 
   def label_width(scenarios) do
@@ -35,15 +35,15 @@ defmodule Benchee.Formatters.Console.Helpers do
     max_label_width + 1
   end
 
-  def ips_out(ips, unit) do
-    Count.format({Count.scale(ips, unit), unit})
+  def count_output(count, unit) do
+    Count.format({Count.scale(count, unit), unit})
   end
 
-  def run_time_out(run_time, unit) do
-    Duration.format({Duration.scale(run_time, unit), unit})
+  def duration_output(duration, unit) do
+    Duration.format({Duration.scale(duration, unit), unit})
   end
 
-  def deviation_out(std_dev_ratio) do
+  def deviation_output(std_dev_ratio) do
     DeviationPercent.format(std_dev_ratio)
   end
 

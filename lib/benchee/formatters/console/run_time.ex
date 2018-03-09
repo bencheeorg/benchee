@@ -27,18 +27,23 @@ defmodule Benchee.Formatters.Console.RunTime do
   ## Examples
 
   ```
+  iex> memory_statistics = %Benchee.Statistics{average: 100.0}
   iex> scenarios = [
   ...>   %Benchee.Benchmark.Scenario{
-  ...>     name: "My Job", run_time_statistics: %Benchee.Statistics{
+  ...>     name: "My Job",
+  ...>     run_time_statistics: %Benchee.Statistics{
   ...>       average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0, percentiles: %{99 => 300.1},
   ...>       minimum: 100.1, maximum: 200.2, sample_size: 10_101, mode: 333.2
-  ...>     }
+  ...>     },
+  ...>     memory_usage_statistics: memory_statistics
   ...>   },
   ...>   %Benchee.Benchmark.Scenario{
-  ...>     name: "Job 2", run_time_statistics: %Benchee.Statistics{
+  ...>     name: "Job 2",
+  ...>     run_time_statistics: %Benchee.Statistics{
   ...>       average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0, percentiles: %{99 => 500.1},
   ...>       minimum: 200.2, maximum: 400.4, sample_size: 20_202, mode: [612.3, 554.1]
-  ...>     }
+  ...>     },
+  ...>     memory_usage_statistics: memory_statistics
   ...>   }
   ...> ]
   iex> configuration = %{comparison: false, unit_scaling: :best, extended_statistics: true}
@@ -57,15 +62,15 @@ defmodule Benchee.Formatters.Console.RunTime do
   @spec format_scenarios([Scenario.t()], map) :: [String.t(), ...]
   def format_scenarios(scenarios, config) do
     %{unit_scaling: scaling_strategy} = config
-    units = Conversion.units(scenarios, scaling_strategy, :run_time)
+    units = Conversion.units(scenarios, scaling_strategy)
     label_width = Helpers.label_width(scenarios)
 
-    [
-      column_descriptors(label_width)
-      | scenario_reports(scenarios, units, label_width) ++
-          comparison_report(scenarios, units, label_width, config) ++
-          extended_statistics_report(scenarios, units, label_width, config)
-    ]
+    List.flatten([
+      column_descriptors(label_width),
+      scenario_reports(scenarios, units, label_width),
+      comparison_report(scenarios, units, label_width, config),
+      extended_statistics_report(scenarios, units, label_width, config)
+    ])
   end
 
   @spec extended_statistics_report([Scenario.t()], unit_per_statistic, integer, map) :: [
@@ -107,9 +112,9 @@ defmodule Benchee.Formatters.Console.RunTime do
       -label_width,
       name,
       @minimum_width,
-      Helpers.run_time_out(minimum, run_time_unit),
+      Helpers.duration_output(minimum, run_time_unit),
       @maximum_width,
-      Helpers.run_time_out(maximum, run_time_unit),
+      Helpers.duration_output(maximum, run_time_unit),
       @sample_size_width,
       Count.format(sample_size),
       @mode_width,
@@ -181,15 +186,15 @@ defmodule Benchee.Formatters.Console.RunTime do
       -label_width,
       name,
       @ips_width,
-      Helpers.ips_out(ips, ips_unit),
+      Helpers.count_output(ips, ips_unit),
       @average_width,
-      Helpers.run_time_out(average, run_time_unit),
+      Helpers.duration_output(average, run_time_unit),
       @deviation_width,
-      Helpers.deviation_out(std_dev_ratio),
+      Helpers.deviation_output(std_dev_ratio),
       @median_width,
-      Helpers.run_time_out(median, run_time_unit),
+      Helpers.duration_output(median, run_time_unit),
       @percentile_width,
-      Helpers.run_time_out(percentile_99, run_time_unit)
+      Helpers.duration_output(percentile_99, run_time_unit)
     ])
     |> to_string
   end
@@ -216,7 +221,7 @@ defmodule Benchee.Formatters.Console.RunTime do
     } = scenario
 
     "~*s~*s\n"
-    |> :io_lib.format([-label_width, name, @ips_width, Helpers.ips_out(ips, ips_unit)])
+    |> :io_lib.format([-label_width, name, @ips_width, Helpers.count_output(ips, ips_unit)])
     |> to_string
   end
 
@@ -232,7 +237,7 @@ defmodule Benchee.Formatters.Console.RunTime do
 
   defp format_comparison(scenario, %{ips: ips_unit}, label_width, slower) do
     %Scenario{name: name, run_time_statistics: %Statistics{ips: ips}} = scenario
-    ips_format = Helpers.ips_out(ips, ips_unit)
+    ips_format = Helpers.count_output(ips, ips_unit)
 
     "~*s~*s - ~.2fx slower\n"
     |> :io_lib.format([-label_width, name, @ips_width, ips_format, slower])

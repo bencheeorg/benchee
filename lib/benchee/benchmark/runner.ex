@@ -45,6 +45,14 @@ defmodule Benchee.Benchmark.Runner do
 
     run_times = Enum.flat_map(measurements, fn {run_times, _} -> run_times end)
     memory_usages = Enum.flat_map(measurements, fn {_, memory_usages} -> memory_usages end)
+
+    memory_usages =
+      if Enum.all?(memory_usages, &is_nil/1) do
+        []
+      else
+        memory_usages
+      end
+
     %Scenario{scenario | run_times: run_times, memory_usages: memory_usages}
   end
 
@@ -212,7 +220,12 @@ defmodule Benchee.Benchmark.Runner do
          }
        ) do
     {run_time, memory_usage} = measure_iteration(scenario, scenario_context)
-    {run_time / num_iterations, memory_usage / num_iterations}
+
+    if is_nil(memory_usage) do
+      {run_time / num_iterations, memory_usage}
+    else
+      {run_time / num_iterations, memory_usage / num_iterations}
+    end
   end
 
   defp measure_iteration(
@@ -224,10 +237,9 @@ defmodule Benchee.Benchmark.Runner do
        ) do
     new_input = run_before_each(scenario, scenario_context)
     function = main_function(function, new_input)
-    otp_version = List.to_integer(:erlang.system_info(:otp_release))
 
     {microseconds, memory_usage, return_value} =
-      measure_time_and_memory(function, measure_memory && otp_version > 18)
+      measure_time_and_memory(function, measure_memory)
 
     run_after_each(return_value, scenario, scenario_context)
     {microseconds, memory_usage}
@@ -260,7 +272,7 @@ defmodule Benchee.Benchmark.Runner do
 
   defp measure_time_and_memory(function, false) do
     {microseconds, return_value} = :timer.tc(function)
-    {microseconds, 1, return_value}
+    {microseconds, nil, return_value}
   end
 
   @no_input Benchmark.no_input()

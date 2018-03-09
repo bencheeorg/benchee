@@ -151,15 +151,11 @@ defmodule Benchee.Statistics do
 
   """
   @spec statistics(Suite.t()) :: Suite.t()
-  def statistics(suite = %Suite{scenarios: scenarios, configuration: %{measure_memory: measure_memory}}) do
+  def statistics(suite = %Suite{scenarios: scenarios}) do
     scenarios_with_statistics =
       Parallel.map(scenarios, fn scenario ->
         run_time_stats = job_statistics(scenario.run_times)
-        memory_stats = if measure_memory do
-          job_statistics(scenario.memory_usages)
-        else
-          nil
-        end
+        memory_stats = job_statistics(scenario.memory_usages)
 
         %Scenario{
           scenario
@@ -195,6 +191,10 @@ defmodule Benchee.Statistics do
 
   """
   @spec job_statistics(samples) :: __MODULE__.t()
+  def job_statistics([]) do
+    %__MODULE__{}
+  end
+
   def job_statistics(run_times) do
     total_time = Enum.sum(run_times)
     iterations = Enum.count(run_times)

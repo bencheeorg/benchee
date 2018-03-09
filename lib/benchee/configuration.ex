@@ -280,6 +280,7 @@ defmodule Benchee.Configuration do
       |> standardized_user_configuration
       |> merge_with_defaults
       |> convert_time_to_micro_s
+      |> update_measure_memory
       |> save_option_conversion
 
     %Suite{configuration: config}
@@ -324,6 +325,11 @@ defmodule Benchee.Configuration do
 
       new_config
     end)
+  end
+
+  defp update_measure_memory(config = %{measure_memory: measure_memory}) do
+    otp_version = List.to_integer(:erlang.system_info(:otp_release))
+    Map.put(config, :measure_memory, measure_memory and otp_version > 18)
   end
 
   defp save_option_conversion(config = %{save: false}) do

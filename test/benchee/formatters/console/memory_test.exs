@@ -21,7 +21,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 300.1}
-          }
+          },
+          run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         },
         %Scenario{
           name: "Second",
@@ -31,7 +32,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.1,
             median: 375.0,
             percentiles: %{99 => 400.1}
-          }
+          },
+          run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         }
       ]
 
@@ -55,7 +57,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
           std_dev_ratio: 0.1,
           median: 375.0,
           percentiles: %{99 => 500.1}
-        }
+        },
+        run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
       }
 
       longer_scenarios = scenarios ++ [long_scenario]
@@ -80,7 +83,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.1,
             median: 90.0,
             percentiles: %{99 => 500.1}
-          }
+          },
+          run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         },
         %Scenario{
           name: "Second",
@@ -90,7 +94,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 500.1}
-          }
+          },
+          run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         }
       ]
 
@@ -112,7 +117,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 300.1}
-          }
+          },
+          run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         },
         %Scenario{
           name: "First",
@@ -122,7 +128,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.1,
             median: 90.0,
             percentiles: %{99 => 200.1}
-          }
+          },
+          run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         }
       ]
 
@@ -152,7 +159,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.1,
             median: 90.0,
             percentiles: %{99 => 200.1}
-          }
+          },
+          run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         },
         %Scenario{
           name: second_name,
@@ -162,7 +170,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 300.1}
-          }
+          },
+          run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         }
       ]
 
@@ -185,7 +194,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.1,
             median: 90.0,
             percentiles: %{99 => 200.1}
-          }
+          },
+          run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         }
       ]
 
@@ -203,7 +213,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.0,
             median: 100.0,
             percentiles: %{99 => 100.0}
-          }
+          },
+          run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         },
         %Scenario{
           name: "Second",
@@ -213,7 +224,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.0,
             median: 200.0,
             percentiles: %{99 => 200.0}
-          }
+          },
+          run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         }
       ]
 

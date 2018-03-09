@@ -120,6 +120,9 @@ defmodule Benchee.Conversion.Memory do
   end
 
   # Helper function for returning a tuple of {value, unit}
+  defp scale_with_unit(nil, _) do
+    {nil, nil}
+  end
   defp scale_with_unit(memory, unit) do
     {scale(memory, unit), unit_for(unit)}
   end
