@@ -261,7 +261,7 @@ map.flatten          514 μs        1926 μs        13.01 K                   51
 
 ### Hooks (Setup, Teardown etc.)
 
-Most of the time, it's best to keep your benchmarks as simple as possible: plain old immutable functions work best. But sometimes you need other things to happen. When you want to add before or after hooks to your benchmarks, we've got you covered! Before you dig into this section, **you ususally don't need hooks**.
+Most of the time, it's best to keep your benchmarks as simple as possible: plain old immutable functions work best. But sometimes you need other things to happen. When you want to add before or after hooks to your benchmarks, we've got you covered! Before you dig into this section, **you usually don't need hooks**.
 
 Benchee has three types of hooks:
 
