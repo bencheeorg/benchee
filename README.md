@@ -584,6 +584,25 @@ Benchee.run(%{}, load: "save.benchee")
 
 In the more verbose API this is triggered via `Benchee.load/1`.
 
+### Measuring memory consumption
+
+Starting with version 0.13, users can now get measurements of how much memory their benchmarks use. This measurement is **not** the actual effect on the size of the BEAM VM size, but the total amount of memory that was allocated during the execution of a given scenario. This includes all memory that was garbage collected during the execution of that scenario. It **does not** include any memory used in any process other than the original one in which the scenario is run.
+
+This measurement of memory does not affect the measurement of run times.
+
+In cases where all measurements of memory consumption are identical, which happens very frequently, the full statistics will be omitted from the standard console formatter. If your function is deterministic, this will always be the case. Only in functions with some amount of randomness will there be variation in memory usage.
+
+Memory measurement is disabled by default, and you can choose to enable it by passing the following configuration option to `Benchee.run/2`.
+
+```elixir
+Benchee.run(%{
+  "something_great" => fn -> cool_stuff end
+}, measure_memory: true)
+```
+
+A full example, including an example of the console output, can be found
+[here](samples/measure_memory.exs).
+
 ### More verbose usage
 
 It is important to note that the benchmarking code shown in the beginning is the convenience interface. The same benchmark in its more verbose form looks like this:

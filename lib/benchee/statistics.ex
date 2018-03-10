@@ -24,23 +24,22 @@ defmodule Benchee.Statistics do
   @type mode :: [number] | number | nil
 
   @type t :: %__MODULE__{
-    average: float,
-    ips: float,
-    std_dev: float,
-    std_dev_ratio: float,
-    std_dev_ips: float,
-    median: number,
-    percentiles: %{number => float},
-    mode: mode,
-    minimum: number,
-    maximum: number,
-    sample_size: integer
-  }
+          average: float,
+          ips: float,
+          std_dev: float,
+          std_dev_ratio: float,
+          std_dev_ips: float,
+          median: number,
+          percentiles: %{number => float},
+          mode: mode,
+          minimum: number,
+          maximum: number,
+          sample_size: integer
+        }
 
   @type samples :: [number]
 
-  alias Benchee.{Statistics, Conversion.Duration, Suite, Benchmark.Scenario,
-                 Utility.Parallel}
+  alias Benchee.{Statistics, Conversion.Duration, Suite, Benchmark.Scenario, Utility.Parallel}
   require Integer
 
   @doc """
@@ -59,11 +58,9 @@ defmodule Benchee.Statistics do
   """
   @spec sort([%Scenario{}]) :: [%Scenario{}]
   def sort(scenarios) do
-    Enum.sort_by(scenarios,
-      fn(%Scenario{run_time_statistics: %Statistics{average: average}}) ->
-        average
-      end
-    )
+    Enum.sort_by(scenarios, fn %Scenario{run_time_statistics: %Statistics{average: average}} ->
+      average
+    end)
   end
 
   @doc """
@@ -105,17 +102,20 @@ defmodule Benchee.Statistics do
       ...>   %Benchee.Benchmark.Scenario{
       ...>     job_name: "My Job",
       ...>     run_times: [200, 400, 400, 400, 500, 500, 700, 900],
+      ...>     memory_usages: [200, 400, 400, 400, 500, 500, 700, 900],
       ...>     input_name: "Input",
       ...>     input: "Input"
       ...>   }
       ...> ]
-      iex> suite = %Benchee.Suite{scenarios: scenarios}
+      iex> suite = %Benchee.Suite{scenarios: scenarios, configuration: %{measure_memory: true}}
       iex> Benchee.Statistics.statistics(suite)
       %Benchee.Suite{
+        configuration: %{measure_memory: true},
         scenarios: [
           %Benchee.Benchmark.Scenario{
             job_name: "My Job",
             run_times: [200, 400, 400, 400, 500, 500, 700, 900],
+            memory_usages: [200, 400, 400, 400, 500, 500, 700, 900],
             input_name: "Input",
             input: "Input",
             run_time_statistics: %Benchee.Statistics{
@@ -130,20 +130,39 @@ defmodule Benchee.Statistics do
               minimum:       200,
               maximum:       900,
               sample_size:   8
+            },
+            memory_usage_statistics: %Benchee.Statistics{
+              average:       500.0,
+              ips:           2000.0,
+              std_dev:       200.0,
+              std_dev_ratio: 0.4,
+              std_dev_ips:   800.0,
+              median:        450.0,
+              percentiles:   %{50 => 450.0, 99 => 900.0},
+              mode:          400,
+              minimum:       200,
+              maximum:       900,
+              sample_size:   8
             }
           }
         ],
-        configuration: nil,
         system: nil
       }
 
   """
-  @spec statistics(Suite.t) :: Suite.t
+  @spec statistics(Suite.t()) :: Suite.t()
   def statistics(suite = %Suite{scenarios: scenarios}) do
-    scenarios_with_statistics = Parallel.map(scenarios, fn(scenario) ->
-      stats = job_statistics(scenario.run_times)
-      %Scenario{scenario | run_time_statistics: stats}
-    end)
+    scenarios_with_statistics =
+      Parallel.map(scenarios, fn scenario ->
+        run_time_stats = job_statistics(scenario.run_times)
+        memory_stats = job_statistics(scenario.memory_usages)
+
+        %Scenario{
+          scenario
+          | run_time_statistics: run_time_stats,
+            memory_usage_statistics: memory_stats
+        }
+      end)
 
     %Suite{suite | scenarios: scenarios_with_statistics}
   end
@@ -171,33 +190,37 @@ defmodule Benchee.Statistics do
       }
 
   """
-  @spec job_statistics(samples) :: __MODULE__.t
+  @spec job_statistics(samples) :: __MODULE__.t()
+  def job_statistics([]) do
+    %__MODULE__{}
+  end
+
   def job_statistics(run_times) do
-    total_time          = Enum.sum(run_times)
-    iterations          = Enum.count(run_times)
-    average             = total_time / iterations
-    ips                 = iterations_per_second(average)
-    deviation           = standard_deviation(run_times, average, iterations)
-    standard_dev_ratio  = deviation / average
-    standard_dev_ips    = ips * standard_dev_ratio
-    percentiles         = Percentile.percentiles(run_times, [50, 99])
-    median              = Map.fetch!(percentiles, 50)
-    mode                = Mode.mode(run_times)
-    minimum             = Enum.min run_times
-    maximum             = Enum.max run_times
+    total_time = Enum.sum(run_times)
+    iterations = Enum.count(run_times)
+    average = total_time / iterations
+    ips = iterations_per_second(average)
+    deviation = standard_deviation(run_times, average, iterations)
+    standard_dev_ratio = deviation / average
+    standard_dev_ips = ips * standard_dev_ratio
+    percentiles = Percentile.percentiles(run_times, [50, 99])
+    median = Map.fetch!(percentiles, 50)
+    mode = Mode.mode(run_times)
+    minimum = Enum.min(run_times)
+    maximum = Enum.max(run_times)
 
     %__MODULE__{
-      average:       average,
-      ips:           ips,
-      std_dev:       deviation,
+      average: average,
+      ips: ips,
+      std_dev: deviation,
       std_dev_ratio: standard_dev_ratio,
-      std_dev_ips:   standard_dev_ips,
-      median:        median,
-      percentiles:   percentiles,
-      mode:          mode,
-      minimum:       minimum,
-      maximum:       maximum,
-      sample_size:   iterations
+      std_dev_ips: standard_dev_ips,
+      median: median,
+      percentiles: percentiles,
+      mode: mode,
+      minimum: minimum,
+      maximum: maximum,
+      sample_size: iterations
     }
   end
 
@@ -212,18 +235,21 @@ defmodule Benchee.Statistics do
   ...>   %Benchee.Benchmark.Scenario{
   ...>     job_name: "My Job",
   ...>     run_times: [200, 400, 400, 400, 500, 500, 700, 900],
+  ...>     memory_usages: [200, 400, 400, 400, 500, 500, 700, 900],
   ...>     input_name: "Input",
   ...>     input: "Input"
   ...>   }
   ...> ]
-  iex> %Benchee.Suite{scenarios: scenarios}
+  iex> %Benchee.Suite{scenarios: scenarios, configuration: %{measure_memory: true}}
   ...> |> Benchee.Statistics.statistics
   ...> |> Benchee.Statistics.add_percentiles([25, 75])
   %Benchee.Suite{
+    configuration: %{measure_memory: true},
     scenarios: [
       %Benchee.Benchmark.Scenario{
         job_name: "My Job",
         run_times: [200, 400, 400, 400, 500, 500, 700, 900],
+        memory_usages: [200, 400, 400, 400, 500, 500, 700, 900],
         input_name: "Input",
         input: "Input",
         run_time_statistics: %Benchee.Statistics{
@@ -238,18 +264,32 @@ defmodule Benchee.Statistics do
           minimum:       200,
           maximum:       900,
           sample_size:   8
+        },
+        memory_usage_statistics: %Benchee.Statistics{
+          average:       500.0,
+          ips:           2000.0,
+          std_dev:       200.0,
+          std_dev_ratio: 0.4,
+          std_dev_ips:   800.0,
+          median:        450.0,
+          percentiles:   %{50 => 450.0, 99 => 900.0},
+          mode:          400,
+          minimum:       200,
+          maximum:       900,
+          sample_size:   8
         }
       }
     ]
   }
   """
   def add_percentiles(suite = %Suite{scenarios: scenarios}, percentile_ranks) do
-    new_scenarios = Parallel.map(scenarios, fn scenario ->
-      update_in(scenario.run_time_statistics.percentiles, fn existing ->
-        new = Percentile.percentiles(scenario.run_times, percentile_ranks)
-        Map.merge(existing, new)
+    new_scenarios =
+      Parallel.map(scenarios, fn scenario ->
+        update_in(scenario.run_time_statistics.percentiles, fn existing ->
+          new = Percentile.percentiles(scenario.run_times, percentile_ranks)
+          Map.merge(existing, new)
+        end)
       end)
-    end)
 
     %Suite{suite | scenarios: new_scenarios}
   end
@@ -259,10 +299,12 @@ defmodule Benchee.Statistics do
   end
 
   defp standard_deviation(samples, average, iterations) do
-    total_variance = Enum.reduce samples, 0,  fn(sample, total) ->
-      total + :math.pow((sample - average), 2)
-    end
+    total_variance =
+      Enum.reduce(samples, 0, fn sample, total ->
+        total + :math.pow(sample - average, 2)
+      end)
+
     variance = total_variance / iterations
-    :math.sqrt variance
+    :math.sqrt(variance)
   end
 end

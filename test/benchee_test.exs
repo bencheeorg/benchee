@@ -3,6 +3,8 @@ defmodule BencheeTest do
   import ExUnit.CaptureIO
   import Benchee.TestHelpers
   alias Benchee.Test.FakeFormatter
+  alias Benchee.Statistics
+  alias Benchee.Formatters.Console
   doctest Benchee
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median.+99th %$/m
@@ -10,12 +12,13 @@ defmodule BencheeTest do
   test "integration step by step" do
     capture_io fn ->
       result =
-        Benchee.init(@test_times)
+        @test_times
+        |> Benchee.init
         |> Benchee.system
         |> Benchee.benchmark("Sleeps", fn -> :timer.sleep(10) end)
         |> Benchee.measure
-        |> Benchee.Statistics.statistics
-        |> Benchee.Formatters.Console.format
+        |> Statistics.statistics
+        |> Console.format
 
       [[_input_name, header, benchmark_stats]] = result
       assert Regex.match?(@header_regex, header)
@@ -450,6 +453,20 @@ defmodule BencheeTest do
         :global_before_scenario, :global_before, :global_after,
         :global_after_scenario
       ]
+    end
+  end
+
+  describe "memory measurement" do
+    @describetag :memory_measure
+
+    test "measures memory usage when instructed to do so" do
+      output = capture_io fn ->
+        Benchee.run(%{"To List" => fn -> Enum.to_list(1..100) end},
+                    time: 0.01, warmup: 0.005, measure_memory: true)
+      end
+
+      assert Regex.match?(~r/Memory usage statistics:/, output)
+      assert Regex.match?(~r/To List\s+[0-9.]{3,} K*B{1}/, output)
     end
   end
 

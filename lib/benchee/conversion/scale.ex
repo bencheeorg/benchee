@@ -138,6 +138,10 @@ defmodule Benchee.Conversion.Scale do
       iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :largest).name
       :million
   """
+  def best_unit([], module, _) do
+    module.base_unit
+  end
+
   def best_unit(list, module, opts) do
     case Keyword.get(opts, :strategy, :best) do
       :best     -> best_unit(list, module)

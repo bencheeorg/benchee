@@ -8,11 +8,11 @@ defmodule Benchee.StatistcsTest do
   describe ".statistics" do
     test "computes the statistics for all jobs correctly" do
       scenarios = [
-        %Scenario{input: "Input", input_name: "Input", job_name: "Job 1", run_times: @sample_1},
-        %Scenario{input: "Input", input_name: "Input", job_name: "Job 2", run_times: @sample_2}
+        %Scenario{input: "Input", input_name: "Input", job_name: "Job 1", run_times: @sample_1, memory_usages: @sample_1},
+        %Scenario{input: "Input", input_name: "Input", job_name: "Job 2", run_times: @sample_2, memory_usages: @sample_2}
       ]
 
-      suite = %Suite{scenarios: scenarios}
+      suite = %Suite{scenarios: scenarios, configuration: %{measure_memory: true}}
       new_suite = Statistics.statistics(suite)
 
       stats_1 = stats_for(new_suite, "Job 1", "Input")
@@ -24,11 +24,11 @@ defmodule Benchee.StatistcsTest do
 
     test "computes statistics correctly for multiple inputs" do
       scenarios = [
-        %Scenario{input: "Input 1", input_name: "Input 1", job_name: "Job", run_times: @sample_1},
-        %Scenario{input: "Input 2", input_name: "Input 2", job_name: "Job", run_times: @sample_2}
+        %Scenario{input: "Input 1", input_name: "Input 1", job_name: "Job", run_times: @sample_1, memory_usages: @sample_1},
+        %Scenario{input: "Input 2", input_name: "Input 2", job_name: "Job", run_times: @sample_2, memory_usages: @sample_2}
       ]
 
-      suite = %Suite{scenarios: scenarios}
+      suite = %Suite{scenarios: scenarios, configuration: %{measure_memory: true}}
       new_suite = Statistics.statistics(suite)
 
       stats_1 = stats_for(new_suite, "Job", "Input 1")
@@ -40,8 +40,8 @@ defmodule Benchee.StatistcsTest do
 
     @mode_sample [55, 40, 67, 55, 44, 40, 10, 8, 55, 90, 67]
     test "mode is calculated correctly" do
-      scenarios = [%Scenario{run_times: @mode_sample}]
-      suite = Statistics.statistics(%Suite{scenarios: scenarios})
+      scenarios = [%Scenario{run_times: @mode_sample, memory_usages: @mode_sample}]
+      suite = Statistics.statistics(%Suite{scenarios: scenarios, configuration: %{measure_memory: false}})
 
       [%Scenario{run_time_statistics: stats}] = suite.scenarios
       assert stats.mode == 55
@@ -50,7 +50,7 @@ defmodule Benchee.StatistcsTest do
     test "preserves all other keys in the map handed to it" do
       suite = %Suite{
         scenarios: [],
-        configuration: %{formatters: []}
+        configuration: %{formatters: [], measure_memory: false}
       }
 
       assert %Suite{configuration: %{formatters: []}} = Statistics.statistics(suite)
