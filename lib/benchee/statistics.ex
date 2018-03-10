@@ -101,8 +101,8 @@ defmodule Benchee.Statistics do
       iex> scenarios = [
       ...>   %Benchee.Benchmark.Scenario{
       ...>     job_name: "My Job",
-      ...>     run_times: [200, 400, 400, 400, 500, 500, 700, 900],
-      ...>     memory_usages: [200, 400, 400, 400, 500, 500, 700, 900],
+      ...>     run_times: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+      ...>     memory_usages: [200, 400, 400, 400, 500, 500, 500, 700, 900],
       ...>     input_name: "Input",
       ...>     input: "Input"
       ...>   }
@@ -114,8 +114,8 @@ defmodule Benchee.Statistics do
         scenarios: [
           %Benchee.Benchmark.Scenario{
             job_name: "My Job",
-            run_times: [200, 400, 400, 400, 500, 500, 700, 900],
-            memory_usages: [200, 400, 400, 400, 500, 500, 700, 900],
+            run_times: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+            memory_usages: [200, 400, 400, 400, 500, 500, 500, 700, 900],
             input_name: "Input",
             input: "Input",
             run_time_statistics: %Benchee.Statistics{
@@ -124,12 +124,12 @@ defmodule Benchee.Statistics do
               std_dev:       200.0,
               std_dev_ratio: 0.4,
               std_dev_ips:   800.0,
-              median:        450.0,
-              percentiles:   %{50 => 450.0, 99 => 900.0},
-              mode:          400,
+              median:        500.0,
+              percentiles:   %{50 => 500.0, 99 => 900.0},
+              mode:          [500, 400],
               minimum:       200,
               maximum:       900,
-              sample_size:   8
+              sample_size:   9
             },
             memory_usage_statistics: %Benchee.Statistics{
               average:       500.0,
@@ -137,12 +137,12 @@ defmodule Benchee.Statistics do
               std_dev:       200.0,
               std_dev_ratio: 0.4,
               std_dev_ips:   800.0,
-              median:        450.0,
-              percentiles:   %{50 => 450.0, 99 => 900.0},
-              mode:          400,
+              median:        500.0,
+              percentiles:   %{50 => 500.0, 99 => 900.0},
+              mode:          [500, 400],
               minimum:       200,
               maximum:       900,
-              sample_size:   8
+              sample_size:   9
             }
           }
         ],
@@ -173,7 +173,7 @@ defmodule Benchee.Statistics do
 
   ## Examples
 
-      iex> run_times = [200, 400, 400, 400, 500, 500, 700, 900]
+      iex> run_times = [200, 400, 400, 400, 500, 500, 500, 700, 900]
       iex> Benchee.Statistics.job_statistics(run_times)
       %Benchee.Statistics{
         average:       500.0,
@@ -181,18 +181,48 @@ defmodule Benchee.Statistics do
         std_dev:       200.0,
         std_dev_ratio: 0.4,
         std_dev_ips:   800.0,
-        median:        450.0,
-        percentiles:   %{50 => 450.0, 99 => 900.0},
-        mode:          400,
+        median:        500.0,
+        percentiles:   %{50 => 500.0, 99 => 900.0},
+        mode:          [500, 400],
         minimum:       200,
         maximum:       900,
-        sample_size:   8
+        sample_size:   9
+      }
+
+      iex> Benchee.Statistics.job_statistics([100])
+      %Benchee.Statistics{
+        average:       100.0,
+        ips:           10_000.0,
+        std_dev:       0,
+        std_dev_ratio: 0.0,
+        std_dev_ips:   0.0,
+        median:        100.0,
+        percentiles:   %{50 => 100.0, 99 => 100.0},
+        mode:          nil,
+        minimum:       100,
+        maximum:       100,
+        sample_size:   1
+      }
+
+      iex> Benchee.Statistics.job_statistics([])
+      %Benchee.Statistics{
+        average:       nil,
+        ips:           nil,
+        std_dev:       nil,
+        std_dev_ratio: nil,
+        std_dev_ips:   nil,
+        median:        nil,
+        percentiles:   nil,
+        mode:          nil,
+        minimum:       nil,
+        maximum:       nil,
+        sample_size:   0
       }
 
   """
   @spec job_statistics(samples) :: __MODULE__.t()
   def job_statistics([]) do
-    %__MODULE__{}
+    %__MODULE__{sample_size: 0}
   end
 
   def job_statistics(run_times) do
@@ -234,8 +264,8 @@ defmodule Benchee.Statistics do
   iex> scenarios = [
   ...>   %Benchee.Benchmark.Scenario{
   ...>     job_name: "My Job",
-  ...>     run_times: [200, 400, 400, 400, 500, 500, 700, 900],
-  ...>     memory_usages: [200, 400, 400, 400, 500, 500, 700, 900],
+  ...>     run_times: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+  ...>     memory_usages: [200, 400, 400, 400, 500, 500, 500, 700, 900],
   ...>     input_name: "Input",
   ...>     input: "Input"
   ...>   }
@@ -248,8 +278,8 @@ defmodule Benchee.Statistics do
     scenarios: [
       %Benchee.Benchmark.Scenario{
         job_name: "My Job",
-        run_times: [200, 400, 400, 400, 500, 500, 700, 900],
-        memory_usages: [200, 400, 400, 400, 500, 500, 700, 900],
+        run_times: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+        memory_usages: [200, 400, 400, 400, 500, 500, 500, 700, 900],
         input_name: "Input",
         input: "Input",
         run_time_statistics: %Benchee.Statistics{
@@ -258,12 +288,12 @@ defmodule Benchee.Statistics do
           std_dev:       200.0,
           std_dev_ratio: 0.4,
           std_dev_ips:   800.0,
-          median:        450.0,
-          percentiles:   %{25 => 400.0, 50 => 450.0, 75 => 650.0, 99 => 900.0},
-          mode:          400,
+          median:        500.0,
+          percentiles:   %{25 => 400.0, 50 => 500.0, 75 => 600.0, 99 => 900.0},
+          mode:          [500, 400],
           minimum:       200,
           maximum:       900,
-          sample_size:   8
+          sample_size:   9
         },
         memory_usage_statistics: %Benchee.Statistics{
           average:       500.0,
@@ -271,12 +301,12 @@ defmodule Benchee.Statistics do
           std_dev:       200.0,
           std_dev_ratio: 0.4,
           std_dev_ips:   800.0,
-          median:        450.0,
-          percentiles:   %{50 => 450.0, 99 => 900.0},
-          mode:          400,
+          median:        500.0,
+          percentiles:   %{50 => 500.0, 99 => 900.0},
+          mode:          [500, 400],
           minimum:       200,
           maximum:       900,
-          sample_size:   8
+          sample_size:   9
         }
       }
     ]
@@ -298,13 +328,14 @@ defmodule Benchee.Statistics do
     Duration.microseconds({1, :second}) / average_microseconds
   end
 
-  defp standard_deviation(samples, average, iterations) do
+  defp standard_deviation(_samples, _average, 1), do: 0
+  defp standard_deviation(samples, average, sample_size) do
     total_variance =
       Enum.reduce(samples, 0, fn sample, total ->
         total + :math.pow(sample - average, 2)
       end)
 
-    variance = total_variance / iterations
+    variance = total_variance / (sample_size - 1)
     :math.sqrt(variance)
   end
 end

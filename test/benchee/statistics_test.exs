@@ -47,6 +47,16 @@ defmodule Benchee.StatistcsTest do
       assert stats.mode == 55
     end
 
+    @standard_deviation_sample [600, 470, 170, 430, 300]
+    test "statistical standard deviation is calculated correctly" do
+      scenarios = [%Scenario{run_times: @standard_deviation_sample, memory_usages: @standard_deviation_sample}]
+      suite = Statistics.statistics(%Suite{scenarios: scenarios, configuration: %{measure_memory: false}})
+
+      [%Scenario{run_time_statistics: stats}] = suite.scenarios
+      assert_in_delta stats.std_dev, 164.7, 0.1
+      assert_in_delta stats.std_dev_ratio, 0.41, 0.01
+    end
+
     test "preserves all other keys in the map handed to it" do
       suite = %Suite{
         scenarios: [],
@@ -67,8 +77,8 @@ defmodule Benchee.StatistcsTest do
 
     defp sample_1_asserts(stats) do
       assert stats.average == 394.0
-      assert_in_delta stats.std_dev, 147.32, 0.01
-      assert_in_delta stats.std_dev_ratio, 0.37, 0.01
+      assert_in_delta stats.std_dev, 164.71, 0.01
+      assert_in_delta stats.std_dev_ratio, 0.41, 0.01
       assert_in_delta stats.ips, 2538, 1
       assert stats.median == 430.0
       assert stats.minimum == 170
@@ -79,8 +89,8 @@ defmodule Benchee.StatistcsTest do
 
     defp sample_2_asserts(stats) do
       assert stats.average == 14.0
-      assert_in_delta stats.std_dev, 5.25, 0.01
-      assert_in_delta stats.std_dev_ratio, 0.37, 0.01
+      assert_in_delta stats.std_dev, 5.76, 0.01
+      assert_in_delta stats.std_dev_ratio, 0.41, 0.01
       assert_in_delta stats.ips, 71428, 1
       assert stats.median == 14.0
       assert stats.minimum == 7
