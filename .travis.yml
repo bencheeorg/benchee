@@ -9,7 +9,7 @@ otp_release:
   - 20.2
 matrix:
   exclude:
-    - elixir: 1.6.0
+    - elixir: 1.6.3
       otp_release: 18.3
 
 before_script:
