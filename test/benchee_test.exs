@@ -126,7 +126,7 @@ defmodule BencheeTest do
 
   test "integration super fast function warning is printed once per job" do
     output = capture_io fn ->
-      Benchee.run(%{"Fast" => fn -> 0 end}, time: 1.001, warmup: 0.001)
+      Benchee.run(%{"Fast" => fn -> 0 end}, time: 0.001, warmup: 0.001)
     end
 
     warnings = output
