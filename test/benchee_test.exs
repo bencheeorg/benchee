@@ -5,6 +5,7 @@ defmodule BencheeTest do
   alias Benchee.Test.FakeFormatter
   alias Benchee.Statistics
   alias Benchee.Formatters.Console
+  alias Benchee.Suite
   doctest Benchee
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median.+99th %$/m
@@ -100,8 +101,9 @@ defmodule BencheeTest do
       list = Enum.to_list(1..10_000)
       map_fun = fn(i) -> [i, i * i] end
 
-      Benchee.init(@test_times)
-      |> Benchee.system
+      @test_times
+      |> Benchee.init()
+      |> Benchee.system()
       |> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
       |> Benchee.benchmark("map.flatten",
                            fn -> list |> Enum.map(map_fun) |> List.flatten end)
@@ -378,6 +380,26 @@ defmodule BencheeTest do
     assert String.contains? output, ["small list", "mediumList"]
     occurences = Regex.scan body_regex("flat_map"), output
     assert length(occurences) == 2
+  end
+
+  defmodule MacroTest do
+    defmacro add_numbers(num1, num2) do
+      quote do
+        unquote(num1) + unquote(num2)
+      end
+    end
+  end
+
+  test "works for macros" do
+    require MacroTest
+
+    capture_io fn ->
+      %Suite{scenarios: [scenario]} = Benchee.run(%{
+        macro_add: fn -> MacroTest.add_numbers(100, 200) end
+      }, time: 0.001, warmup: 0)
+
+      assert length(scenario.run_times) > 0
+    end
   end
 
   describe "save & load" do
