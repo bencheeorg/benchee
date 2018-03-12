@@ -49,6 +49,7 @@ defmodule Benchee.Formatters.Console.Memory do
     end)
   end
 
+  defp column_descriptors(label_width, hide_statistics)
   defp column_descriptors(label_width, false) do
     "\n~*s~*s~*s~*s~*s\n"
     |> :io_lib.format([
@@ -78,6 +79,7 @@ defmodule Benchee.Formatters.Console.Memory do
   end
 
   @spec scenario_reports([Scenario.t()], unit_per_statistic, integer, boolean) :: [String.t()]
+  defp scenario_reports(scenarios, units, label_width, hide_statistics)
   defp scenario_reports([scenario | other_scenarios], units, label_width, true) do
     [
       reference_report(scenario, units, label_width),
