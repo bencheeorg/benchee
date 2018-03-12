@@ -114,6 +114,23 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert length(memory_usages) > 0
     end
 
+    @tag :memory_measure
+    test "records memory when the function only runs once" do
+      suite =
+        test_suite(%Suite{configuration: %{time: 0.001, warmup: 0, measure_memory: true}})
+
+      new_suite =
+        suite
+        |> Benchmark.benchmark("Name", fn ->
+          Enum.map(0..1000, fn _ -> [12.23, 30.536, 30.632, 7398.3295] end)
+        end)
+        |> Benchmark.measure(TestPrinter)
+
+      memory_usages = List.first(new_suite.scenarios).memory_usages
+
+      assert length(memory_usages) > 0
+    end
+
     test "very fast functions print a warning" do
       output =
         ExUnit.CaptureIO.capture_io(fn ->
