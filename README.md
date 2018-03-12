@@ -82,7 +82,7 @@ end
 
 Install via `mix deps.get` and then happy benchmarking as described in [Usage](#usage) :)
 
-Elixir versions supported are 1.3+.
+Elixir versions supported are 1.4+.
 
 ## Usage
 
