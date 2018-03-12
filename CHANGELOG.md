@@ -8,6 +8,9 @@ everything will run without error before running the full set of benchmarks.
 benchmarks with each input before running the actual suite. This should save
 time while actually writing the code for your benchmarks.
 
+### Bugfixes (User Facing)
+* Standard Deviation is now calculated correctly for being a sample of the population (divided by `n - 1` and not just `n`)
+
 ## 0.12.1 (2018-02-26)
 
 ### Bugfixes (User Facing)
