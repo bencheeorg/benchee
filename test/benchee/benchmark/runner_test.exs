@@ -131,6 +131,23 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert length(memory_usages) > 0
     end
 
+    @tag :memory_measure
+    test "correctly scales down memory usage of very fast functions" do
+      suite =
+        test_suite(%Suite{configuration: %{time: 100, warmup: 1, measure_memory: true}})
+
+      new_suite =
+        suite
+        |> Benchmark.benchmark("Boom", fn -> Enum.map([1, 2, 3], fn i -> i + 1 end) end)
+        |> Benchmark.measure(TestPrinter)
+
+      memory_usages = List.first(new_suite.scenarios).memory_usages
+
+      assert [memory_consumption] = Enum.uniq(memory_usages)
+      assert memory_consumption >= 1
+      assert memory_consumption <= 10
+    end
+
     test "very fast functions print a warning" do
       output =
         ExUnit.CaptureIO.capture_io(fn ->

@@ -228,8 +228,8 @@ defmodule Benchee.Benchmark.Runner do
     adjust_for_iterations(run_time, memory_usage, num_iterations)
   end
 
-  defp adjust_for_iterations(run_time, memory_usage, num_iterations) do
-    {run_time / num_iterations, memory_usage}
+  defp adjust_for_iterations(run_time, nil, num_iterations) do
+    {run_time / num_iterations, nil}
   end
 
   defp adjust_for_iterations(run_time, memory_usage, num_iterations) do
