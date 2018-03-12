@@ -140,7 +140,7 @@ defmodule Benchee.Benchmark.Runner do
     end_time = current_time() + run_time
     :erlang.garbage_collect()
 
-    {num_iterations, initial_run_time} =
+    {num_iterations, initial_run_time, initial_memory_usage} =
       determine_n_times(scenario, scenario_context, fast_warning)
 
     new_context = %ScenarioContext{
@@ -150,7 +150,7 @@ defmodule Benchee.Benchmark.Runner do
         num_iterations: num_iterations
     }
 
-    do_benchmark(scenario, new_context, {[initial_run_time], []})
+    do_benchmark(scenario, new_context, {[initial_run_time], [initial_memory_usage]})
   end
 
   defp current_time, do: :erlang.system_time(:micro_seconds)
@@ -168,10 +168,14 @@ defmodule Benchee.Benchmark.Runner do
          },
          fast_warning
        ) do
-    {run_time, _} = measure_iteration(scenario, scenario_context)
+    {run_time, memory_usage} = measure_iteration(scenario, scenario_context)
 
     if run_time >= @minimum_execution_time do
-      {num_iterations, run_time / num_iterations}
+      if is_nil(memory_usage) do
+        {num_iterations, run_time / num_iterations, memory_usage}
+      else
+        {num_iterations, run_time / num_iterations, memory_usage / num_iterations}
+      end
     else
       if fast_warning, do: printer.fast_warning()
 
@@ -238,8 +242,7 @@ defmodule Benchee.Benchmark.Runner do
     new_input = run_before_each(scenario, scenario_context)
     function = main_function(function, new_input)
 
-    {microseconds, memory_usage, return_value} =
-      measure_time_and_memory(function, measure_memory)
+    {microseconds, memory_usage, return_value} = measure_time_and_memory(function, measure_memory)
 
     run_after_each(return_value, scenario, scenario_context)
     {microseconds, memory_usage}
