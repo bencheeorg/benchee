@@ -209,7 +209,7 @@ defmodule Benchee.Benchmark.Runner do
     do_benchmark(
       scenario,
       updated_context,
-      {[run_time | run_times], updated_memory_usages(memory_usage, memory_usages) }
+      {[run_time | run_times], updated_memory_usages(memory_usage, memory_usages)}
     )
   end
 
