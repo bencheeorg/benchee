@@ -144,7 +144,7 @@ defmodule BencheeTest do
                   time: 0.001, warmup: 0, print: [fast_warning: false])
     end
 
-    refute Regex.match? ~r/fast/, output
+    refute output =~ ~r/fast/
   end
 
   test "integration comparison report can be deactivated" do
@@ -318,9 +318,9 @@ defmodule BencheeTest do
       }, configuration)
     end
 
-    assert Regex.match?(@header_regex, output)
-    assert Regex.match? ~r/fast/, output
-    assert Regex.match? ~r/unreliable/, output
+    assert output =~ @header_regex
+    assert output =~ ~r/fast/
+    assert output =~ ~r/unreliable/
 
     assert String.contains? output, ["number_one", "symbol_one"]
     occurences = Regex.scan body_regex("identity"), output
@@ -487,8 +487,8 @@ defmodule BencheeTest do
                     time: 0.01, warmup: 0.005, measure_memory: true)
       end
 
-      assert Regex.match?(~r/Memory usage statistics:/, output)
-      assert Regex.match?(~r/To List\s+[0-9.]{3,} K*B{1}/, output)
+      assert output =~ ~r/Memory usage statistics:/
+      assert output =~ ~r/To List\s+[0-9.]{3,} K*B{1}/
     end
   end
 
@@ -503,7 +503,7 @@ defmodule BencheeTest do
     assert output =~ ~r/^flat_map#{tag_regex}\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
     assert output =~ ~r/#{@slower_regex}/m
 
-    refute Regex.match?(~r/fast/i, output)
+    refute output =~ ~r/fast/i
   end
 
   defp body_regex(benchmark_name, tag_regex \\ "") do
