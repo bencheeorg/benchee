@@ -329,7 +329,18 @@ defmodule Benchee.Configuration do
 
   defp update_measure_memory(config = %{measure_memory: measure_memory}) do
     otp_version = List.to_integer(:erlang.system_info(:otp_release))
+    if measure_memory and otp_version <= 18, do: print_memory_measure_warning()
     Map.put(config, :measure_memory, measure_memory and otp_version > 18)
+  end
+
+  defp print_memory_measure_warning do
+    IO.puts("""
+
+      Measuring memory consumption is only available on OTP 19 or greater.
+      If you would like to benchmark memory consumption, please upgrade to a
+      newer verion of OTP.
+
+    """)
   end
 
   defp save_option_conversion(config = %{save: false}) do
