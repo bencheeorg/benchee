@@ -81,7 +81,9 @@ defmodule Benchee.Output.BenchmarkPrinter do
   """
   def fast_warning do
     IO.puts """
-    Warning: The function you are trying to benchmark is super fast, making measures more unreliable! See: https://github.com/PragTob/benchee/wiki/Benchee-Warnings#fast-execution-warning
+    Warning: The function you are trying to benchmark is super fast, making measurements more unreliable!
+    This holds especially true for memory measurements.
+    See: https://github.com/PragTob/benchee/wiki/Benchee-Warnings#fast-execution-warning
 
     You may disable this warning by passing print: [fast_warning: false] as configuration options.
     """

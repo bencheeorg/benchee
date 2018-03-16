@@ -133,7 +133,7 @@ defmodule BencheeTest do
 
     warnings = output
                |> String.split("\n")
-               |> Enum.filter(fn(line) -> line =~ ~r/Warning.+fast/ end)
+               |> Enum.filter(fn(line) -> line =~ ~r/Warning:.+fast/ end)
 
     assert Enum.count(warnings) == 1
   end
