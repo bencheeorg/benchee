@@ -215,6 +215,7 @@ defmodule Benchee.Benchmark.Runner do
 
   # We return nil if no memory measurement is performed so keep it empty
   defp updated_memory_usages(nil, memory_usages), do: memory_usages
+  defp updated_memory_usages(memory_usage, memory_usages) when memory_usage < 0, do: memory_usages
   defp updated_memory_usages(memory_usage, memory_usages), do: [memory_usage | memory_usages]
 
   defp iteration_measurements(
