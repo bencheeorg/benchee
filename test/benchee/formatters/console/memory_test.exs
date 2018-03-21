@@ -241,6 +241,46 @@ defmodule Benchee.Formatters.Console.MemoryTest do
       refute Regex.match?(~r/Comparison/i, output)
       refute Regex.match?(~r/average/i, output)
     end
+
+    test "displays extended statistics" do
+      scenarios = [
+        %Scenario{
+          name: "First job",
+          memory_usage_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1},
+            minimum: 111.1,
+            maximum: 333.3,
+            mode: 201.2,
+            sample_size: 50_000
+          },
+          run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
+        }
+      ]
+
+      params = %{
+        comparison: true,
+        unit_scaling: :best,
+        extended_statistics: true
+      }
+
+      output = Memory.format_scenarios(scenarios, params)
+      [_memory_title, _header1, _result1, title, header2, result2] = output
+
+      assert title =~ ~r/Extended statistics: /
+      assert header2 =~ ~r/minimum/
+      assert header2 =~ ~r/maximum/
+      assert header2 =~ ~r/sample size/
+      assert header2 =~ ~r/mode/
+      assert result2 =~ ~r/First job/
+      assert result2 =~ ~r/111.10/
+      assert result2 =~ ~r/333.30/
+      assert result2 =~ ~r/50 K/
+      assert result2 =~ ~r/201.20/
+    end
   end
 
   defp assert_column_width(name, string, expected_width) do
