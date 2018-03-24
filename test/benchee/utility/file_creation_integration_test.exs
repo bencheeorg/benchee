@@ -21,6 +21,7 @@ defmodule Benchee.Utility.FileCreationIntegrationTest do
         assert_correct_files()
       after
         File.rm_rf! @directory
+        File.rm_rf! "testing"
       end
     end
 
@@ -30,6 +31,7 @@ defmodule Benchee.Utility.FileCreationIntegrationTest do
         assert_correct_files()
       after
         File.rm_rf! @directory
+        File.rm_rf! "testing"
       end
     end
 
@@ -41,6 +43,7 @@ defmodule Benchee.Utility.FileCreationIntegrationTest do
         assert output =~ @file_name_2
       after
         File.rm_rf! @directory
+        File.rm_rf! "testing"
       end
     end
 
@@ -52,6 +55,7 @@ defmodule Benchee.Utility.FileCreationIntegrationTest do
       assert File.exists? "#{@directory}/test_string_length_1.txt"
     after
       File.rm_rf! @directory
+      File.rm_rf! "testing"
     end
 
     defp assert_correct_files do
@@ -76,6 +80,7 @@ defmodule Benchee.Utility.FileCreationIntegrationTest do
         assert Enum.member?(file_names, @file_name_2)
       after
         File.rm_rf! @directory
+        File.rm_rf! "testing"
       end
     end
   end

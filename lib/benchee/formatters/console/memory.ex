@@ -11,6 +11,7 @@ defmodule Benchee.Formatters.Console.Memory do
     Benchmark.Scenario,
     Conversion,
     Conversion.Unit,
+    Conversion.Count,
     Formatters.Console.Helpers
   }
 
@@ -21,6 +22,10 @@ defmodule Benchee.Formatters.Console.Memory do
   @deviation_width 11
   @median_width 15
   @percentile_width 15
+  @minimum_width 15
+  @maximum_width 15
+  @sample_size_width 15
+  @mode_width 25
 
   @doc """
   Formats the memory statistics to a report suitable for output on the CLI. If
@@ -39,7 +44,8 @@ defmodule Benchee.Formatters.Console.Memory do
       "\nMemory usage statistics:\n",
       column_descriptors(label_width, hide_statistics),
       scenario_reports(scenarios, units, label_width, hide_statistics),
-      comparison_report(scenarios, units, label_width, config, hide_statistics)
+      comparison_report(scenarios, units, label_width, config, hide_statistics),
+      extended_statistics_report(scenarios, units, label_width, config, hide_statistics)
     ])
   end
 
@@ -204,6 +210,67 @@ defmodule Benchee.Formatters.Console.Memory do
 
     "~*s~*s - ~.2fx memory usage\n"
     |> :io_lib.format([-label_width, name, @median_width, median_format, slower])
+    |> to_string
+  end
+
+  defp extended_statistics_report(_, _, _, %{extended_statistics: false}, _), do: []
+  defp extended_statistics_report(_, _, _, _, true), do: []
+
+  defp extended_statistics_report(scenarios, units, label_width, _config, _hide_statistics) do
+    [
+      Helpers.descriptor("Extended statistics"),
+      extended_column_descriptors(label_width)
+      | extended_statistics(scenarios, units, label_width)
+    ]
+  end
+
+  defp extended_column_descriptors(label_width) do
+    "\n~*s~*s~*s~*s~*s\n"
+    |> :io_lib.format([
+      -label_width,
+      "Name",
+      @minimum_width,
+      "minimum",
+      @maximum_width,
+      "maximum",
+      @sample_size_width,
+      "sample size",
+      @mode_width,
+      "mode"
+    ])
+    |> to_string
+  end
+
+  defp extended_statistics(scenarios, units, label_width) do
+    Enum.map(scenarios, fn scenario ->
+      format_scenario_extended(scenario, units, label_width)
+    end)
+  end
+
+  defp format_scenario_extended(scenario, %{memory: memory_unit}, label_width) do
+    %Scenario{
+      name: name,
+      memory_usage_statistics: %Statistics{
+        minimum: minimum,
+        maximum: maximum,
+        sample_size: sample_size,
+        mode: mode
+      }
+    } = scenario
+
+    "~*s~*ts~*ts~*ts~*ts\n"
+    |> :io_lib.format([
+      -label_width,
+      name,
+      @minimum_width,
+      Helpers.count_output(minimum, memory_unit),
+      @maximum_width,
+      Helpers.count_output(maximum, memory_unit),
+      @sample_size_width,
+      Count.format(sample_size),
+      @mode_width,
+      Helpers.mode_out(mode, memory_unit)
+    ])
     |> to_string
   end
 end
