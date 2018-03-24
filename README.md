@@ -146,10 +146,10 @@ The available options are the following (also documented in [hexdocs](https://he
 * `warmup` - the time in seconds for which a benchmarking job should be run without measuring times before "real" measurements start. This simulates a _"warm"_ running system. Defaults to 2.
 * `time` - the time in seconds for how long each individual benchmarking job should be run for measuring the execution times (run time performance). Defaults to 5.
 * `memory_time` - the time in seconds for how long [memory measurements](measuring-memory-consumption) should be conducted. Defaults to 0 (turned off).
-* `pre_check` - whether or not to run each job with each input - including all given before or after scenario or each hooks - before the benchmarks are measured to ensure that your code executes without error. This can save time while developing your suites. Defaults to `false`.
 * `inputs` - a map from descriptive input names to some different input, your benchmarking jobs will then be run with each of these inputs. For this to work your benchmarking function gets the current input passed in as an argument into the function. Defaults to `nil`, aka no input specified and functions are called without an argument. See [Inputs](#inputs).
-* `parallel` - the function of each benchmarking job will be executed in `parallel` number processes. If `parallel: 4` then 4 processes will be spawned that all execute the _same_ function for the given time. When these finish/the time is up 4 new processes will be spawned for the next job/function. This gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking). Defaults to 1 (no parallel execution).
 * `formatters` - list of formatters either as module implementing the formatter behaviour or formatter functions. They are run when using `Benchee.run/2`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter `Benchee.Formatters.Console`. See [Formatters](#formatters).
+* `pre_check` - whether or not to run each job with each input - including all given before or after scenario or each hooks - before the benchmarks are measured to ensure that your code executes without error. This can save time while developing your suites. Defaults to `false`.
+* `parallel` - the function of each benchmarking job will be executed in `parallel` number processes. If `parallel: 4` then 4 processes will be spawned that all execute the _same_ function for the given time. When these finish/the time is up 4 new processes will be spawned for the next job/function. This gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking). Defaults to 1 (no parallel execution).
 * `save` - specify a `path` where to store the results of the current benchmarking suite, tagged with the specified `tag`. See [Saving & Loading](#saving-loading-and-comparing-previous-runs).
 * `load` - load saved suit or suits to compare your current benchmarks against. Can be a string or a list of strings or patterns. See [Saving & Loading](#saving-loading-and-comparing-previous-runs).
 * `print` - a map from atoms to `true` or `false` to configure if the output identified by the atom will be printed during the standard Benchee benchmarking process. All options are enabled by default (true). Options are:
@@ -232,7 +232,6 @@ Benchee.run(%{
   ],
   formatter_options: [html: [file: "samples_output/my.html"]]
 )
-
 ```
 
 ### Extended Console Formatter Statistics
@@ -261,6 +260,48 @@ map.flatten          514 μs        1926 μs        13.01 K                   51
 ```
 
 (Btw. notice how the modes of both are much closer and for `map.flatten` much less than the average of `766.99`, see `samples/run_extended_statistics`)
+
+### Measuring memory consumption
+
+Starting with version 0.13, users can now get measurements of how much memory their benchmarks use. This measurement is **not** the actual effect on the size of the BEAM VM size, but the total amount of memory that was allocated during the execution of a given scenario. This includes all memory that was garbage collected during the execution of that scenario. It **does not** include any memory used in any process other than the original one in which the scenario is run.
+
+This measurement of memory does not affect the measurement of run times.
+
+In cases where all measurements of memory consumption are identical, which happens very frequently, the full statistics will be omitted from the standard console formatter. If your function is deterministic, this will always be the case. Only in functions with some amount of randomness will there be variation in memory usage.
+
+Memory measurement is disabled by default, and you can choose to enable it by passing `memory_time: your_seconds` option to `Benchee.run/2`:
+
+```elixir
+Benchee.run(%{
+  "something_great" => fn -> cool_stuff end
+}, memory_time: 2)
+```
+
+Memory time can be specified separately as it will often be constant - so it might not need as much measuring time.
+
+A full example, including an example of the console output, can be found
+[here](samples/measure_memory.exs).
+
+### Saving, loading and comparing previous runs
+
+Benchee can store the results of previous runs in a file and then load them again to compare them. For example this is useful to compare what was recorded on the master branch against a branch with performance improvements.
+
+**Saving** is done through the `save` configuration option. You can specify a `path` where results are saved, or you can use the default option of`"benchmark.benchee"` if you don't pass a `path`. You can also pass a `tag` option which annotates these results (for instance with a branch name). The default option for the `tag` is a timestamp of when the benchmark was run.
+
+**Loading** is done through the `load` option specifying a path to the file to
+load (for instance `benchmark.benchee`). You can also specify multiple files to load through a list of paths (`["my.benchee", "master_save.benchee"]`) - each one of those can also be a glob expression to match even more files glob (`"save_number*.benchee"`).
+
+```elixir
+Benchee.run(%{
+  "something_great" => fn -> cool_stuff end
+},
+  save: [path: "save.benchee", tag: "first-try"]
+)
+
+Benchee.run(%{}, load: "save.benchee")
+```
+
+In the more verbose API this is triggered via `Benchee.load/1`.
 
 ### Hooks (Setup, Teardown etc.)
 
@@ -565,48 +606,6 @@ global_after_scenario(2)
 
 suite_tear_down
 ```
-
-### Saving, loading and comparing previous runs
-
-Benchee can store the results of previous runs in a file and then load them again to compare them. For example this is useful to compare what was recorded on the master branch against a branch with performance improvements.
-
-**Saving** is done through the `save` configuration option. You can specify a `path` where results are saved, or you can use the default option of`"benchmark.benchee"` if you don't pass a `path`. You can also pass a `tag` option which annotates these results (for instance with a branch name). The default option for the `tag` is a timestamp of when the benchmark was run.
-
-**Loading** is done through the `load` option specifying a path to the file to
-load (for instance `benchmark.benchee`). You can also specify multiple files to load through a list of paths (`["my.benchee", "master_save.benchee"]`) - each one of those can also be a glob expression to match even more files glob (`"save_number*.benchee"`).
-
-```elixir
-Benchee.run(%{
-  "something_great" => fn -> cool_stuff end
-},
-  save: [path: "save.benchee", tag: "first-try"]
-)
-
-Benchee.run(%{}, load: "save.benchee")
-```
-
-In the more verbose API this is triggered via `Benchee.load/1`.
-
-### Measuring memory consumption
-
-Starting with version 0.13, users can now get measurements of how much memory their benchmarks use. This measurement is **not** the actual effect on the size of the BEAM VM size, but the total amount of memory that was allocated during the execution of a given scenario. This includes all memory that was garbage collected during the execution of that scenario. It **does not** include any memory used in any process other than the original one in which the scenario is run.
-
-This measurement of memory does not affect the measurement of run times.
-
-In cases where all measurements of memory consumption are identical, which happens very frequently, the full statistics will be omitted from the standard console formatter. If your function is deterministic, this will always be the case. Only in functions with some amount of randomness will there be variation in memory usage.
-
-Memory measurement is disabled by default, and you can choose to enable it by passing `memory_time: your_seconds` option to `Benchee.run/2`:
-
-```elixir
-Benchee.run(%{
-  "something_great" => fn -> cool_stuff end
-}, memory_time: 2)
-```
-
-Memory time can be specified separately as it will often be constant - so it might not need as much measuring time.
-
-A full example, including an example of the console output, can be found
-[here](samples/measure_memory.exs).
 
 ### More verbose usage
 

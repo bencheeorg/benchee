@@ -82,15 +82,21 @@ defmodule Benchee.Configuration do
     Defaults to 5.
     * `memory_time` - the time in seconds for how long memory measurements
     should be conducted. Defaults to 0 (turned off).
-    * `pre_check` - whether or not to run each job with each input - including all
-    given before or after scenario or each hooks - before the benchmarks are
-    measured to ensure that your code executes without error. This can save time
-    while developing your suites. Defaults to `false`.
+    * `formatters` - list of formatters either as module implementing the
+    formatter behaviour or formatter functions. They are run when using
+    `Benchee.run/2`. Functions need to accept one argument (which is the
+    benchmarking suite with all data) and then use that to produce output. Used
+    for plugins. Defaults to the builtin console formatter
+    `Benchee.Formatters.Console`.
     * `inputs` - a map from descriptive input names to some different input,
     your benchmarking jobs will then be run with each of these inputs. For this
     to work your benchmarking function gets the current input passed in as an
     argument into the function. Defaults to `nil`, aka no input specified and
     functions are called without an argument.
+    * `pre_check` - whether or not to run each job with each input - including all
+    given before or after scenario or each hooks - before the benchmarks are
+    measured to ensure that your code executes without error. This can save time
+    while developing your suites. Defaults to `false`.
     * `parallel`   - each the function of each job will be executed in
     `parallel` number processes. If `parallel` is `4` then 4 processes will be
     spawned that all execute the _same_ function for the given time. When these
@@ -100,12 +106,6 @@ defmodule Benchee.Configuration do
     and cons of parallel benchmarking [check the
     wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking).
     Defaults to 1 (no parallel execution).
-    * `formatters` - list of formatters either as module implementing the
-    formatter behaviour or formatter functions. They are run when using
-    `Benchee.run/2`. Functions need to accept one argument (which is the
-    benchmarking suite with all data) and then use that to produce output. Used
-    for plugins. Defaults to the builtin console formatter
-    `Benchee.Formatters.Console`.
     * `save` - specify a `path` where to store the results of the current
     benchmarking suite, tagged with the specified `tag`.
     * `load` - load saved suit or suits to compare your current benchmarks
