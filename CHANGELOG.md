@@ -1,9 +1,9 @@
-## 0.13.0 (2018-??-??)
+## 0.13.0 (2018-03-24)
 
-Adds the ability to run a `pre_check` of your benchmarks if you want to make sure
-everything will run without error before running the full set of benchmarks.
+Memory Measurements are finally here! Please report problems if you experience them.
 
 ### Features (User Facing)
+* Memory measurements obviously ;) Memory measurement are currently limited to process your function will be run in - memory consumption of other processes will **not** be measured. More information can be found in the [README](https://github.com/PragTob/benchee#measuring-memory-consumption). Only usable on OTP 19+.
 * new `pre_check` configuration option which allows users to add a dry run of all
 benchmarks with each input before running the actual suite. This should save
 time while actually writing the code for your benchmarks.
