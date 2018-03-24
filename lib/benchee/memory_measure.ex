@@ -8,14 +8,9 @@ defmodule Benchee.MemoryMeasure do
 
   @spec apply(fun) :: no_return() | tuple()
   def apply(fun) do
-    apply(:erlang, :apply, [fun, []])
-  end
-
-  @spec apply(atom, atom, list) :: no_return() | tuple()
-  def apply(module, function, arguments) do
     ref = make_ref()
     Process.flag(:trap_exit, true)
-    start_runner(module, function, arguments, ref)
+    start_runner(fun, ref)
 
     receive do
       {^ref, memory_usage_info} -> memory_usage_info
@@ -23,14 +18,14 @@ defmodule Benchee.MemoryMeasure do
     end
   end
 
-  defp start_runner(module, function, arguments, ref) do
+  defp start_runner(fun, ref) do
     parent = self()
 
     spawn_link(fn ->
       tracer = start_tracer(self())
 
       try do
-        memory_usage_info = measure_memory(module, function, arguments, tracer)
+        memory_usage_info = measure_memory(fun, tracer)
         send(parent, {ref, memory_usage_info})
       catch
         kind, reason -> graceful_exit(kind, reason, tracer, parent)
@@ -40,10 +35,10 @@ defmodule Benchee.MemoryMeasure do
     end)
   end
 
-  defp measure_memory(module, function, arguments, tracer) do
+  defp measure_memory(fun, tracer) do
     word_size = :erlang.system_info(:wordsize)
     {:garbage_collection_info, info_before} = Process.info(self(), :garbage_collection_info)
-    result = Kernel.apply(module, function, arguments)
+    result = fun.()
     {:garbage_collection_info, info_after} = Process.info(self(), :garbage_collection_info)
     mem_collected = get_collected_memory(tracer)
 
