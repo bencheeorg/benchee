@@ -40,6 +40,7 @@ defmodule Benchee.Benchmark.RunnerTest do
   end
 
   describe ".run_scenarios" do
+    @tag :performance
     test "runs a benchmark suite and enriches it with measurements" do
       retrying(fn ->
         suite = test_suite(%Suite{configuration: %{time: 60_000, warmup: 10_000}})
@@ -57,6 +58,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       end)
     end
 
+    @tag :performance
     test "runs a suite with multiple jobs and gathers results" do
       retrying(fn ->
         suite = test_suite(%Suite{configuration: %{time: 100_000, warmup: 10_000}})
@@ -159,6 +161,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert average < 10
     end
 
+    @tag :performance
     test "doesn't take longer than advertised for very fast funs" do
       retrying(fn ->
         time = 20_000
@@ -262,6 +265,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       end)
     end
 
+    @tag :performance
     test "populates results for all inputs" do
       retrying(fn ->
         inputs = %{
@@ -584,6 +588,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       ])
     end
 
+    @tag :performance
     test "each triggers for every invocation, scenario once" do
       me = self()
 

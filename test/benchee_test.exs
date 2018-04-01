@@ -228,6 +228,8 @@ defmodule BencheeTest do
   end
 
   @rough_10_milli_s "((8|9|10|11|12|13|14)\\.\\d{2} ms)"
+
+  @tag :performance
   test "formatters have full access to the suite data, values in assigns" do
     retrying fn ->
       formatter_one = fn(suite) ->
@@ -503,10 +505,18 @@ defmodule BencheeTest do
     assert output =~ ~r/^flat_map#{tag_regex}\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
     assert output =~ ~r/#{@slower_regex}/m
 
-    refute output =~ ~r/fast/i
+    # In windows time resolution seems to be milliseconds, hence even
+    # standard examples produce a fast warning.
+    # So we skip this basic is everything going fine test on windows
+    unless windows?(), do: refute output =~ ~r/fast/i
   end
 
   defp body_regex(benchmark_name, tag_regex \\ "") do
     ~r/^#{benchmark_name}#{tag_regex}\s+\d+.+\s+\d+\.?\d*.+\s+.+\d+\.?\d*.+\s+\d+\.?\d*.+/m
+  end
+
+  defp windows? do
+    {_, os} = :os.type()
+    os == :nt
   end
 end
