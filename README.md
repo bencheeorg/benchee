@@ -1,5 +1,7 @@
 # Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee) [![docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/) [![Inline docs](http://inch-ci.org/github/PragTob/benchee.svg)](http://inch-ci.org/github/PragTob/benchee) [![Build Status](https://travis-ci.org/PragTob/benchee.svg?branch=master)](https://travis-ci.org/PragTob/benchee) [![Coverage Status](https://coveralls.io/repos/github/PragTob/benchee/badge.svg?branch=master)](https://coveralls.io/github/PragTob/benchee?branch=master)
 
+**ATTENTION: Benchee has been renamed to bunny! You can find [bunny here](https://github.com/PragTob/bunny). It's just a better more bunnytastic API. For now benchee and its documentation will remain functional though. You can find more reasoning in [this blog post](https://pragtob.wordpress.com/2018/04/01/benchee-is-now-called-bunny/)**
+
 Library for easy and nice (micro) benchmarking in Elixir. It allows you to compare the performance of different pieces of code at a glance. Benchee is also versatile and extensible, relying only on functions! There are also a bunch of [plugins](#plugins) to draw pretty graphs and more!
 
 Benchee runs each of your functions for a given amount of time after an initial warmup. It then shows different statistical values like average, iterations per second and the standard deviation.
