@@ -4,10 +4,11 @@ defmodule Benchee.Benchmark.Runner do
   run time and memory usage to each scenario.
   """
 
-  alias Benchee.{Benchmark, MemoryMeasure}
+  alias Benchee.Benchmark
   alias Benchee.Benchmark.{Scenario, ScenarioContext}
   alias Benchee.Utility.{RepeatN, Parallel}
   alias Benchee.Configuration
+  alias Benchee.Benchmark.Measurer
 
   @doc """
   Executes the benchmarks defined before by first running the defined functions
@@ -34,7 +35,7 @@ defmodule Benchee.Benchmark.Runner do
   defp pre_check(scenario, scenario_context = %ScenarioContext{config: %{pre_check: true}}) do
     scenario_input = run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
-    _ = measure_iteration(scenario, scenario_context)
+    _ = measure_iteration(scenario, scenario_context, Measurer.Time)
     _ = run_after_scenario(scenario, scenario_context)
     nil
   end
@@ -58,7 +59,6 @@ defmodule Benchee.Benchmark.Runner do
   defp measure_scenario_parallel(config, scenario, scenario_context) do
     1..config.parallel
     |> Parallel.map(fn _ -> measure_scenario(scenario, scenario_context) end)
-    |> List.flatten()
   end
 
   defp add_measurements_to_scenario(measurements, scenario) do
@@ -72,9 +72,11 @@ defmodule Benchee.Benchmark.Runner do
     scenario_input = run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
     _ = run_warmup(scenario, scenario_context)
-    measurements = run_benchmark(scenario, scenario_context)
+    runtimes = run_runtime_benchmark(scenario, scenario_context)
+    memory_usages = run_memory_benchmark(scenario, scenario_context)
     run_after_scenario(scenario, scenario_context)
-    measurements
+
+    {runtimes, memory_usages}
   end
 
   defp run_before_scenario(
@@ -103,7 +105,7 @@ defmodule Benchee.Benchmark.Runner do
     measure_runtimes(scenario, scenario_context, warmup, false)
   end
 
-  defp run_benchmark(
+  defp run_runtime_benchmark(
          scenario,
          scenario_context = %ScenarioContext{
            config: %Configuration{
@@ -113,6 +115,29 @@ defmodule Benchee.Benchmark.Runner do
          }
        ) do
     measure_runtimes(scenario, scenario_context, run_time, fast_warning)
+  end
+
+  defp run_memory_benchmark(_, %ScenarioContext{config: %{memory_time: 0}}) do
+    []
+  end
+  defp run_memory_benchmark(
+         scenario,
+         scenario_context = %ScenarioContext{
+           config: %Configuration{
+             memory_time: memory_time
+           }
+         }
+       ) do
+
+    end_time = current_time() + memory_time
+
+    new_context = %ScenarioContext{
+      scenario_context
+      | current_time: current_time(),
+        end_time: end_time
+    }
+
+    do_benchmark(scenario, new_context, Measurer.Memory, [])
   end
 
   defp run_after_scenario(
@@ -135,7 +160,7 @@ defmodule Benchee.Benchmark.Runner do
     end_time = current_time() + run_time
     :erlang.garbage_collect()
 
-    {num_iterations, initial_run_time, initial_memory_usage} =
+    {num_iterations, initial_run_time} =
       determine_n_times(scenario, scenario_context, fast_warning)
 
     new_context = %ScenarioContext{
@@ -145,10 +170,7 @@ defmodule Benchee.Benchmark.Runner do
         num_iterations: num_iterations
     }
 
-    do_benchmark(
-      scenario,
-      new_context,
-      {[initial_run_time], updated_memory_usages(initial_memory_usage, [])})
+    do_benchmark(scenario, new_context, Measurer.Time, [initial_run_time])
   end
 
   defp current_time, do: :erlang.system_time(:micro_seconds)
@@ -166,12 +188,10 @@ defmodule Benchee.Benchmark.Runner do
          },
          fast_warning
        ) do
-    {run_time, memory_usage} = measure_iteration(scenario, scenario_context)
+    run_time = measure_iteration(scenario, scenario_context, Measurer.Time)
 
     if run_time >= @minimum_execution_time do
-      {adjusted_run_time, adjusted_memory_usage} =
-        adjust_for_iterations(run_time, memory_usage, num_iterations)
-      {num_iterations, adjusted_run_time, adjusted_memory_usage}
+      {num_iterations, adjust_for_iterations(run_time, num_iterations)}
     else
       if fast_warning, do: printer.fast_warning()
 
@@ -195,22 +215,19 @@ defmodule Benchee.Benchmark.Runner do
            current_time: current_time,
            end_time: end_time
          },
-         {run_times, memory_usages}
+         _measurer,
+         measurements
        )
        when current_time > end_time do
     # restore correct order - important for graphing
-    {Enum.reverse(run_times), Enum.reverse(memory_usages)}
+    Enum.reverse(measurements)
   end
 
-  defp do_benchmark(scenario, scenario_context, {run_times, memory_usages}) do
-    {run_time, memory_usage} = iteration_measurements(scenario, scenario_context)
+  defp do_benchmark(scenario, scenario_context, measurer, measurements) do
+    measurement = iteration_measurements(scenario, scenario_context, measurer)
     updated_context = %ScenarioContext{scenario_context | current_time: current_time()}
 
-    do_benchmark(
-      scenario,
-      updated_context,
-      {[run_time | run_times], updated_memory_usages(memory_usage, memory_usages)}
-    )
+    do_benchmark(scenario, updated_context, measurer, [measurement | measurements])
   end
 
   # We return nil if no memory measurement is performed so keep it empty
@@ -222,43 +239,39 @@ defmodule Benchee.Benchmark.Runner do
          scenario,
          scenario_context = %ScenarioContext{
            num_iterations: num_iterations
-         }
+         },
+         measurer
        ) do
-    {run_time, memory_usage} = measure_iteration(scenario, scenario_context)
+    measurement = measure_iteration(scenario, scenario_context, measurer)
 
-    adjust_for_iterations(run_time, memory_usage, num_iterations)
+    adjust_for_iterations(measurement, num_iterations)
   end
 
-  defp adjust_for_iterations(run_time, nil, num_iterations) do
-    {run_time / num_iterations, nil}
-  end
-
-  defp adjust_for_iterations(run_time, memory_usage, num_iterations) do
-    {run_time / num_iterations, memory_usage / num_iterations}
-  end
+  defp adjust_for_iterations(measurement, 1), do: measurement
+  defp adjust_for_iterations(measurement, num_iterations), do: measurement / num_iterations
 
   defp measure_iteration(
          scenario = %Scenario{function: function},
          scenario_context = %ScenarioContext{
            num_iterations: 1,
-           config: %{measure_memory: measure_memory}
-         }
+         },
+         measurer
        ) do
     new_input = run_before_each(scenario, scenario_context)
     function = main_function(function, new_input)
 
-    {microseconds, memory_usage, return_value} = measure_time_and_memory(function, measure_memory)
+    {measurement, return_value} = measurer.measure(function)
 
     run_after_each(return_value, scenario, scenario_context)
-    {microseconds, memory_usage}
+    measurement
   end
 
   defp measure_iteration(
          scenario,
          scenario_context = %ScenarioContext{
-           num_iterations: iterations,
-           config: %{measure_memory: measure_memory}
-         }
+           num_iterations: iterations
+         },
+         measurer
        )
        when iterations > 1 do
     # When we have more than one iteration, then the repetition and calling
@@ -266,21 +279,9 @@ defmodule Benchee.Benchmark.Runner do
     # `build_benchmarking_function/2`
     function = build_benchmarking_function(scenario, scenario_context)
 
-    {microseconds, memory_usage, _return_value} =
-      measure_time_and_memory(function, measure_memory)
+    {measurement, _return_value} = measurer.measure(function)
 
-    {microseconds, memory_usage}
-  end
-
-  defp measure_time_and_memory(function, true) do
-    {microseconds, return_value} = :timer.tc(function)
-    {memory_usage, _} = MemoryMeasure.apply(function)
-    {microseconds, memory_usage, return_value}
-  end
-
-  defp measure_time_and_memory(function, false) do
-    {microseconds, return_value} = :timer.tc(function)
-    {microseconds, nil, return_value}
+    measurement
   end
 
   @no_input Benchmark.no_input()

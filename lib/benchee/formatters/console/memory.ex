@@ -35,7 +35,21 @@ defmodule Benchee.Formatters.Console.Memory do
   """
   @spec format_scenarios([Scenario.t()], map) :: [String.t(), ...]
   def format_scenarios(scenarios, config) do
-    %{unit_scaling: scaling_strategy} = config
+    if memory_measurements_present?(scenarios) do
+      render(scenarios, config)
+    else
+      []
+    end
+  end
+
+  defp memory_measurements_present?(scenarios) do
+    Enum.any?(scenarios, fn scenario ->
+      scenario.memory_usage_statistics.sample_size > 0
+    end)
+  end
+
+  defp render(scenarios, config) do
+    scaling_strategy = config.unit_scaling
     units = Conversion.units(scenarios, scaling_strategy)
     label_width = Helpers.label_width(scenarios)
     hide_statistics = all_have_deviation_of_0?(scenarios)

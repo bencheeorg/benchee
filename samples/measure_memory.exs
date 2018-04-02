@@ -7,7 +7,7 @@ Benchee.run(%{
 inputs: %{
   "Small" => Enum.to_list(1..1000),
   "Bigger" => Enum.to_list(1..100_000)
-}, measure_memory: true)
+}, memory_time: 2)
 
 #Operating System: macOS
 #CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz

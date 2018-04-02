@@ -18,7 +18,7 @@ defmodule Benchee.Statistics do
     :mode,
     :minimum,
     :maximum,
-    :sample_size
+    sample_size: 0
   ]
 
   @type mode :: [number] | number | nil
@@ -107,10 +107,9 @@ defmodule Benchee.Statistics do
       ...>     input: "Input"
       ...>   }
       ...> ]
-      iex> suite = %Benchee.Suite{scenarios: scenarios, configuration: %{measure_memory: true}}
+      iex> suite = %Benchee.Suite{scenarios: scenarios}
       iex> Benchee.Statistics.statistics(suite)
       %Benchee.Suite{
-        configuration: %{measure_memory: true},
         scenarios: [
           %Benchee.Benchmark.Scenario{
             job_name: "My Job",
@@ -270,11 +269,10 @@ defmodule Benchee.Statistics do
   ...>     input: "Input"
   ...>   }
   ...> ]
-  iex> %Benchee.Suite{scenarios: scenarios, configuration: %{measure_memory: true}}
+  iex> %Benchee.Suite{scenarios: scenarios}
   ...> |> Benchee.Statistics.statistics
   ...> |> Benchee.Statistics.add_percentiles([25, 75])
   %Benchee.Suite{
-    configuration: %{measure_memory: true},
     scenarios: [
       %Benchee.Benchmark.Scenario{
         job_name: "My Job",

@@ -484,7 +484,7 @@ defmodule BencheeTest do
     test "measures memory usage when instructed to do so" do
       output = capture_io fn ->
         Benchee.run(%{"To List" => fn -> Enum.to_list(1..100) end},
-                    time: 0.01, warmup: 0.005, measure_memory: true)
+                    time: 0.01, warmup: 0.005, memory_time: 0.001)
       end
 
       assert Regex.match?(~r/Memory usage statistics:/, output)

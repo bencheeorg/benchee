@@ -1,13 +1,11 @@
-defmodule Benchee.MemoryMeasure do
+defmodule Benchee.Benchmark.Measurer.Memory do
   @moduledoc """
-  This exposes two functions, apply/1 and apply/3. Both execute a given function
-  and report on the memory used by monitoring the garbage collection process for
-  a single process.
+  Measure memory consumption of a function.
   """
-  import Kernel, except: [apply: 3, apply: 2]
 
-  @spec apply(fun) :: no_return() | tuple()
-  def apply(fun) do
+  @behaviour Benchee.Benchmark.Measurer
+
+  def measure(fun) do
     ref = make_ref()
     Process.flag(:trap_exit, true)
     start_runner(fun, ref)
