@@ -117,7 +117,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     @tag :memory_measure
     test "records memory when the function only runs once" do
       suite =
-        test_suite(%Suite{configuration: %{time: 0.001, warmup: 0, memory_time: 0.001}})
+        test_suite(%Suite{configuration: %{time: 0, warmup: 0, memory_time: 1_000}})
 
       new_suite =
         suite

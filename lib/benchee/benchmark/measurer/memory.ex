@@ -1,6 +1,8 @@
 defmodule Benchee.Benchmark.Measurer.Memory do
   @moduledoc """
   Measure memory consumption of a function.
+
+  Returns `{nil, return_value}` in case the memory measurement went bad.
   """
 
   @behaviour Benchee.Benchmark.Measurer
@@ -11,7 +13,7 @@ defmodule Benchee.Benchmark.Measurer.Memory do
     start_runner(fun, ref)
 
     receive do
-      {^ref, memory_usage_info} -> memory_usage_info
+      {^ref, memory_usage_info} -> return_memory(memory_usage_info)
       :shutdown -> nil
     end
   end
@@ -32,6 +34,9 @@ defmodule Benchee.Benchmark.Measurer.Memory do
       end
     end)
   end
+
+  defp return_memory({memory_usage, result}) when memory_usage < 0, do: {nil, result}
+  defp return_memory({memory_usage, result}), do: {memory_usage, result}
 
   defp measure_memory(fun, tracer) do
     word_size = :erlang.system_info(:wordsize)

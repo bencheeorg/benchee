@@ -227,14 +227,17 @@ defmodule Benchee.Benchmark.Runner do
     measurement = iteration_measurements(scenario, scenario_context, measurer)
     updated_context = %ScenarioContext{scenario_context | current_time: current_time()}
 
-    do_benchmark(scenario, updated_context, measurer, [measurement | measurements])
+    do_benchmark(
+      scenario,
+      updated_context,
+      measurer,
+      updated_measurements(measurement, measurements)
+    )
   end
 
-  # Hush now until I need you again
-  # We return nil if no memory measurement is performed so keep it empty
-  # defp updated_memory_usages(nil, memory_usages), do: memory_usages
-  # defp updated_memory_usages(memory_usage, memory_usages) when memory_usage < 0, do: memory_usages
-  # defp updated_memory_usages(memory_usage, memory_usages), do: [memory_usage | memory_usages]
+  # We return `nil` if memory measurement failed so keep it empty
+  defp updated_measurements(nil, measurements), do: measurements
+  defp updated_measurements(measurement, measurements), do: [measurement | measurements]
 
   defp iteration_measurements(
          scenario,
