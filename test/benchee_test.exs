@@ -144,7 +144,7 @@ defmodule BencheeTest do
                   time: 0.001, warmup: 0, print: [fast_warning: false])
     end
 
-    refute Regex.match? ~r/fast/, output
+    refute output =~ ~r/fast/
   end
 
   test "integration comparison report can be deactivated" do
@@ -228,6 +228,8 @@ defmodule BencheeTest do
   end
 
   @rough_10_milli_s "((8|9|10|11|12|13|14)\\.\\d{2} ms)"
+
+  @tag :performance
   test "formatters have full access to the suite data, values in assigns" do
     retrying fn ->
       formatter_one = fn(suite) ->
@@ -318,9 +320,9 @@ defmodule BencheeTest do
       }, configuration)
     end
 
-    assert Regex.match?(@header_regex, output)
-    assert Regex.match? ~r/fast/, output
-    assert Regex.match? ~r/unreliable/, output
+    assert output =~ @header_regex
+    assert output =~ ~r/fast/
+    assert output =~ ~r/unreliable/
 
     assert String.contains? output, ["number_one", "symbol_one"]
     occurences = Regex.scan body_regex("identity"), output
@@ -487,8 +489,8 @@ defmodule BencheeTest do
                     time: 0.01, warmup: 0.005, measure_memory: true)
       end
 
-      assert Regex.match?(~r/Memory usage statistics:/, output)
-      assert Regex.match?(~r/To List\s+[0-9.]{3,} K*B{1}/, output)
+      assert output =~ ~r/Memory usage statistics:/
+      assert output =~ ~r/To List\s+[0-9.]{3,} K*B{1}/
     end
   end
 
@@ -503,10 +505,18 @@ defmodule BencheeTest do
     assert output =~ ~r/^flat_map#{tag_regex}\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
     assert output =~ ~r/#{@slower_regex}/m
 
-    refute Regex.match?(~r/fast/i, output)
+    # In windows time resolution seems to be milliseconds, hence even
+    # standard examples produce a fast warning.
+    # So we skip this basic is everything going fine test on windows
+    unless windows?(), do: refute output =~ ~r/fast/i
   end
 
   defp body_regex(benchmark_name, tag_regex \\ "") do
     ~r/^#{benchmark_name}#{tag_regex}\s+\d+.+\s+\d+\.?\d*.+\s+.+\d+\.?\d*.+\s+\d+\.?\d*.+/m
+  end
+
+  defp windows? do
+    {_, os} = :os.type()
+    os == :nt
   end
 end
