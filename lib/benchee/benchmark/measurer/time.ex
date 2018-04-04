@@ -1,9 +1,9 @@
-defmodule Benchee.Benchmark.Measurer.Time do
+defmodule Benchee.Benchmark.Measure.Time do
   @moduledoc """
   Measure the time consumed by a executing function.
   """
 
-  @behaviour Benchee.Benchmark.Measurer
+  @behaviour Benchee.Benchmark.Measure
 
   def measure(function) do
     :timer.tc(function)

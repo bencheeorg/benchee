@@ -3,11 +3,11 @@ defmodule Benchee.MemoryMeasureTest do
   # there aren't any leaked processes if functions fail while we're tracing
   # them.
   use ExUnit.Case
-  alias Benchee.Benchmark.Measurer.Memory
+  alias Benchee.Benchmark.Measure.Memory
   import ExUnit.CaptureIO
 
   @moduletag :memory_measure
-  
+
   describe "measure/1" do
     test "returns the result of the function and the memory used (in bytes)" do
       fun_to_run = fn -> Enum.to_list(1..10) end

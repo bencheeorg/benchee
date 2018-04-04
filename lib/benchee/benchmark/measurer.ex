@@ -1,4 +1,4 @@
-defmodule Benchee.Benchmark.Measurer do
+defmodule Benchee.Benchmark.Measure do
   @moduledoc """
   A thing that measures something about a function execution - like time or
   memory needed.
@@ -8,7 +8,7 @@ defmodule Benchee.Benchmark.Measurer do
   Takes an anonymous 0 arity function to measure and returns the measurement
   and the return value of the function in a tuple.
 
-  The returned measurement may be `nil` if the measurement failed for some 
+  The returned measurement may be `nil` if the measurement failed for some
   reason - it will then be ignored and not counted.
   """
   @callback measure((() -> any)) :: {non_neg_integer | nil, any}

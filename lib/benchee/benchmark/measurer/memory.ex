@@ -1,11 +1,11 @@
-defmodule Benchee.Benchmark.Measurer.Memory do
+defmodule Benchee.Benchmark.Measure.Memory do
   @moduledoc """
   Measure memory consumption of a function.
 
   Returns `{nil, return_value}` in case the memory measurement went bad.
   """
 
-  @behaviour Benchee.Benchmark.Measurer
+  @behaviour Benchee.Benchmark.Measure
 
   def measure(fun) do
     ref = make_ref()

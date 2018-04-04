@@ -5,10 +5,9 @@ defmodule Benchee.Benchmark.Runner do
   """
 
   alias Benchee.Benchmark
-  alias Benchee.Benchmark.{Scenario, ScenarioContext}
+  alias Benchee.Benchmark.{Scenario, ScenarioContext, Measure}
   alias Benchee.Utility.{RepeatN, Parallel}
   alias Benchee.Configuration
-  alias Benchee.Benchmark.Measurer
 
   @doc """
   Executes the benchmarks defined before by first running the defined functions
@@ -35,7 +34,7 @@ defmodule Benchee.Benchmark.Runner do
   defp pre_check(scenario, scenario_context = %ScenarioContext{config: %{pre_check: true}}) do
     scenario_input = run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
-    _ = measure_iteration(scenario, scenario_context, Measurer.Time)
+    _ = measure_iteration(scenario, scenario_context, Measure.Time)
     _ = run_after_scenario(scenario, scenario_context)
     nil
   end
@@ -137,7 +136,7 @@ defmodule Benchee.Benchmark.Runner do
         end_time: end_time
     }
 
-    do_benchmark(scenario, new_context, Measurer.Memory, [])
+    do_benchmark(scenario, new_context, Measure.Memory, [])
   end
 
   defp run_after_scenario(
@@ -170,7 +169,7 @@ defmodule Benchee.Benchmark.Runner do
         num_iterations: num_iterations
     }
 
-    do_benchmark(scenario, new_context, Measurer.Time, [initial_run_time])
+    do_benchmark(scenario, new_context, Measure.Time, [initial_run_time])
   end
 
   defp current_time, do: :erlang.system_time(:micro_seconds)
@@ -188,7 +187,7 @@ defmodule Benchee.Benchmark.Runner do
          },
          fast_warning
        ) do
-    run_time = measure_iteration(scenario, scenario_context, Measurer.Time)
+    run_time = measure_iteration(scenario, scenario_context, Measure.Time)
 
     if run_time >= @minimum_execution_time do
       {num_iterations, adjust_for_iterations(run_time, num_iterations)}
