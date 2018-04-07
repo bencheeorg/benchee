@@ -30,26 +30,33 @@ defmodule Benchee.Output.BenchmarkPrinter do
                             num_cores: num_cores,
                             cpu_speed: cpu_speed,
                             available_memory: available_memory}) do
-    IO.puts "Operating System: #{os}"
-    IO.puts "CPU Information: #{cpu_speed}"
-    IO.puts "Number of Available Cores: #{num_cores}"
-    IO.puts "Available memory: #{available_memory}"
-    IO.puts "Elixir #{elixir_version}"
-    IO.puts "Erlang #{erlang_version}"
+    IO.puts """
+    Operating System: #{os}"
+    CPU Information: #{cpu_speed}
+    Number of Available Cores: #{num_cores}
+    Available memory: #{available_memory}
+    Elixir #{elixir_version}
+    Erlang #{erlang_version}
+    """
   end
 
-  defp suite_information(scenarios, %{parallel: parallel,
-                                 time:     time,
-                                 warmup:   warmup,
-                                 inputs:   inputs}) do
+  defp suite_information(scenarios,
+                         %{
+                             parallel:    parallel,
+                             time:        time,
+                             warmup:      warmup,
+                             inputs:      inputs,
+                             memory_time: memory_time
+                         }) do
     scenario_count = length(scenarios)
-    exec_time      = warmup + time
+    exec_time      = warmup + time + memory_time
     total_time     = scenario_count * exec_time
 
     IO.puts """
     Benchmark suite executing with the following configuration:
     warmup: #{Duration.format(warmup)}
     time: #{Duration.format(time)}
+    memory time: #{Duration.format(memory_time)}
     parallel: #{parallel}
     inputs: #{inputs_out(inputs)}
     Estimated total run time: #{Duration.format(total_time)}

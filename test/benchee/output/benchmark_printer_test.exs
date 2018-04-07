@@ -4,13 +4,16 @@ defmodule Benchee.Output.BenchmarkPrintertest do
   import Benchee.Output.BenchmarkPrinter
   alias Benchee.Benchmark.Scenario
   alias Benchee.Benchmark
+  alias Benchee.Configuration
 
-  @system_info %{elixir: "1.4",
-                 erlang: "19.2",
-                 os: :macOS,
-                 num_cores: 4,
-                 cpu_speed: "Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz",
-                 available_memory: 8568392814}
+  @system_info %{
+    elixir: "1.4",
+    erlang: "19.2",
+    os: :macOS,
+    num_cores: 4,
+    cpu_speed: "Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz",
+    available_memory: 8568392814
+  }
 
   test ".duplicate_benchmark_warning" do
     output = capture_io fn ->
@@ -25,7 +28,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
     test "sys information" do
       output = capture_io fn ->
         %{
-          configuration: %{parallel: 2, time: 10_000, warmup: 0, inputs: nil},
+          configuration: %Configuration{parallel: 2, time: 10_000, warmup: 0, inputs: nil},
           scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
           system: @system_info
         }
@@ -41,6 +44,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       assert output =~ ~r/following configuration/i
       assert output =~ "warmup: 0 μs"
       assert output =~ "time: 10 ms"
+      assert output =~ "memory time: 0 μs"
       assert output =~ "parallel: 2"
       assert output =~ "Estimated total run time: 20 ms"
     end
@@ -48,10 +52,11 @@ defmodule Benchee.Output.BenchmarkPrintertest do
     test "it scales times appropriately" do
       output = capture_io fn ->
         %{
-          configuration: %Benchee.Configuration{
+          configuration: %Configuration{
             parallel: 1,
             time: 60_000_000,
             warmup: 10_000_000,
+            memory_time: 5_000_000,
             inputs: nil
           },
           scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
@@ -62,15 +67,22 @@ defmodule Benchee.Output.BenchmarkPrintertest do
 
       assert output =~ "warmup: 10 s"
       assert output =~ "time: 1 min"
+      assert output =~ "memory time: 5 s"
       assert output =~ "parallel: 1"
-      assert output =~ "Estimated total run time: 2.33 min"
+      assert output =~ "Estimated total run time: 2.50 min"
     end
 
     @inputs %{"Arg 1" => 1, "Arg 2" => 2}
     test "multiple inputs" do
       output = capture_io fn ->
         %{
-          configuration: %{parallel: 2, time: 10_000, warmup: 0, inputs: @inputs},
+          configuration: %{
+            parallel: 2,
+            time: 10_000,
+            warmup: 0,
+            memory_time: 1_000,
+            inputs: @inputs
+          },
           scenarios: [
             %Scenario{job_name: "one", input_name: "Arg 1", input: 1},
             %Scenario{job_name: "one", input_name: "Arg 2", input: 2},
@@ -83,9 +95,10 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       end
 
       assert output =~ "time: 10 ms"
+      assert output =~ "memory time: 1 ms"
       assert output =~ "parallel: 2"
       assert output =~ "inputs: Arg 1, Arg 2"
-      assert output =~ "Estimated total run time: 40 ms"
+      assert output =~ "Estimated total run time: 44 ms"
     end
 
     test "does not print if disabled" do
