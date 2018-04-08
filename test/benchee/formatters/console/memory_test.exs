@@ -293,6 +293,12 @@ defmodule Benchee.Formatters.Console.MemoryTest do
       assert result2 =~ ~r/50 K/
       assert result2 =~ ~r/201.20/
     end
+
+    test "does nothing when there's no statistics to format" do
+      scenarios = [%Scenario{memory_usage_statistics: %Statistics{sample_size: 0}}]
+      
+      assert [] = Memory.format_scenarios(scenarios, %{})
+    end
   end
 
   defp assert_column_width(name, string, expected_width) do

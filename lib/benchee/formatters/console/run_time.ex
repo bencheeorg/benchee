@@ -61,6 +61,20 @@ defmodule Benchee.Formatters.Console.RunTime do
   """
   @spec format_scenarios([Scenario.t()], map) :: [String.t(), ...]
   def format_scenarios(scenarios, config) do
+    if run_time_measurements_present?(scenarios) do
+      render(scenarios, config)
+    else
+      []
+    end
+  end
+
+  defp run_time_measurements_present?(scenarios) do
+    Enum.any?(scenarios, fn scenario ->
+      scenario.run_time_statistics.sample_size > 0
+    end)
+  end
+
+  defp render(scenarios, config) do
     %{unit_scaling: scaling_strategy} = config
     units = Conversion.units(scenarios, scaling_strategy)
     label_width = Helpers.label_width(scenarios)

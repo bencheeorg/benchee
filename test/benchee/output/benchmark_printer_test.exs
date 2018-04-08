@@ -137,6 +137,14 @@ defmodule Benchee.Output.BenchmarkPrintertest do
 
       assert output == ""
     end
+
+    test "doesn't print if all times are set to 0" do
+      output = capture_io fn ->
+        benchmarking "Never", "don't care", %Configuration{time: 0, warmup: 0, memory_time: 0}
+      end
+
+      assert output == ""
+    end
   end
 
   test ".fast_warning warns with reference to more information" do
