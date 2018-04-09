@@ -24,6 +24,6 @@ defmodule Benchee.Utility.RepeatNTest do
     refute_receive :called
   end
   defp assert_called_exactly_times(n) do
-    Enum.each(Enum.to_list(1..n), fn (_)-> assert_receive :called end)
+    Enum.each(Enum.to_list(1..n), fn _ -> assert_receive :called end)
   end
 end

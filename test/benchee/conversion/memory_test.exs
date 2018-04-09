@@ -33,7 +33,9 @@ defmodule Benchee.Conversion.MemoryTest do
     end
   end
 
-  @list_with_mostly_megabytes [1, 200, 3_000_000, 4_000_000, 50_000_000, 50_000_000, 77_000_000_000]
+  @list_with_mostly_megabytes [
+    1, 200, 3_000_000, 4_000_000, 50_000_000, 50_000_000, 77_000_000_000
+  ]
 
   describe ".best" do
     test "when list is mostly megabytes" do
@@ -62,13 +64,13 @@ defmodule Benchee.Conversion.MemoryTest do
       actual_value = convert({8, @kilobyte_unit}, @kilobyte_unit)
       assert actual_value == {8, @kilobyte_unit}
     end
-  
+
     test "convert kb to mb returns correct result" do
       actual_value = convert({8, @kilobyte_unit}, @megabyte_unit)
       expected_value = 8 / 1024
       assert actual_value == {expected_value, @megabyte_unit}
     end
-  
+
     test "convert mb to kb returns correct result" do
       actual_value = convert({8, @megabyte_unit}, @kilobyte_unit)
       expected_value = 8 * 1024

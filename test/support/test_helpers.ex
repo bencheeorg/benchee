@@ -1,4 +1,6 @@
 defmodule Benchee.TestHelpers do
+  @moduledoc false
+
   import ExUnit.Assertions
 
   @default_retries 10
@@ -12,12 +14,10 @@ defmodule Benchee.TestHelpers do
   end
 
   def retrying(asserting_function, n) do
-    try do
-      asserting_function.()
-    rescue
-      ExUnit.AssertionError ->
-        retrying(asserting_function, n - 1)
-    end
+    asserting_function.()
+  rescue
+    ExUnit.AssertionError ->
+      retrying(asserting_function, n - 1)
   end
 
   def assert_received_exactly(expected) do

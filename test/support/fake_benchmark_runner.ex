@@ -1,4 +1,6 @@
 defmodule Benchee.Test.FakeBenchmarkRunner do
+  @moduledoc false
+
   def run_scenarios(scenarios, scenario_context) do
     send(self(), {:run_scenarios, scenarios, scenario_context})
 

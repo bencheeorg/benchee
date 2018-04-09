@@ -175,7 +175,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 90.0,
             percentiles: %{99 => 500.1},
-            sample_size: 400            
+            sample_size: 400
           },
           memory_usage_statistics: %Statistics{}
         },
@@ -328,9 +328,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
         %Scenario{
           name: "Job",
           run_time_statistics: %Statistics{
-            average: 11000.0,
-            ips: 12000.0,
-            std_dev_ratio: 13000.0,
+            average: 11_000.0,
+            ips: 12_000.0,
+            std_dev_ratio: 13_000.0,
             median: 140_000.0,
             percentiles: %{99 => 200_000.1},
             sample_size: 200

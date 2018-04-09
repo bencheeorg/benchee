@@ -1,6 +1,7 @@
 defmodule Benchee.Benchmark.RunnerTest do
   use ExUnit.Case, async: true
   import Benchee.TestHelpers
+  import ExUnit.CaptureIO
   alias Benchee.{Suite, Benchmark, Configuration, Statistics}
   alias Benchee.Benchmark.Scenario
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
@@ -153,7 +154,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
     test "very fast functions print a warning" do
       output =
-        ExUnit.CaptureIO.capture_io(fn ->
+        capture_io(fn ->
           %Suite{configuration: %{print: %{fast_warning: true}}}
           |> test_suite()
           |> Benchmark.benchmark("", fn -> 1 end)

@@ -122,7 +122,7 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.1,
             median: 195.5,
             percentiles: %{99 => 300.1},
-            sample_size: 10            
+            sample_size: 10
           },
           run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         },
@@ -296,7 +296,7 @@ defmodule Benchee.Formatters.Console.MemoryTest do
 
     test "does nothing when there's no statistics to format" do
       scenarios = [%Scenario{memory_usage_statistics: %Statistics{sample_size: 0}}]
-      
+
       assert [] = Memory.format_scenarios(scenarios, %{})
     end
   end

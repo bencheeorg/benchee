@@ -6,6 +6,8 @@ defmodule BencheeTest do
   alias Benchee.Statistics
   alias Benchee.Formatters.Console
   alias Benchee.Suite
+  alias Benchee.Conversion.Duration
+
   doctest Benchee
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median.+99th %$/m
@@ -109,7 +111,7 @@ defmodule BencheeTest do
                            fn -> list |> Enum.map(map_fun) |> List.flatten end)
       |> Benchee.measure
       |> Benchee.statistics
-      |> Benchee.Formatters.Console.format
+      |> Console.format
       |> IO.puts
     end
 
@@ -185,7 +187,7 @@ defmodule BencheeTest do
           fn -> list |> Enum.map(map_fun) |> List.flatten end
       }, time: 0.01,
          warmup: 0.005,
-         formatters: [Benchee.Formatters.Console])
+         formatters: [Console])
     end
 
     readme_sample_asserts output
@@ -202,7 +204,7 @@ defmodule BencheeTest do
           fn -> list |> Enum.map(map_fun) |> List.flatten end
       }, time: 0.01,
          warmup: 0.005,
-         formatters: [&Benchee.Formatters.Console.output/1])
+         formatters: [&Console.output/1])
     end
 
     readme_sample_asserts output
@@ -235,7 +237,7 @@ defmodule BencheeTest do
       formatter_one = fn(suite) ->
         run_time = suite.scenarios
                    |> (fn([scenario | _]) -> List.last(scenario.run_times) end).()
-                   |> Benchee.Conversion.Duration.format
+                   |> Duration.format
 
         IO.puts "Run time: #{run_time}"
       end
@@ -243,7 +245,7 @@ defmodule BencheeTest do
       formatter_two = fn(suite) ->
         average = suite.scenarios
                   |> (fn([scenario | _]) -> scenario.run_time_statistics.average end).()
-                  |> Benchee.Conversion.Duration.format
+                  |> Duration.format
         IO.puts "Average: #{average}"
       end
 
@@ -295,7 +297,6 @@ defmodule BencheeTest do
       ]
 
       configuration = Keyword.merge @test_times, inputs
-
 
       Benchee.run(%{
         "flat_map"    => fn(input) -> Enum.flat_map(input, map_fun) end,
@@ -462,7 +463,10 @@ defmodule BencheeTest do
         Benchee.run %{
           "sleeper"   => {
             fn -> :timer.sleep 1 end,
-            before_each: fn(input) -> send(myself, :local_before); input end,
+            before_each: fn(input) ->
+              send(myself, :local_before)
+              input
+            end,
             after_each:  fn(_) -> send myself, :local_after end,
             before_scenario: fn(input) ->
               send myself, :local_before_scenario
@@ -472,7 +476,10 @@ defmodule BencheeTest do
           "sleeper 2" => fn -> :timer.sleep 1 end
         }, time: 0.0001,
            warmup: 0,
-           before_each: fn(input) -> send(myself, :global_before); input end,
+           before_each: fn(input) ->
+             send(myself, :global_before)
+             input
+           end,
            after_each: fn(_) -> send myself, :global_after end,
            before_scenario: fn(input) ->
              send myself, :global_before_scenario
