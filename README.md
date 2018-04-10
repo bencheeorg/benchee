@@ -747,6 +747,7 @@ If you're on the [elixir-lang slack](https://elixir-lang.slack.com) also feel fr
 ## Development
 
 * `mix deps.get` to install dependencies
-* `mix test` to run tests or `mix test.watch` to run them continuously while you change files
+* `mix test` to run tests
 * `mix dialyzer` to run dialyzer for type checking, might take a while on the first invocation (try building plts first with `mix dialyzer --plt`)
 * `mix credo --strict` to find code style problems
+* or run `mix guard` to run all of them continuously on file change
