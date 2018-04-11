@@ -8,8 +8,20 @@ defmodule Benchee.StatistcsTest do
   describe ".statistics" do
     test "computes the statistics for all jobs correctly" do
       scenarios = [
-        %Scenario{input: "Input", input_name: "Input", job_name: "Job 1", run_times: @sample_1, memory_usages: @sample_1},
-        %Scenario{input: "Input", input_name: "Input", job_name: "Job 2", run_times: @sample_2, memory_usages: @sample_2}
+        %Scenario{
+          input: "Input",
+          input_name: "Input",
+          job_name: "Job 1",
+          run_times: @sample_1,
+          memory_usages: @sample_1
+        },
+        %Scenario{
+          input: "Input",
+          input_name: "Input",
+          job_name: "Job 2",
+          run_times: @sample_2,
+          memory_usages: @sample_2
+        }
       ]
 
       suite = %Suite{scenarios: scenarios}
@@ -24,8 +36,20 @@ defmodule Benchee.StatistcsTest do
 
     test "computes statistics correctly for multiple inputs" do
       scenarios = [
-        %Scenario{input: "Input 1", input_name: "Input 1", job_name: "Job", run_times: @sample_1, memory_usages: @sample_1},
-        %Scenario{input: "Input 2", input_name: "Input 2", job_name: "Job", run_times: @sample_2, memory_usages: @sample_2}
+        %Scenario{
+          input: "Input 1",
+          input_name: "Input 1",
+          job_name: "Job",
+          run_times: @sample_1,
+          memory_usages: @sample_1
+        },
+        %Scenario{
+          input: "Input 2",
+          input_name: "Input 2",
+          job_name: "Job",
+          run_times: @sample_2,
+          memory_usages: @sample_2
+        }
       ]
 
       suite = %Suite{scenarios: scenarios}
@@ -49,7 +73,12 @@ defmodule Benchee.StatistcsTest do
 
     @standard_deviation_sample [600, 470, 170, 430, 300]
     test "statistical standard deviation is calculated correctly" do
-      scenarios = [%Scenario{run_times: @standard_deviation_sample, memory_usages: @standard_deviation_sample}]
+      scenarios = [
+        %Scenario{
+          run_times: @standard_deviation_sample,
+          memory_usages: @standard_deviation_sample
+        }
+      ]
       suite = Statistics.statistics(%Suite{scenarios: scenarios})
 
       [%Scenario{run_time_statistics: stats}] = suite.scenarios
@@ -91,7 +120,7 @@ defmodule Benchee.StatistcsTest do
       assert stats.average == 14.0
       assert_in_delta stats.std_dev, 5.76, 0.01
       assert_in_delta stats.std_dev_ratio, 0.41, 0.01
-      assert_in_delta stats.ips, 71428, 1
+      assert_in_delta stats.ips, 71_428, 1
       assert stats.median == 14.0
       assert stats.minimum == 7
       assert stats.maximum == 23

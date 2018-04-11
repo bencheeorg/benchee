@@ -90,18 +90,22 @@ defmodule Benchee.Conversion.CountTest do
       assert best(@list_with_mostly_ones, strategy: :largest) == unit_for(:thousand)
     end
 
-    @list_with_thousands_and_millions_tied_for_most [0.0001, 1, 1_000, 100_000, 1_000_000, 10_000_000, 1_000_000_000]
+    @list_with_thousands_and_millions_tied_for_most [
+      0.0001, 1, 1_000, 100_000, 1_000_000, 10_000_000, 1_000_000_000
+    ]
 
     test "when list has thousands and millions tied for most, billions highest" do
       assert best(@list_with_thousands_and_millions_tied_for_most) == unit_for(:million)
     end
 
     test "when list has thousands and millions tied for most, billions highest, strategy: :smallest" do
-      assert best(@list_with_thousands_and_millions_tied_for_most, strategy: :smallest) == unit_for(:one)
+      best_unit = best(@list_with_thousands_and_millions_tied_for_most, strategy: :smallest)
+      assert best_unit == unit_for(:one)
     end
 
     test "when list has thousands and millions tied for most, billions highest, strategy: :largest" do
-      assert best(@list_with_thousands_and_millions_tied_for_most, strategy: :largest) == unit_for(:billion)
+      best_unit = best(@list_with_thousands_and_millions_tied_for_most, strategy: :largest)
+      assert best_unit == unit_for(:billion)
     end
 
     @list_with_mostly_thousands [1_000, 2_000, 30_000, 999]

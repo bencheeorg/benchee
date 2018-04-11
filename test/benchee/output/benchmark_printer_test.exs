@@ -12,7 +12,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
     os: :macOS,
     num_cores: 4,
     cpu_speed: "Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz",
-    available_memory: 8568392814
+    available_memory: 8_568_392_814
   }
 
   test ".duplicate_benchmark_warning" do

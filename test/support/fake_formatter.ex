@@ -1,4 +1,6 @@
 defmodule Benchee.Test.FakeFormatter do
+  @moduledoc false
+
   @behaviour Benchee.Formatter
 
   def format(_) do

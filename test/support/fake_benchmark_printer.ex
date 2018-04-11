@@ -1,4 +1,6 @@
 defmodule Benchee.Test.FakeBenchmarkPrinter do
+  @moduledoc false
+
   def duplicate_benchmark_warning(name) do
     send(self(), {:duplicate, name})
   end
