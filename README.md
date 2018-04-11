@@ -48,6 +48,7 @@ The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/Pr
 ## Features
 
 * first runs the functions for a given warmup time without recording the results, to simulate a _"warm"_ running system
+* [measures memory](measuring-memory-consumption)
 * provides you with lots of statistics - check the next list
 * plugin/extensible friendly architecture so you can use different formatters to generate [CSV, HTML and more](#plugins)
 * nicely formatted console output with units scaled to appropriate units
@@ -64,7 +65,8 @@ Provides you with the following **statistical data**:
 * **median**    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of samples is even). More stable than the average and somewhat more likely to be a typical value you see. (the lower the better)
 * **99th %**    - 99th percentile, 99% of all run times are less than this
 
-In addition, you can optionally output an extended set of statistics.
+In addition, you can optionally output an extended set of statistics:
+
 * **minimum**     - the smallest (fastest) run time measured for the job
 * **maximum**     - the biggest (slowest) run time measured for the job
 * **sample size** - the number of run time measurements taken
@@ -141,8 +143,9 @@ Benchee.run(%{"some function" => fn -> magic end}, print: [benchmarking: false])
 
 The available options are the following (also documented in [hexdocs](https://hexdocs.pm/benchee/Benchee.Configuration.html#init/1)).
 
-* `warmup` - the time in seconds for which a benchmarking job should be run without measuring times before real measurements start. This simulates a _"warm"_ running system. Defaults to 2.
-* `time` - the time in seconds for how long each individual benchmarking job should be run and measured. Defaults to 5.
+* `warmup` - the time in seconds for which a benchmarking job should be run without measuring times before "real" measurements start. This simulates a _"warm"_ running system. Defaults to 2.
+* `time` - the time in seconds for how long each individual benchmarking job should be run for measuring the execution times (run time performance). Defaults to 5.
+* `memory_time` - the time in seconds for how long [memory measurements](measuring-memory-consumption) should be conducted. Defaults to 0 (turned off).
 * `pre_check` - whether or not to run each job with each input - including all given before or after scenario or each hooks - before the benchmarks are measured to ensure that your code executes without error. This can save time while developing your suites. Defaults to `false`.
 * `inputs` - a map from descriptive input names to some different input, your benchmarking jobs will then be run with each of these inputs. For this to work your benchmarking function gets the current input passed in as an argument into the function. Defaults to `nil`, aka no input specified and functions are called without an argument. See [Inputs](#inputs).
 * `parallel` - the function of each benchmarking job will be executed in `parallel` number processes. If `parallel: 4` then 4 processes will be spawned that all execute the _same_ function for the given time. When these finish/the time is up 4 new processes will be spawned for the next job/function. This gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking). Defaults to 1 (no parallel execution).
@@ -592,13 +595,15 @@ This measurement of memory does not affect the measurement of run times.
 
 In cases where all measurements of memory consumption are identical, which happens very frequently, the full statistics will be omitted from the standard console formatter. If your function is deterministic, this will always be the case. Only in functions with some amount of randomness will there be variation in memory usage.
 
-Memory measurement is disabled by default, and you can choose to enable it by passing the following configuration option to `Benchee.run/2`.
+Memory measurement is disabled by default, and you can choose to enable it by passing `memory_time: your_seconds` option to `Benchee.run/2`:
 
 ```elixir
 Benchee.run(%{
   "something_great" => fn -> cool_stuff end
-}, measure_memory: true)
+}, memory_time: 2)
 ```
+
+Memory time can be specified separately as it will often be constant - so it might not need as much measuring time.
 
 A full example, including an example of the console output, can be found
 [here](samples/measure_memory.exs).

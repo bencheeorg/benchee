@@ -27,9 +27,10 @@ defmodule Benchee.Formatters.ConsoleTest do
             ips: 5_000.0,
             std_dev_ratio: 0.1,
             median: 195.5,
-            percentiles: %{99 => 400.1}
+            percentiles: %{99 => 400.1},
+            sample_size: 200
           },
-          memory_usage_statistics: %Statistics{average: 200.0}
+          memory_usage_statistics: %Statistics{}
         },
         %Scenario{
           name: "First",
@@ -40,9 +41,10 @@ defmodule Benchee.Formatters.ConsoleTest do
             ips: 10_000.0,
             std_dev_ratio: 0.1,
             median: 90.0,
-            percentiles: %{99 => 300.1}
+            percentiles: %{99 => 300.1},
+            sample_size: 200
           },
-          memory_usage_statistics: %Statistics{average: 200.0}
+          memory_usage_statistics: %Statistics{}
         }
       ]
 
@@ -75,9 +77,10 @@ defmodule Benchee.Formatters.ConsoleTest do
             ips: 5_000.0,
             std_dev_ratio: 0.1,
             median: 195.5,
-            percentiles: %{99 => 400.1}
+            percentiles: %{99 => 400.1},
+            sample_size: 200
           },
-          memory_usage_statistics: %Statistics{average: 200.0}
+          memory_usage_statistics: %Statistics{}
         },
         %Scenario{
           name: "Job",
@@ -88,9 +91,10 @@ defmodule Benchee.Formatters.ConsoleTest do
             ips: 2_500.0,
             std_dev_ratio: 0.15,
             median: 395.0,
-            percentiles: %{99 => 500.1}
+            percentiles: %{99 => 500.1},
+            sample_size: 200
           },
-          memory_usage_statistics: %Statistics{average: 200.0}
+          memory_usage_statistics: %Statistics{}
         }
       ]
 
@@ -118,9 +122,10 @@ defmodule Benchee.Formatters.ConsoleTest do
             ips: 5_000.0,
             std_dev_ratio: 0.1,
             median: 195.5,
-            percentiles: %{99 => 300.1}
+            percentiles: %{99 => 300.1},
+            sample_size: 200
           },
-          memory_usage_statistics: %Statistics{average: 200.0}
+          memory_usage_statistics: %Statistics{}
         },
         %Scenario{
           name: "Other Job",
@@ -131,9 +136,10 @@ defmodule Benchee.Formatters.ConsoleTest do
             ips: 10_000.0,
             std_dev_ratio: 0.3,
             median: 98.0,
-            percentiles: %{99 => 200.1}
+            percentiles: %{99 => 200.1},
+            sample_size: 200
           },
-          memory_usage_statistics: %Statistics{average: 200.0}
+          memory_usage_statistics: %Statistics{}
         },
         %Scenario{
           name: "Job",
@@ -144,9 +150,10 @@ defmodule Benchee.Formatters.ConsoleTest do
             ips: 2_500.0,
             std_dev_ratio: 0.15,
             median: 395.0,
-            percentiles: %{99 => 500.1}
+            percentiles: %{99 => 500.1},
+            sample_size: 200
           },
-          memory_usage_statistics: %Statistics{average: 200.0}
+          memory_usage_statistics: %Statistics{}
         },
         %Scenario{
           name: "Other Job",
@@ -157,9 +164,10 @@ defmodule Benchee.Formatters.ConsoleTest do
             ips: 4_000.0,
             std_dev_ratio: 0.31,
             median: 225.5,
-            percentiles: %{99 => 300.1}
+            percentiles: %{99 => 300.1},
+            sample_size: 200
           },
-          memory_usage_statistics: %Statistics{average: 200.0}
+          memory_usage_statistics: %Statistics{}
         }
       ]
 
@@ -191,9 +199,10 @@ defmodule Benchee.Formatters.ConsoleTest do
             ips: 5_000.0,
             std_dev_ratio: 0.1,
             median: 195.5,
-            percentiles: %{99 => 300.1}
+            percentiles: %{99 => 300.1},
+            sample_size: 200
           },
-          memory_usage_statistics: %Statistics{average: 200.0}
+          memory_usage_statistics: %Statistics{}
         },
         %Scenario{
           name: "job (improved)",
@@ -204,9 +213,10 @@ defmodule Benchee.Formatters.ConsoleTest do
             ips: 10_000.0,
             std_dev_ratio: 0.1,
             median: 90.0,
-            percentiles: %{99 => 200.1}
+            percentiles: %{99 => 200.1},
+            sample_size: 200
           },
-          memory_usage_statistics: %Statistics{average: 200.0}
+          memory_usage_statistics: %Statistics{}
         }
       ]
 

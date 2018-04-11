@@ -20,7 +20,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             ips: 5_000.0,
             std_dev_ratio: 0.1,
             median: 195.5,
-            percentiles: %{99 => 300.1}
+            percentiles: %{99 => 300.1},
+            sample_size: 10
           },
           run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         },
@@ -31,7 +32,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             ips: 2_500.0,
             std_dev_ratio: 0.1,
             median: 375.0,
-            percentiles: %{99 => 400.1}
+            percentiles: %{99 => 400.1},
+            sample_size: 10
           },
           run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         }
@@ -56,7 +58,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
           ips: 2_500.0,
           std_dev_ratio: 0.1,
           median: 375.0,
-          percentiles: %{99 => 500.1}
+          percentiles: %{99 => 500.1},
+          sample_size: 10
         },
         run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
       }
@@ -82,7 +85,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             ips: 10_000.0,
             std_dev_ratio: 0.1,
             median: 90.0,
-            percentiles: %{99 => 500.1}
+            percentiles: %{99 => 500.1},
+            sample_size: 10
           },
           run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         },
@@ -93,7 +97,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             ips: 5_000.0,
             std_dev_ratio: 0.1,
             median: 195.5,
-            percentiles: %{99 => 500.1}
+            percentiles: %{99 => 500.1},
+            sample_size: 10
           },
           run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         }
@@ -116,7 +121,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             ips: 5_000.0,
             std_dev_ratio: 0.1,
             median: 195.5,
-            percentiles: %{99 => 300.1}
+            percentiles: %{99 => 300.1},
+            sample_size: 10            
           },
           run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         },
@@ -127,7 +133,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             ips: 10_000.0,
             std_dev_ratio: 0.1,
             median: 90.0,
-            percentiles: %{99 => 200.1}
+            percentiles: %{99 => 200.1},
+            sample_size: 10
           },
           run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         }
@@ -158,7 +165,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             ips: 10_000.0,
             std_dev_ratio: 0.1,
             median: 90.0,
-            percentiles: %{99 => 200.1}
+            percentiles: %{99 => 200.1},
+            sample_size: 10
           },
           run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         },
@@ -169,7 +177,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             ips: 5_000.0,
             std_dev_ratio: 0.1,
             median: 195.5,
-            percentiles: %{99 => 300.1}
+            percentiles: %{99 => 300.1},
+            sample_size: 10
           },
           run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         }
@@ -193,7 +202,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             ips: 10_000.0,
             std_dev_ratio: 0.1,
             median: 90.0,
-            percentiles: %{99 => 200.1}
+            percentiles: %{99 => 200.1},
+            sample_size: 10
           },
           run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         }
@@ -212,7 +222,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev: 0.0,
             std_dev_ratio: 0.0,
             median: 100.0,
-            percentiles: %{99 => 100.0}
+            percentiles: %{99 => 100.0},
+            sample_size: 10
           },
           run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         },
@@ -223,7 +234,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev: 0.0,
             std_dev_ratio: 0.0,
             median: 200.0,
-            percentiles: %{99 => 200.0}
+            percentiles: %{99 => 200.0},
+            sample_size: 10
           },
           run_time_statistics: %Statistics{average: 100.0, ips: 1_000.0}
         }
@@ -280,6 +292,12 @@ defmodule Benchee.Formatters.Console.MemoryTest do
       assert result2 =~ ~r/333.30/
       assert result2 =~ ~r/50 K/
       assert result2 =~ ~r/201.20/
+    end
+
+    test "does nothing when there's no statistics to format" do
+      scenarios = [%Scenario{memory_usage_statistics: %Statistics{sample_size: 0}}]
+      
+      assert [] = Memory.format_scenarios(scenarios, %{})
     end
   end
 

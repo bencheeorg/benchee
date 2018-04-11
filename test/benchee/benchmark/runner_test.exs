@@ -102,7 +102,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     @tag :memory_measure
     test "measures the memory usage of a scenario" do
       suite =
-        test_suite(%Suite{configuration: %{time: 60_000, warmup: 10_000, measure_memory: true}})
+        test_suite(%Suite{configuration: %{time: 60_000, warmup: 10_000, memory_time: 10_000}})
 
       new_suite =
         suite
@@ -119,7 +119,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     @tag :memory_measure
     test "records memory when the function only runs once" do
       suite =
-        test_suite(%Suite{configuration: %{time: 0.001, warmup: 0, measure_memory: true}})
+        test_suite(%Suite{configuration: %{time: 0, warmup: 0, memory_time: 1_000}})
 
       new_suite =
         suite
@@ -136,7 +136,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     @tag :memory_measure
     test "correctly scales down memory usage of very fast functions" do
       suite =
-        test_suite(%Suite{configuration: %{time: 1_000, warmup: 1, measure_memory: true}})
+        test_suite(%Suite{configuration: %{time: 1_000, warmup: 1, memory_time: 1_000}})
 
       new_suite =
         suite
@@ -148,7 +148,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert [memory_consumption] = Enum.uniq(memory_usages)
       assert memory_consumption >= 1
       # depending on the number iterations determined, there can be spikes/changes
-      assert memory_consumption <= 100
+      assert memory_consumption <= 1_000
     end
 
     test "very fast functions print a warning" do

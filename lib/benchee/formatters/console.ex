@@ -22,15 +22,25 @@ defmodule Benchee.Formatters.Console do
   iex> scenarios = [
   ...>   %Benchee.Benchmark.Scenario{
   ...>     name: "My Job", input_name: "My input", run_time_statistics: %Benchee.Statistics{
-  ...>       average: 200.0,ips: 5000.0,std_dev_ratio: 0.1, median: 190.0, percentiles: %{99 => 300.1}
+  ...>       average: 200.0,
+  ...>       ips: 5000.0,
+  ...>       std_dev_ratio: 0.1,
+  ...>       median: 190.0,
+  ...>       percentiles: %{99 => 300.1},
+  ...>       sample_size: 200
   ...>     },
-  ...>     memory_usage_statistics: %Benchee.Statistics{average: 100.0}
+  ...>     memory_usage_statistics: %Benchee.Statistics{}
   ...>   },
   ...>   %Benchee.Benchmark.Scenario{
   ...>     name: "Job 2", input_name: "My input", run_time_statistics: %Benchee.Statistics{
-  ...>       average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0, percentiles: %{99 => 500.1}
+  ...>       average: 400.0,
+  ...>       ips: 2500.0,
+  ...>       std_dev_ratio: 0.2,
+  ...>       median: 390.0,
+  ...>       percentiles: %{99 => 500.1},
+  ...>       sample_size: 200
   ...>     },
-  ...>     memory_usage_statistics: %Benchee.Statistics{average: 100.0}
+  ...>     memory_usage_statistics: %Benchee.Statistics{}
   ...>   }
   ...> ]
   iex> suite = %Benchee.Suite{
@@ -40,7 +50,6 @@ defmodule Benchee.Formatters.Console do
   ...>       console: %{comparison: false, extended_statistics: false}
   ...>     },
   ...>     unit_scaling: :best,
-  ...>     measure_memory: false
   ...>   }
   ...> }
   iex> Benchee.Formatters.Console.format(suite)
@@ -53,8 +62,6 @@ defmodule Benchee.Formatters.Console do
   """
   @spec format(Suite.t()) :: [any]
   def format(%Suite{scenarios: scenarios, configuration: config}) do
-    %{measure_memory: measure_memory} = config
-
     config = console_configuration(config)
 
     scenarios
@@ -62,7 +69,7 @@ defmodule Benchee.Formatters.Console do
     |> Enum.map(fn {input, scenarios} ->
       scenarios
       |> Statistics.sort()
-      |> generate_output(config, input, measure_memory)
+      |> generate_output(config, input)
     end)
   end
 
@@ -92,20 +99,11 @@ defmodule Benchee.Formatters.Console do
     )
   end
 
-  defp generate_output(scenarios, config, input, measure_memory)
-
-  defp generate_output(scenarios, config, input, true) do
+  defp generate_output(scenarios, config, input) do
     [
       input_header(input) |
       RunTime.format_scenarios(scenarios, config) ++
       Memory.format_scenarios(scenarios, config)
-    ]
-  end
-
-  defp generate_output(scenarios, config, input, false) do
-    [
-      input_header(input) |
-      RunTime.format_scenarios(scenarios, config)
     ]
   end
 

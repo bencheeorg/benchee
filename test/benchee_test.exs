@@ -404,6 +404,19 @@ defmodule BencheeTest do
     end
   end
 
+  test "does not blow up setting all times to 0 and never executes a function" do
+    output = capture_io fn ->
+      Benchee.run(
+        %{
+          "never execute me" => fn -> raise "BOOOOM" end
+        },
+        time: 0, warmup: 0, memory_time: 0
+      )
+    end
+
+    refute output =~ "never execute me"
+  end
+
   describe "save & load" do
     test "saving the suite to disk and restoring it" do
       save = [save: [path: "save.benchee", tag: "master"]]
@@ -486,7 +499,7 @@ defmodule BencheeTest do
     test "measures memory usage when instructed to do so" do
       output = capture_io fn ->
         Benchee.run(%{"To List" => fn -> Enum.to_list(1..100) end},
-                    time: 0.01, warmup: 0.005, measure_memory: true)
+                    time: 0.01, warmup: 0.005, memory_time: 0.001)
       end
 
       assert output =~ ~r/Memory usage statistics:/

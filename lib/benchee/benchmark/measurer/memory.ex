@@ -1,19 +1,19 @@
-defmodule Benchee.MemoryMeasure do
+defmodule Benchee.Benchmark.Measure.Memory do
   @moduledoc """
-  This exposes two functions, apply/1 and apply/3. Both execute a given function
-  and report on the memory used by monitoring the garbage collection process for
-  a single process.
-  """
-  import Kernel, except: [apply: 3, apply: 2]
+  Measure memory consumption of a function.
 
-  @spec apply(fun) :: no_return() | tuple()
-  def apply(fun) do
+  Returns `{nil, return_value}` in case the memory measurement went bad.
+  """
+
+  @behaviour Benchee.Benchmark.Measure
+
+  def measure(fun) do
     ref = make_ref()
     Process.flag(:trap_exit, true)
     start_runner(fun, ref)
 
     receive do
-      {^ref, memory_usage_info} -> memory_usage_info
+      {^ref, memory_usage_info} -> return_memory(memory_usage_info)
       :shutdown -> nil
     end
   end
@@ -34,6 +34,9 @@ defmodule Benchee.MemoryMeasure do
       end
     end)
   end
+
+  defp return_memory({memory_usage, result}) when memory_usage < 0, do: {nil, result}
+  defp return_memory({memory_usage, result}), do: {memory_usage, result}
 
   defp measure_memory(fun, tracer) do
     word_size = :erlang.system_info(:wordsize)

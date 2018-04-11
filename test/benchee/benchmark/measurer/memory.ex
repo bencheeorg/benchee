@@ -3,14 +3,15 @@ defmodule Benchee.MemoryMeasureTest do
   # there aren't any leaked processes if functions fail while we're tracing
   # them.
   use ExUnit.Case
-  @moduletag :memory_measure
-  alias Benchee.MemoryMeasure
+  alias Benchee.Benchmark.Measure.Memory
   import ExUnit.CaptureIO
 
-  describe "apply/1" do
+  @moduletag :memory_measure
+
+  describe "measure/1" do
     test "returns the result of the function and the memory used (in bytes)" do
       fun_to_run = fn -> Enum.to_list(1..10) end
-      assert {memory_used, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} = MemoryMeasure.apply(fun_to_run)
+      assert {memory_used, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} = Memory.measure(fun_to_run)
       # We need to have some wiggle room here because memory used varies from
       # system to system. It's consistent in an environment, but changes
       # between environments.
@@ -27,7 +28,7 @@ defmodule Benchee.MemoryMeasureTest do
       # a separate process, so we need to wait for that to emit so we can
       # capture it.
       capture_io(fn ->
-        MemoryMeasure.apply(fn -> exit(:kill) end)
+        Memory.measure(fn -> exit(:kill) end)
         Process.sleep(1)
       end)
 

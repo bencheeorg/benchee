@@ -13,9 +13,9 @@ defmodule Benchee.Configuration do
   }
 
   defstruct parallel: 1,
-            measure_memory: false,
             time: 5,
             warmup: 2,
+            memory_time: 0,
             pre_check: false,
             formatters: [Console],
             print: %{
@@ -44,9 +44,9 @@ defmodule Benchee.Configuration do
 
   @type t :: %__MODULE__{
           parallel: integer,
-          measure_memory: boolean,
           time: number,
           warmup: number,
+          memory_time: number,
           pre_check: boolean,
           formatters: [(Suite.t() -> Suite.t())],
           print: map,
@@ -63,7 +63,7 @@ defmodule Benchee.Configuration do
         }
 
   @type user_configuration :: map | keyword
-  @time_keys [:time, :warmup]
+  @time_keys [:time, :warmup, :memory_time]
 
   @doc """
   Returns the initial benchmark configuration for Benchee, composed of defaults
@@ -74,10 +74,14 @@ defmodule Benchee.Configuration do
 
   Possible options:
 
-    * `time`       - total run time in seconds of a single benchmark (determines
-    how often it is executed). Defaults to 5.
-    * `warmup`     - the time in seconds for which the benchmarking function
-    should be run without gathering results. Defaults to 2.
+    * `warmup` - the time in seconds for which a benchmarking job should be run
+    without measuring times before "real" measurements start. This simulates a
+    _"warm"_ running system. Defaults to 2.
+    * `time` - the time in seconds for how long each individual benchmarking job
+    should be run for measuring the execution times (run time performance).
+    Defaults to 5.
+    * `memory_time` - the time in seconds for how long memory measurements
+    should be conducted. Defaults to 0 (turned off).
     * `pre_check` - whether or not to run each job with each input - including all
     given before or after scenario or each hooks - before the benchmarks are
     measured to ensure that your code executes without error. This can save time
@@ -327,10 +331,15 @@ defmodule Benchee.Configuration do
     end)
   end
 
-  defp update_measure_memory(config = %{measure_memory: measure_memory}) do
+  defp update_measure_memory(config = %{memory_time: memory_time}) do
     otp_version = List.to_integer(:erlang.system_info(:otp_release))
-    if measure_memory and otp_version <= 18, do: print_memory_measure_warning()
-    Map.put(config, :measure_memory, measure_memory and otp_version > 18)
+
+    if (memory_time > 0) and otp_version <= 18 do
+      print_memory_measure_warning()
+      Map.put(config, :memory_time, 0)
+    else
+      config
+    end
   end
 
   defp print_memory_measure_warning do

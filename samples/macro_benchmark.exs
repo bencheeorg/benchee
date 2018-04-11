@@ -7,7 +7,7 @@ end
 Benchee.run(%{
   "35 fibonacci numbers" => fn -> Fib.fib(35) end,
   "43 fibonacci numbers" => fn -> Fib.fib(43) end
-}, time: 10, warmup: 0, measure_memory: true)
+}, time: 10, warmup: 0, memory_time: 10)
 
 # Operating System: macOS
 # CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
