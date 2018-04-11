@@ -82,17 +82,17 @@ defmodule Benchee.Configuration do
     Defaults to 5.
     * `memory_time` - the time in seconds for how long memory measurements
     should be conducted. Defaults to 0 (turned off).
+    * `inputs` - a map from descriptive input names to some different input,
+    your benchmarking jobs will then be run with each of these inputs. For this
+    to work your benchmarking function gets the current input passed in as an
+    argument into the function. Defaults to `nil`, aka no input specified and
+    functions are called without an argument.
     * `formatters` - list of formatters either as module implementing the
     formatter behaviour or formatter functions. They are run when using
     `Benchee.run/2`. Functions need to accept one argument (which is the
     benchmarking suite with all data) and then use that to produce output. Used
     for plugins. Defaults to the builtin console formatter
     `Benchee.Formatters.Console`.
-    * `inputs` - a map from descriptive input names to some different input,
-    your benchmarking jobs will then be run with each of these inputs. For this
-    to work your benchmarking function gets the current input passed in as an
-    argument into the function. Defaults to `nil`, aka no input specified and
-    functions are called without an argument.
     * `pre_check` - whether or not to run each job with each input - including all
     given before or after scenario or each hooks - before the benchmarks are
     measured to ensure that your code executes without error. This can save time

@@ -1,9 +1,9 @@
-## 0.13.0 (2018-03-24)
+## 0.13.0 (2018-04-12)
 
 Memory Measurements are finally here! Please report problems if you experience them.
 
 ### Features (User Facing)
-* Memory measurements obviously ;) Memory measurement are currently limited to process your function will be run in - memory consumption of other processes will **not** be measured. More information can be found in the [README](https://github.com/PragTob/benchee#measuring-memory-consumption). Only usable on OTP 19+.
+* Memory measurements obviously ;) Memory measurement are currently limited to process your function will be run in - memory consumption of other processes will **not** be measured. More information can be found in the [README](https://github.com/PragTob/benchee#measuring-memory-consumption). Only usable on OTP 19+. Special thanks go to @devonestes and @michalmuskala
 * new `pre_check` configuration option which allows users to add a dry run of all
 benchmarks with each input before running the actual suite. This should save
 time while actually writing the code for your benchmarks.

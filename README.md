@@ -178,6 +178,27 @@ The available options are the following (also documented in [hexdocs](https://he
     equivalent to the behaviour Benchee had pre 0.5.0)
 * `:before_scenario`/`after_scenario`/`before_each`/`after_each` - read up on them in the [hooks section](#hooks-setup-teardown-etc)
 
+### Measuring memory consumption
+
+Starting with version 0.13, users can now get measurements of how much memory their benchmarks use. This measurement is **not** the actual effect on the size of the BEAM VM size, but the total amount of memory that was allocated during the execution of a given scenario. This includes all memory that was garbage collected during the execution of that scenario. It **does not** include any memory used in any process other than the original one in which the scenario is run.
+
+This measurement of memory does not affect the measurement of run times.
+
+In cases where all measurements of memory consumption are identical, which happens very frequently, the full statistics will be omitted from the standard console formatter. If your function is deterministic, this will always be the case. Only in functions with some amount of randomness will there be variation in memory usage.
+
+Memory measurement is disabled by default, and you can choose to enable it by passing `memory_time: your_seconds` option to `Benchee.run/2`:
+
+```elixir
+Benchee.run(%{
+  "something_great" => fn -> cool_stuff end
+}, memory_time: 2)
+```
+
+Memory time can be specified separately as it will often be constant - so it might not need as much measuring time.
+
+A full example, including an example of the console output, can be found
+[here](samples/measure_memory.exs).
+
 ### Inputs
 
 `:inputs` is a very useful configuration that allows you to run the same benchmarking jobs with different inputs. You specify the inputs as a map from name (String or atom) to the actual input value. Functions can have different performance characteristics on differently shaped inputs - be that structure or input size.
@@ -260,27 +281,6 @@ map.flatten          514 μs        1926 μs        13.01 K                   51
 ```
 
 (Btw. notice how the modes of both are much closer and for `map.flatten` much less than the average of `766.99`, see `samples/run_extended_statistics`)
-
-### Measuring memory consumption
-
-Starting with version 0.13, users can now get measurements of how much memory their benchmarks use. This measurement is **not** the actual effect on the size of the BEAM VM size, but the total amount of memory that was allocated during the execution of a given scenario. This includes all memory that was garbage collected during the execution of that scenario. It **does not** include any memory used in any process other than the original one in which the scenario is run.
-
-This measurement of memory does not affect the measurement of run times.
-
-In cases where all measurements of memory consumption are identical, which happens very frequently, the full statistics will be omitted from the standard console formatter. If your function is deterministic, this will always be the case. Only in functions with some amount of randomness will there be variation in memory usage.
-
-Memory measurement is disabled by default, and you can choose to enable it by passing `memory_time: your_seconds` option to `Benchee.run/2`:
-
-```elixir
-Benchee.run(%{
-  "something_great" => fn -> cool_stuff end
-}, memory_time: 2)
-```
-
-Memory time can be specified separately as it will often be constant - so it might not need as much measuring time.
-
-A full example, including an example of the console output, can be found
-[here](samples/measure_memory.exs).
 
 ### Saving, loading and comparing previous runs
 
