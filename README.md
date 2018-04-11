@@ -143,8 +143,8 @@ Benchee.run(%{"some function" => fn -> magic end}, print: [benchmarking: false])
 
 The available options are the following (also documented in [hexdocs](https://hexdocs.pm/benchee/Benchee.Configuration.html#init/1)).
 
-* `warmup` - the time in seconds for which a benchmarking job should be run without measuring times before real measurements start. This simulates a _"warm"_ running system. Defaults to 2.
-* `time` - the time in seconds for how long each individual benchmarking job should be run and measured. Defaults to 5.
+* `warmup` - the time in seconds for which a benchmarking job should be run without measuring times before "real" measurements start. This simulates a _"warm"_ running system. Defaults to 2.
+* `time` - the time in seconds for how long each individual benchmarking job should be run for measuring the execution times (run time performance). Defaults to 5.
 * `memory_time` - the time in seconds for how long [memory measurements](measuring-memory-consumption) should be conducted. Defaults to 0 (turned off).
 * `pre_check` - whether or not to run each job with each input - including all given before or after scenario or each hooks - before the benchmarks are measured to ensure that your code executes without error. This can save time while developing your suites. Defaults to `false`.
 * `inputs` - a map from descriptive input names to some different input, your benchmarking jobs will then be run with each of these inputs. For this to work your benchmarking function gets the current input passed in as an argument into the function. Defaults to `nil`, aka no input specified and functions are called without an argument. See [Inputs](#inputs).
@@ -589,7 +589,7 @@ In the more verbose API this is triggered via `Benchee.load/1`.
 
 ### Measuring memory consumption
 
-Starting with version 0.13, users can now get measurements of how much memory their benchmarks use. This measurement is **not** the actual effect on the size of the BEAM VM size, but the total amount of memory that was allocated during the execution of a given scenario. This includes all memory that was garbage collected during the execution of that scenario. It **does not** include any memory used in any process other than the original one in which the scenario is run. 
+Starting with version 0.13, users can now get measurements of how much memory their benchmarks use. This measurement is **not** the actual effect on the size of the BEAM VM size, but the total amount of memory that was allocated during the execution of a given scenario. This includes all memory that was garbage collected during the execution of that scenario. It **does not** include any memory used in any process other than the original one in which the scenario is run.
 
 This measurement of memory does not affect the measurement of run times.
 

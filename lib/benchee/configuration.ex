@@ -74,10 +74,12 @@ defmodule Benchee.Configuration do
 
   Possible options:
 
-    * `time`       - total run time in seconds of a single benchmark (determines
-    how often it is executed). Defaults to 5.
-    * `warmup`     - the time in seconds for which the benchmarking function
-    should be run without gathering results. Defaults to 2.
+    * `warmup` - the time in seconds for which a benchmarking job should be run
+    without measuring times before "real" measurements start. This simulates a
+    _"warm"_ running system. Defaults to 2.
+    * `time` - the time in seconds for how long each individual benchmarking job
+    should be run for measuring the execution times (run time performance).
+    Defaults to 5.
     * `memory_time` - the time in seconds for how long memory measurements
     should be conducted. Defaults to 0 (turned off).
     * `pre_check` - whether or not to run each job with each input - including all
