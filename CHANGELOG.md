@@ -1,4 +1,4 @@
-## 0.13.0 (2018-04-12)
+## 0.13.0 (2018-04-14)
 
 Memory Measurements are finally here! Please report problems if you experience them.
 
