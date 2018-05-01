@@ -299,6 +299,83 @@ defmodule Benchee.Formatters.Console.MemoryTest do
 
       assert [] = Memory.format_scenarios(scenarios, %{})
     end
+
+    test "it doesn't blow up if some of the values have no statistics (yes that happened)" do
+      scenarios = [
+        %Scenario{
+          name: "First",
+          memory_usage_statistics: %Statistics{
+            average: 100.0,
+            std_dev: 0.0,
+            std_dev_ratio: 0.0,
+            median: 100.0,
+            percentiles: %{99 => 100.0},
+            sample_size: 10
+          },
+          run_time_statistics: %Statistics{}
+        },
+        %Scenario{
+          name: "Second",
+          memory_usage_statistics: %Statistics{},
+          run_time_statistics: %Statistics{}
+        }
+      ]
+
+      output =
+        Enum.join(
+          Memory.format_scenarios(scenarios, %{
+            comparison: true,
+            unit_scaling: :best,
+            extended_statistics: false
+          })
+        )
+
+      assert output =~ "First"
+      assert output =~ ~r/Second.+N\/A/i
+      assert output =~ "N/A"
+    end
+
+    test "it doesn't blow up if some come back with a median of 0.0" do
+      scenarios = [
+        %Scenario{
+          name: "First",
+          memory_usage_statistics: %Statistics{
+            average: 0.0,
+            median: 0.0,
+            sample_size: 10,
+            percentiles: %{99 => 0.0},
+            std_dev: 0.0,
+            std_dev_ratio: 0.0
+          },
+          run_time_statistics: %Statistics{}
+        },
+        %Scenario{
+          name: "Second",
+          memory_usage_statistics: %Statistics{
+            average: 100.0,
+            median: 100.0,
+            sample_size: 5,
+            percentiles: %{99 => 100.0},
+            std_dev: 5.0,
+            std_dev_ratio: 0.10
+          },
+          run_time_statistics: %Statistics{}
+        }
+      ]
+
+      output =
+        Enum.join(
+          Memory.format_scenarios(scenarios, %{
+            comparison: true,
+            unit_scaling: :best,
+            extended_statistics: false
+          })
+        )
+
+      assert output =~ "First"
+      assert output =~ "Second"
+      refute output =~ "x memory usage"
+    end
   end
 
   defp assert_column_width(name, string, expected_width) do
