@@ -126,14 +126,21 @@ defmodule Benchee.Formatters.Console.Memory do
          label_width,
          _) do
 
-    "~*ts~*ts\n"
-    |> :io_lib.format([
-      -label_width,
-      scenario.name,
-      @average_width,
-      @na
-    ])
-    |> to_string
+    warning =  "WARNING the scenario \"#{scenario.name}\" has no memory measurements!" <>
+               " This is probably a bug please report it!\n" <>
+               "https://github.com/PragTob/benchee/issues/new"
+
+    data =
+      "~*ts~*ts\n"
+      |> :io_lib.format([
+        -label_width,
+        scenario.name,
+        @average_width,
+        @na
+      ])
+      |> to_string
+
+    warning <> "\n" <> data
   end
 
   defp format_scenario(scenario, %{memory: memory_unit}, label_width, false) do

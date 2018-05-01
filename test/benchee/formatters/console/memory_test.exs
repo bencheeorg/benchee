@@ -333,6 +333,8 @@ defmodule Benchee.Formatters.Console.MemoryTest do
       assert output =~ "First"
       assert output =~ ~r/Second.+N\/A/i
       assert output =~ "N/A"
+      assert output =~ "WARNING"
+      assert output =~ "report"
     end
 
     test "it doesn't blow up if some come back with a median of 0.0" do
