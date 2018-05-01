@@ -79,6 +79,7 @@ defmodule Benchee.StatistcsTest do
           memory_usages: @standard_deviation_sample
         }
       ]
+
       suite = Statistics.statistics(%Suite{scenarios: scenarios})
 
       [%Scenario{run_time_statistics: stats}] = suite.scenarios
@@ -93,6 +94,18 @@ defmodule Benchee.StatistcsTest do
       }
 
       assert %Suite{configuration: %{formatters: []}} = Statistics.statistics(suite)
+    end
+
+    @all_zeros [0, 0, 0, 0, 0]
+    test "doesn't blow up when all measurements are zeros (mostly memory measurement)" do
+      scenarios = [%Scenario{run_times: @all_zeros, memory_usages: @all_zeros}]
+      suite = Statistics.statistics(%Suite{scenarios: scenarios})
+
+      [%Scenario{run_time_statistics: run_time_stats, memory_usage_statistics: memory_stats}] =
+        suite.scenarios
+
+      assert run_time_stats.sample_size == 5
+      assert memory_stats.sample_size == 5
     end
 
     defp stats_for(suite, job_name, input_name) do

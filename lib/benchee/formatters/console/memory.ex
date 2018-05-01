@@ -12,6 +12,7 @@ defmodule Benchee.Formatters.Console.Memory do
     Conversion,
     Conversion.Unit,
     Conversion.Count,
+    Conversion.Memory,
     Formatters.Console.Helpers
   }
 
@@ -114,7 +115,34 @@ defmodule Benchee.Formatters.Console.Memory do
     end)
   end
 
+  @na "N/A"
+
   @spec format_scenario(Scenario.t(), unit_per_statistic, integer, boolean) :: String.t()
+  defp format_scenario(scenario, units, label_width, hide_statistics)
+
+  defp format_scenario(
+         scenario = %Scenario{memory_usage_statistics: %{sample_size: 0}},
+         _,
+         label_width,
+         _) do
+
+    warning =  "WARNING the scenario \"#{scenario.name}\" has no memory measurements!" <>
+               " This is probably a bug please report it!\n" <>
+               "https://github.com/PragTob/benchee/issues/new"
+
+    data =
+      "~*ts~*ts\n"
+      |> :io_lib.format([
+        -label_width,
+        scenario.name,
+        @average_width,
+        @na
+      ])
+      |> to_string
+
+    warning <> "\n" <> data
+  end
+
   defp format_scenario(scenario, %{memory: memory_unit}, label_width, false) do
     %Scenario{
       name: name,
@@ -205,13 +233,18 @@ defmodule Benchee.Formatters.Console.Memory do
     end)
   end
 
-  defp calculate_slower_value(0, _), do: "N/A"
-  defp calculate_slower_value(_, 0), do: "N/A"
-  defp calculate_slower_value(job_median, reference_median), do: job_median / reference_median
+  defp calculate_slower_value(job_median, reference_median)
+        when job_median == 0 or is_nil(job_median) or reference_median == 0 or
+               is_nil(reference_median) do
+    @na
+  end
+  defp calculate_slower_value(job_median, reference_median) do
+    job_median / reference_median
+  end
 
-  defp format_comparison(scenario, %{memory: memory_unit}, label_width, "N/A") do
+  defp format_comparison(scenario, %{memory: memory_unit}, label_width, @na) do
     %Scenario{name: name, memory_usage_statistics: %Statistics{median: median}} = scenario
-    median_format = Helpers.duration_output(median, memory_unit)
+    median_format = memory_output(median, memory_unit)
 
     "~*s~*s\n"
     |> :io_lib.format([-label_width, name, @median_width, median_format])
@@ -225,6 +258,12 @@ defmodule Benchee.Formatters.Console.Memory do
     "~*s~*s - ~.2fx memory usage\n"
     |> :io_lib.format([-label_width, name, @median_width, median_format, slower])
     |> to_string
+  end
+
+  defp memory_output(nil, _unit), do: "N/A"
+
+  defp memory_output(memory, unit) do
+    Memory.format({Memory.scale(memory, unit), unit})
   end
 
   defp extended_statistics_report(_, _, _, %{extended_statistics: false}, _), do: []
