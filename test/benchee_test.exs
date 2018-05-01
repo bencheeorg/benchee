@@ -526,6 +526,35 @@ defmodule BencheeTest do
       refute output =~ ~r/ips/i # no runtime statistics displayed
       assert output =~ ~r/memory.+statistics/i
     end
+
+    test "the micro keyword list code from Michal does not break memory measurements #213" do
+      benches = %{
+        "delete old" => fn {kv, key} -> BenchKeyword.delete_v0(kv, key) end,
+        "delete reverse" => fn {kv, key} -> BenchKeyword.delete_v2(kv, key) end,
+        "delete keymember reverse" => fn {kv, key} -> BenchKeyword.delete_v3(kv, key) end,
+      }
+
+      inputs = %{
+        "large miss" => {Enum.map(1..100, &{:"k#{&1}", &1}), :k101},
+        "large hit" => {Enum.map(1..100, &{:"k#{&1}", &1}), :k100}
+      }
+
+      output = capture_io fn ->
+        Benchee.run(
+          benches,
+          inputs: inputs,
+          print: [fast_warning: false],
+          memory_time: 0.001,
+          warmup: 0,
+          time: 0
+        )
+      end
+
+      refute output =~ "N/A"
+      refute output =~ ~r/warning/i
+      assert output =~ "large hit"
+      assert output =~ "B" # yte
+    end
   end
 
   @slower_regex "\\s+- \\d+\\.\\d+x slower"
