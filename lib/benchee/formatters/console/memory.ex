@@ -144,7 +144,6 @@ defmodule Benchee.Formatters.Console.Memory do
   end
 
   defp format_scenario(scenario, %{memory: memory_unit}, label_width, false) do
-    # IO.inspect(scenario)
     %Scenario{
       name: name,
       memory_usage_statistics: %Statistics{

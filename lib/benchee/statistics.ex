@@ -261,9 +261,10 @@ defmodule Benchee.Statistics do
     :math.sqrt(variance)
   end
 
-  defp add_ips(statistics = %__MODULE{sample_size: 0}), do: statistics
+  defp add_ips(statistics = %__MODULE__{sample_size: 0}), do: statistics
+  defp add_ips(statistics = %__MODULE__{average: 0.0}), do: statistics
   defp add_ips(statistics) do
-    ips = iterations_per_second(statistics.average)
+    ips = Duration.microseconds({1, :second}) / statistics.average
     standard_dev_ips = ips * statistics.std_dev_ratio
 
     %__MODULE__{
@@ -271,11 +272,6 @@ defmodule Benchee.Statistics do
       ips: ips,
       std_dev_ips: standard_dev_ips
     }
-  end
-
-  defp iterations_per_second(0.0), do: 0.0
-  defp iterations_per_second(average_microseconds) do
-    Duration.microseconds({1, :second}) / average_microseconds
   end
 
   @doc """
