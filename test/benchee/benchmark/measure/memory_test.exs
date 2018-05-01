@@ -19,6 +19,14 @@ defmodule Benchee.MemoryMeasureTest do
       assert memory_used < 380
     end
 
+    test "doesn't return broken values" do
+      fun = fn -> BenchKeyword.delete_v0(Enum.map(1..100, &{:"k#{&1}", &1}), :k100) end
+      assert {memory_used, _} = Memory.measure(fun)
+
+      assert memory_used >= 5_000
+      assert memory_used <= 10_000
+    end
+
     test "will not leak processes if the applied function raises an exception" do
       starting_processes = Enum.count(Process.list())
 
