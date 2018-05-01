@@ -137,12 +137,32 @@ defmodule Benchee.Conversion.Scale do
       iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
       iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :largest).name
       :million
+
+      iex> list = []
+      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :best).name
+      :one
+
+      iex> list = [nil]
+      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :best).name
+      :one
+
+      iex> list = [nil, nil, nil, nil]
+      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :best).name
+      :one
+
+      iex> list = [nil, nil, nil, nil, 2_000]
+      iex> Benchee.Conversion.Scale.best_unit(list, Benchee.Conversion.Count, strategy: :best).name
+      :thousand
   """
-  def best_unit([], module, _) do
+  def best_unit(measurements, module, options) do
+    do_best_unit(Enum.reject(measurements, &is_nil/1), module, options)
+  end
+
+  defp do_best_unit([], module, _) do
     module.base_unit
   end
 
-  def best_unit(list, module, opts) do
+  defp do_best_unit(list, module, opts) do
     case Keyword.get(opts, :strategy, :best) do
       :best     -> best_unit(list, module)
       :largest  -> largest_unit(list, module)

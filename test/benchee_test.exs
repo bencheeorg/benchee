@@ -418,6 +418,20 @@ defmodule BencheeTest do
     refute output =~ "never execute me"
   end
 
+  test "does not blow up when only measuring memory times" do
+    output = capture_io fn ->
+      Benchee.run(
+        %{
+          "something" => fn -> Enum.map(1..100, fn i -> i + 1 end) end
+        },
+        time: 0, warmup: 0, memory_time: 0.001
+      )
+    end
+
+    refute output =~ ~r/ips/i # no runtime statistics displayed
+    assert output =~ ~r/memory.+statistics/i
+  end
+
   describe "save & load" do
     test "saving the suite to disk and restoring it" do
       save = [save: [path: "save.benchee", tag: "master"]]
