@@ -47,8 +47,11 @@ defmodule Benchee.Formatters.TaggedSave do
 
   defp get_maximum_tag_increaser(tags, desired_tag) do
     tags
+    |> Enum.uniq()
+    |> Kernel.--([desired_tag])
     |> Enum.map(fn tag -> String.replace(tag, desired_tag <> "-", "") end)
     |> Enum.map(&String.to_integer/1)
+    |> Kernel.++([0])
     |> Enum.max()
   end
 
