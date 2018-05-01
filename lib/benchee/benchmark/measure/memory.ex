@@ -40,12 +40,15 @@ defmodule Benchee.Benchmark.Measure.Memory do
 
   defp measure_memory(fun, tracer) do
     word_size = :erlang.system_info(:wordsize)
-    {:garbage_collection_info, info_before} = Process.info(self(), :garbage_collection_info)
+    {:garbage_collection_info, heap_before} = Process.info(self(), :garbage_collection_info)
     result = fun.()
-    {:garbage_collection_info, info_after} = Process.info(self(), :garbage_collection_info)
+    {:garbage_collection_info, heap_after} = Process.info(self(), :garbage_collection_info)
     mem_collected = get_collected_memory(tracer)
 
-    {(info_after[:heap_size] - info_before[:heap_size] + mem_collected) * word_size, result}
+    memory_used =
+      (total_memory(heap_after) - total_memory(heap_before) + mem_collected) * word_size
+
+    {memory_used, result}
   end
 
   @spec graceful_exit(Exception.kind(), any(), pid(), pid()) :: no_return
@@ -80,10 +83,10 @@ defmodule Benchee.Benchmark.Measure.Memory do
         send(reply_to, {ref, acc})
 
       {:trace, ^pid, :gc_minor_start, info} ->
-        listen_gc_end(pid, :gc_minor_end, acc, Keyword.fetch!(info, :heap_size))
+        listen_gc_end(pid, :gc_minor_end, acc, total_memory(info))
 
       {:trace, ^pid, :gc_major_start, info} ->
-        listen_gc_end(pid, :gc_major_end, acc, Keyword.fetch!(info, :heap_size))
+        listen_gc_end(pid, :gc_major_end, acc, total_memory(info))
 
       :done ->
         exit(:normal)
@@ -93,8 +96,15 @@ defmodule Benchee.Benchmark.Measure.Memory do
   defp listen_gc_end(pid, tag, acc, mem_before) do
     receive do
       {:trace, ^pid, ^tag, info} ->
-        mem_after = Keyword.fetch!(info, :heap_size)
+        mem_after = total_memory(info)
         tracer_loop(pid, acc + mem_before - mem_after)
     end
+  end
+
+  defp total_memory(info) do
+    # `:heap_size` seems to only contain the memory size of the youngest
+    # generation `:old_heap_size` has the old generation. There is also
+    # `:recent_size` but that seems to already be accounted for.
+    Keyword.fetch!(info, :heap_size) + Keyword.fetch!(info, :old_heap_size)
   end
 end
