@@ -1,52 +1,7 @@
+# Original code by Michal Muskala
+# https://gist.github.com/michalmuskala/5ff53581b4b53adec2fff7fb4d69fd52
 defmodule BenchKeyword do
   @compile :inline_list_funcs
-
-  # def pop_throw(keywords, key, default \\ nil) when is_list(keywords) do
-  #   do_pop(keywords, key, [])
-  # catch
-  #   :not_found -> {default, keywords}
-  # end
-
-  # defp do_pop([{key, value} | rest], key, acc),
-  #   do: {value, :lists.reverse(acc, delete(rest, key))}
-  # defp do_pop([{_, _} = pair | rest], key, acc),
-  #   do: do_pop(rest, key, [pair | acc])
-  # defp do_pop([], _key, _acc),
-  #   do: throw(:not_found)
-
-  # def pop_ret(keywords, key, default \\ nil) when is_list(keywords) do
-  #   do_pop(keywords, key, [], keywords, default)
-  # end
-
-  # defp do_pop([{key, value} | rest], key, acc, _keywords, _default),
-  #   do: {value, :lists.reverse(acc, delete(rest, key))}
-  # defp do_pop([{_, _} = pair | rest], key, acc, keywords, default),
-  #   do: do_pop(rest, key, [pair | acc], keywords, default)
-  # defp do_pop([], _key, _acc, keywords, default),
-  #   do: {default, keywords}
-
-  # def pop(keywords, key, default \\ nil) when is_list(keywords) do
-  #   case fetch(keywords, key) do
-  #     {:ok, value} ->
-  #       {value, delete(keywords, key)}
-  #     :error ->
-  #       {default, keywords}
-  #   end
-  # end
-
-  # def pop2(keywords, key, default \\ nil) when is_list(keywords) do
-  #   case :lists.keyfind(key, 1, keywords) do
-  #     {^key, value} -> {value, delete2(keywords, key)}
-  #     false -> {default, keywords}
-  #   end
-  # end
-
-  # def fetch(keywords, key) when is_list(keywords) and is_atom(key) do
-  #   case :lists.keyfind(key, 1, keywords) do
-  #     {^key, value} -> {:ok, value}
-  #     false -> :error
-  #   end
-  # end
 
   def delete_v0(keywords, key) when is_list(keywords) and is_atom(key) do
     :lists.filter(fn {k, _} -> k != key end, keywords)
@@ -123,13 +78,6 @@ defmodule BenchKeyword do
   end
 end
 
-# benches = %{
-#   "pop_throw" => fn {kv, key} -> BenchKeyword.pop_throw(kv, key) end,
-#   "pop_ret" => fn {kv, key} -> BenchKeyword.pop_ret(kv, key) end,
-#   "pop" => fn {kv, key} -> BenchKeyword.pop(kv, key) end,
-#   "pop2" => fn {kv, key} -> BenchKeyword.pop2(kv, key) end
-# }
-
 benches = %{
   "delete old" => fn {kv, key} -> BenchKeyword.delete_v0(kv, key) end,
   "delete throw" => fn {kv, key} -> BenchKeyword.delete_v1(kv, key) end,
@@ -147,4 +95,4 @@ inputs = %{
   "huge hit" => {Enum.map(1..10000, &{:"k#{&1}", &1}), :k10000}
 }
 
-Benchee.run(benches, inputs: inputs, print: [fast_warning: false], memory_time: 0.5, warmup: 0, time: 0)
+Benchee.run(benches, inputs: inputs, print: [fast_warning: false], memory_time: 0.001, warmup: 0, time: 0)
