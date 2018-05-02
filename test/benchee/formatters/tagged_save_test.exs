@@ -99,20 +99,26 @@ defmodule Benchee.Formatters.TaggedSaveTest do
     end
 
     test "when there's already a -2 and -3 tag we end up with -4" do
-      scenario_1 = %Scenario{job_name: "foo", tag: "#{@benchee_tag}-2"}
-      scenario_2 = %Scenario{job_name: "foo", tag: "#{@benchee_tag}-3"}
+      scenario_1 = %Scenario{job_name: "foo", tag: @benchee_tag}
+      scenario_2 = %Scenario{job_name: "foo", tag: "#{@benchee_tag}-2"}
+      scenario_3 = %Scenario{job_name: "foo", tag: "#{@benchee_tag}-3"}
       new_scenario = %Scenario{job_name: "foo"}
 
-      suite = %Suite{@suite | scenarios: [scenario_1, new_scenario, scenario_2]}
+      suite = %Suite{@suite | scenarios: [scenario_1, new_scenario, scenario_2, scenario_3]}
 
       scenarios = scenarios_from_formatted(suite)
       tags = sorted_tags(scenarios)
       names = sorted_names(scenarios)
 
-      assert tags == [@benchee_tag <> "-2", @benchee_tag <> "-3", @benchee_tag <> "-4"]
+      assert tags ==
+        [@benchee_tag, @benchee_tag <> "-2", @benchee_tag <> "-3", @benchee_tag <> "-4"]
 
-      assert names ==
-               ["foo (#{@benchee_tag}-2)", "foo (#{@benchee_tag}-3)", "foo (#{@benchee_tag}-4)"]
+      assert names == [
+        "foo (#{@benchee_tag})",
+        "foo (#{@benchee_tag}-2)",
+        "foo (#{@benchee_tag}-3)",
+        "foo (#{@benchee_tag}-4)"
+      ]
     end
 
     defp scenarios_from_formatted(suite) do

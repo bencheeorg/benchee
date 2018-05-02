@@ -37,20 +37,19 @@ defmodule Benchee.Formatters.TaggedSave do
   defp choose_tag([], desired_tag), do: desired_tag
 
   defp choose_tag(tags, desired_tag) do
-    if Enum.all?(tags, fn tag -> tag == desired_tag end) do
-      "#{desired_tag}-2"
-    else
-      max = get_maximum_tag_increaser(tags, desired_tag)
-      "#{desired_tag}-#{max + 1}"
-    end
+    max = get_maximum_tag_increaser(tags, desired_tag)
+    "#{desired_tag}-#{max + 1}"
   end
 
   defp get_maximum_tag_increaser(tags, desired_tag) do
     tags
-    |> Enum.map(fn tag -> String.replace(tag, desired_tag <> "-", "") end)
-    |> Enum.map(&String.to_integer/1)
+    |> Enum.map(fn tag -> String.replace(tag, ~r/#{Regex.escape(desired_tag)}-?/, "") end)
+    |> Enum.map(&tag_increaser/1)
     |> Enum.max()
   end
+
+  defp tag_increaser(""), do: 1
+  defp tag_increaser(string_number), do: String.to_integer(string_number)
 
   defp tag_scenarios(scenarios, tag) do
     Enum.map(scenarios, fn scenario ->
