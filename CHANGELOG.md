@@ -1,3 +1,13 @@
+## 0.13.1 (2018-05-02)
+
+Mostly fixing memory measurement bugs and related issues :) Enjoy a better memory measurement experience from now on!
+
+### Bugfixes (User Facing)
+* Memory measurements now correctly take the old generation on the heap into account. In reality that means sometimes bigger results and no missing measurements. See [#216](https://github.com/PragTob/benchee/pull/216) for details. Thanks to @michalmuskala for providing an interesting sample.
+* Formatters are now more robust (aka not crashing) when dealing with partially missing memory measurements. Although it shouldn't happen anymore with the item before fixed, benchee shouldn't crash on you so we want to be on the safe side.
+* It's now possible to run just memory measurements (i.e. `time: 0, warmup: 0, memory_time: 1`)
+* even when you already have scenarios tagged with `-2` etc. it still correctly produces `-3`, `-4` etc. when saving again with the same "base tage name"
+
 ## 0.13.0 (2018-04-14)
 
 Memory Measurements are finally here! Please report problems if you experience them.
