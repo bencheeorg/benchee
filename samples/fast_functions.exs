@@ -10,7 +10,7 @@ Benchee.run(%{
   "++ array concat"           => fn -> [1] ++ [1] end,
   "noop"                      => fn -> 0 end,
   "Enum.map(10)"              => fn -> Enum.map(range, fn(i) -> i end) end
-}, time: 1, warmup: 1)
+}, time: 1, warmup: 1, memory_time: 1)
 
 #
 # Before  adding running fast functions multiple times, these where just too

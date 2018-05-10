@@ -121,7 +121,7 @@ defmodule Benchee.StatistcsTest do
       assert stats.average == 394.0
       assert_in_delta stats.std_dev, 164.71, 0.01
       assert_in_delta stats.std_dev_ratio, 0.41, 0.01
-      assert_in_delta stats.ips, 2538, 1
+      assert_in_delta stats.ips, 2_538_071, 1
       assert stats.median == 430.0
       assert stats.minimum == 170
       assert stats.maximum == 600
@@ -133,7 +133,7 @@ defmodule Benchee.StatistcsTest do
       assert stats.average == 14.0
       assert_in_delta stats.std_dev, 5.76, 0.01
       assert_in_delta stats.std_dev_ratio, 0.41, 0.01
-      assert_in_delta stats.ips, 71_428, 1
+      assert_in_delta stats.ips, 71_428_571, 1
       assert stats.median == 14.0
       assert stats.minimum == 7
       assert stats.maximum == 23
