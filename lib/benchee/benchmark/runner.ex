@@ -172,7 +172,7 @@ defmodule Benchee.Benchmark.Runner do
     do_benchmark(scenario, new_context, Measure.Time, [initial_run_time])
   end
 
-  defp current_time, do: :erlang.system_time(:micro_seconds)
+  defp current_time, do: :erlang.system_time(:nano_seconds)
 
   # If a function executes way too fast measurements are too unreliable and
   # with too high variance. Therefore determine an n how often it should be

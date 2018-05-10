@@ -172,25 +172,25 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
-  Converts a value of the given unit into microseconds
+  Converts a value of the given unit into the desired unit, returning only the value not the unit.
 
   ## Examples
 
-      iex> Benchee.Conversion.Duration.microseconds({1.234, :second})
+      iex> Benchee.Conversion.Duration.convert_value({1.234, :second}, :microsecond)
       1_234_000.0
 
-      iex> Benchee.Conversion.Duration.microseconds({1.234, :minute})
+      iex> Benchee.Conversion.Duration.convert_value({1.234, :minute}, :microsecond)
       7.404e7
 
-      iex> microseconds = Benchee.Conversion.Duration.microseconds({1.234, :minute})
+      iex> microseconds = Benchee.Conversion.Duration.convert_value({1.234, :minute}, :microsecond)
       iex> {value, _} = Benchee.Conversion.Duration.convert({microseconds, :microsecond}, :minute)
       iex> value
       1.234
 
   """
-  def microseconds({duration, unit}) do
-    {microseconds, _} = convert({duration, unit}, :microsecond)
-    microseconds
+  def convert_value({duration, unit}, desired_unit) do
+    {value, _} = convert({duration, unit}, desired_unit)
+    value
   end
 
   @doc """

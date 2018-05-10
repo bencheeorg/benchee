@@ -8,8 +8,8 @@ defmodule Benchee.Benchmark.RunnerTest do
 
   @config %Configuration{
     parallel: 1,
-    time: 40_000,
-    warmup: 20_000,
+    time: 40_000_000,
+    warmup: 20_000_000,
     inputs: nil,
     pre_check: false,
     print: %{fast_warning: false, configuration: true}
@@ -44,7 +44,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     @tag :performance
     test "runs a benchmark suite and enriches it with measurements" do
       retrying(fn ->
-        suite = test_suite(%Suite{configuration: %{time: 60_000, warmup: 10_000}})
+        suite = test_suite(%Suite{configuration: %{time: 60_000_000, warmup: 10_000_000}})
 
         new_suite =
           suite
@@ -62,7 +62,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     @tag :performance
     test "runs a suite with multiple jobs and gathers results" do
       retrying(fn ->
-        suite = test_suite(%Suite{configuration: %{time: 100_000, warmup: 10_000}})
+        suite = test_suite(%Suite{configuration: %{time: 100_000_000, warmup: 10_000_000}})
 
         new_suite =
           suite
@@ -78,7 +78,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     end
 
     test "can run multiple benchmarks in parallel" do
-      suite = test_suite(%Suite{configuration: %{parallel: 4, time: 60_000}})
+      suite = test_suite(%Suite{configuration: %{parallel: 4, time: 60_000_000}})
 
       new_suite =
         suite
@@ -90,7 +90,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     end
 
     test "combines results for parallel benchmarks into a single scenario" do
-      suite = test_suite(%Suite{configuration: %{parallel: 4, time: 60_000}})
+      suite = test_suite(%Suite{configuration: %{parallel: 4, time: 60_000_000}})
 
       new_suite =
         suite
@@ -103,7 +103,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     @tag :memory_measure
     test "measures the memory usage of a scenario" do
       suite =
-        test_suite(%Suite{configuration: %{time: 60_000, warmup: 10_000, memory_time: 10_000}})
+        test_suite(%Suite{configuration: %{time: 60_000_000, warmup: 10_000, memory_time: 10_000}})
 
       new_suite =
         suite
@@ -120,7 +120,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     @tag :memory_measure
     test "records memory when the function only runs once" do
       suite =
-        test_suite(%Suite{configuration: %{time: 0.0, warmup: 0.0, memory_time: 1_000}})
+        test_suite(%Suite{configuration: %{time: 0.0, warmup: 0.0, memory_time: 1_000_000}})
 
       new_suite =
         suite
@@ -137,7 +137,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     @tag :memory_measure
     test "correctly scales down memory usage of very fast functions" do
       suite =
-        test_suite(%Suite{configuration: %{time: 1_000, warmup: 1, memory_time: 1_000}})
+        test_suite(%Suite{configuration: %{time: 0.0, warmup: 1, memory_time: 1_000_000}})
 
       new_suite =
         suite
@@ -176,16 +176,16 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> Benchmark.measure(TestPrinter)
         |> Benchee.statistics()
 
-      [%{run_time_statistics: %{average: average}}] = suite.scenarios
+      [%{run_time_statistics: %{median: median}}] = suite.scenarios
 
-      assert average < 200 # around ~78 on my machine
+      assert median < 200 # around ~78 on my machine
     end
 
     @tag :performance
     test "doesn't take longer than advertised for very fast funs" do
       retrying(fn ->
-        time = 20_000
-        warmup = 10_000
+        time = 20_000_000
+        warmup = 10_000_000
         projected = time + warmup
 
         suite =
@@ -193,7 +193,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           |> test_suite()
           |> Benchmark.benchmark("", fn -> :timer.sleep(1) end)
 
-        {time, _} = :timer.tc(fn -> Benchmark.measure(suite, TestPrinter) end)
+        {time, _} = Benchmark.Measure.Time.measure(fn -> Benchmark.measure(suite, TestPrinter) end)
 
         # if the system is too busy there are too many false positives
         leeway = projected * 0.4
@@ -271,7 +271,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           "Longer wait" => 19
         }
 
-        config = %{time: 100_000, warmup: 10_000, inputs: inputs}
+        config = %{time: 100_000_000, warmup: 10_000_000, inputs: inputs}
 
         new_suite =
           %Suite{configuration: config}
@@ -288,7 +288,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
     test "runs the job exactly once if its time exceeds given time" do
       new_suite =
-        %Suite{configuration: %{time: 100, warmup: 0.0}}
+        %Suite{configuration: %{time: 1, warmup: 0.0}}
         |> test_suite
         |> Benchmark.benchmark("Sleeps", fn -> :timer.sleep(2) end)
         |> Benchmark.measure(TestPrinter)
@@ -308,7 +308,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         end
 
         run_times =
-          %Suite{configuration: %{time: 70_000, warmup: 0.0}}
+          %Suite{configuration: %{time: 70_000_000, warmup: 0.0}}
           |> test_suite
           |> Benchmark.benchmark("Sleep more", increasing_function)
           |> Benchmark.measure(TestPrinter)
@@ -593,7 +593,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       suite = %Suite{
         configuration: %{
           warmup: 0.0,
-          time: 10_000,
+          time: 10_000_000,
           before_each: fn input ->
             send(me, :global_before)
             input
@@ -670,7 +670,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       suite = %Suite{
         configuration: %{
           warmup: 1,
-          time: 1_000,
+          time: 1_000_000,
           before_each: fn input ->
             send(me, :global_before)
             input

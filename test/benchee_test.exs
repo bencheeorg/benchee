@@ -565,6 +565,9 @@ defmodule BencheeTest do
 
   @slower_regex "\\s+- \\d+\\.\\d+x slower"
   defp readme_sample_asserts(output, tag_string \\ "") do
+    assert output =~ "warmup: 5 ms"
+    assert output =~ "time: 10 ms"
+
     tag_regex = Regex.escape(tag_string)
     assert output =~ @header_regex
     assert output =~ body_regex("flat_map", tag_regex)

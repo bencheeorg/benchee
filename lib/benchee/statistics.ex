@@ -119,10 +119,10 @@ defmodule Benchee.Statistics do
             input: "Input",
             run_time_statistics: %Benchee.Statistics{
               average:       500.0,
-              ips:           2000.0,
+              ips:           2000_000.0,
               std_dev:       200.0,
               std_dev_ratio: 0.4,
-              std_dev_ips:   800.0,
+              std_dev_ips:   800_000.0,
               median:        500.0,
               percentiles:   %{50 => 500.0, 99 => 900.0},
               mode:          [500, 400],
@@ -264,7 +264,7 @@ defmodule Benchee.Statistics do
   defp add_ips(statistics = %__MODULE__{sample_size: 0}), do: statistics
   defp add_ips(statistics = %__MODULE__{average: 0.0}), do: statistics
   defp add_ips(statistics) do
-    ips = Duration.microseconds({1, :second}) / statistics.average
+    ips = Duration.convert_value({1, :second}, :nanosecond) / statistics.average
     standard_dev_ips = ips * statistics.std_dev_ratio
 
     %__MODULE__{
@@ -303,10 +303,10 @@ defmodule Benchee.Statistics do
         input: "Input",
         run_time_statistics: %Benchee.Statistics{
           average:       500.0,
-          ips:           2000.0,
+          ips:           2_000_000.0,
           std_dev:       200.0,
           std_dev_ratio: 0.4,
-          std_dev_ips:   800.0,
+          std_dev_ips:   800_000.0,
           median:        500.0,
           percentiles:   %{25 => 400.0, 50 => 500.0, 75 => 600.0, 99 => 900.0},
           mode:          [500, 400],

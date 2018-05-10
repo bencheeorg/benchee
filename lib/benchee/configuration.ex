@@ -150,8 +150,8 @@ defmodule Benchee.Configuration do
         configuration:
           %Benchee.Configuration{
             parallel: 1,
-            time: 5_000_000.0,
-            warmup: 2_000_000.0,
+            time: 5_000_000_000.0,
+            warmup: 2_000_000_000.0,
             inputs: nil,
             save: false,
             load: false,
@@ -180,8 +180,8 @@ defmodule Benchee.Configuration do
         configuration:
           %Benchee.Configuration{
             parallel: 1,
-            time: 1_000_000.0,
-            warmup: 200_000.0,
+            time: 1_000_000_000.0,
+            warmup: 200_000_000.0,
             inputs: nil,
             save: false,
             load: false,
@@ -210,8 +210,8 @@ defmodule Benchee.Configuration do
         configuration:
           %Benchee.Configuration{
             parallel: 1,
-            time: 1_000_000.0,
-            warmup: 200_000.0,
+            time: 1_000_000_000.0,
+            warmup: 200_000_000.0,
             inputs: nil,
             save: false,
             load: false,
@@ -249,8 +249,8 @@ defmodule Benchee.Configuration do
         configuration:
           %Benchee.Configuration{
             parallel: 2,
-            time: 1_000_000.0,
-            warmup: 200_000.0,
+            time: 1_000_000_000.0,
+            warmup: 200_000_000.0,
             inputs: %{"Small" => 5, "Big" => 9999},
             save: false,
             load: false,
@@ -324,7 +324,7 @@ defmodule Benchee.Configuration do
     Enum.reduce(@time_keys, config, fn key, new_config ->
       {_, new_config} =
         Map.get_and_update!(new_config, key, fn seconds ->
-          {seconds, Duration.microseconds({seconds, :second})}
+          {seconds, Duration.convert_value({seconds, :second}, :nanosecond)}
         end)
 
       new_config
