@@ -49,12 +49,12 @@ defmodule Benchee.Formatters.Console.RunTime do
   iex> configuration = %{comparison: false, unit_scaling: :best, extended_statistics: true}
   iex> Benchee.Formatters.Console.RunTime.format_scenarios(scenarios, configuration)
   ["\nName             ips        average  deviation         median         99th %\n",
-  "My Job           5 K         200 μs    ±10.00%         190 μs      300.10 μs\n",
-  "Job 2         2.50 K         400 μs    ±20.00%         390 μs      500.10 μs\n",
+  "My Job           5 K         200 ns    ±10.00%         190 ns      300.10 ns\n",
+  "Job 2         2.50 K         400 ns    ±20.00%         390 ns      500.10 ns\n",
   "\nExtended statistics: \n",
   "\nName           minimum        maximum    sample size                     mode\n",
-  "My Job       100.10 μs      200.20 μs        10.10 K                333.20 μs\n",
-  "Job 2        200.20 μs      400.40 μs        20.20 K     612.30 μs, 554.10 μs\n"]
+  "My Job       100.10 ns      200.20 ns        10.10 K                333.20 ns\n",
+  "Job 2        200.20 ns      400.40 ns        20.20 K     612.30 ns, 554.10 ns\n"]
 
   ```
 

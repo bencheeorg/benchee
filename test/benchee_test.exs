@@ -118,6 +118,7 @@ defmodule BencheeTest do
     readme_sample_asserts(output)
   end
 
+  @tag :needs_fast_function_repetition
   test "integration super fast function print warnings" do
     output = capture_io fn ->
       Benchee.run(%{"Constant" => fn -> 0 end}, time: 0.001, warmup: 0)
@@ -128,6 +129,7 @@ defmodule BencheeTest do
     assert output =~ ~r/^Constant\s+\d+.+\s+[0-2]\.\d+ μs/m
   end
 
+  @tag :needs_fast_function_repetition
   test "integration super fast function warning is printed once per job" do
     output = capture_io fn ->
       Benchee.run(%{"Fast" => fn -> 0 end}, time: 0.001, warmup: 0.001)
@@ -322,8 +324,12 @@ defmodule BencheeTest do
     end
 
     assert output =~ @header_regex
-    assert output =~ ~r/fast/
-    assert output =~ ~r/unreliable/
+
+    # fast fnction warnings only appear on Windows because of none nanosecond precision
+    if windows?() do
+      assert output =~ ~r/fast/
+      assert output =~ ~r/unreliable/
+    end
 
     assert String.contains? output, ["number_one", "symbol_one"]
     occurences = Regex.scan body_regex("identity"), output

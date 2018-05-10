@@ -42,11 +42,11 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       assert output =~ "macOS"
       assert output =~ "8568392814"
       assert output =~ ~r/following configuration/i
-      assert output =~ "warmup: 0 μs"
-      assert output =~ "time: 10 ms"
-      assert output =~ "memory time: 0 μs"
+      assert output =~ "warmup: 0 ns"
+      assert output =~ "time: 10 μs"
+      assert output =~ "memory time: 0 ns"
       assert output =~ "parallel: 2"
-      assert output =~ "Estimated total run time: 20 ms"
+      assert output =~ "Estimated total run time: 20 μs"
     end
 
     test "it scales times appropriately" do
@@ -54,9 +54,9 @@ defmodule Benchee.Output.BenchmarkPrintertest do
         %{
           configuration: %Configuration{
             parallel: 1,
-            time: 60_000_000,
-            warmup: 10_000_000,
-            memory_time: 5_000_000,
+            time: 60_000_000_000,
+            warmup: 10_000_000_000,
+            memory_time: 5_000_000_000,
             inputs: nil
           },
           scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
@@ -94,11 +94,11 @@ defmodule Benchee.Output.BenchmarkPrintertest do
         |> configuration_information
       end
 
-      assert output =~ "time: 10 ms"
-      assert output =~ "memory time: 1 ms"
+      assert output =~ "time: 10 μs"
+      assert output =~ "memory time: 1 μs"
       assert output =~ "parallel: 2"
       assert output =~ "inputs: Arg 1, Arg 2"
-      assert output =~ "Estimated total run time: 44 ms"
+      assert output =~ "Estimated total run time: 44 μs"
     end
 
     test "does not print if disabled" do
@@ -140,7 +140,9 @@ defmodule Benchee.Output.BenchmarkPrintertest do
 
     test "doesn't print if all times are set to 0" do
       output = capture_io fn ->
-        benchmarking "Never", "don't care", %Configuration{time: 0, warmup: 0, memory_time: 0}
+        benchmarking "Never",
+                     "don't care",
+                     %Configuration{time: 0.0, warmup: 0.0, memory_time: 0.0}
       end
 
       assert output == ""

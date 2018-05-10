@@ -116,7 +116,7 @@ defmodule Benchee.Benchmark.Runner do
     measure_runtimes(scenario, scenario_context, run_time, fast_warning)
   end
 
-  defp run_memory_benchmark(_, %ScenarioContext{config: %{memory_time: 0}}) do
+  defp run_memory_benchmark(_, %ScenarioContext{config: %{memory_time: 0.0}}) do
     []
   end
   defp run_memory_benchmark(
@@ -153,7 +153,7 @@ defmodule Benchee.Benchmark.Runner do
   end
 
   defp measure_runtimes(scenario, context, run_time, fast_warning)
-  defp measure_runtimes(_, _, 0, _), do: []
+  defp measure_runtimes(_, _, 0.0, _), do: []
 
   defp measure_runtimes(scenario, scenario_context, run_time, fast_warning) do
     end_time = current_time() + run_time

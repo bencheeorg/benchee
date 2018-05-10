@@ -72,8 +72,8 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       [_header1, _result1, _header2, _header3, result2] =
         RunTime.format_scenarios(scenarios, @console_config_extended_params)
 
-      assert result2 =~ ~r/201.20 μs/
-      assert result2 =~ ~r/205.55 μs/
+      assert result2 =~ ~r/201.20 ns/
+      assert result2 =~ ~r/205.55 ns/
     end
 
     test "displays N/A when no mode exists" do
@@ -318,9 +318,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       ]
 
       assert [_, result] = RunTime.format_scenarios(scenarios, @console_config)
-      assert Regex.match?(~r/0.150\s?μs/, result)
-      assert Regex.match?(~r/0.0125\s?μs/, result)
-      assert Regex.match?(~r/0.0234\s?μs/, result)
+      assert Regex.match?(~r/0.150\s?ns/, result)
+      assert Regex.match?(~r/0.0125\s?ns/, result)
+      assert Regex.match?(~r/0.0234\s?ns/, result)
     end
 
     test "doesn't output weird 'e' formats" do
@@ -328,11 +328,11 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
         %Scenario{
           name: "Job",
           run_time_statistics: %Statistics{
-            average: 11_000.0,
+            average: 11_000_000.0,
             ips: 12_000.0,
             std_dev_ratio: 13_000.0,
-            median: 140_000.0,
-            percentiles: %{99 => 200_000.1},
+            median: 140_000_000.0,
+            percentiles: %{99 => 200_000_000.1},
             sample_size: 200
           },
           memory_usage_statistics: %Statistics{}

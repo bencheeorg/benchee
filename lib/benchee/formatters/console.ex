@@ -54,8 +54,8 @@ defmodule Benchee.Formatters.Console do
   ...> }
   iex> Benchee.Formatters.Console.format(suite)
   [["\n##### With input My input #####", "\nName             ips        average  deviation         median         99th %\n",
-  "My Job           5 K         200 μs    ±10.00%         190 μs      300.10 μs\n",
-  "Job 2         2.50 K         400 μs    ±20.00%         390 μs      500.10 μs\n"]]
+  "My Job           5 K         200 ns    ±10.00%         190 ns      300.10 ns\n",
+  "Job 2         2.50 K         400 ns    ±20.00%         390 ns      500.10 ns\n"]]
 
   ```
 
