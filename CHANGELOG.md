@@ -1,3 +1,14 @@
+## 0.14.0 (unreleased)
+
+### Breaking Changes (User Facing)
+* dropped support for Erlang 18.x
+
+### Features (User Facing)
+* benchee now uses the maximum precision available to measure which on Linux and OSX is nanoseonds instead of microseconds. Somewhat surprisingly `:timer.tc/1` always cut down to microseconds although better precision is available.
+
+### Breaking Changes (Plugins)
+* all reported times are now in nanoseconds instead of microseconds
+
 ## 0.13.1 (2018-05-02)
 
 Mostly fixing memory measurement bugs and related issues :) Enjoy a better memory measurement experience from now on!
