@@ -126,7 +126,7 @@ defmodule BencheeTest do
 
     assert output =~ ~r/fast/
     assert output =~ ~r/unreliable/
-    assert output =~ ~r/^Constant\s+\d+.+\s+[0-2]\.\d+ μs/m
+    assert output =~ ~r/^Constant\s+\d+.+\s+[0-2]\.\d+ ns/m
   end
 
   @tag :needs_fast_function_repetition
