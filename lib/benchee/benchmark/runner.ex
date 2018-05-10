@@ -187,7 +187,7 @@ defmodule Benchee.Benchmark.Runner do
          },
          fast_warning
        ) do
-    run_time = measure_iteration(scenario, scenario_context, Measure.Time)
+    run_time = measure_iteration(scenario, scenario_context, Measure.NativeTime)
 
     if run_time >= @minimum_execution_time do
       {num_iterations, adjust_for_iterations(run_time, num_iterations)}

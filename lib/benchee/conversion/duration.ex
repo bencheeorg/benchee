@@ -8,50 +8,59 @@ defmodule Benchee.Conversion.Duration do
   @behaviour Scale
   @behaviour Format
 
+  @nanoseconds_per_microsecond 1000
   @microseconds_per_millisecond 1000
   @milliseconds_per_second 1000
   @seconds_per_minute 60
   @minutes_per_hour 60
-  @microseconds_per_second @microseconds_per_millisecond *
+
+  @nanoseconds_per_millisecond @nanoseconds_per_microsecond * @microseconds_per_millisecond
+  @nanoseconds_per_second @nanoseconds_per_millisecond *
     @milliseconds_per_second
-  @microseconds_per_minute @microseconds_per_second * @seconds_per_minute
-  @microseconds_per_hour @microseconds_per_minute * @minutes_per_hour
+  @nanoseconds_per_minute @nanoseconds_per_second * @seconds_per_minute
+  @nanoseconds_per_hour @nanoseconds_per_minute * @minutes_per_hour
 
   @units %{
     hour:        %Unit{
                     name:      :hour,
-                    magnitude: @microseconds_per_hour,
+                    magnitude: @nanoseconds_per_hour,
                     label:     "h",
                     long:      "Hours"
                  },
     minute:      %Unit{
                     name:      :minute,
-                    magnitude: @microseconds_per_minute,
+                    magnitude: @nanoseconds_per_minute,
                     label:     "min",
                     long:      "Minutes"
                  },
     second:      %Unit{
                     name:      :second,
-                    magnitude: @microseconds_per_second,
+                    magnitude: @nanoseconds_per_second,
                     label:     "s",
                     long:      "Seconds"
                  },
     millisecond: %Unit{
                     name:      :millisecond,
-                    magnitude: @microseconds_per_millisecond,
+                    magnitude: @nanoseconds_per_millisecond,
                     label:     "ms",
                     long:      "Milliseconds"
                  },
     microsecond: %Unit{
                     name:      :microsecond,
-                    magnitude: 1,
+                    magnitude: @nanoseconds_per_microsecond,
                     label:     "μs",
                     long:      "Microseconds"
+                 },
+    nanosecond:  %Unit{
+                   name:      :nanosecond,
+                   magnitude: 1,
+                   label:     "ns",
+                   long:      "Nanoseconds"
                  }
   }
 
   @doc """
-  Scales a duration value in microseconds into a larger unit if appropriate
+  Scales a duration value in nanoseconds into a larger unit if appropriate
 
   ## Examples
 
@@ -59,34 +68,37 @@ defmodule Benchee.Conversion.Duration do
       iex> value
       1.0
       iex> unit.name
-      :microsecond
+      :nanosecond
 
       iex> {value, unit} = Benchee.Conversion.Duration.scale(1_234)
       iex> value
       1.234
       iex> unit.name
-      :millisecond
+      :microsecond
 
-      iex> {value, unit} = Benchee.Conversion.Duration.scale(11_234_567_890.123)
+      iex> {value, unit} = Benchee.Conversion.Duration.scale(11_234_567_890_123)
       iex> value
       3.1207133028119443
       iex> unit.name
       :hour
   """
-  def scale(duration) when duration >= @microseconds_per_hour do
+  def scale(duration) when duration >= @nanoseconds_per_hour do
     scale_with_unit duration, :hour
   end
-  def scale(duration) when duration >= @microseconds_per_minute do
+  def scale(duration) when duration >= @nanoseconds_per_minute do
     scale_with_unit duration, :minute
   end
-  def scale(duration) when duration >= @microseconds_per_second do
+  def scale(duration) when duration >= @nanoseconds_per_second do
     scale_with_unit duration, :second
   end
-  def scale(duration) when duration >= @microseconds_per_millisecond do
+  def scale(duration) when duration >= @nanoseconds_per_millisecond do
     scale_with_unit duration, :millisecond
   end
-  def scale(duration) do
+  def scale(duration) when duration >= @nanoseconds_per_microsecond do
     scale_with_unit duration, :microsecond
+  end
+  def scale(duration) do
+    scale_with_unit duration, :nanosecond
   end
 
   # Helper function for returning a tuple of {value, unit}
@@ -103,20 +115,20 @@ defmodule Benchee.Conversion.Duration do
       iex> Benchee.Conversion.Duration.unit_for :hour
       %Benchee.Conversion.Unit{
         name:      :hour,
-        magnitude: 3_600_000_000,
+        magnitude: 3_600_000_000_000,
         label:     "h",
         long:      "Hours"
       }
 
       iex> Benchee.Conversion.Duration.unit_for(%Benchee.Conversion.Unit{
       ...>   name:      :hour,
-      ...>   magnitude: 3_600_000_000,
+      ...>   magnitude: 3_600_000_000_000,
       ...>   label:     "h",
       ...>   long:      "Hours"
       ...>})
       %Benchee.Conversion.Unit{
         name:      :hour,
-        magnitude: 3_600_000_000,
+        magnitude: 3_600_000_000_000,
         label:     "h",
         long:      "Hours"
       }
@@ -126,18 +138,18 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
-  Scales a duration value in microseconds into a value in the specified unit
+  Scales a duration value in nanoseconds into a value in the specified unit
 
   ## Examples
 
-      iex> Benchee.Conversion.Duration.scale(12345, :microsecond)
+      iex> Benchee.Conversion.Duration.scale(12345, :nanosecond)
       12345.0
 
-      iex> Benchee.Conversion.Duration.scale(12345, :millisecond)
+      iex> Benchee.Conversion.Duration.scale(12345, :microsecond)
       12.345
 
       iex> Benchee.Conversion.Duration.scale(12345, :minute)
-      2.0575e-4
+      2.0575e-7
 
   """
   def scale(count, unit) do
@@ -170,15 +182,15 @@ defmodule Benchee.Conversion.Duration do
       iex> Benchee.Conversion.Duration.microseconds({1.234, :minute})
       7.404e7
 
-      iex> Benchee.Conversion.Duration.microseconds({1.234, :minute}) |> Benchee.Conversion.Duration.scale(:minute)
+      iex> microseconds = Benchee.Conversion.Duration.microseconds({1.234, :minute})
+      iex> {value, _} = Benchee.Conversion.Duration.convert({microseconds, :microsecond}, :minute)
+      iex> value
       1.234
 
   """
-  def microseconds({duration, %Unit{magnitude: magnitude}}) do
-    duration * magnitude
-  end
-  def microseconds({duration, unit_atom}) do
-    microseconds {duration, unit_for(unit_atom)}
+  def microseconds({duration, unit}) do
+    {microseconds, _} = convert({duration, unit}, :microsecond)
+    microseconds
   end
 
   @doc """
@@ -191,15 +203,15 @@ defmodule Benchee.Conversion.Duration do
   ## Examples
 
       iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000]).name
-      :millisecond
+      :microsecond
 
-      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000, 3_450_000]).name
+      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000_000, 2_340_000_000, 3_450_000_000]).name
       :second
 
       iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000], strategy: :smallest).name
-      :microsecond
+      :nanosecond
 
-      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000], strategy: :largest).name
+      iex> Benchee.Conversion.Duration.best([23, 23_000, 34_000, 2_340_000_000], strategy: :largest).name
       :second
   """
   def best(list, opts \\ [strategy: :best])
@@ -208,15 +220,15 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
-  The most basic unit in which measurements occur, microseconds.
+  The most basic unit in which measurements occur.
 
   ## Examples
 
       iex> Benchee.Conversion.Duration.base_unit.name
-      :microsecond
+      :nanosecond
 
   """
-  def base_unit, do: unit_for(:microsecond)
+  def base_unit, do: unit_for(:nanosecond)
 
   @doc """
   Formats a number as a string, with a unit label. To specify the unit, pass
@@ -225,10 +237,10 @@ defmodule Benchee.Conversion.Duration do
   ## Examples
 
       iex> Benchee.Conversion.Duration.format(45_678.9)
-      "45.68 ms"
+      "45.68 μs"
 
       iex> Benchee.Conversion.Duration.format(45.6789)
-      "45.68 μs"
+      "45.68 ns"
 
       iex> Benchee.Conversion.Duration.format({45.6789, :millisecond})
       "45.68 ms"
