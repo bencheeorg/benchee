@@ -63,9 +63,7 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     end
 
     defp output_results(suite = %{configuration: %{formatters: formatters}}) do
-      # Can be replaced with `split_with` once we deprecate elixir 1.3
-      {parallelizable, serial} =
-        Enum.split_with(formatters, &is_formatter_module?/1)
+      {parallelizable, serial} = Enum.split_with(formatters, &is_formatter_module?/1)
 
       # why do we ignore this suite? It shouldn't be changed anyway.
       _suite = Formatter.parallel_output(suite, parallelizable)
