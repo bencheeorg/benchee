@@ -18,7 +18,7 @@ defmodule Benchee.Conversion do
 
   ## Examples
 
-      iex> statistics = %Benchee.Statistics{average: 1000.0, ips: 1000.0}
+      iex> statistics = %Benchee.Statistics{average: 1_000_000.0, ips: 1000.0}
       iex> scenario = %Benchee.Benchmark.Scenario{
       ...>   run_time_statistics: statistics,
       ...>   memory_usage_statistics: statistics
@@ -34,14 +34,14 @@ defmodule Benchee.Conversion do
         run_time: %Benchee.Conversion.Unit{
                     label: "ms",
                     long: "Milliseconds",
-                    magnitude: 1000,
+                    magnitude: 1_000_000,
                     name: :millisecond
                   },
         memory:   %Benchee.Conversion.Unit{
-                    label: "B",
-                    long: "Bytes",
-                    magnitude: 1,
-                    name: :byte
+                    label: "KB",
+                    long: "Kilobytes",
+                    magnitude: 1024,
+                    name: :kilobyte
                   }
       }
   """

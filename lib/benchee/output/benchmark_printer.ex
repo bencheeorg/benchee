@@ -80,7 +80,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
   Prints a notice which job is currently being benchmarked.
   """
   def benchmarking(_, _, %{print: %{benchmarking: false}}), do: nil
-  def benchmarking(_, _, %{time: 0, warmup: 0, memory_time: 0}), do: nil
+  def benchmarking(_, _, %{time: 0.0, warmup: 0.0, memory_time: 0.0}), do: nil
 
   def benchmarking(name, input_name, _config) do
     IO.puts("Benchmarking #{name}#{input_information(input_name)}...")

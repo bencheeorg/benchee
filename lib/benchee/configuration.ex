@@ -15,7 +15,7 @@ defmodule Benchee.Configuration do
   defstruct parallel: 1,
             time: 5,
             warmup: 2,
-            memory_time: 0,
+            memory_time: 0.0,
             pre_check: false,
             formatters: [Console],
             print: %{
@@ -150,8 +150,8 @@ defmodule Benchee.Configuration do
         configuration:
           %Benchee.Configuration{
             parallel: 1,
-            time: 5_000_000,
-            warmup: 2_000_000,
+            time: 5_000_000.0,
+            warmup: 2_000_000.0,
             inputs: nil,
             save: false,
             load: false,
@@ -180,7 +180,7 @@ defmodule Benchee.Configuration do
         configuration:
           %Benchee.Configuration{
             parallel: 1,
-            time: 1_000_000,
+            time: 1_000_000.0,
             warmup: 200_000.0,
             inputs: nil,
             save: false,
@@ -210,7 +210,7 @@ defmodule Benchee.Configuration do
         configuration:
           %Benchee.Configuration{
             parallel: 1,
-            time: 1_000_000,
+            time: 1_000_000.0,
             warmup: 200_000.0,
             inputs: nil,
             save: false,
@@ -249,7 +249,7 @@ defmodule Benchee.Configuration do
         configuration:
           %Benchee.Configuration{
             parallel: 2,
-            time: 1_000_000,
+            time: 1_000_000.0,
             warmup: 200_000.0,
             inputs: %{"Small" => 5, "Big" => 9999},
             save: false,

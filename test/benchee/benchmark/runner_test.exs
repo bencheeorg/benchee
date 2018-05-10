@@ -2,7 +2,7 @@ defmodule Benchee.Benchmark.RunnerTest do
   use ExUnit.Case, async: true
   import Benchee.TestHelpers
   import ExUnit.CaptureIO
-  alias Benchee.{Suite, Benchmark, Configuration, Statistics}
+  alias Benchee.{Suite, Benchmark, Configuration}
   alias Benchee.Benchmark.Scenario
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
 
@@ -120,7 +120,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     @tag :memory_measure
     test "records memory when the function only runs once" do
       suite =
-        test_suite(%Suite{configuration: %{time: 0, warmup: 0, memory_time: 1_000}})
+        test_suite(%Suite{configuration: %{time: 0.0, warmup: 0.0, memory_time: 1_000}})
 
       new_suite =
         suite
@@ -152,6 +152,8 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert memory_consumption <= 1_000
     end
 
+    # not fast enough to get fast warnings on nano second accuracy
+    @tag :needs_fast_function_repetition
     test "very fast functions print a warning" do
       output =
         capture_io(fn ->
@@ -176,8 +178,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       [%{run_time_statistics: %{average: average}}] = suite.scenarios
 
-      # They are repeated but times are scaled down for the repetition again
-      assert average < 10
+      assert average < 200 # around ~78 on my machine
     end
 
     @tag :performance
@@ -204,32 +205,10 @@ defmodule Benchee.Benchmark.RunnerTest do
       end)
     end
 
-    test "variance does not skyrocket on very fast functions" do
-      retrying(fn ->
-        range = 0..10
-
-        suite =
-          %Suite{configuration: %{time: 150_000, warmup: 20_000}}
-          |> test_suite
-          |> Benchmark.benchmark("noop", fn -> 1 + 1 end)
-          |> Benchmark.benchmark("map", fn ->
-            Enum.map(range, fn i -> i end)
-          end)
-          |> Benchmark.measure(TestPrinter)
-          |> Statistics.statistics()
-
-        stats = Enum.map(suite.scenarios, fn scenario -> scenario.run_time_statistics end)
-
-        Enum.each(stats, fn %Statistics{std_dev_ratio: std_dev_ratio} ->
-          assert std_dev_ratio <= 2.5
-        end)
-      end)
-    end
-
     test "never calls the function if warmup and time are 0" do
       ref = self()
 
-      %Suite{configuration: %{time: 0, warmup: 0}}
+      %Suite{configuration: %{time: 0.0, warmup: 0.0}}
       |> test_suite
       |> Benchmark.benchmark("", fn -> send(ref, :called) end)
       |> Benchmark.measure(TestPrinter)
@@ -239,7 +218,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
     test "run times of the scenarios are empty when nothing runs" do
       %{scenarios: [scenario]} =
-        %Suite{configuration: %{time: 0, warmup: 0}}
+        %Suite{configuration: %{time: 0.0, warmup: 0.0}}
         |> test_suite
         |> Benchmark.benchmark("don't care", fn -> 0 end)
         |> Benchmark.measure(TestPrinter)
@@ -309,7 +288,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
     test "runs the job exactly once if its time exceeds given time" do
       new_suite =
-        %Suite{configuration: %{time: 100, warmup: 0}}
+        %Suite{configuration: %{time: 100, warmup: 0.0}}
         |> test_suite
         |> Benchmark.benchmark("Sleeps", fn -> :timer.sleep(2) end)
         |> Benchmark.measure(TestPrinter)
@@ -329,7 +308,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         end
 
         run_times =
-          %Suite{configuration: %{time: 70_000, warmup: 0}}
+          %Suite{configuration: %{time: 70_000, warmup: 0.0}}
           |> test_suite
           |> Benchmark.benchmark("Sleep more", increasing_function)
           |> Benchmark.measure(TestPrinter)
@@ -372,7 +351,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       %Suite{
         configuration: %{
-          warmup: 0,
+          warmup: 0.0,
           time: 100,
           before_each: fn input ->
             send(me, :before)
@@ -393,7 +372,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       %Suite{
         configuration: %{
-          warmup: 0,
+          warmup: 0.0,
           time: 100
         }
       }
@@ -458,7 +437,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       %Suite{
         configuration: %{
-          warmup: 0,
+          warmup: 0.0,
           time: 100,
           before_each: fn input ->
             send(me, :global_before)
@@ -515,7 +494,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       %Suite{
         configuration: %{
-          warmup: 0,
+          warmup: 0.0,
           time: 100,
           before_each: fn input ->
             send(me, :global_before)
@@ -558,7 +537,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       %Suite{
         configuration: %{
-          warmup: 0,
+          warmup: 0.0,
           time: 100,
           before_each: fn input ->
             send(me, :global_before)
@@ -613,7 +592,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       suite = %Suite{
         configuration: %{
-          warmup: 0,
+          warmup: 0.0,
           time: 10_000,
           before_each: fn input ->
             send(me, :global_before)
@@ -684,6 +663,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert sample_size == hook_call_count
     end
 
+    @tag :needs_fast_function_repetition
     test "hooks also trigger for very fast invocations" do
       me = self()
 
@@ -896,7 +876,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       inputs = %{"small" => 1, "big" => 100}
 
-      config = %{time: 0, warmup: 0, inputs: inputs, pre_check: true}
+      config = %{time: 0.0, warmup: 0.0, inputs: inputs, pre_check: true}
 
       %Suite{configuration: config}
       |> test_suite
