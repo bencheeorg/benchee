@@ -31,9 +31,10 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
            num_iterations: num_iterations,
            printer: printer
          },
-         fast_warning
+         fast_warning,
+         measurer \\ Measure.NativeTime
        ) do
-    run_time = measure_iteration(scenario, scenario_context, Measure.NativeTime)
+    run_time = measure_iteration(scenario, scenario_context, measurer)
 
     if run_time >= @minimum_execution_time do
       {num_iterations, adjust_for_iterations(run_time, num_iterations)}
@@ -45,7 +46,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
         | num_iterations: num_iterations * @times_multiplier
       }
 
-      determine_n_times(scenario, new_context, false)
+      determine_n_times(scenario, new_context, false, measurer)
     end
   end
 
