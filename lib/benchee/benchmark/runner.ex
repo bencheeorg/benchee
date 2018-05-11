@@ -212,6 +212,6 @@ defmodule Benchee.Benchmark.Runner do
   end
 
   @no_input Benchmark.no_input()
-  defp main_function(function, @no_input), do: function
-  defp main_function(function, input), do: fn -> function.(input) end
+  def main_function(function, @no_input), do: function
+  def main_function(function, input), do: fn -> function.(input) end
 end
