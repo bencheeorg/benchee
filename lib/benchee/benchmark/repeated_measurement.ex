@@ -116,7 +116,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
          }
        )
        when iterations > 1 do
-    main = main_function(function, input)
+    main = Runner.main_function(function, input)
     # with no before/after each we can safely omit them and don't get the hit
     # on run time measurements (See PR discussions for this for more info #127)
     fn -> RepeatN.repeat_n(main, iterations) end
@@ -131,7 +131,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
       RepeatN.repeat_n(
         fn ->
           new_input = Hooks.run_before_each(scenario, scenario_context)
-          main = main_function(function, new_input)
+          main = Runner.main_function(function, new_input)
           return_value = main.()
           Hooks.run_after_each(return_value, scenario, scenario_context)
         end,
@@ -139,9 +139,4 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
       )
     end
   end
-
-  # TODO: temporarily duplicated
-  @no_input Benchee.Benchmark.no_input()
-  defp main_function(function, @no_input), do: function
-  defp main_function(function, input), do: fn -> function.(input) end
 end
