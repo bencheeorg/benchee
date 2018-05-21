@@ -1,9 +1,9 @@
 defmodule Benchee.Benchmark.Measure.Memory do
-  @moduledoc """
-  Measure memory consumption of a function.
+  @moduledoc false
 
-  Returns `{nil, return_value}` in case the memory measurement went bad.
-  """
+  # Measure memory consumption of a function.
+  #
+  # Returns `{nil, return_value}` in case the memory measurement went bad.
 
   @behaviour Benchee.Benchmark.Measure
 
