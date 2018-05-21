@@ -1,5 +1,6 @@
 defmodule Benchee.Benchmark.RepeatedMeasurement do
   @moduledoc false
+
   # This module is an internal implementation detail, and should absolutely not be relied upon
   # from external clients.
   #

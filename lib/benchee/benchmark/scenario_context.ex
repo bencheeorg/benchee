@@ -1,7 +1,8 @@
 defmodule Benchee.Benchmark.ScenarioContext do
-  @moduledoc """
-  This struct holds the context in which any scenario is run.
-  """
+  @moduledoc false
+
+  # This struct holds the context in which any scenario is run.
+
   defstruct [
     :config,
     :printer,

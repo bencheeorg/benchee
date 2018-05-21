@@ -1,8 +1,8 @@
 defmodule Benchee.Benchmark.Measure do
-  @moduledoc """
-  A thing that measures something about a function execution - like time or
-  memory needed.
-  """
+  @moduledoc false
+
+  # A thing that measures something about a function execution - like time or
+  # memory needed.
 
   @doc """
   Takes an anonymous 0 arity function to measure and returns the measurement

@@ -1,13 +1,13 @@
 defmodule Benchee.Benchmark.Measure.Time do
-  @moduledoc """
-  Measure the time elapsed while executing a given function.
+  @moduledoc false
 
-  In contrast to `:timer.tc/1` it always returns the result in nano seconds instead of micro
-  seconds. This helps us avoid losing precision as both Linux and MacOSX seem to be able to
-  measure in nano seconds. `:timer.tc/n`
-  [forfeits this precision](
-  https://github.com/erlang/otp/blob/master/lib/stdlib/src/timer.erl#L164-L169).
-  """
+  # Measure the time elapsed while executing a given function.
+  #
+  # In contrast to `:timer.tc/1` it always returns the result in nano seconds instead of micro
+  # seconds. This helps us avoid losing precision as both Linux and MacOSX seem to be able to
+  # measure in nano seconds. `:timer.tc/n`
+  # [forfeits this precision](
+  # https://github.com/erlang/otp/blob/master/lib/stdlib/src/timer.erl#L164-L169).
 
   @behaviour Benchee.Benchmark.Measure
 
