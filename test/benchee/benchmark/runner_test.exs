@@ -119,8 +119,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
     @tag :memory_measure
     test "records memory when the function only runs once" do
-      suite =
-        test_suite(%Suite{configuration: %{time: 0.0, warmup: 0.0, memory_time: 1_000_000}})
+      suite = test_suite(%Suite{configuration: %{time: 0.0, warmup: 0.0, memory_time: 1_000_000}})
 
       new_suite =
         suite
@@ -136,8 +135,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
     @tag :memory_measure
     test "correctly scales down memory usage of very fast functions" do
-      suite =
-        test_suite(%Suite{configuration: %{time: 0.0, warmup: 1, memory_time: 1_000_000}})
+      suite = test_suite(%Suite{configuration: %{time: 0.0, warmup: 1, memory_time: 1_000_000}})
 
       new_suite =
         suite
@@ -178,7 +176,8 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       [%{run_time_statistics: %{median: median}}] = suite.scenarios
 
-      assert median < 1500 # around ~78 on my machine, CI is awful for performance
+      # around ~78 on my machine, CI is awful for performance
+      assert median < 1500
     end
 
     @tag :performance
