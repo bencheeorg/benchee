@@ -13,30 +13,30 @@ defmodule Benchee.Conversion.Count do
   @one_thousand 1_000
 
   @units %{
-    billion:  %Unit{
-                name:      :billion,
-                magnitude: @one_billion,
-                label:     "B",
-                long:      "Billion"
-              },
-    million:  %Unit{
-                name:      :million,
-                magnitude: @one_million,
-                label:     "M",
-                long:      "Million"
-              },
+    billion: %Unit{
+      name: :billion,
+      magnitude: @one_billion,
+      label: "B",
+      long: "Billion"
+    },
+    million: %Unit{
+      name: :million,
+      magnitude: @one_million,
+      label: "M",
+      long: "Million"
+    },
     thousand: %Unit{
-                name:      :thousand,
-                magnitude: @one_thousand,
-                label:     "K",
-                long:      "Thousand"
-              },
-    one:      %Unit{
-                name:      :one,
-                magnitude: 1,
-                label:     "",
-                long:      ""
-              },
+      name: :thousand,
+      magnitude: @one_thousand,
+      label: "K",
+      long: "Thousand"
+    },
+    one: %Unit{
+      name: :one,
+      magnitude: 1,
+      label: "",
+      long: ""
+    }
   }
 
   @doc """
@@ -60,12 +60,15 @@ defmodule Benchee.Conversion.Count do
   def scale(count) when count >= @one_billion do
     scale_with_unit(count, :billion)
   end
+
   def scale(count) when count >= @one_million do
     scale_with_unit(count, :million)
   end
+
   def scale(count) when count >= @one_thousand do
     scale_with_unit(count, :thousand)
   end
+
   def scale(count) do
     scale_with_unit(count, :one)
   end
@@ -103,7 +106,7 @@ defmodule Benchee.Conversion.Count do
       }
   """
   def unit_for(unit) do
-    Scale.unit_for @units, unit
+    Scale.unit_for(@units, unit)
   end
 
   @doc """
@@ -125,7 +128,7 @@ defmodule Benchee.Conversion.Count do
 
   """
   def scale(count, unit) do
-    Scale.scale count, unit, __MODULE__
+    Scale.scale(count, unit, __MODULE__)
   end
 
   @doc """
@@ -140,7 +143,7 @@ defmodule Benchee.Conversion.Count do
     :million
   """
   def convert(number_and_unit, desired_unit) do
-    Scale.convert number_and_unit, desired_unit, __MODULE__
+    Scale.convert(number_and_unit, desired_unit, __MODULE__)
   end
 
   @doc """
@@ -166,6 +169,7 @@ defmodule Benchee.Conversion.Count do
 
   """
   def best(list, opts \\ [strategy: :best])
+
   def best(list, opts) do
     Scale.best_unit(list, __MODULE__, opts)
   end
