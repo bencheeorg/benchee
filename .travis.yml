@@ -6,18 +6,14 @@ elixir:
 otp_release:
   - 19.3
   - 20.3
-matrix:
-  exclude:
-    - elixir: 1.6.4
-      otp_release: 18.3
 
 before_script:
   - MIX_ENV=test mix compile --warnings-as-errors
   - travis_wait mix dialyzer --plt
 script:
   - mix credo --strict
-  - # skip dialyzer for elixir 1.4 and erlang 18 as it produces weird errors, see #69
-  - if ! ([[ "$TRAVIS_ELIXIR_VERSION" == "1.4"* ]] && [[ "$TRAVIS_OTP_RELEASE" == "18"* ]]); then mix dialyzer --halt-exit-status; fi
+  - if [[ "$TRAVIS_ELIXIR_VERSION" == "1.6"* ]]; then mix format --check-formatted; fi
+  - mix dialyzer --halt-exit-status
   - mix safe_coveralls.travis
 after_script:
   - mix deps.get --only docs

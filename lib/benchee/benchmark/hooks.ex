@@ -35,15 +35,15 @@ defmodule Benchee.Benchmark.Hooks do
     |> run_before_function(local_before_each)
   end
 
-def run_after_each(
-      return_value,
-      %{
-        after_each: local_after_each
-      },
-      %{
-        config: %{after_each: global_after_each}
-      }
-    ) do
+  def run_after_each(
+        return_value,
+        %{
+          after_each: local_after_each
+        },
+        %{
+          config: %{after_each: global_after_each}
+        }
+      ) do
     if local_after_each, do: local_after_each.(return_value)
     if global_after_each, do: global_after_each.(return_value)
   end

@@ -27,14 +27,14 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
   @minimum_execution_time 10
   @times_multiplier 10
   def determine_n_times(
-         scenario,
-         scenario_context = %ScenarioContext{
-           num_iterations: num_iterations,
-           printer: printer
-         },
-         fast_warning,
-         measurer \\ Measure.NativeTime
-       ) do
+        scenario,
+        scenario_context = %ScenarioContext{
+          num_iterations: num_iterations,
+          printer: printer
+        },
+        fast_warning,
+        measurer \\ Measure.NativeTime
+      ) do
     run_time = measure_iteration(scenario, scenario_context, measurer)
 
     if run_time >= @minimum_execution_time do
@@ -67,23 +67,23 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
   end
 
   defp measure_iteration(
-        scenario,
-        scenario_context = %ScenarioContext{
-          num_iterations: 1
-        },
-        measurer
-      ) do
+         scenario,
+         scenario_context = %ScenarioContext{
+           num_iterations: 1
+         },
+         measurer
+       ) do
     Runner.measure(scenario, scenario_context, measurer)
   end
 
   defp measure_iteration(
-        scenario,
-        scenario_context = %ScenarioContext{
-          num_iterations: iterations
-        },
-        measurer
-      )
-      when iterations > 1 do
+         scenario,
+         scenario_context = %ScenarioContext{
+           num_iterations: iterations
+         },
+         measurer
+       )
+       when iterations > 1 do
     # When we have more than one iteration, then the repetition and calling
     # of hooks is already included in the function, for reference/reasoning see
     # `build_benchmarking_function/2`

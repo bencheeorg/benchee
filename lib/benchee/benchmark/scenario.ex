@@ -31,21 +31,21 @@ defmodule Benchee.Benchmark.Scenario do
   ]
 
   @type t :: %__MODULE__{
-    name:                    String.t,
-    job_name:                String.t,
-    function:                fun,
-    input_name:              String.t | nil,
-    input:                   any | nil,
-    run_times:               [float],
-    run_time_statistics:     Benchee.Statistics.t | nil,
-    memory_usages:           [non_neg_integer],
-    memory_usage_statistics: Benchee.Statistics.t | nil,
-    before_each:             fun | nil,
-    after_each:              fun | nil,
-    before_scenario:         fun | nil,
-    after_scenario:          fun | nil,
-    tag:                     String.t | nil
-  }
+          name: String.t(),
+          job_name: String.t(),
+          function: fun,
+          input_name: String.t() | nil,
+          input: any | nil,
+          run_times: [float],
+          run_time_statistics: Benchee.Statistics.t() | nil,
+          memory_usages: [non_neg_integer],
+          memory_usage_statistics: Benchee.Statistics.t() | nil,
+          before_each: fun | nil,
+          after_each: fun | nil,
+          before_scenario: fun | nil,
+          after_scenario: fun | nil,
+          tag: String.t() | nil
+        }
 
   @doc """
   Returns the correct name to display of the given scenario data.
@@ -63,8 +63,8 @@ defmodule Benchee.Benchmark.Scenario do
       iex> Scenario.display_name(%{job_name: "flat_map"})
       "flat_map"
   """
-  @spec display_name(map) :: String.t
+  @spec display_name(map) :: String.t()
   def display_name(%{job_name: job_name, tag: nil}), do: job_name
   def display_name(%{job_name: job_name, tag: tag}), do: "#{job_name} (#{tag})"
-  def display_name(%{job_name: job_name}),           do: job_name
+  def display_name(%{job_name: job_name}), do: job_name
 end
