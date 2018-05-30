@@ -91,7 +91,13 @@ defmodule Benchee.Conversion.CountTest do
     end
 
     @list_with_thousands_and_millions_tied_for_most [
-      0.0001, 1, 1_000, 100_000, 1_000_000, 10_000_000, 1_000_000_000
+      0.0001,
+      1,
+      1_000,
+      100_000,
+      1_000_000,
+      10_000_000,
+      1_000_000_000
     ]
 
     test "when list has thousands and millions tied for most, billions highest" do

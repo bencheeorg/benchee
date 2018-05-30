@@ -34,7 +34,13 @@ defmodule Benchee.Conversion.MemoryTest do
   end
 
   @list_with_mostly_megabytes [
-    1, 200, 3_000_000, 4_000_000, 50_000_000, 50_000_000, 77_000_000_000
+    1,
+    200,
+    3_000_000,
+    4_000_000,
+    50_000_000,
+    50_000_000,
+    77_000_000_000
   ]
 
   describe ".best" do

@@ -16,9 +16,10 @@ defmodule Benchee.Output.BenchmarkPrintertest do
   }
 
   test ".duplicate_benchmark_warning" do
-    output = capture_io fn ->
-      duplicate_benchmark_warning("Something")
-    end
+    output =
+      capture_io(fn ->
+        duplicate_benchmark_warning("Something")
+      end)
 
     assert output =~ "same name"
     assert output =~ "Something"
@@ -26,14 +27,15 @@ defmodule Benchee.Output.BenchmarkPrintertest do
 
   describe ".configuration_information" do
     test "sys information" do
-      output = capture_io fn ->
-        %{
-          configuration: %Configuration{parallel: 2, time: 10_000, warmup: 0, inputs: nil},
-          scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
-          system: @system_info
-        }
-        |> configuration_information
-      end
+      output =
+        capture_io(fn ->
+          %{
+            configuration: %Configuration{parallel: 2, time: 10_000, warmup: 0, inputs: nil},
+            scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
+            system: @system_info
+          }
+          |> configuration_information
+        end)
 
       assert output =~ "Erlang 19.2"
       assert output =~ "Elixir 1.4"
@@ -50,20 +52,21 @@ defmodule Benchee.Output.BenchmarkPrintertest do
     end
 
     test "it scales times appropriately" do
-      output = capture_io fn ->
-        %{
-          configuration: %Configuration{
-            parallel: 1,
-            time: 60_000_000_000,
-            warmup: 10_000_000_000,
-            memory_time: 5_000_000_000,
-            inputs: nil
-          },
-          scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
-          system: @system_info
-        }
-        |> configuration_information
-      end
+      output =
+        capture_io(fn ->
+          %{
+            configuration: %Configuration{
+              parallel: 1,
+              time: 60_000_000_000,
+              warmup: 10_000_000_000,
+              memory_time: 5_000_000_000,
+              inputs: nil
+            },
+            scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
+            system: @system_info
+          }
+          |> configuration_information
+        end)
 
       assert output =~ "warmup: 10 s"
       assert output =~ "time: 1 min"
@@ -74,25 +77,26 @@ defmodule Benchee.Output.BenchmarkPrintertest do
 
     @inputs %{"Arg 1" => 1, "Arg 2" => 2}
     test "multiple inputs" do
-      output = capture_io fn ->
-        %{
-          configuration: %{
-            parallel: 2,
-            time: 10_000,
-            warmup: 0,
-            memory_time: 1_000,
-            inputs: @inputs
-          },
-          scenarios: [
-            %Scenario{job_name: "one", input_name: "Arg 1", input: 1},
-            %Scenario{job_name: "one", input_name: "Arg 2", input: 2},
-            %Scenario{job_name: "two", input_name: "Arg 1", input: 1},
-            %Scenario{job_name: "two", input_name: "Arg 2", input: 2}
-          ],
-          system: @system_info
-        }
-        |> configuration_information
-      end
+      output =
+        capture_io(fn ->
+          %{
+            configuration: %{
+              parallel: 2,
+              time: 10_000,
+              warmup: 0,
+              memory_time: 1_000,
+              inputs: @inputs
+            },
+            scenarios: [
+              %Scenario{job_name: "one", input_name: "Arg 1", input: 1},
+              %Scenario{job_name: "one", input_name: "Arg 2", input: 2},
+              %Scenario{job_name: "two", input_name: "Arg 1", input: 1},
+              %Scenario{job_name: "two", input_name: "Arg 2", input: 2}
+            ],
+            system: @system_info
+          }
+          |> configuration_information
+        end)
 
       assert output =~ "time: 10 μs"
       assert output =~ "memory time: 1 μs"
@@ -102,61 +106,67 @@ defmodule Benchee.Output.BenchmarkPrintertest do
     end
 
     test "does not print if disabled" do
-      output = capture_io fn ->
-        %{configuration: %{print: %{configuration: false}}}
-        |> configuration_information
-      end
+      output =
+        capture_io(fn ->
+          %{configuration: %{print: %{configuration: false}}}
+          |> configuration_information
+        end)
 
       assert output == ""
     end
   end
 
   describe ".benchmarking" do
-
     @no_input Benchmark.no_input()
     test "prints information that it's currently benchmarking without input" do
-      output = capture_io fn ->
-        benchmarking("Something", @no_input, %{})
-      end
+      output =
+        capture_io(fn ->
+          benchmarking("Something", @no_input, %{})
+        end)
 
       assert output =~ ~r/Benchmarking.+Something/i
     end
 
     test "prints information that it's currently benchmarking with input" do
-      output = capture_io fn ->
-        benchmarking("Something", "great input", %{})
-      end
+      output =
+        capture_io(fn ->
+          benchmarking("Something", "great input", %{})
+        end)
 
       assert output =~ ~r/Benchmarking.+Something with input great input/i
     end
 
     test "doesn't print if it's deactivated" do
-      output = capture_io fn ->
-        benchmarking "A", "some", %{print: %{benchmarking: false}}
-      end
+      output =
+        capture_io(fn ->
+          benchmarking("A", "some", %{print: %{benchmarking: false}})
+        end)
 
       assert output == ""
     end
 
     test "doesn't print if all times are set to 0" do
-      output = capture_io fn ->
-        benchmarking "Never",
-                     "don't care",
-                     %Configuration{time: 0.0, warmup: 0.0, memory_time: 0.0}
-      end
+      output =
+        capture_io(fn ->
+          benchmarking("Never", "don't care", %Configuration{
+            time: 0.0,
+            warmup: 0.0,
+            memory_time: 0.0
+          })
+        end)
 
       assert output == ""
     end
   end
 
   test ".fast_warning warns with reference to more information" do
-    output = capture_io fn ->
-      fast_warning()
-    end
+    output =
+      capture_io(fn ->
+        fast_warning()
+      end)
 
     assert output =~ ~r/fast/i
     assert output =~ ~r/unreliable/i
     assert output =~ "benchee/wiki"
-
   end
 end
