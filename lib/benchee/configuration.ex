@@ -334,7 +334,7 @@ defmodule Benchee.Configuration do
   defp update_measure_memory(config = %{memory_time: memory_time}) do
     otp_version = List.to_integer(:erlang.system_info(:otp_release))
 
-    if (memory_time > 0) and otp_version <= 18 do
+    if memory_time > 0 and otp_version <= 18 do
       print_memory_measure_warning()
       Map.put(config, :memory_time, 0)
     else
