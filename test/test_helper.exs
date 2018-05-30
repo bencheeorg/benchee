@@ -5,12 +5,14 @@ exclusions = if otp_release > 18, do: [], else: [memory_measure: true]
 # On Windows we have by far worse time measurements (millisecond level)
 # see: https://github.com/PragTob/benchee/pull/195#issuecomment-377010006
 {_, os} = :os.type()
-exclusions = if os == :nt do
-               [{:performance, true} | exclusions]
-             else
-               # with our new nanosecond accuracy we can't trigger our super fast function code
-               # anymore on Linux/MacOS
-               [{:needs_fast_function_repetition, true} |exclusions]
-             end
+
+exclusions =
+  if os == :nt do
+    [{:performance, true} | exclusions]
+  else
+    # with our new nanosecond accuracy we can't trigger our super fast function code
+    # anymore on Linux/MacOS
+    [{:needs_fast_function_repetition, true} | exclusions]
+  end
 
 ExUnit.start(exclude: exclusions)
