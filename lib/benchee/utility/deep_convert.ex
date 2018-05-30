@@ -26,9 +26,9 @@ defmodule Benchee.Utility.DeepConvert do
 
   defp do_to_map(kwlist = [{_key, _value} | _tail]) do
     kwlist
-    |> Enum.map(fn({key, value}) -> {key, do_to_map(value)} end)
-    |> Map.new
+    |> Enum.map(fn {key, value} -> {key, do_to_map(value)} end)
+    |> Map.new()
   end
-  defp do_to_map(no_list), do: no_list
 
+  defp do_to_map(no_list), do: no_list
 end

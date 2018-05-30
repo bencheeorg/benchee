@@ -42,8 +42,9 @@ defmodule Benchee.Statistics.Percentile do
   def percentiles(samples, percentile_ranks) do
     number_of_samples = length(samples)
     sorted_samples = Enum.sort(samples)
+
     percentile_ranks
-    |> List.wrap
+    |> List.wrap()
     |> Enum.reduce(%{}, fn percentile_rank, acc ->
       perc = percentile(sorted_samples, number_of_samples, percentile_rank)
       Map.put(acc, percentile_rank, perc)
@@ -55,7 +56,7 @@ defmodule Benchee.Statistics.Percentile do
   end
 
   defp percentile(sorted_samples, number_of_samples, percentile_rank) do
-    rank = (percentile_rank / 100) * max(0, number_of_samples + 1)
+    rank = percentile_rank / 100 * max(0, number_of_samples + 1)
     percentile_value(sorted_samples, rank)
   end
 
@@ -83,7 +84,7 @@ defmodule Benchee.Statistics.Percentile do
   # Nothing beyond the split: use the last value before the split
   defp calculate_percentile_value(_, previous_values, []) do
     previous_values
-    |> Enum.reverse
+    |> Enum.reverse()
     |> hd
     |> to_float
   end
@@ -102,6 +103,6 @@ defmodule Benchee.Statistics.Percentile do
   end
 
   defp to_float(maybe_integer) do
-    :erlang.float maybe_integer
+    :erlang.float(maybe_integer)
   end
 end
