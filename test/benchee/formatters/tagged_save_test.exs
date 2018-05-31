@@ -111,14 +111,14 @@ defmodule Benchee.Formatters.TaggedSaveTest do
       names = sorted_names(scenarios)
 
       assert tags ==
-        [@benchee_tag, @benchee_tag <> "-2", @benchee_tag <> "-3", @benchee_tag <> "-4"]
+               [@benchee_tag, @benchee_tag <> "-2", @benchee_tag <> "-3", @benchee_tag <> "-4"]
 
       assert names == [
-        "foo (#{@benchee_tag})",
-        "foo (#{@benchee_tag}-2)",
-        "foo (#{@benchee_tag}-3)",
-        "foo (#{@benchee_tag}-4)"
-      ]
+               "foo (#{@benchee_tag})",
+               "foo (#{@benchee_tag}-2)",
+               "foo (#{@benchee_tag}-3)",
+               "foo (#{@benchee_tag}-4)"
+             ]
     end
 
     defp scenarios_from_formatted(suite) do

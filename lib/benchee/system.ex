@@ -9,14 +9,17 @@ defmodule Benchee.System do
   @doc """
   Adds system information to the suite (currently elixir and erlang versions).
   """
-  @spec system(Suite.t) :: Suite.t
+  @spec system(Suite.t()) :: Suite.t()
   def system(suite = %Suite{}) do
-    system_info = %{elixir: elixir(),
-                    erlang: erlang(),
-                    num_cores: num_cores(),
-                    os: os(),
-                    available_memory: available_memory(),
-                    cpu_speed: cpu_speed()}
+    system_info = %{
+      elixir: elixir(),
+      erlang: erlang(),
+      num_cores: num_cores(),
+      os: os(),
+      available_memory: available_memory(),
+      cpu_speed: cpu_speed()
+    }
+
     %Suite{suite | system: system_info}
   end
 
@@ -30,11 +33,14 @@ defmodule Benchee.System do
   """
   def erlang do
     otp_release = :erlang.system_info(:otp_release)
-    file = Path.join([:code.root_dir, "releases", otp_release , "OTP_VERSION"])
+    file = Path.join([:code.root_dir(), "releases", otp_release, "OTP_VERSION"])
+
     case File.read(file) do
-      {:ok, version}    -> String.trim(version)
-      {:error, reason}  ->
-        IO.puts "Error trying to dermine erlang version #{reason}"
+      {:ok, version} ->
+        String.trim(version)
+
+      {:error, reason} ->
+        IO.puts("Error trying to dermine erlang version #{reason}")
     end
   end
 
@@ -52,6 +58,7 @@ defmodule Benchee.System do
     {_, name} = :os.type()
     os(name)
   end
+
   defp os(:darwin), do: :macOS
   defp os(:nt), do: :Windows
   defp os(_), do: :Linux
@@ -65,9 +72,11 @@ defmodule Benchee.System do
   defp cpu_speed(:Windows) do
     parse_cpu_for(:Windows, system_cmd("WMIC", ["CPU", "GET", "NAME"]))
   end
+
   defp cpu_speed(:macOS) do
     parse_cpu_for(:macOS, system_cmd("sysctl", ["-n", "machdep.cpu.brand_string"]))
   end
+
   defp cpu_speed(:Linux) do
     parse_cpu_for(:Linux, system_cmd("cat", ["/proc/cpuinfo"]))
   end
@@ -75,18 +84,20 @@ defmodule Benchee.System do
   @linux_cpuinfo_regex ~r/model name.*:([\w \(\)\-\@\.]*)/i
 
   def parse_cpu_for(_, "N/A"), do: "N/A"
+
   def parse_cpu_for(:Windows, raw_output) do
     "Name" <> cpu_info = raw_output
     String.trim(cpu_info)
   end
+
   def parse_cpu_for(:macOS, raw_output), do: String.trim(raw_output)
+
   def parse_cpu_for(:Linux, raw_output) do
-    match_info = Regex.run(@linux_cpuinfo_regex,
-                           raw_output,
-                           capture: :all_but_first)
+    match_info = Regex.run(@linux_cpuinfo_regex, raw_output, capture: :all_but_first)
+
     case match_info do
       [cpu_info] -> String.trim(cpu_info)
-      _          -> "Unrecognized processor"
+      _ -> "Unrecognized processor"
     end
   end
 
@@ -102,40 +113,49 @@ defmodule Benchee.System do
       system_cmd("WMIC", ["COMPUTERSYSTEM", "GET", "TOTALPHYSICALMEMORY"])
     )
   end
+
   defp available_memory(:macOS) do
     parse_memory_for(:macOS, system_cmd("sysctl", ["-n", "hw.memsize"]))
   end
+
   defp available_memory(:Linux) do
     parse_memory_for(:Linux, system_cmd("cat", ["/proc/meminfo"]))
   end
 
   defp parse_memory_for(_, "N/A"), do: "N/A"
+
   defp parse_memory_for(:Windows, raw_output) do
     [memory] = Regex.run(~r/\d+/, raw_output)
     {memory, _} = Integer.parse(memory)
     Memory.format(memory)
   end
+
   defp parse_memory_for(:macOS, raw_output) do
     {memory, _} = Integer.parse(raw_output)
     Memory.format(memory)
   end
+
   defp parse_memory_for(:Linux, raw_output) do
     ["MemTotal:" <> memory_info] = Regex.run(~r/MemTotal.*kB/, raw_output)
-    {memory_in_kilobytes, _} = memory_info
-                  |> String.trim()
-                  |> String.trim_trailing(" kB")
-                  |> Integer.parse
 
-    {memory_in_bytes, _} = Memory.convert(
-      {memory_in_kilobytes, :kilobyte},
-      :byte
-    )
+    {memory_in_kilobytes, _} =
+      memory_info
+      |> String.trim()
+      |> String.trim_trailing(" kB")
+      |> Integer.parse()
+
+    {memory_in_bytes, _} =
+      Memory.convert(
+        {memory_in_kilobytes, :kilobyte},
+        :byte
+      )
 
     Memory.format(memory_in_bytes)
   end
 
   def system_cmd(cmd, args, system_func \\ &System.cmd/2) do
     {output, exit_code} = system_func.(cmd, args)
+
     if exit_code > 0 do
       IO.puts("Something went wrong trying to get system information:")
       IO.puts(output)

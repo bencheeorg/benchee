@@ -22,19 +22,19 @@ defmodule Benchee.Formatter do
   of multiple formatters in parallel. The result will then be passed to
   `write/1`.
   """
-  @callback format(Suite.t) :: any
+  @callback format(Suite.t()) :: any
 
   @doc """
   Takes the return value of `format/1` and then performs some I/O for the user
   to actually see the formatted data (UI, File IO, HTTP, ...)
   """
-  @callback write(any) :: :ok | {:error, String.t}
+  @callback write(any) :: :ok | {:error, String.t()}
 
   @doc """
   Combines `format/1` and `write/1` into a single convenience function that is
   also chainable (as it takes a suite and returns a suite).
   """
-  @callback output(Suite.t) :: Suite.t
+  @callback output(Suite.t()) :: Suite.t()
 
   defmacro __using__(_) do
     quote location: :keep do
@@ -44,11 +44,12 @@ defmodule Benchee.Formatter do
       Combines `format/1` and `write/1` into a single convenience function that
       is also chainable (as it takes a suite and returns a suite).
       """
-      @spec output(Benchee.Suite.t) :: Benchee.Suite.t
+      @spec output(Benchee.Suite.t()) :: Benchee.Suite.t()
       def output(suite) do
-        :ok = suite
-              |> format
-              |> write
+        :ok =
+          suite
+          |> format
+          |> write
 
         suite
       end
@@ -60,11 +61,11 @@ defmodule Benchee.Formatter do
   behaviour. The output for all formatters are generated in parallel, and then
   the results of that formatting are written in sequence.
   """
-  @spec parallel_output(Suite.t, [module]) :: Suite.t
+  @spec parallel_output(Suite.t(), [module]) :: Suite.t()
   def parallel_output(suite, modules) do
     modules
-    |> Parallel.map(fn(module) -> {module, module.format(suite)} end)
-    |> Enum.each(fn({module, output}) -> module.write(output) end)
+    |> Parallel.map(fn module -> {module, module.format(suite)} end)
+    |> Enum.each(fn {module, output} -> module.write(output) end)
 
     suite
   end

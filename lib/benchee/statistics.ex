@@ -263,14 +263,15 @@ defmodule Benchee.Statistics do
 
   defp add_ips(statistics = %__MODULE__{sample_size: 0}), do: statistics
   defp add_ips(statistics = %__MODULE__{average: 0.0}), do: statistics
+
   defp add_ips(statistics) do
     ips = Duration.convert_value({1, :second}, :nanosecond) / statistics.average
     standard_dev_ips = ips * statistics.std_dev_ratio
 
     %__MODULE__{
-      statistics |
-      ips: ips,
-      std_dev_ips: standard_dev_ips
+      statistics
+      | ips: ips,
+        std_dev_ips: standard_dev_ips
     }
   end
 

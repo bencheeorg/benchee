@@ -235,11 +235,7 @@ defmodule Benchee.Formatters.Console.RunTime do
     } = scenario
 
     "~*s~*s\n"
-    |> :io_lib.format([
-      -label_width,
-      name,
-      @ips_width,
-      Helpers.count_output(ips, ips_unit)])
+    |> :io_lib.format([-label_width, name, @ips_width, Helpers.count_output(ips, ips_unit)])
     |> to_string
   end
 

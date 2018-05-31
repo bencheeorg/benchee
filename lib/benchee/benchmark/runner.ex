@@ -102,6 +102,7 @@ defmodule Benchee.Benchmark.Runner do
   defp run_memory_benchmark(_, %ScenarioContext{config: %{memory_time: 0.0}}) do
     []
   end
+
   defp run_memory_benchmark(
          scenario,
          scenario_context = %ScenarioContext{
@@ -110,7 +111,6 @@ defmodule Benchee.Benchmark.Runner do
            }
          }
        ) do
-
     end_time = current_time() + memory_time
 
     new_context = %ScenarioContext{
@@ -187,7 +187,7 @@ defmodule Benchee.Benchmark.Runner do
   def measure(
         scenario = %Scenario{function: function},
         scenario_context = %ScenarioContext{
-          num_iterations: 1,
+          num_iterations: 1
         },
         measurer
       ) do

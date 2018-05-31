@@ -71,6 +71,7 @@ defmodule Benchee.Formatters.Console.Memory do
   end
 
   defp column_descriptors(label_width, hide_statistics)
+
   defp column_descriptors(label_width, false) do
     "\n~*s~*s~*s~*s~*s\n"
     |> :io_lib.format([
@@ -101,6 +102,7 @@ defmodule Benchee.Formatters.Console.Memory do
 
   @spec scenario_reports([Scenario.t()], unit_per_statistic, integer, boolean) :: [String.t()]
   defp scenario_reports(scenarios, units, label_width, hide_statistics)
+
   defp scenario_reports([scenario | other_scenarios], units, label_width, true) do
     [
       reference_report(scenario, units, label_width),
@@ -124,11 +126,12 @@ defmodule Benchee.Formatters.Console.Memory do
          scenario = %Scenario{memory_usage_statistics: %{sample_size: 0}},
          _,
          label_width,
-         _) do
-
-    warning =  "WARNING the scenario \"#{scenario.name}\" has no memory measurements!" <>
-               " This is probably a bug please report it!\n" <>
-               "https://github.com/PragTob/benchee/issues/new"
+         _
+       ) do
+    warning =
+      "WARNING the scenario \"#{scenario.name}\" has no memory measurements!" <>
+        " This is probably a bug please report it!\n" <>
+        "https://github.com/PragTob/benchee/issues/new"
 
     data =
       "~*ts~*ts\n"
@@ -234,10 +237,11 @@ defmodule Benchee.Formatters.Console.Memory do
   end
 
   defp calculate_slower_value(job_median, reference_median)
-        when job_median == 0 or is_nil(job_median) or reference_median == 0 or
-               is_nil(reference_median) do
+       when job_median == 0 or is_nil(job_median) or reference_median == 0 or
+              is_nil(reference_median) do
     @na
   end
+
   defp calculate_slower_value(job_median, reference_median) do
     job_median / reference_median
   end

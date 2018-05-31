@@ -38,9 +38,11 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
 
     """
     def run(jobs, config \\ [])
+
     def run(jobs, config) when is_list(config) do
       do_run(jobs, config)
     end
+
     def run(config, jobs) when is_map(jobs) do
       # pre 0.6.0 way of passing in the config first and as a map
       do_run(jobs, config)
@@ -54,12 +56,12 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
 
     defp run_benchmarks(jobs, config) do
       config
-      |> Benchee.init
-      |> Benchee.system
+      |> Benchee.init()
+      |> Benchee.system()
       |> add_benchmarking_jobs(jobs)
-      |> Benchee.measure
-      |> Benchee.statistics
-      |> Benchee.load
+      |> Benchee.measure()
+      |> Benchee.statistics()
+      |> Benchee.load()
     end
 
     defp output_results(suite = %{configuration: %{formatters: formatters}}) do
@@ -67,9 +69,10 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
 
       # why do we ignore this suite? It shouldn't be changed anyway.
       _suite = Formatter.parallel_output(suite, parallelizable)
-      Enum.each serial, fn(output_function) ->
+
+      Enum.each(serial, fn output_function ->
         output_function.(suite)
-      end
+      end)
 
       suite
     end
@@ -81,22 +84,23 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
       |> Keyword.get(:behaviour, [])
       |> Enum.member?(Benchee.Formatter)
     end
+
     defp is_formatter_module?(_), do: false
 
     defp add_benchmarking_jobs(suite, jobs) do
-      Enum.reduce jobs, suite, fn({key, function}, suite_acc) ->
+      Enum.reduce(jobs, suite, fn {key, function}, suite_acc ->
         Benchee.benchmark(suite_acc, key, function)
-      end
+      end)
     end
 
-    defdelegate init(),                           to: Benchee.Configuration
-    defdelegate init(config),                     to: Benchee.Configuration
-    defdelegate system(suite),                    to: Benchee.System
-    defdelegate measure(suite),                   to: Benchee.Benchmark
-    defdelegate measure(suite, printer),          to: Benchee.Benchmark
+    defdelegate init(), to: Benchee.Configuration
+    defdelegate init(config), to: Benchee.Configuration
+    defdelegate system(suite), to: Benchee.System
+    defdelegate measure(suite), to: Benchee.Benchmark
+    defdelegate measure(suite, printer), to: Benchee.Benchmark
     defdelegate benchmark(suite, name, function), to: Benchee.Benchmark
-    defdelegate statistics(suite),                to: Benchee.Statistics
-    defdelegate load(suite),                      to: Benchee.ScenarioLoader
+    defdelegate statistics(suite), to: Benchee.Statistics
+    defdelegate load(suite), to: Benchee.ScenarioLoader
     defdelegate benchmark(suite, name, function, printer), to: Benchee.Benchmark
   end
 end

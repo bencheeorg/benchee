@@ -101,9 +101,8 @@ defmodule Benchee.Formatters.Console do
 
   defp generate_output(scenarios, config, input) do
     [
-      input_header(input) |
-      RunTime.format_scenarios(scenarios, config) ++
-      Memory.format_scenarios(scenarios, config)
+      input_header(input)
+      | RunTime.format_scenarios(scenarios, config) ++ Memory.format_scenarios(scenarios, config)
     ]
   end
 

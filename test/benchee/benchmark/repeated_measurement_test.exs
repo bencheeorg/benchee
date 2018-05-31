@@ -35,9 +35,11 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
       {num_iterations, time} = determine_n_times(scenario, @scenario_context, false, FakeMeasurer)
 
       assert num_iterations == 10
-      assert time == 5 # 50 adjusted by the 10 iteration factor
+      # 50 adjusted by the 10 iteration factor
+      assert time == 5
 
-      assert_received_exactly_n_times(:called, 11) # 1 initial + 10 more after repeat
+      # 1 initial + 10 more after repeat
+      assert_received_exactly_n_times(:called, 11)
     end
 
     test "doesn't do repetitions if the time is small enough from the get go" do
@@ -50,7 +52,8 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
       assert num_iterations == 1
       assert time == 10
 
-      assert_received_exactly_n_times(:called, 1) # 1 initial + 10 more after repeat
+      # 1 initial + 10 more after repeat
+      assert_received_exactly_n_times(:called, 1)
     end
   end
 
@@ -58,12 +61,14 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
     test "scales reported times approproately" do
       scenario_context = %ScenarioContext{
         @scenario_context
-        | num_iterations: 10,
+        | num_iterations: 10
       }
+
       scenario = %Scenario{
         input: @no_input,
         function: fn -> 42 end
       }
+
       Process.put(:test_measurement_time, 50)
 
       time = measure(scenario, scenario_context, FakeMeasurer)
@@ -73,26 +78,29 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
 
     test "calls hooks appropriately even with multiple iterations" do
       num_iterations = 10
+
       scenario_context = %ScenarioContext{
         @scenario_context
         | num_iterations: num_iterations,
           config: %Benchee.Configuration{
             before_each: fn _ ->
-              send self(), :global_before
+              send(self(), :global_before)
               @no_input
             end,
-            after_each: fn _ -> send self(), :global_after end
+            after_each: fn _ -> send(self(), :global_after) end
           }
       }
+
       scenario = %Scenario{
         input: @no_input,
         function: fn -> send(self(), :called) end,
         before_each: fn _ ->
-          send self(), :local_before
+          send(self(), :local_before)
           @no_input
         end,
-        after_each: fn _ -> send self(), :local_after end
+        after_each: fn _ -> send(self(), :local_after) end
       }
+
       Process.put(:test_measurement_time, 50)
 
       time = measure(scenario, scenario_context, FakeMeasurer)
