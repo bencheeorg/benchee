@@ -31,7 +31,12 @@ defmodule Benchee.Benchmark.Runner do
       Enum.each(scenarios, fn scenario -> pre_check(scenario, scenario_context) end)
     end
 
-    function_call_overhead = determine_function_call_overhead()
+    function_call_overhead =
+      if scenario_context.config.measure_function_call_overhead do
+        determine_function_call_overhead()
+      else
+        0
+      end
 
     scenario_context = %ScenarioContext{
       scenario_context

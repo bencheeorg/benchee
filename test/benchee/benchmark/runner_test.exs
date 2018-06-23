@@ -12,7 +12,8 @@ defmodule Benchee.Benchmark.RunnerTest do
     warmup: 20_000_000,
     inputs: nil,
     pre_check: false,
-    print: %{fast_warning: false, configuration: true}
+    print: %{fast_warning: false, configuration: true},
+    measure_function_call_overhead: false
   }
   @system %{
     elixir: "1.4.0",
@@ -182,7 +183,8 @@ defmodule Benchee.Benchmark.RunnerTest do
 
     test "very fast function times are almost 0 with function call overhead elimination" do
       suite =
-        test_suite()
+        %{configuration: %{measure_function_call_overhead: true}}
+        |> test_suite()
         |> Benchmark.benchmark("", fn -> 1 end)
         |> Benchmark.measure(TestPrinter)
         |> Benchee.statistics()
