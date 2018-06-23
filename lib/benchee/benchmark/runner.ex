@@ -25,21 +25,21 @@ defmodule Benchee.Benchmark.Runner do
   """
   @spec run_scenarios([Scenario.t()], ScenarioContext.t()) :: [Scenario.t()]
   def run_scenarios(scenarios, scenario_context) do
-    Enum.each(scenarios, fn scenario -> pre_check(scenario, scenario_context) end)
+    if scenario_context.config.pre_check do
+      Enum.each(scenarios, fn scenario -> pre_check(scenario, scenario_context) end)
+    end
     Enum.map(scenarios, fn scenario -> parallel_benchmark(scenario, scenario_context) end)
   end
 
   # This will run the given scenario exactly once, including the before and
   # after hooks, to ensure the function can execute without raising an error.
-  defp pre_check(scenario, scenario_context = %ScenarioContext{config: %{pre_check: true}}) do
+  defp pre_check(scenario, scenario_context) do
     scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
     _ = measure(scenario, scenario_context, Measure.Time)
     _ = Hooks.run_after_scenario(scenario, scenario_context)
     nil
   end
-
-  defp pre_check(_, _), do: nil
 
   defp parallel_benchmark(
          scenario = %Scenario{job_name: job_name, input_name: input_name},
