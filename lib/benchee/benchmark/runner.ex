@@ -49,7 +49,8 @@ defmodule Benchee.Benchmark.Runner do
     scenario_context = %ScenarioContext{
       config: %Configuration{
         time: @overhead_determination_time,
-        warmup: @overhead_determination_time
+        warmup: @overhead_determination_time,
+        print: %{fast_warning: false}
       }
     }
 
