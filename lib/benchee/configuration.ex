@@ -283,7 +283,7 @@ defmodule Benchee.Configuration do
       config
       |> standardized_user_configuration
       |> merge_with_defaults
-      |> convert_time_to_micro_s
+      |> convert_time_to_nano_s
       |> update_measure_memory
       |> save_option_conversion
 
@@ -320,7 +320,7 @@ defmodule Benchee.Configuration do
     DeepMerge.deep_merge(%Configuration{}, user_config)
   end
 
-  defp convert_time_to_micro_s(config) do
+  defp convert_time_to_nano_s(config) do
     Enum.reduce(@time_keys, config, fn key, new_config ->
       {_, new_config} =
         Map.get_and_update!(new_config, key, fn seconds ->
