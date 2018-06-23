@@ -191,8 +191,9 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       [%{run_time_statistics: %{median: median}}] = suite.scenarios
 
-      # Should be 0 if it works correctly, give a bit of leeway
-      assert median <= 5
+      # Should be 0 if it works correctly, give a bit of leeway - especially the appveyor CI
+      # with Windows has a tougher time here as it repeats the function call
+      assert median <= 35
     end
 
     @tag :performance
