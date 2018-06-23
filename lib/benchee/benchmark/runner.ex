@@ -8,6 +8,8 @@ defmodule Benchee.Benchmark.Runner do
   alias Benchee.Benchmark.{Scenario, ScenarioContext, Measure, Hooks, RepeatedMeasurement}
   alias Benchee.Utility.Parallel
   alias Benchee.Configuration
+  alias Benchee.Conversion
+  alias Benchee.Statistics
 
   @doc """
   Executes the benchmarks defined before by first running the defined functions
@@ -28,7 +30,33 @@ defmodule Benchee.Benchmark.Runner do
     if scenario_context.config.pre_check do
       Enum.each(scenarios, fn scenario -> pre_check(scenario, scenario_context) end)
     end
+
+    function_call_overhead = determine_function_call_overhead()
+
+    scenario_context = %ScenarioContext{
+      scenario_context
+      | function_call_overhead: function_call_overhead
+    }
+
     Enum.map(scenarios, fn scenario -> parallel_benchmark(scenario, scenario_context) end)
+  end
+
+  @no_input Benchmark.no_input()
+  @overhead_determination_time Conversion.Duration.convert_value({0.01, :second}, :nanosecond)
+  defp determine_function_call_overhead do
+    scenario = %Scenario{function: fn -> nil end, input: @no_input}
+
+    scenario_context = %ScenarioContext{
+      config: %Configuration{
+        time: @overhead_determination_time,
+        warmup: @overhead_determination_time
+      }
+    }
+
+    {run_times, []} = measure_scenario(scenario, scenario_context)
+    %{50 => median} = Statistics.Percentile.percentiles(run_times, 50)
+
+    median
   end
 
   # This will run the given scenario exactly once, including the before and
@@ -71,11 +99,16 @@ defmodule Benchee.Benchmark.Runner do
     scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
     _ = run_warmup(scenario, scenario_context)
-    runtimes = run_runtime_benchmark(scenario, scenario_context)
+
+    run_times =
+      scenario
+      |> run_runtime_benchmark(scenario_context)
+      |> deduct_function_call_overhead(scenario_context.function_call_overhead)
+
     memory_usages = run_memory_benchmark(scenario, scenario_context)
     Hooks.run_after_scenario(scenario, scenario_context)
 
-    {runtimes, memory_usages}
+    {run_times, memory_usages}
   end
 
   defp run_warmup(
@@ -97,6 +130,16 @@ defmodule Benchee.Benchmark.Runner do
          }
        ) do
     measure_runtimes(scenario, scenario_context, run_time, fast_warning)
+  end
+
+  defp deduct_function_call_overhead(run_times, 0) do
+    run_times
+  end
+
+  defp deduct_function_call_overhead(run_times, overhead) do
+    Enum.map(run_times, fn time ->
+      max(time - overhead, 0)
+    end)
   end
 
   defp run_memory_benchmark(_, %ScenarioContext{config: %{memory_time: 0.0}}) do
@@ -211,7 +254,6 @@ defmodule Benchee.Benchmark.Runner do
     RepeatedMeasurement.measure(scenario, scenario_context, measurer)
   end
 
-  @no_input Benchmark.no_input()
   def main_function(function, @no_input), do: function
   def main_function(function, input), do: fn -> function.(input) end
 end

@@ -180,6 +180,19 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert median < 1500
     end
 
+    test "very fast function times are almost 0 with function call overhead elimination" do
+      suite =
+        test_suite()
+        |> Benchmark.benchmark("", fn -> 1 end)
+        |> Benchmark.measure(TestPrinter)
+        |> Benchee.statistics()
+
+      [%{run_time_statistics: %{median: median}}] = suite.scenarios
+
+      # Should be 0 if it works correctly, give a bit of leeway
+      assert median <= 5
+    end
+
     @tag :performance
     test "doesn't take longer than advertised for very fast funs" do
       retrying(fn ->
@@ -326,7 +339,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     # keep or add to them (adding to them makes no sense as they were run on a
     # different machine, just keeping them can be accomplished by loading them
     # after `measure`)
-    test "completely overrides existing runtimes" do
+    test "completely overrides existing run times" do
       suite = %Suite{
         scenarios: [
           %Scenario{
