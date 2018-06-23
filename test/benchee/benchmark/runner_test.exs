@@ -193,7 +193,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       # Should be 0 if it works correctly, give a bit of leeway - especially the appveyor CI
       # with Windows has a tougher time here as it repeats the function call
-      assert median <= 35
+      assert median <= 60
     end
 
     @tag :performance
