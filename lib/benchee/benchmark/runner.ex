@@ -46,6 +46,16 @@ defmodule Benchee.Benchmark.Runner do
     Enum.map(scenarios, fn scenario -> parallel_benchmark(scenario, scenario_context) end)
   end
 
+  # This will run the given scenario exactly once, including the before and
+  # after hooks, to ensure the function can execute without raising an error.
+  defp pre_check(scenario, scenario_context) do
+    scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
+    scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
+    _ = measure(scenario, scenario_context, Measure.Time)
+    _ = Hooks.run_after_scenario(scenario, scenario_context)
+    nil
+  end
+
   @no_input Benchmark.no_input()
   @overhead_determination_time Conversion.Duration.convert_value({0.01, :second}, :nanosecond)
   defp determine_function_call_overhead do
@@ -63,16 +73,6 @@ defmodule Benchee.Benchmark.Runner do
     %{50 => median} = Statistics.Percentile.percentiles(run_times, 50)
 
     median
-  end
-
-  # This will run the given scenario exactly once, including the before and
-  # after hooks, to ensure the function can execute without raising an error.
-  defp pre_check(scenario, scenario_context) do
-    scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
-    scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
-    _ = measure(scenario, scenario_context, Measure.Time)
-    _ = Hooks.run_after_scenario(scenario, scenario_context)
-    nil
   end
 
   defp parallel_benchmark(
