@@ -370,7 +370,7 @@ defmodule BencheeTest do
 
     assert output =~ @header_regex
 
-    # fast fnction warnings only appear on Windows because of none nanosecond precision
+    # fast function warnings only appear on Windows because of none nanosecond precision
     if windows?() do
       assert output =~ ~r/fast/
       assert output =~ ~r/unreliable/
