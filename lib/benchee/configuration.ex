@@ -40,7 +40,8 @@ defmodule Benchee.Configuration do
             before_each: nil,
             after_each: nil,
             before_scenario: nil,
-            after_scenario: nil
+            after_scenario: nil,
+            measure_function_call_overhead: true
 
   @type t :: %__MODULE__{
           parallel: integer,
@@ -59,7 +60,8 @@ defmodule Benchee.Configuration do
           before_each: fun | nil,
           after_each: fun | nil,
           before_scenario: fun | nil,
-          after_scenario: fun | nil
+          after_scenario: fun | nil,
+          measure_function_call_overhead: boolean
         }
 
   @type user_configuration :: map | keyword
@@ -142,6 +144,7 @@ defmodule Benchee.Configuration do
       in microseconds, and counts will be displayed in ones (this is
       equivalent to the behaviour Benchee had pre 0.5.0)
     * `:before_scenario`/`after_scenario`/`before_each`/`after_each` - read up on them in the hooks section in the README
+    * `:measure_function_call_overhead` - Measure how long an empty function call takes and deduct this from each measure tun time. Defaults to true.
 
   ## Examples
 

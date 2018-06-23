@@ -11,11 +11,11 @@ defmodule BencheeTest do
   doctest Benchee
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median.+99th %$/m
-  @test_times [time: 0.01, warmup: 0.005]
+  @test_configuration [time: 0.01, warmup: 0.005, measure_function_call_overhead: false]
   test "integration step by step" do
     capture_io(fn ->
       result =
-        @test_times
+        @test_configuration
         |> Benchee.init()
         |> Benchee.system()
         |> Benchee.benchmark("Sleeps", fn -> :timer.sleep(10) end)
@@ -32,7 +32,7 @@ defmodule BencheeTest do
   test "integration high level interface .run" do
     output =
       capture_io(fn ->
-        Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end}, @test_times)
+        Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end}, @test_configuration)
       end)
 
     assert Regex.match?(@header_regex, output)
@@ -46,7 +46,7 @@ defmodule BencheeTest do
       capture_io(fn ->
         Benchee.run(
           %{"Sleeps" => fn -> :timer.sleep(10) end, "Magic" => fn -> Enum.to_list(1..100) end},
-          @test_times
+          @test_configuration
         )
       end)
 
@@ -61,7 +61,7 @@ defmodule BencheeTest do
         list = Enum.to_list(1..10_000)
         map_fun = fn i -> [i, i * i] end
 
-        map_config = Enum.into(@test_times, %{})
+        map_config = Enum.into(@test_configuration, %{})
 
         Benchee.run(map_config, %{
           "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
@@ -83,8 +83,7 @@ defmodule BencheeTest do
             "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
             "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
           },
-          time: 0.01,
-          warmup: 0.005
+          @test_configuration
         )
       end)
 
@@ -102,8 +101,7 @@ defmodule BencheeTest do
             "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
             "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
           },
-          time: 0.01,
-          warmup: 0.005
+          @test_configuration
         )
       end)
 
@@ -116,7 +114,7 @@ defmodule BencheeTest do
         list = Enum.to_list(1..10_000)
         map_fun = fn i -> [i, i * i] end
 
-        @test_times
+        @test_configuration
         |> Benchee.init()
         |> Benchee.system()
         |> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
@@ -134,7 +132,10 @@ defmodule BencheeTest do
   test "integration super fast function print warnings" do
     output =
       capture_io(fn ->
-        Benchee.run(%{"Constant" => fn -> 0 end}, time: 0.001, warmup: 0)
+        Benchee.run(
+          %{"Constant" => fn -> 0 end},
+          Keyword.merge(@test_configuration, time: 0.001, warmup: 0)
+        )
       end)
 
     assert output =~ ~r/fast/
@@ -146,7 +147,10 @@ defmodule BencheeTest do
   test "integration super fast function warning is printed once per job" do
     output =
       capture_io(fn ->
-        Benchee.run(%{"Fast" => fn -> 0 end}, time: 0.001, warmup: 0.001)
+        Benchee.run(
+          %{"Fast" => fn -> 0 end},
+          Keyword.merge(@test_configuration, time: 0.001, warmup: 0.001)
+        )
       end)
 
     warnings =
@@ -162,9 +166,12 @@ defmodule BencheeTest do
       capture_io(fn ->
         Benchee.run(
           %{"Blitz" => fn -> 0 end},
-          time: 0.001,
-          warmup: 0,
-          print: [fast_warning: false]
+          Keyword.merge(
+            @test_configuration,
+            time: 0.001,
+            warmup: 0,
+            print: [fast_warning: false]
+          )
         )
       end)
 
@@ -176,9 +183,12 @@ defmodule BencheeTest do
       capture_io(fn ->
         Benchee.run(
           %{"Sleeps" => fn -> :timer.sleep(10) end, "Sleeps 2" => fn -> :timer.sleep(20) end},
-          time: 0.01,
-          warmup: 0,
-          console: [comparison: false]
+          Keyword.merge(
+            @test_configuration,
+            time: 0.01,
+            warmup: 0,
+            console: [comparison: false]
+          )
         )
       end)
 
@@ -190,9 +200,13 @@ defmodule BencheeTest do
       capture_io(fn ->
         Benchee.run(
           %{"Sleeps" => fn -> :timer.sleep(10) end},
-          time: 0.01,
-          warmup: 0.01,
-          formatters: [fn _ -> IO.puts("Formatter one") end, fn _ -> IO.puts("Formatter two") end]
+          Keyword.merge(
+            @test_configuration,
+            formatters: [
+              fn _ -> IO.puts("Formatter one") end,
+              fn _ -> IO.puts("Formatter two") end
+            ]
+          )
         )
       end)
 
@@ -211,9 +225,10 @@ defmodule BencheeTest do
             "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
             "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
           },
-          time: 0.01,
-          warmup: 0.005,
-          formatters: [Console]
+          Keyword.merge(
+            @test_configuration,
+            formatters: [Console]
+          )
         )
       end)
 
@@ -231,9 +246,10 @@ defmodule BencheeTest do
             "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
             "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
           },
-          time: 0.01,
-          warmup: 0.005,
-          formatters: [&Console.output/1]
+          Keyword.merge(
+            @test_configuration,
+            formatters: [&Console.output/1]
+          )
         )
       end)
 
@@ -244,13 +260,15 @@ defmodule BencheeTest do
     capture_io(fn ->
       Benchee.run(
         %{"Sleeps" => fn -> :timer.sleep(10) end},
-        time: 0.01,
-        warmup: 0,
-        formatters: [
-          FakeFormatter,
-          FakeFormatter,
-          fn _ -> send(self(), :other) end
-        ]
+        Keyword.merge(
+          @test_configuration,
+          warmup: 0,
+          formatters: [
+            FakeFormatter,
+            FakeFormatter,
+            fn _ -> send(self(), :other) end
+          ]
+        )
       )
     end)
 
@@ -292,10 +310,11 @@ defmodule BencheeTest do
         capture_io(fn ->
           Benchee.run(
             %{"Sleeps" => fn -> :timer.sleep(10) end},
-            time: 0.01,
-            warmup: 0.005,
-            assigns: %{custom: "Custom value"},
-            formatters: [formatter_one, formatter_two, formatter_three]
+            Keyword.merge(
+              @test_configuration,
+              assigns: %{custom: "Custom value"},
+              formatters: [formatter_one, formatter_two, formatter_three]
+            )
           )
         end)
 
@@ -310,7 +329,11 @@ defmodule BencheeTest do
       capture_io(fn ->
         map_fun = fn i -> [i, i * i] end
 
-        configuration = Keyword.merge(@test_times, inputs: %{"list" => Enum.to_list(1..10_000)})
+        configuration =
+          Keyword.merge(
+            @test_configuration,
+            inputs: %{"list" => Enum.to_list(1..10_000)}
+          )
 
         Benchee.run(
           %{
@@ -337,7 +360,7 @@ defmodule BencheeTest do
           }
         ]
 
-        configuration = Keyword.merge(@test_times, inputs)
+        configuration = Keyword.merge(@test_configuration, inputs)
 
         Benchee.run(
           %{
@@ -358,7 +381,7 @@ defmodule BencheeTest do
       capture_io(fn ->
         inputs = [inputs: %{"number_one" => 1, :symbole_one => :one}]
 
-        configuration = Keyword.merge(@test_times, inputs)
+        configuration = Keyword.merge(@test_configuration, inputs)
 
         Benchee.run(
           %{
@@ -388,8 +411,11 @@ defmodule BencheeTest do
           %{
             "sleep" => fn -> :timer.sleep(1) end
           },
-          time: 0.001,
-          warmup: 0
+          Keyword.merge(
+            @test_configuration,
+            time: 0.001,
+            warmup: 0
+          )
         )
 
       assert %Benchee.Suite{scenarios: _, configuration: _} = suite
@@ -403,8 +429,11 @@ defmodule BencheeTest do
           %{
             "sleep" => fn -> :timer.sleep(1) end
           },
-          time: 0.001,
-          warmup: 0
+          Keyword.merge(
+            @test_configuration,
+            time: 0.001,
+            warmup: 0
+          )
         )
 
       elixir = Benchee.System.elixir()
@@ -421,8 +450,11 @@ defmodule BencheeTest do
           %{
             sleep: fn -> :timer.sleep(1) end
           },
-          time: 0.001,
-          warmup: 0
+          Keyword.merge(
+            @test_configuration,
+            time: 0.001,
+            warmup: 0
+          )
         )
 
       assert Enum.map(suite.scenarios, & &1.job_name) == ~w(sleep)
@@ -441,7 +473,7 @@ defmodule BencheeTest do
           }
         ]
 
-        configuration = Keyword.merge(@test_times, inputs)
+        configuration = Keyword.merge(@test_configuration, inputs)
 
         Benchee.run(
           %{
@@ -474,8 +506,11 @@ defmodule BencheeTest do
           %{
             macro_add: fn -> MacroTest.add_numbers(100, 200) end
           },
-          time: 0.001,
-          warmup: 0
+          Keyword.merge(
+            @test_configuration,
+            time: 0.001,
+            warmup: 0
+          )
         )
 
       assert length(scenario.run_times) > 0
@@ -504,7 +539,7 @@ defmodule BencheeTest do
       expected_file = "save.benchee"
 
       try do
-        configuration = Keyword.merge(@test_times, save)
+        configuration = Keyword.merge(@test_configuration, save)
         map_fun = fn i -> [i, i * i] end
         list = Enum.to_list(1..10_000)
 
@@ -530,7 +565,7 @@ defmodule BencheeTest do
 
         loaded_output =
           capture_io(fn ->
-            Benchee.run(%{}, Keyword.merge(@test_times, load: expected_file))
+            Benchee.run(%{}, Keyword.merge(@test_configuration, load: expected_file))
           end)
 
         readme_sample_asserts(loaded_output, " (master)")
@@ -563,18 +598,21 @@ defmodule BencheeTest do
                after_scenario: fn _ -> send(myself, :local_after_scenario) end},
             "sleeper 2" => fn -> :timer.sleep(1) end
           },
-          time: 0.0001,
-          warmup: 0,
-          before_each: fn input ->
-            send(myself, :global_before)
-            input
-          end,
-          after_each: fn _ -> send(myself, :global_after) end,
-          before_scenario: fn input ->
-            send(myself, :global_before_scenario)
-            input
-          end,
-          after_scenario: fn _ -> send(myself, :global_after_scenario) end
+          Keyword.merge(
+            @test_configuration,
+            time: 0.0001,
+            warmup: 0,
+            before_each: fn input ->
+              send(myself, :global_before)
+              input
+            end,
+            after_each: fn _ -> send(myself, :global_after) end,
+            before_scenario: fn input ->
+              send(myself, :global_before_scenario)
+              input
+            end,
+            after_scenario: fn _ -> send(myself, :global_after_scenario) end
+          )
         )
       end)
 
@@ -605,9 +643,10 @@ defmodule BencheeTest do
         capture_io(fn ->
           Benchee.run(
             %{"To List" => fn -> Enum.to_list(1..100) end},
-            time: 0.01,
-            warmup: 0.005,
-            memory_time: 0.001
+            Keyword.merge(
+              @test_configuration,
+              memory_time: 0.001
+            )
           )
         end)
 
@@ -622,9 +661,12 @@ defmodule BencheeTest do
             %{
               "something" => fn -> Enum.map(1..100, fn i -> i + 1 end) end
             },
-            time: 0,
-            warmup: 0,
-            memory_time: 0.001
+            Keyword.merge(
+              @test_configuration,
+              time: 0,
+              warmup: 0,
+              memory_time: 0.001
+            )
           )
         end)
 
@@ -649,18 +691,21 @@ defmodule BencheeTest do
         capture_io(fn ->
           Benchee.run(
             benches,
-            inputs: inputs,
-            print: [fast_warning: false],
-            memory_time: 0.001,
-            warmup: 0,
-            time: 0
+            Keyword.merge(
+              @test_configuration,
+              inputs: inputs,
+              print: [fast_warning: false],
+              memory_time: 0.001,
+              warmup: 0,
+              time: 0
+            )
           )
         end)
 
       refute output =~ "N/A"
       refute output =~ ~r/warning/i
       assert output =~ "large hit"
-      # yte
+      # Byte
       assert output =~ "B"
     end
   end
