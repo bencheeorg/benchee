@@ -144,7 +144,7 @@ defmodule Benchee.Configuration do
       in microseconds, and counts will be displayed in ones (this is
       equivalent to the behaviour Benchee had pre 0.5.0)
     * `:before_scenario`/`after_scenario`/`before_each`/`after_each` - read up on them in the hooks section in the README
-    * `:measure_function_call_overhead` - Measure how long an empty function call takes and deduct this from each measure tun time. Defaults to true.
+    * `:measure_function_call_overhead` - Measure how long an empty function call takes and deduct this from each measure run time. Defaults to true.
 
   ## Examples
 
