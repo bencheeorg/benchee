@@ -20,6 +20,8 @@ defmodule Benchee.System do
       cpu_speed: cpu_speed()
     }
 
+    warn_about_performance_degrading_settings()
+
     %Suite{suite | system: system_info}
   end
 
@@ -163,5 +165,23 @@ defmodule Benchee.System do
     else
       output
     end
+  end
+
+  defp warn_about_performance_degrading_settings do
+    unless all_protocols_consolidated?() do
+      IO.puts("""
+      Not all of your protocols have been consolidated. In order to achieve the
+      best possible accuracy for benchmarks, please ensure protocol
+      consolidation is enabled in your benchmarking environment.
+      """)
+    end
+  end
+
+  defp all_protocols_consolidated? do
+    path = :code.lib_dir(:elixir, :ebin)
+
+    [path]
+    |> Protocol.extract_protocols()
+    |> Enum.all?(&Protocol.consolidated?/1)
   end
 end
