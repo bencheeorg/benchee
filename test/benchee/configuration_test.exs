@@ -71,11 +71,14 @@ defmodule Benchee.ConfigurationTest do
         time: 10,
         formatter_options: %{
           custom: %{option: true},
-          console: %{comparison: true, extended_statistics: true}
+          console: %{
+            comparison: true,
+            extended_statistics: true
+          }
         }
       }
 
-      assert ^expected = result
+      assert expected == result
     end
 
     test "it just replaces when given another configuration" do

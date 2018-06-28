@@ -11,8 +11,8 @@ defmodule Benchee.Suite do
   configuration.
   """
   defstruct [
-    :configuration,
     :system,
+    configuration: %Benchee.Configuration{},
     scenarios: []
   ]
 

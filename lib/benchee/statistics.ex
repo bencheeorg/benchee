@@ -151,10 +151,14 @@ defmodule Benchee.Statistics do
   """
   @spec statistics(Suite.t()) :: Suite.t()
   def statistics(suite = %Suite{scenarios: scenarios}) do
+    config = suite.configuration
+
+    percentiles = Enum.uniq([50 | config.percentiles])
+
     scenarios_with_statistics =
       Parallel.map(scenarios, fn scenario ->
-        run_time_stats = scenario.run_times |> job_statistics() |> add_ips
-        memory_stats = job_statistics(scenario.memory_usages)
+        run_time_stats = scenario.run_times |> job_statistics(percentiles) |> add_ips
+        memory_stats = job_statistics(scenario.memory_usages, percentiles)
 
         %Scenario{
           scenario
@@ -173,7 +177,7 @@ defmodule Benchee.Statistics do
   ## Examples
 
       iex> run_times = [200, 400, 400, 400, 500, 500, 500, 700, 900]
-      iex> Benchee.Statistics.job_statistics(run_times)
+      iex> Benchee.Statistics.job_statistics(run_times, [50, 99])
       %Benchee.Statistics{
         average:       500.0,
         ips:           nil,
@@ -188,7 +192,7 @@ defmodule Benchee.Statistics do
         sample_size:   9
       }
 
-      iex> Benchee.Statistics.job_statistics([100])
+      iex> Benchee.Statistics.job_statistics([100], [50, 99])
       %Benchee.Statistics{
         average:       100.0,
         ips:           nil,
@@ -203,7 +207,7 @@ defmodule Benchee.Statistics do
         sample_size:   1
       }
 
-      iex> Benchee.Statistics.job_statistics([])
+      iex> Benchee.Statistics.job_statistics([], [])
       %Benchee.Statistics{
         average:       nil,
         ips:           nil,
@@ -219,18 +223,18 @@ defmodule Benchee.Statistics do
       }
 
   """
-  @spec job_statistics(samples) :: __MODULE__.t()
-  def job_statistics([]) do
+  @spec job_statistics(samples, list) :: __MODULE__.t()
+  def job_statistics([], _) do
     %__MODULE__{sample_size: 0}
   end
 
-  def job_statistics(measurements) do
+  def job_statistics(measurements, percentiles) do
     total = Enum.sum(measurements)
     num_iterations = length(measurements)
     average = total / num_iterations
     deviation = standard_deviation(measurements, average, num_iterations)
     standard_dev_ratio = if average == 0, do: 0, else: deviation / average
-    percentiles = Percentile.percentiles(measurements, [50, 99])
+    percentiles = Percentile.percentiles(measurements, percentiles)
     median = Map.fetch!(percentiles, 50)
     mode = Mode.mode(measurements)
     minimum = Enum.min(measurements)

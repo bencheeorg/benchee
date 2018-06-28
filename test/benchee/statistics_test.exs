@@ -1,6 +1,6 @@
 defmodule Benchee.StatistcsTest do
   use ExUnit.Case, async: true
-  alias Benchee.{Statistics, Suite, Benchmark.Scenario}
+  alias Benchee.{Statistics, Suite, Benchmark.Scenario, Configuration}
   doctest Benchee.Statistics
 
   @sample_1 [600, 470, 170, 430, 300]
@@ -87,13 +87,69 @@ defmodule Benchee.StatistcsTest do
       assert_in_delta stats.std_dev_ratio, 0.41, 0.01
     end
 
-    test "preserves all other keys in the map handed to it" do
+    test "preserves all other keys in the suite handed to it" do
       suite = %Suite{
         scenarios: [],
-        configuration: %{formatters: []}
+        configuration: %Configuration{formatters: []}
       }
 
       assert %Suite{configuration: %{formatters: []}} = Statistics.statistics(suite)
+    end
+
+    test "calculates percentiles configured by the user" do
+      suite = %Suite{
+        configuration: %Configuration{
+          percentiles: [25, 50, 75]
+        },
+        scenarios: [
+          %Scenario{
+            run_times: [1, 2],
+            memory_usages: [1, 2]
+          }
+        ]
+      }
+
+      %Suite{
+        scenarios: [
+          %Scenario{
+            run_time_statistics: %Statistics{
+              percentiles: %{
+                25 => _,
+                50 => _,
+                75 => _
+              }
+            }
+          }
+        ]
+      } = Statistics.statistics(suite)
+    end
+
+    test "always calculates the 50th percentile, even if not set in the config" do
+      suite = %Suite{
+        configuration: %Configuration{
+          percentiles: [25, 75]
+        },
+        scenarios: [
+          %Scenario{
+            run_times: [1, 2],
+            memory_usages: [1, 2]
+          }
+        ]
+      }
+
+      %Suite{
+        scenarios: [
+          %Scenario{
+            run_time_statistics: %Statistics{
+              percentiles: %{
+                25 => _,
+                50 => _,
+                75 => _
+              }
+            }
+          }
+        ]
+      } = Statistics.statistics(suite)
     end
 
     @all_zeros [0, 0, 0, 0, 0]
