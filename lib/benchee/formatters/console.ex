@@ -86,11 +86,15 @@ defmodule Benchee.Formatters.Console do
   defp console_configuration(config) do
     %Configuration{
       formatter_options: %{console: console_config},
-      unit_scaling: scaling_strategy
+      unit_scaling: scaling_strategy,
+      title: title
     } = config
 
     if Map.has_key?(console_config, :unit_scaling), do: warn_unit_scaling()
-    Map.put(console_config, :unit_scaling, scaling_strategy)
+
+    console_config
+    |> Map.put(:unit_scaling, scaling_strategy)
+    |> Map.put(:title, title)
   end
 
   defp warn_unit_scaling do
@@ -101,10 +105,17 @@ defmodule Benchee.Formatters.Console do
 
   defp generate_output(scenarios, config, input) do
     [
-      input_header(input)
+      suite_header(input, config)
       | RunTime.format_scenarios(scenarios, config) ++ Memory.format_scenarios(scenarios, config)
     ]
   end
+
+  defp suite_header(input, config) do
+    "#{title_header(config)}#{input_header(input)}"
+  end
+
+  defp title_header(%{title: nil}), do: ""
+  defp title_header(%{title: title}), do: "\n*** #{title} ***\n"
 
   @no_input_marker Benchee.Benchmark.no_input()
   defp input_header(input) when input == @no_input_marker, do: ""
