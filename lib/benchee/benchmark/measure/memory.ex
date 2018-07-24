@@ -28,7 +28,13 @@ defmodule Benchee.Benchmark.Measure.Memory do
         memory_usage_info = measure_memory(fun, tracer)
         send(parent, {ref, memory_usage_info})
       catch
-        kind, reason -> graceful_exit(kind, reason, tracer, parent)
+        kind, reason ->
+          # would love to have this in a separate function, but elixir 1.7 complains
+          send(tracer, :done)
+          send(parent, :shutdown)
+          stacktrace = System.stacktrace()
+          IO.puts(Exception.format(kind, reason, stacktrace))
+          exit(:normal)
       after
         send(tracer, :done)
       end
@@ -49,15 +55,6 @@ defmodule Benchee.Benchmark.Measure.Memory do
       (total_memory(heap_after) - total_memory(heap_before) + mem_collected) * word_size
 
     {memory_used, result}
-  end
-
-  @spec graceful_exit(Exception.kind(), any(), pid(), pid()) :: no_return
-  defp graceful_exit(kind, reason, tracer, parent) do
-    send(tracer, :done)
-    send(parent, :shutdown)
-    stacktrace = System.stacktrace()
-    IO.puts(Exception.format(kind, reason, stacktrace))
-    exit(:normal)
   end
 
   defp get_collected_memory(tracer) do
