@@ -11,7 +11,8 @@ defmodule Benchee.Formatters.ConsoleTest do
         comparison: true,
         extended_statistics: false
       }
-    }
+    },
+    title: "A comprehensive benchmarking of inputs"
   }
   @no_input Benchee.Benchmark.no_input()
 
@@ -226,6 +227,29 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert job_with_tag =~ ~r/job \(improved\)\s+10 K/
       assert job =~ ~r/job\s+5 K/
       assert comparison =~ ~r/job \(improved\)\s+ 10 K/
+    end
+
+    test "includes the suite's title" do
+      scenarios = [
+        %Scenario{
+          name: "job",
+          input_name: @no_input,
+          input: @no_input,
+          run_time_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1},
+            sample_size: 200
+          },
+          memory_usage_statistics: %Statistics{}
+        }
+      ]
+
+      [[title | _]] = Console.format(%Suite{scenarios: scenarios, configuration: @config})
+
+      assert title =~ ~r/A comprehensive benchmarking of inputs/
     end
   end
 end

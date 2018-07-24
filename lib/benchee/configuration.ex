@@ -41,7 +41,8 @@ defmodule Benchee.Configuration do
             after_each: nil,
             before_scenario: nil,
             after_scenario: nil,
-            measure_function_call_overhead: true
+            measure_function_call_overhead: true,
+            title: nil
 
   @type t :: %__MODULE__{
           parallel: integer,
@@ -61,7 +62,8 @@ defmodule Benchee.Configuration do
           after_each: fun | nil,
           before_scenario: fun | nil,
           after_scenario: fun | nil,
-          measure_function_call_overhead: boolean
+          measure_function_call_overhead: boolean,
+          title: String.t() | nil
         }
 
   @type user_configuration :: map | keyword
@@ -89,6 +91,9 @@ defmodule Benchee.Configuration do
     to work your benchmarking function gets the current input passed in as an
     argument into the function. Defaults to `nil`, aka no input specified and
     functions are called without an argument.
+    * `title` - this option is purely cosmetic. If you would like to add a
+    title with some meaning to a given suite, you can do so by providing
+    a single string here. This is only for use by formatters.
     * `formatters` - list of formatters either as module implementing the
     formatter behaviour or formatter functions. They are run when using
     `Benchee.run/2`. Functions need to accept one argument (which is the
