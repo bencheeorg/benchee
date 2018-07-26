@@ -5,8 +5,8 @@ defmodule Benchee.Conversion do
   Can be used by plugins to use benchee unit scaling logic.
   """
 
-  alias Benchee.Conversion.{Duration, Count, Memory}
   alias Benchee.Benchmark.Scenario
+  alias Benchee.Conversion.{Duration, Count, Memory}
 
   @doc """
   Takes scenarios and a given scaling_strategy, returns the best units for the

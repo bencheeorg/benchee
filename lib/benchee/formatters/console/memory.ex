@@ -7,13 +7,13 @@ defmodule Benchee.Formatters.Console.Memory do
   """
 
   alias Benchee.{
-    Statistics,
     Benchmark.Scenario,
     Conversion,
     Conversion.Unit,
     Conversion.Count,
     Conversion.Memory,
-    Formatters.Console.Helpers
+    Formatters.Console.Helpers,
+    Statistics
   }
 
   @type unit_per_statistic :: %{atom => Unit.t()}

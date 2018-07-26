@@ -3,8 +3,8 @@ defmodule Benchee.System do
   Provides information about the system the benchmarks are run on.
   """
 
-  alias Benchee.Suite
   alias Benchee.Conversion.Memory
+  alias Benchee.Suite
 
   @doc """
   Adds system information to the suite (currently elixir and erlang versions).

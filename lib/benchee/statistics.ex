@@ -4,8 +4,11 @@ defmodule Benchee.Statistics do
   times and then compute statistics like the average and the standard devaition.
   """
 
+  alias Benchee.{Benchmark.Scenario, Conversion.Duration, Statistics, Suite, Utility.Parallel}
+
   alias Benchee.Statistics.Mode
   alias Benchee.Statistics.Percentile
+  require Integer
 
   defstruct [
     :average,
@@ -38,9 +41,6 @@ defmodule Benchee.Statistics do
         }
 
   @type samples :: [number]
-
-  alias Benchee.{Statistics, Conversion.Duration, Suite, Benchmark.Scenario, Utility.Parallel}
-  require Integer
 
   @doc """
   Sorts the given scenarios fastest to slowest by run_time average.

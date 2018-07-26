@@ -6,10 +6,10 @@ defmodule Benchee.Benchmark.Runner do
 
   alias Benchee.Benchmark
   alias Benchee.Benchmark.{Scenario, ScenarioContext, Measure, Hooks, RepeatedMeasurement}
-  alias Benchee.Utility.Parallel
   alias Benchee.Configuration
   alias Benchee.Conversion
   alias Benchee.Statistics
+  alias Benchee.Utility.Parallel
 
   @doc """
   Executes the benchmarks defined before by first running the defined functions

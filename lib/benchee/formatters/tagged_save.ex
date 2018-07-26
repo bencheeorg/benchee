@@ -10,8 +10,8 @@ defmodule Benchee.Formatters.TaggedSave do
 
   use Benchee.Formatter
 
-  alias Benchee.Suite
   alias Benchee.Benchmark.Scenario
+  alias Benchee.Suite
   alias Benchee.Utility.FileCreation
 
   @spec format(Suite.t()) :: {binary, String.t()}
