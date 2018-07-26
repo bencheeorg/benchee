@@ -18,6 +18,7 @@ defmodule Benchee.Configuration do
             memory_time: 0.0,
             pre_check: false,
             formatters: [Console],
+            percentiles: [50, 99],
             print: %{
               benchmarking: true,
               configuration: true,
@@ -131,6 +132,9 @@ defmodule Benchee.Configuration do
       (x times slower than) is shown (true/false). Enabled by default.
       * `extended_statistics` - display more statistics, aka `minimum`,
       `maximum`, `sample_size` and `mode`. Disabled by default.
+    * `percentiles` - if you are using extended statistics and want to see the
+    results for certain percentiles of results beyond just the median.
+    Defaults to [50, 99] to calculate the 50th and 99th percentiles.
     * `:unit_scaling` - the strategy for choosing a unit for durations and
     counts. May or may not be implemented by a given formatter (The console
     formatter implements it). When scaling a value, Benchee finds the "best fit"
@@ -170,8 +174,12 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: true, extended_statistics: false}
+              console: %{
+                comparison: true,
+                extended_statistics: false
+              }
             },
+            percentiles: [50, 99],
             unit_scaling: :best,
             assigns: %{},
             before_each: nil,
@@ -200,8 +208,12 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: true, extended_statistics: false}
+              console: %{
+                comparison: true,
+                extended_statistics: false
+              }
             },
+            percentiles: [50, 99],
             unit_scaling: :best,
             assigns: %{},
             before_each: nil,
@@ -230,8 +242,12 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: true, extended_statistics: false}
+              console: %{
+                comparison: true,
+                extended_statistics: false
+              }
             },
+            percentiles: [50, 99],
             unit_scaling: :best,
             assigns: %{},
             before_each: nil,
@@ -269,9 +285,13 @@ defmodule Benchee.Configuration do
               configuration: true
             },
             formatter_options: %{
-              console: %{comparison: false, extended_statistics: false},
+              console: %{
+                comparison: false,
+                extended_statistics: false
+              },
               some: "option"
             },
+            percentiles: [50, 99],
             unit_scaling: :smallest,
             assigns: %{},
             before_each: nil,
