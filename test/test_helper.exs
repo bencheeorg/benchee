@@ -2,6 +2,13 @@
 otp_release = List.to_integer(:erlang.system_info(:otp_release))
 exclusions = if otp_release > 18, do: [], else: [memory_measure: true]
 
+# See #234
+exclusions = if otp_release >= 21 do
+               [{:otp_21_memory_problems, true} | exclusions]
+             else
+               exclusions
+             end
+
 # On Windows we have by far worse time measurements (millisecond level)
 # see: https://github.com/PragTob/benchee/pull/195#issuecomment-377010006
 {_, os} = :os.type()

@@ -633,7 +633,8 @@ defmodule BencheeTest do
       assert output =~ ~r/memory.+statistics/i
     end
 
-    test "the micro keyword list code from Michal does not break memory measurements #213" do
+    @tag :otp_21_memory_problems
+    test "the micro keyword list code from Michał does not break memory measurements #213" do
       benches = %{
         "delete old" => fn {kv, key} -> BenchKeyword.delete_v0(kv, key) end,
         "delete reverse" => fn {kv, key} -> BenchKeyword.delete_v2(kv, key) end,
