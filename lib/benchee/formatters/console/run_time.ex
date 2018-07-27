@@ -9,7 +9,8 @@ defmodule Benchee.Formatters.Console.RunTime do
   alias Benchee.{
     Benchmark.Scenario,
     Conversion,
-    Conversion.{Count, Unit},
+    Conversion.Count,
+    Conversion.Unit,
     Formatters.Console.Helpers,
     Statistics
   }
