@@ -49,13 +49,6 @@ defmodule Benchee.Conversion.Format do
     format({count, module.unit_for(unit_atom)}, module)
   end
 
-  @doc """
-  Scales a number to the most appropriate unit as defined in `module`, and
-  formats the scaled value with a label. The module should provide a `units/0`
-  function that returns a Map like
-
-      %{ :unit_name => %Benchee.Conversion.Unit{ ... } }
-  """
   def format(number, module) do
     number
     |> module.scale
