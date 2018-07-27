@@ -6,8 +6,14 @@ defmodule Benchee.Formatters.Console.RunTime do
   these two things into separate modules to avoid confusion.
   """
 
-  alias Benchee.{Statistics, Benchmark.Scenario, Conversion, Formatters.Console.Helpers}
-  alias Benchee.Conversion.{Count, Unit}
+  alias Benchee.{
+    Benchmark.Scenario,
+    Conversion,
+    Conversion.Count,
+    Conversion.Unit,
+    Formatters.Console.Helpers,
+    Statistics
+  }
 
   @type unit_per_statistic :: %{atom => Unit.t()}
 

@@ -1,7 +1,7 @@
 defmodule Benchee.Output.BenchmarkPrinter do
   @moduledoc false
 
-  alias Benchee.{Conversion.Duration, Benchmark}
+  alias Benchee.{Benchmark, Conversion.Duration}
 
   @doc """
   Shown when you try to define a benchmark with the same name twice.
