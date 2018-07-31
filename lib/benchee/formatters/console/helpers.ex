@@ -4,7 +4,7 @@ defmodule Benchee.Formatters.Console.Helpers do
   memory usage statistics.
   """
 
-  alias Benchee.Conversion.{Count, DeviationPercent, Duration, Format, Scale, Unit}
+  alias Benchee.Conversion.{Count, DeviationPercent, Format, Scale, Unit}
   alias Benchee.Statistics
 
   @type unit_per_statistic :: %{atom => Unit.t()}

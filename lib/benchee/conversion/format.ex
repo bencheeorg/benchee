@@ -40,6 +40,10 @@ defmodule Benchee.Conversion.Format do
   custom separator string that will appear between the value and label in the
   formatted output. If no `separator/0` function exists, the default separator
   (a single space) will be used.
+
+      iex> Benchee.Conversion.Format.format({1.0, :kilobyte}, Benchee.Conversion.Memory)
+      "1 KB"
+
   """
   def format({count, unit = %Unit{}}) do
     format(count, label(unit), separator())
@@ -57,12 +61,6 @@ defmodule Benchee.Conversion.Format do
     number
     |> module.scale()
     |> format
-  end
-
-  def format(number) do
-    number
-    |> Scale.scale()
-    |> format()
   end
 
   @default_separator " "
