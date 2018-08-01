@@ -7,7 +7,7 @@ defmodule Benchee.Formatters.Console.RunTime do
   """
 
   alias Benchee.{Statistics, Benchmark.Scenario, Conversion, Formatters.Console.Helpers}
-  alias Benchee.Conversion.{Count, Unit}
+  alias Benchee.Conversion.{Count, Duration, Unit}
 
   @type unit_per_statistic :: %{atom => Unit.t()}
 
@@ -126,9 +126,9 @@ defmodule Benchee.Formatters.Console.RunTime do
       -label_width,
       name,
       @minimum_width,
-      Helpers.duration_output(minimum, run_time_unit),
+      duration_output(minimum, run_time_unit),
       @maximum_width,
-      Helpers.duration_output(maximum, run_time_unit),
+      duration_output(maximum, run_time_unit),
       @sample_size_width,
       Count.format(sample_size),
       @mode_width,
@@ -202,13 +202,13 @@ defmodule Benchee.Formatters.Console.RunTime do
       @ips_width,
       Helpers.count_output(ips, ips_unit),
       @average_width,
-      Helpers.duration_output(average, run_time_unit),
+      duration_output(average, run_time_unit),
       @deviation_width,
       Helpers.deviation_output(std_dev_ratio),
       @median_width,
-      Helpers.duration_output(median, run_time_unit),
+      duration_output(median, run_time_unit),
       @percentile_width,
-      Helpers.duration_output(percentile_99, run_time_unit)
+      duration_output(percentile_99, run_time_unit)
     ])
     |> to_string
   end
@@ -260,5 +260,9 @@ defmodule Benchee.Formatters.Console.RunTime do
     "~*s~*s - ~.2fx slower\n"
     |> :io_lib.format([-label_width, name, @ips_width, ips_format, slower])
     |> to_string
+  end
+
+  defp duration_output(duration, unit) do
+    Duration.format({Duration.scale(duration, unit), unit})
   end
 end

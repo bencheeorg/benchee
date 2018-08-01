@@ -5,7 +5,7 @@ defmodule Benchee.Formatters.Console.Helpers do
   """
 
   alias Benchee.Statistics
-  alias Benchee.Conversion.{Count, Duration, Unit, DeviationPercent}
+  alias Benchee.Conversion.{Count, Format, Scale, Unit, DeviationPercent}
 
   @type unit_per_statistic :: %{atom => Unit.t()}
 
@@ -18,11 +18,15 @@ defmodule Benchee.Formatters.Console.Helpers do
   end
 
   def mode_out(modes, run_time_unit) when is_list(modes) do
-    Enum.map_join(modes, ", ", fn mode -> duration_output(mode, run_time_unit) end)
+    Enum.map_join(modes, ", ", fn mode -> unit_output(mode, run_time_unit) end)
   end
 
   def mode_out(mode, run_time_unit) when is_number(mode) do
-    duration_output(mode, run_time_unit)
+    unit_output(mode, run_time_unit)
+  end
+
+  defp unit_output(value, unit) do
+    Format.format({Scale.scale(value, unit), unit})
   end
 
   def label_width(scenarios) do
@@ -37,10 +41,6 @@ defmodule Benchee.Formatters.Console.Helpers do
 
   def count_output(count, unit) do
     Count.format({Count.scale(count, unit), unit})
-  end
-
-  def duration_output(duration, unit) do
-    Duration.format({Duration.scale(duration, unit), unit})
   end
 
   def deviation_output(std_dev_ratio) do
