@@ -9,7 +9,6 @@ defmodule Benchee.MemoryMeasureTest do
   @moduletag :memory_measure
 
   describe "measure/1" do
-    @tag :otp_21_memory_problems
     test "returns the result of the function and the memory used (in bytes)" do
       fun_to_run = fn -> Enum.to_list(1..10) end
       assert {memory_used, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} = Memory.measure(fun_to_run)

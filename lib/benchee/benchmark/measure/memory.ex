@@ -11,10 +11,19 @@ defmodule Benchee.Benchmark.Measure.Memory do
     ref = make_ref()
     Process.flag(:trap_exit, true)
     start_runner(fun, ref)
+    await_results({nil, nil}, ref)
+  end
 
+  def await_results({_, result}, ref) do
     receive do
-      {^ref, memory_usage_info} -> return_memory(memory_usage_info)
-      :shutdown -> nil
+      {:result, real_result} ->
+        await_results({nil, real_result}, ref)
+
+      {^ref, real_memory_usage} ->
+        return_memory({real_memory_usage, result})
+
+      :shutdown ->
+        nil
     end
   end
 
@@ -25,8 +34,10 @@ defmodule Benchee.Benchmark.Measure.Memory do
       tracer = start_tracer(self())
 
       try do
-        memory_usage_info = measure_memory(fun, tracer)
-        send(parent, {ref, memory_usage_info})
+        measure_memory(fun, tracer, parent)
+        word_size = :erlang.system_info(:wordsize)
+        memory_used = get_collected_memory(tracer)
+        send(parent, {ref, memory_used * word_size})
       catch
         kind, reason ->
           # would love to have this in a separate function, but elixir 1.7 complains
@@ -44,17 +55,22 @@ defmodule Benchee.Benchmark.Measure.Memory do
   defp return_memory({memory_usage, result}) when memory_usage < 0, do: {nil, result}
   defp return_memory({memory_usage, result}), do: {memory_usage, result}
 
-  defp measure_memory(fun, tracer) do
-    word_size = :erlang.system_info(:wordsize)
-    {:garbage_collection_info, heap_before} = Process.info(self(), :garbage_collection_info)
+  defp measure_memory(fun, tracer, parent) do
+    :erlang.garbage_collect()
+    send(tracer, :begin_collection)
+
+    receive do
+      :ready -> nil
+    end
+
     result = fun.()
-    {:garbage_collection_info, heap_after} = Process.info(self(), :garbage_collection_info)
-    mem_collected = get_collected_memory(tracer)
+    send(parent, {:result, result})
+    :erlang.garbage_collect()
+    send(tracer, :end_collection)
 
-    memory_used =
-      (total_memory(heap_after) - total_memory(heap_before) + mem_collected) * word_size
-
-    {memory_used, result}
+    receive do
+      :ready -> nil
+    end
   end
 
   defp get_collected_memory(tracer) do
@@ -68,13 +84,21 @@ defmodule Benchee.Benchmark.Measure.Memory do
   end
 
   defp start_tracer(pid) do
-    tracer = spawn(fn -> tracer_loop(pid, 0) end)
-    :erlang.trace(pid, true, [:garbage_collection, tracer: tracer])
-    tracer
+    spawn(fn -> tracer_loop(pid, 0) end)
   end
 
   defp tracer_loop(pid, acc) do
     receive do
+      :begin_collection ->
+        :erlang.trace(pid, true, [:garbage_collection, tracer: self()])
+        send(pid, :ready)
+        tracer_loop(pid, acc)
+
+      :end_collection ->
+        :erlang.trace(pid, false, [:garbage_collection])
+        send(pid, :ready)
+        tracer_loop(pid, acc)
+
       {:get_collected_memory, reply_to, ref} ->
         send(reply_to, {ref, acc})
 

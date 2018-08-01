@@ -135,7 +135,6 @@ defmodule Benchee.Benchmark.RunnerTest do
     end
 
     @tag :memory_measure
-    @tag :otp_21_memory_problems
     test "correctly scales down memory usage of very fast functions" do
       suite = test_suite(%Suite{configuration: %{time: 0.0, warmup: 1, memory_time: 1_000_000}})
 
