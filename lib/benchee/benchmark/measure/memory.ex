@@ -11,16 +11,16 @@ defmodule Benchee.Benchmark.Measure.Memory do
     ref = make_ref()
     Process.flag(:trap_exit, true)
     start_runner(fun, ref)
-    await_results({nil, nil}, ref)
+    await_results(nil, ref)
   end
 
-  def await_results({_, result}, ref) do
+  def await_results(result, ref) do
     receive do
-      {:result, real_result} ->
-        await_results({nil, real_result}, ref)
+      {:result, new_result} ->
+        await_results(new_result, ref)
 
-      {^ref, real_memory_usage} ->
-        return_memory({real_memory_usage, result})
+      {^ref, memory_usage} ->
+        return_memory({memory_usage, result})
 
       :shutdown ->
         nil
@@ -60,7 +60,7 @@ defmodule Benchee.Benchmark.Measure.Memory do
     send(tracer, :begin_collection)
 
     receive do
-      :ready -> nil
+      :ready_to_begin -> nil
     end
 
     result = fun.()
@@ -69,7 +69,7 @@ defmodule Benchee.Benchmark.Measure.Memory do
     send(tracer, :end_collection)
 
     receive do
-      :ready -> nil
+      :ready_to_end -> nil
     end
   end
 
@@ -91,12 +91,12 @@ defmodule Benchee.Benchmark.Measure.Memory do
     receive do
       :begin_collection ->
         :erlang.trace(pid, true, [:garbage_collection, tracer: self()])
-        send(pid, :ready)
+        send(pid, :ready_to_begin)
         tracer_loop(pid, acc)
 
       :end_collection ->
         :erlang.trace(pid, false, [:garbage_collection])
-        send(pid, :ready)
+        send(pid, :ready_to_end)
         tracer_loop(pid, acc)
 
       {:get_collected_memory, reply_to, ref} ->
