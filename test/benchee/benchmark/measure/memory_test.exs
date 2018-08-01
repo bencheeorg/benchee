@@ -16,16 +16,16 @@ defmodule Benchee.MemoryMeasureTest do
       # We need to have some wiggle room here because memory used varies from
       # system to system. It's consistent in an environment, but changes
       # between environments.
-      assert memory_used > 350
-      assert memory_used < 380
+      assert memory_used > 380
+      assert memory_used < 460
     end
 
     test "doesn't return broken values" do
       fun = fn -> BenchKeyword.delete_v0(Enum.map(1..100, &{:"k#{&1}", &1}), :k100) end
       assert {memory_used, _} = Memory.measure(fun)
 
-      assert memory_used >= 5_000
-      assert memory_used <= 10_000
+      assert memory_used >= 8_000
+      assert memory_used <= 14_000
     end
 
     test "will not leak processes if the applied function raises an exception" do

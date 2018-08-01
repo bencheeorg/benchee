@@ -68,10 +68,9 @@ defmodule Benchee.Benchmark.Measure.Memory do
   end
 
   defp start_tracer(pid) do
-    spawn(fn ->
-      :erlang.trace(pid, true, [:garbage_collection, tracer: self()])
-      tracer_loop(pid, 0)
-    end)
+    tracer = spawn(fn -> tracer_loop(pid, 0) end)
+    :erlang.trace(pid, true, [:garbage_collection, tracer: tracer])
+    tracer
   end
 
   defp tracer_loop(pid, acc) do
