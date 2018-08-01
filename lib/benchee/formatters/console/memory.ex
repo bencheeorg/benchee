@@ -159,13 +159,13 @@ defmodule Benchee.Formatters.Console.Memory do
       -label_width,
       name,
       @average_width,
-      Helpers.duration_output(average, memory_unit),
+      memory_output(average, memory_unit),
       @deviation_width,
       Helpers.deviation_output(std_dev_ratio),
       @median_width,
-      Helpers.duration_output(median, memory_unit),
+      memory_output(median, memory_unit),
       @percentile_width,
-      Helpers.duration_output(percentile_99, memory_unit)
+      memory_output(percentile_99, memory_unit)
     ])
     |> to_string
   end
@@ -183,7 +183,7 @@ defmodule Benchee.Formatters.Console.Memory do
       -label_width,
       name,
       @average_width,
-      Helpers.duration_output(average, memory_unit)
+      memory_output(average, memory_unit)
     ])
     |> to_string
   end
@@ -217,7 +217,7 @@ defmodule Benchee.Formatters.Console.Memory do
       -label_width,
       name,
       @median_width,
-      Helpers.duration_output(median, memory_unit)
+      memory_output(median, memory_unit)
     ])
     |> to_string
   end
@@ -253,7 +253,7 @@ defmodule Benchee.Formatters.Console.Memory do
 
   defp format_comparison(scenario, %{memory: memory_unit}, label_width, slower) do
     %Scenario{name: name, memory_usage_statistics: %Statistics{median: median}} = scenario
-    median_format = Helpers.duration_output(median, memory_unit)
+    median_format = memory_output(median, memory_unit)
 
     "~*s~*s - ~.2fx memory usage\n"
     |> :io_lib.format([-label_width, name, @median_width, median_format, slower])
