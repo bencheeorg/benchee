@@ -63,7 +63,7 @@ defmodule Benchee.Benchmark.Scenario do
       iex> Scenario.display_name(%{job_name: "flat_map"})
       "flat_map"
   """
-  @spec display_name(map) :: String.t()
+  @spec display_name(t) :: String.t()
   def display_name(%{job_name: job_name, tag: nil}), do: job_name
   def display_name(%{job_name: job_name, tag: tag}), do: "#{job_name} (#{tag})"
   def display_name(%{job_name: job_name}), do: job_name
