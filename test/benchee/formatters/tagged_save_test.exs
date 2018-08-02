@@ -38,20 +38,17 @@ defmodule Benchee.Formatters.TaggedSaveTest do
           percentiles: %{99 => 300.1}
         }
       }
-    ],
-    configuration: %Benchee.Configuration{
-      formatter_options: %{
-        tagged_save: %{
-          path: @filename,
-          tag: @benchee_tag
-        }
-      }
-    }
+    ]
   }
 
-  describe ".format/1" do
+  @options %{
+    path: @filename,
+    tag: @benchee_tag
+  }
+
+  describe ".format/2" do
     test "able to restore the original just fine" do
-      {binary, path} = format(@suite)
+      {binary, path} = format(@suite, @options)
 
       loaded_suite =
         binary
@@ -63,7 +60,7 @@ defmodule Benchee.Formatters.TaggedSaveTest do
     end
 
     test "tags the scenarios and adds it to the name" do
-      {binary, _path} = format(@suite)
+      {binary, _path} = format(@suite, @options)
 
       loaded_suite = :erlang.binary_to_term(binary)
 
@@ -122,7 +119,7 @@ defmodule Benchee.Formatters.TaggedSaveTest do
     end
 
     defp scenarios_from_formatted(suite) do
-      {binary, _path} = format(suite)
+      {binary, _path} = format(suite, @options)
       loaded_suite = :erlang.binary_to_term(binary)
       loaded_suite.scenarios
     end
@@ -142,9 +139,9 @@ defmodule Benchee.Formatters.TaggedSaveTest do
     end
   end
 
-  describe ".output/1" do
+  describe ".output/2" do
     test "able to restore fully from file" do
-      capture_io(fn -> output(@suite) end)
+      capture_io(fn -> output(@suite, @options) end)
 
       etf_data = File.read!(@filename)
 

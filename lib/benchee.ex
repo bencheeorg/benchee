@@ -65,19 +65,30 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     end
 
     defp output_results(suite = %{configuration: %{formatters: formatters}}) do
-      {parallelizable, serial} = Enum.split_with(formatters, &is_formatter_module?/1)
+      {parallelizable, serial} =
+        formatters
+        |> Enum.map(&normalize_module_configuration/1)
+        |> Enum.split_with(&is_formatter_module?/1)
 
       # why do we ignore this suite? It shouldn't be changed anyway.
       _suite = Formatter.parallel_output(suite, parallelizable)
 
-      Enum.each(serial, fn output_function ->
-        output_function.(suite)
-      end)
+      Enum.each(serial, fn function -> function.(suite) end)
 
       suite
     end
 
-    defp is_formatter_module?(formatter) when is_atom(formatter) do
+    @default_opts %{}
+    defp normalize_module_configuration(module_configuration)
+    defp normalize_module_configuration(config = {_module, _opts}), do: config
+
+    defp normalize_module_configuration(formatter) when is_atom(formatter) do
+      {formatter, @default_opts}
+    end
+
+    defp normalize_module_configuration(formatter), do: formatter
+
+    defp is_formatter_module?({formatter, _options}) when is_atom(formatter) do
       module_attributes = formatter.module_info(:attributes)
 
       module_attributes

@@ -6,17 +6,15 @@ defmodule Benchee.Formatters.ConsoleTest do
   alias Benchee.{Formatters.Console, Suite, Statistics, Benchmark.Scenario}
 
   @config %Benchee.Configuration{
-    formatter_options: %{
-      console: %{
-        comparison: true,
-        extended_statistics: false
-      }
-    },
     title: "A comprehensive benchmarking of inputs"
   }
   @no_input Benchee.Benchmark.no_input()
+  @options %{
+    comparison: true,
+    extended_statistics: false
+  }
 
-  describe ".output" do
+  describe ".output/2" do
     test "formats and prints the results right to the console" do
       scenarios = [
         %Scenario{
@@ -51,7 +49,7 @@ defmodule Benchee.Formatters.ConsoleTest do
 
       output =
         capture_io(fn ->
-          Console.output(%Suite{scenarios: scenarios, configuration: @config})
+          Console.output(%Suite{scenarios: scenarios, configuration: @config}, @options)
         end)
 
       assert output =~ ~r/First/
@@ -99,7 +97,8 @@ defmodule Benchee.Formatters.ConsoleTest do
         }
       ]
 
-      [my_arg, other_arg] = Console.format(%Suite{scenarios: scenarios, configuration: @config})
+      [my_arg, other_arg] =
+        Console.format(%Suite{scenarios: scenarios, configuration: @config}, @options)
 
       [input_header, header, result] = my_arg
       assert input_header =~ "My Arg"
@@ -172,7 +171,8 @@ defmodule Benchee.Formatters.ConsoleTest do
         }
       ]
 
-      [my_arg, other_arg] = Console.format(%Suite{scenarios: scenarios, configuration: @config})
+      [my_arg, other_arg] =
+        Console.format(%Suite{scenarios: scenarios, configuration: @config}, @options)
 
       [input_header, _header, other_job, job, _comp, ref, slower] = my_arg
       assert input_header =~ "My Arg"
@@ -221,7 +221,7 @@ defmodule Benchee.Formatters.ConsoleTest do
         }
       ]
 
-      [result] = Console.format(%Suite{scenarios: scenarios, configuration: @config})
+      [result] = Console.format(%Suite{scenarios: scenarios, configuration: @config}, @options)
       [_, _header, job_with_tag, job, _, comparison, _slower] = result
 
       assert job_with_tag =~ ~r/job \(improved\)\s+10 K/
@@ -247,7 +247,8 @@ defmodule Benchee.Formatters.ConsoleTest do
         }
       ]
 
-      [[title | _]] = Console.format(%Suite{scenarios: scenarios, configuration: @config})
+      [[title | _]] =
+        Console.format(%Suite{scenarios: scenarios, configuration: @config}, @options)
 
       assert title =~ ~r/A comprehensive benchmarking of inputs/
     end

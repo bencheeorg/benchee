@@ -6,7 +6,7 @@ defmodule Benchee.Formatters.Console do
 
   use Benchee.Formatter
 
-  alias Benchee.{Statistics, Suite, Configuration}
+  alias Benchee.{Statistics, Suite}
   alias Benchee.Formatters.Console.{Memory, RunTime}
 
   @doc """
@@ -46,13 +46,10 @@ defmodule Benchee.Formatters.Console do
   iex> suite = %Benchee.Suite{
   ...>   scenarios: scenarios,
   ...>   configuration: %Benchee.Configuration{
-  ...>     formatter_options: %{
-  ...>       console: %{comparison: false, extended_statistics: false}
-  ...>     },
   ...>     unit_scaling: :best,
   ...>   }
   ...> }
-  iex> Benchee.Formatters.Console.format(suite)
+  iex> Benchee.Formatters.Console.format(suite, %{comparison: false, extended_statistics: false})
   [["\n##### With input My input #####", "\nName             ips        average  deviation         median         99th %\n",
   "My Job           5 K         200 ns    ±10.00%         190 ns      300.10 ns\n",
   "Job 2         2.50 K         400 ns    ±20.00%         390 ns      500.10 ns\n"]]
@@ -60,9 +57,14 @@ defmodule Benchee.Formatters.Console do
   ```
 
   """
-  @spec format(Suite.t()) :: [any]
-  def format(%Suite{scenarios: scenarios, configuration: config}) do
-    config = console_configuration(config)
+  @spec format(Suite.t(), map) :: [any]
+  def format(%Suite{scenarios: scenarios, configuration: config}, options \\ %{}) do
+    if Map.has_key?(options, :unit_scaling), do: warn_unit_scaling()
+
+    config =
+      config
+      |> console_configuration()
+      |> Map.merge(options)
 
     scenarios
     |> Enum.group_by(fn scenario -> scenario.input_name end)
@@ -76,25 +78,15 @@ defmodule Benchee.Formatters.Console do
   @doc """
   Takes the output of `format/1` and writes that to the console.
   """
-  @spec write(any) :: :ok | {:error, String.t()}
-  def write(output) do
+  @spec write(any, map) :: :ok | {:error, String.t()}
+  def write(output, _options \\ %{}) do
     IO.write(output)
   rescue
     _ -> {:error, "Unknown Error"}
   end
 
   defp console_configuration(config) do
-    %Configuration{
-      formatter_options: %{console: console_config},
-      unit_scaling: scaling_strategy,
-      title: title
-    } = config
-
-    if Map.has_key?(console_config, :unit_scaling), do: warn_unit_scaling()
-
-    console_config
-    |> Map.put(:unit_scaling, scaling_strategy)
-    |> Map.put(:title, title)
+    Map.take(config, [:unit_scaling, :title])
   end
 
   defp warn_unit_scaling do

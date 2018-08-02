@@ -167,17 +167,16 @@ defmodule Benchee.Configuration do
             inputs: nil,
             save: false,
             load: false,
-            formatters: [Benchee.Formatters.Console],
+            formatters: [
+              {
+                Benchee.Formatters.Console,
+                %{comparison: true, extended_statistics: false}
+              }
+            ],
             print: %{
               benchmarking: true,
               fast_warning: true,
               configuration: true
-            },
-            formatter_options: %{
-              console: %{
-                comparison: true,
-                extended_statistics: false
-              }
             },
             percentiles: [50, 99],
             unit_scaling: :best,
@@ -201,17 +200,16 @@ defmodule Benchee.Configuration do
             inputs: nil,
             save: false,
             load: false,
-            formatters: [Benchee.Formatters.Console],
+            formatters: [
+              {
+                Benchee.Formatters.Console,
+                %{comparison: true, extended_statistics: false}
+              }
+            ],
             print: %{
               benchmarking: true,
               fast_warning: true,
               configuration: true
-            },
-            formatter_options: %{
-              console: %{
-                comparison: true,
-                extended_statistics: false
-              }
             },
             percentiles: [50, 99],
             unit_scaling: :best,
@@ -235,17 +233,16 @@ defmodule Benchee.Configuration do
             inputs: nil,
             save: false,
             load: false,
-            formatters: [Benchee.Formatters.Console],
+            formatters: [
+              {
+                Benchee.Formatters.Console,
+                %{comparison: true, extended_statistics: false}
+              }
+            ],
             print: %{
               benchmarking: true,
               fast_warning: true,
               configuration: true
-            },
-            formatter_options: %{
-              console: %{
-                comparison: true,
-                extended_statistics: false
-              }
             },
             percentiles: [50, 99],
             unit_scaling: :best,
@@ -263,7 +260,7 @@ defmodule Benchee.Configuration do
       ...>   parallel: 2,
       ...>   time: 1,
       ...>   warmup: 0.2,
-      ...>   formatters: [&IO.puts/2],
+      ...>   formatters: [&IO.puts/1],
       ...>   print: [fast_warning: false],
       ...>   console: [comparison: false],
       ...>   inputs: %{"Small" => 5, "Big" => 9999},
@@ -278,7 +275,7 @@ defmodule Benchee.Configuration do
             inputs: %{"Small" => 5, "Big" => 9999},
             save: false,
             load: false,
-            formatters: [&IO.puts/2],
+            formatters: [&IO.puts/1],
             print: %{
               benchmarking: true,
               fast_warning: false,
@@ -311,6 +308,7 @@ defmodule Benchee.Configuration do
       config
       |> standardized_user_configuration
       |> merge_with_defaults
+      |> formatter_options_to_tuples
       |> convert_time_to_nano_s
       |> update_measure_memory
       |> save_option_conversion
@@ -331,6 +329,19 @@ defmodule Benchee.Configuration do
   defp translate_formatter_keys(config) do
     {formatter_options, config} = Map.split(config, @formatter_keys)
     DeepMerge.deep_merge(%{formatter_options: formatter_options}, config)
+  end
+
+  alias Benchee.Formatters.{Console, CSV, JSON, HTML}
+
+  # backwards compatible formatter definition without leaving the burden on every formatter
+  defp formatter_options_to_tuples(config) do
+    update_in(config, [Access.key(:formatters), Access.all()], fn
+      Console -> {Console, config.formatter_options[:console]}
+      CSV -> {CSV, config.formatter_options[:csv]}
+      JSON -> {JSON, config.formatter_options[:json]}
+      HTML -> {HTML, config.formatter_options[:html]}
+      formatter -> formatter
+    end)
   end
 
   defp force_string_input_keys(config = %{inputs: inputs}) do
@@ -394,8 +405,7 @@ defmodule Benchee.Configuration do
 
     %__MODULE__{
       config
-      | formatters: config.formatters ++ [Benchee.Formatters.TaggedSave],
-        formatter_options: Map.put(config.formatter_options, :tagged_save, tagged_save_options)
+      | formatters: config.formatters ++ [{Benchee.Formatters.TaggedSave, tagged_save_options}]
     }
   end
 

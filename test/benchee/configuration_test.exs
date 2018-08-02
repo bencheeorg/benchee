@@ -35,20 +35,15 @@ defmodule Benchee.ConfigurationTest do
       suite = init(save: [path: "save_one.benchee", tag: "master"])
 
       assert suite.configuration.formatters == [
-               Benchee.Formatters.Console,
-               Benchee.Formatters.TaggedSave
+               {Benchee.Formatters.Console, %{comparison: true, extended_statistics: false}},
+               {Benchee.Formatters.TaggedSave, %{path: "save_one.benchee", tag: "master"}}
              ]
-
-      assert suite.configuration.formatter_options.tagged_save == %{
-               path: "save_one.benchee",
-               tag: "master"
-             }
     end
 
     test ":save tag defaults to date" do
       suite = init(save: [path: "save_one.benchee"])
 
-      etf_options = suite.configuration.formatter_options.tagged_save
+      [_, {_, etf_options}] = suite.configuration.formatters
 
       assert etf_options.tag =~ ~r/\d\d\d\d-\d\d?-\d\d?--\d\d?-\d\d?-\d\d?/
       assert etf_options.path == "save_one.benchee"
