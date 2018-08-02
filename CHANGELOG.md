@@ -1,3 +1,12 @@
+## 0.13.2 (2018-08-02)
+
+Mostly fixing memory measurement bugs and delivering them to you asap ;)
+
+### Bugfixes (User Facing)
+* Remove race condition that caused us to sometimes miss garbage collection events and hence report even negative or N/A results
+* restructure measuring code to produce less overhead (micro memory benchmarks should be much better now)
+* make console formatter more resilient to faulty memory measurements aka don't crash
+
 ## 0.13.1 (2018-05-02)
 
 Mostly fixing memory measurement bugs and related issues :) Enjoy a better memory measurement experience from now on!
