@@ -18,6 +18,8 @@ matrix:
     otp_release: 21.0
   - elixir: 1.7.1
     otp_release: 19.3
+  - elixir: 1.7.1
+    otp_release: 18.3
 
 before_script:
   - MIX_ENV=test mix compile --warnings-as-errors
