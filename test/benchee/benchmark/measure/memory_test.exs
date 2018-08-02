@@ -15,8 +15,8 @@ defmodule Benchee.MemoryMeasureTest do
       # We need to have some wiggle room here because memory used varies from
       # system to system. It's consistent in an environment, but changes
       # between environments.
-      assert memory_used > 380
-      assert memory_used < 460
+      assert memory_used > 360
+      assert memory_used < 400
     end
 
     test "doesn't return broken values" do
@@ -37,7 +37,7 @@ defmodule Benchee.MemoryMeasureTest do
       # capture it.
       capture_io(fn ->
         Memory.measure(fn -> exit(:kill) end)
-        Process.sleep(1)
+        Process.sleep(10)
       end)
 
       assert Enum.count(Process.list()) == starting_processes
