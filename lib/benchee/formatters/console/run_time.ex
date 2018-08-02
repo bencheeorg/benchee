@@ -97,16 +97,16 @@ defmodule Benchee.Formatters.Console.RunTime do
   @spec extended_statistics_report([Scenario.t()], unit_per_statistic, integer, map) :: [
           String.t()
         ]
-  defp extended_statistics_report(_, _, _, %{extended_statistics: false}) do
-    []
-  end
-
-  defp extended_statistics_report(scenarios, units, label_width, _config) do
+  defp extended_statistics_report(scenarios, units, label_width, %{extended_statistics: true}) do
     [
       Helpers.descriptor("Extended statistics"),
       extended_column_descriptors(label_width)
       | extended_statistics(scenarios, units, label_width)
     ]
+  end
+
+  defp extended_statistics_report(_, _, _, _) do
+    []
   end
 
   @spec extended_statistics([Scenario.t()], unit_per_statistic, integer) :: [String.t()]

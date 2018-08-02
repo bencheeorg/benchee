@@ -1,22 +1,13 @@
 defmodule Benchee.Test.FakeFormatter do
   @moduledoc false
 
-  @behaviour Benchee.Formatter
+  use Benchee.Formatter
 
-  def format(_) do
+  def format(_, _) do
     "output of `format/1`"
   end
 
-  def write(output) do
+  def write(output, _) do
     send(self(), {:write, output})
-  end
-
-  def output(suite) do
-    :ok =
-      suite
-      |> format
-      |> write
-
-    suite
   end
 end

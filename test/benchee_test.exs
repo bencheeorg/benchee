@@ -21,7 +21,7 @@ defmodule BencheeTest do
         |> Benchee.benchmark("Sleeps", fn -> :timer.sleep(10) end)
         |> Benchee.measure()
         |> Statistics.statistics()
-        |> Console.format()
+        |> Console.format(%{})
 
       [[_input_name, header, benchmark_stats]] = result
       assert Regex.match?(@header_regex, header)
@@ -121,7 +121,7 @@ defmodule BencheeTest do
         |> Benchee.benchmark("map.flatten", fn -> list |> Enum.map(map_fun) |> List.flatten() end)
         |> Benchee.measure()
         |> Benchee.statistics()
-        |> Console.format()
+        |> Console.format(%{})
         |> IO.puts()
       end)
 

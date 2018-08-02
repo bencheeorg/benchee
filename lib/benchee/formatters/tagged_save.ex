@@ -14,9 +14,8 @@ defmodule Benchee.Formatters.TaggedSave do
   alias Benchee.Suite
   alias Benchee.Utility.FileCreation
 
-  @spec format(Suite.t()) :: {binary, String.t()}
-  def format(suite = %Suite{configuration: config, scenarios: scenarios}) do
-    formatter_config = config.formatter_options.tagged_save
+  @spec format(Suite.t(), map) :: {binary, String.t()}
+  def format(suite = %Suite{scenarios: scenarios}, formatter_config) do
     tag = determine_tag(scenarios, formatter_config)
     tagged_scenarios = tag_scenarios(scenarios, tag)
     tagged_suite = %Suite{suite | scenarios: tagged_scenarios}
@@ -71,8 +70,8 @@ defmodule Benchee.Formatters.TaggedSave do
     %Scenario{scenario | name: Scenario.display_name(scenario)}
   end
 
-  @spec write({binary, String.t()}) :: :ok
-  def write({term_binary, filename}) do
+  @spec write({binary, String.t()}, map) :: :ok
+  def write({term_binary, filename}, _) do
     FileCreation.ensure_directory_exists(filename)
     return_value = File.write(filename, term_binary)
 
