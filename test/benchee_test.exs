@@ -12,6 +12,25 @@ defmodule BencheeTest do
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median.+99th %$/m
   @test_configuration [time: 0.01, warmup: 0.005, measure_function_call_overhead: false]
+
+  test "integration high level README example" do
+    output =
+      capture_io(fn ->
+        list = Enum.to_list(1..10_000)
+        map_fun = fn i -> [i, i * i] end
+
+        Benchee.run(
+          %{
+            "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
+            "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
+          },
+          @test_configuration
+        )
+      end)
+
+    readme_sample_asserts(output)
+  end
+
   test "integration step by step" do
     capture_io(fn ->
       result =
@@ -21,7 +40,7 @@ defmodule BencheeTest do
         |> Benchee.benchmark("Sleeps", fn -> :timer.sleep(10) end)
         |> Benchee.measure()
         |> Statistics.statistics()
-        |> Console.format(%{})
+        |> Console.format()
 
       [[_input_name, header, benchmark_stats]] = result
       assert Regex.match?(@header_regex, header)
@@ -72,7 +91,7 @@ defmodule BencheeTest do
     readme_sample_asserts(output)
   end
 
-  test "integration keywordlist as options in second place" do
+  test "integration high level README example but with formatter options" do
     output =
       capture_io(fn ->
         list = Enum.to_list(1..10_000)
@@ -83,7 +102,8 @@ defmodule BencheeTest do
             "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
             "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
           },
-          @test_configuration
+          @test_configuration ++
+            [formatters: [{Console, comparison: true, extended_statistics: true}]]
         )
       end)
 
@@ -121,7 +141,7 @@ defmodule BencheeTest do
         |> Benchee.benchmark("map.flatten", fn -> list |> Enum.map(map_fun) |> List.flatten() end)
         |> Benchee.measure()
         |> Benchee.statistics()
-        |> Console.format(%{})
+        |> Console.format()
         |> IO.puts()
       end)
 
@@ -273,8 +293,8 @@ defmodule BencheeTest do
     end)
 
     assert_received_exactly([
-      {:write, "output of `format/1`"},
-      {:write, "output of `format/1`"},
+      {:write, "output of `format/1` with %{}"},
+      {:write, "output of `format/1` with %{}"},
       :other
     ])
   end

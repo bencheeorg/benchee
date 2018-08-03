@@ -49,12 +49,6 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     end
 
     defp do_run(jobs, config) do
-      jobs
-      |> run_benchmarks(config)
-      |> output_results
-    end
-
-    defp run_benchmarks(jobs, config) do
       config
       |> Benchee.init()
       |> Benchee.system()
@@ -62,41 +56,8 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
       |> Benchee.measure()
       |> Benchee.statistics()
       |> Benchee.load()
+      |> Formatter.output()
     end
-
-    defp output_results(suite = %{configuration: %{formatters: formatters}}) do
-      {parallelizable, serial} =
-        formatters
-        |> Enum.map(&normalize_module_configuration/1)
-        |> Enum.split_with(&is_formatter_module?/1)
-
-      # why do we ignore this suite? It shouldn't be changed anyway.
-      _suite = Formatter.parallel_output(suite, parallelizable)
-
-      Enum.each(serial, fn function -> function.(suite) end)
-
-      suite
-    end
-
-    @default_opts %{}
-    defp normalize_module_configuration(module_configuration)
-    defp normalize_module_configuration(config = {_module, _opts}), do: config
-
-    defp normalize_module_configuration(formatter) when is_atom(formatter) do
-      {formatter, @default_opts}
-    end
-
-    defp normalize_module_configuration(formatter), do: formatter
-
-    defp is_formatter_module?({formatter, _options}) when is_atom(formatter) do
-      module_attributes = formatter.module_info(:attributes)
-
-      module_attributes
-      |> Keyword.get(:behaviour, [])
-      |> Enum.member?(Benchee.Formatter)
-    end
-
-    defp is_formatter_module?(_), do: false
 
     defp add_benchmarking_jobs(suite, jobs) do
       Enum.reduce(jobs, suite, fn {key, function}, suite_acc ->

@@ -3,8 +3,8 @@ defmodule Benchee.Test.FakeFormatter do
 
   use Benchee.Formatter
 
-  def format(_, _) do
-    "output of `format/1`"
+  def format(_, opts) do
+    "output of `format/1` with #{inspect(opts)}"
   end
 
   def write(output, _) do

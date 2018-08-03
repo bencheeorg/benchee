@@ -20,15 +20,30 @@ defmodule Benchee.Utility.DeepConvert do
 
   iex> Benchee.Utility.DeepConvert.to_map([])
   %{}
-  """
-  def to_map([]), do: %{}
-  def to_map(structure), do: do_to_map(structure)
 
-  defp do_to_map(kwlist = [{_key, _value} | _tail]) do
+  iex> Benchee.Utility.DeepConvert.to_map([a: [b: [f: 5]]], [:a])
+  %{a: [b: [f: 5]]}
+
+  iex> Benchee.Utility.DeepConvert.to_map([a: [b: [f: 5]], c: [d: 3]], [:b])
+  %{a: %{b: [f: 5]}, c: %{d: 3}}
+  """
+  def to_map(structure, exclusions \\ [])
+  def to_map([], _exclusions), do: %{}
+  def to_map(structure, exclusions), do: do_to_map(structure, exclusions)
+
+  defp do_to_map(kwlist = [{_key, _value} | _tail], exclusions) do
     kwlist
-    |> Enum.map(fn {key, value} -> {key, do_to_map(value)} end)
+    |> Enum.map(fn tuple -> to_map_element(tuple, exclusions) end)
     |> Map.new()
   end
 
-  defp do_to_map(no_list), do: no_list
+  defp do_to_map(no_list, _exclusions), do: no_list
+
+  defp to_map_element({key, value}, exclusions) do
+    if Enum.member?(exclusions, key) do
+      {key, value}
+    else
+      {key, do_to_map(value, exclusions)}
+    end
+  end
 end
