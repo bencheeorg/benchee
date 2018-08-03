@@ -48,6 +48,26 @@ defmodule Benchee.ConfigurationTest do
       assert etf_options.tag =~ ~r/\d\d\d\d-\d\d?-\d\d?--\d\d?-\d\d?-\d\d?/
       assert etf_options.path == "save_one.benchee"
     end
+
+    test "takes formatter_options to build tuple list" do
+      suite =
+        init(
+          formatter_options: %{console: %{foo: :bar}},
+          formatters: [Benchee.Formatters.Console]
+        )
+
+      assert [{Benchee.Formatters.Console, %{foo: :bar}}] = suite.configuration.formatters
+    end
+
+    test "formatters already specified as a tuple are left alone" do
+      suite =
+        init(
+          formatter_options: %{console: %{foo: :bar}},
+          formatters: [{Benchee.Formatters.Console, %{a: :b}}]
+        )
+
+      assert [{Benchee.Formatters.Console, %{a: :b}}] == suite.configuration.formatters
+    end
   end
 
   describe ".deep_merge behaviour" do

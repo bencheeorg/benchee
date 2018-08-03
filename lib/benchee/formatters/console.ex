@@ -63,7 +63,7 @@ defmodule Benchee.Formatters.Console do
 
     config =
       config
-      |> console_configuration()
+      |> Map.take([:unit_scaling, :title])
       |> Map.merge(options)
 
     scenarios
@@ -83,10 +83,6 @@ defmodule Benchee.Formatters.Console do
     IO.write(output)
   rescue
     _ -> {:error, "Unknown Error"}
-  end
-
-  defp console_configuration(config) do
-    Map.take(config, [:unit_scaling, :title])
   end
 
   defp warn_unit_scaling do

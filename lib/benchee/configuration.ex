@@ -318,7 +318,7 @@ defmodule Benchee.Configuration do
 
   defp standardized_user_configuration(config) do
     config
-    |> DeepConvert.to_map()
+    |> DeepConvert.to_map([:formatters])
     |> translate_formatter_keys
     |> force_string_input_keys
   end
