@@ -11,24 +11,24 @@ defmodule Benchee.Benchmark.Measure.Memory do
     ref = make_ref()
     Process.flag(:trap_exit, true)
     start_runner(fun, ref)
-
-    return_value =
-      try do
-        fun.()
-      catch
-        _, _ -> nil
-      end
-
-    await_results(return_value, ref)
+    await_results(nil, ref)
   end
 
-  def await_results(return_value, ref) do
+  defp await_results(return_value, ref) do
     receive do
       {^ref, memory_usage} ->
         return_memory({memory_usage, return_value})
 
-      :shutdown ->
+      {^ref, :shutdown} ->
         nil
+
+      # we need a really basic pattern here because sending anything other than
+      # just what's returned from the function that we're benchmarking will
+      # involve allocating a new term, which will skew the measurements.
+      # We need to be very careful to always send the `ref` in every other
+      # message to this process.
+      new_result ->
+        await_results(new_result, ref)
     end
   end
 
@@ -39,7 +39,7 @@ defmodule Benchee.Benchmark.Measure.Memory do
       tracer = start_tracer(self())
 
       try do
-        _ = measure_memory(fun, tracer)
+        _ = measure_memory(fun, tracer, parent)
         word_size = :erlang.system_info(:wordsize)
         memory_used = get_collected_memory(tracer)
         send(parent, {ref, memory_used * word_size})
@@ -47,7 +47,7 @@ defmodule Benchee.Benchmark.Measure.Memory do
         kind, reason ->
           # would love to have this in a separate function, but elixir 1.7 complains
           send(tracer, :done)
-          send(parent, :shutdown)
+          send(parent, {ref, :shutdown})
           stacktrace = System.stacktrace()
           IO.puts(Exception.format(kind, reason, stacktrace))
           exit(:normal)
@@ -60,7 +60,7 @@ defmodule Benchee.Benchmark.Measure.Memory do
   defp return_memory({memory_usage, return_value}) when memory_usage < 0, do: {nil, return_value}
   defp return_memory(memory_usage_info), do: memory_usage_info
 
-  defp measure_memory(fun, tracer) do
+  defp measure_memory(fun, tracer, parent) do
     :erlang.garbage_collect()
     send(tracer, :begin_collection)
 
@@ -68,7 +68,9 @@ defmodule Benchee.Benchmark.Measure.Memory do
       :ready_to_begin -> nil
     end
 
-    fun.()
+    return_value = fun.()
+    send(parent, return_value)
+
     :erlang.garbage_collect()
     send(tracer, :end_collection)
 
@@ -76,7 +78,10 @@ defmodule Benchee.Benchmark.Measure.Memory do
       :ready_to_end -> nil
     end
 
-    fun
+    # We need to reference these variables after we end our collection so
+    # these don't get GC'd and counted towards the memory usage of the function
+    # we're benchmarking.
+    {parent, fun}
   end
 
   defp get_collected_memory(tracer) do
