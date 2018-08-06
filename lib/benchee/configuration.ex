@@ -95,12 +95,13 @@ defmodule Benchee.Configuration do
     * `title` - this option is purely cosmetic. If you would like to add a
     title with some meaning to a given suite, you can do so by providing
     a single string here. This is only for use by formatters.
-    * `formatters` - list of formatters either as module implementing the
-    formatter behaviour or formatter functions. They are run when using
-    `Benchee.run/2`. Functions need to accept one argument (which is the
-    benchmarking suite with all data) and then use that to produce output. Used
+    * `formatters` - list of formatters either as a module implementing the formatter
+    behaviour, a tuple of said module and options it should take or formatter
+    functions. They are run when using `Benchee.run/2` or you can invoktem them
+    through `Benchee.Formatter.output/1`. Functions need to accept one argument (which
+    is the benchmarking suite with all data) and then use that to produce output. Used
     for plugins. Defaults to the builtin console formatter
-    `Benchee.Formatters.Console`.
+    `Benchee.Formatters.Console`. See [Formatters](#formatters).
     * `pre_check` - whether or not to run each job with each input - including all
     given before or after scenario or each hooks - before the benchmarks are
     measured to ensure that your code executes without error. This can save time

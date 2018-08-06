@@ -44,9 +44,10 @@ defmodule Benchee.Formatter do
   functions are actually called in parallel (as they should be pure) - due to potential
   interference the `write/2` functions are called serial.
 
-  Also handles   pure functions that will then be called with the suite.
+  Also handles pure functions that will then be called with the suite.
 
-  Actually, you shouldn't rely on this function. Maybe we should move it somewhere else :D
+  You can't rely on the formatters being called in pre determined order. Right now first those
+  that are parallelizable (benchee formatter modules) are called, then normal functions.
   """
   @spec output(Suite.t()) :: Suite.t()
   def output(suite = %{configuration: %{formatters: formatters}}) do
@@ -87,7 +88,7 @@ defmodule Benchee.Formatter do
   @doc """
   Output a suite with a given formatter and options.
 
-  Replacement for the old `Formatter.output/1` - calls `format/2` and `write/2` one after another
+  Replacement for the old `MyFormatter.output/1` - calls `format/2` and `write/2` one after another
   to create the output defined by the given formatter module. For the given options please refer
   to the documentation of the formatters you use.
   """
