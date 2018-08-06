@@ -149,6 +149,27 @@ defmodule BencheeTest do
     readme_sample_asserts(output)
   end
 
+  test "integration expanded README sample but using Formatter.output/1" do
+    output =
+      capture_io(fn ->
+        list = Enum.to_list(1..10_000)
+        map_fun = fn i -> [i, i * i] end
+
+        configuration = @test_configuration ++ [formatters: [Console]]
+
+        configuration
+        |> Benchee.init()
+        |> Benchee.system()
+        |> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
+        |> Benchee.benchmark("map.flatten", fn -> list |> Enum.map(map_fun) |> List.flatten() end)
+        |> Benchee.measure()
+        |> Benchee.statistics()
+        |> Formatter.output()
+      end)
+
+    readme_sample_asserts(output)
+  end
+
   @tag :needs_fast_function_repetition
   test "integration super fast function print warnings" do
     output =
