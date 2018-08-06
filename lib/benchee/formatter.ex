@@ -33,34 +33,6 @@ defmodule Benchee.Formatter do
   """
   @callback write(any, options) :: :ok | {:error, String.t()}
 
-  @doc """
-  Combines `format/1` and `write/1` into a single convenience function that is
-  also chainable (as it takes a suite and returns a suite).
-  """
-  @callback output(Suite.t(), options) :: Suite.t()
-
-  defmacro __using__(_) do
-    quote location: :keep do
-      @behaviour Benchee.Formatter
-
-      @type options :: any
-
-      @doc """
-      Combines `format/1` and `write/1` into a single convenience function that
-      is also chainable (as it takes a suite and returns a suite).
-      """
-      @spec output(Benchee.Suite.t(), options) :: Benchee.Suite.t()
-      def output(suite, options \\ %{}) do
-        :ok =
-          suite
-          |> format(options)
-          |> write(options)
-
-        suite
-      end
-    end
-  end
-
   @typep module_configuration :: module | {module, options}
 
   @doc """
@@ -77,6 +49,7 @@ defmodule Benchee.Formatter do
 
   Actually, you shouldn't rely on this function. Maybe we should move it somewhere else :D
   """
+  @spec output(Suite.t()) :: Suite.t()
   def output(suite = %{configuration: %{formatters: formatters}}) do
     {parallelizable, serial} =
       formatters
@@ -88,6 +61,16 @@ defmodule Benchee.Formatter do
     _suite = parallel_output(suite, parallelizable)
 
     Enum.each(serial, fn function -> function.(suite) end)
+
+    suite
+  end
+
+  @spec output(Suite.t(), module, options) :: Suite.t()
+  def output(suite, formatter, options) do
+    :ok =
+      suite
+      |> formatter.format(options)
+      |> formatter.write(options)
 
     suite
   end

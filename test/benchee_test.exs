@@ -4,6 +4,7 @@ defmodule BencheeTest do
   import Benchee.TestHelpers
   alias Benchee.Test.FakeFormatter
   alias Benchee.Statistics
+  alias Benchee.Formatter
   alias Benchee.Formatters.Console
   alias Benchee.Suite
   alias Benchee.Conversion.Duration
@@ -255,7 +256,7 @@ defmodule BencheeTest do
     readme_sample_asserts(output)
   end
 
-  test "formatters can be supplied as the output/1 function" do
+  test "formatters can be supplied with the Formatter.output/3 function" do
     output =
       capture_io(fn ->
         list = Enum.to_list(1..10_000)
@@ -268,7 +269,7 @@ defmodule BencheeTest do
           },
           Keyword.merge(
             @test_configuration,
-            formatters: [&Console.output/1]
+            formatters: [fn suite -> Formatter.output(suite, Console, %{}) end]
           )
         )
       end)

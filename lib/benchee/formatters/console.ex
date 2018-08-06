@@ -4,7 +4,7 @@ defmodule Benchee.Formatters.Console do
   output through `IO.write` on the console.
   """
 
-  use Benchee.Formatter
+  @behaviour Benchee.Formatter
 
   alias Benchee.{Statistics, Suite}
   alias Benchee.Formatters.Console.{Memory, RunTime}

@@ -4,6 +4,7 @@ defmodule Benchee.Formatters.ConsoleTest do
 
   import ExUnit.CaptureIO
   alias Benchee.{Formatters.Console, Suite, Statistics, Benchmark.Scenario}
+  alias Benchee.Formatter
 
   @config %Benchee.Configuration{
     title: "A comprehensive benchmarking of inputs"
@@ -14,7 +15,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     extended_statistics: false
   }
 
-  describe ".output/2" do
+  describe "Formatter.output/3 integration" do
     test "formats and prints the results right to the console" do
       scenarios = [
         %Scenario{
@@ -49,7 +50,11 @@ defmodule Benchee.Formatters.ConsoleTest do
 
       output =
         capture_io(fn ->
-          Console.output(%Suite{scenarios: scenarios, configuration: @config}, @options)
+          Formatter.output(
+            %Suite{scenarios: scenarios, configuration: @config},
+            Console,
+            @options
+          )
         end)
 
       assert output =~ ~r/First/

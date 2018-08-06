@@ -1,7 +1,7 @@
 defmodule Benchee.Test.FakeFormatter do
   @moduledoc false
 
-  use Benchee.Formatter
+  @behaviour Benchee.Formatter
 
   def format(_, opts) do
     "output of `format/1` with #{inspect(opts)}"

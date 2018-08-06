@@ -8,7 +8,7 @@ defmodule Benchee.Formatters.TaggedSave do
   configuration.
   """
 
-  use Benchee.Formatter
+  @behaviour Benchee.Formatter
 
   alias Benchee.Benchmark.Scenario
   alias Benchee.Suite
