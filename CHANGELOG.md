@@ -2,17 +2,23 @@
 
 ### Breaking Changes (User Facing)
 * dropped support for Erlang 18.x
+* Formatters no longer have an `output/1` method, instead use `Formatter.output/3` please
+* Usage of `formatter_options` is deprecated, instead please use the new tuple way
 
 ### Features (User Facing)
 * benchee now uses the maximum precision available to measure which on Linux and OSX is nanoseonds instead of microseconds. Somewhat surprisingly `:timer.tc/1` always cut down to microseconds although better precision is available.
+* The preferred way to specify formatters and their options is to specify them as a tuple `{module, options}` instead of using `formatter_options`.
+* New `Formatter.output/1` function that takes a suite and uses all configured formatters to output their results
 * Add the concept of a benchmarking title that formatters can pick up
 * the displayed percentiles can now be adjusted
 
 ### Breaking Changes (Plugins)
 * all reported times are now in nanoseconds instead of microseconds
+* formatter methods `format` and `write` now take 2 arguments each where the additional arguments is the options specified for this formatter so that you have direct access to it without peeling it from the suite
+* You can no longer `use Benchee.Formatter` - just adopt the behaviour (no more auto generated `output/1` method, but `Formatter.output/3` takes that responsibility now)
 
-### Features (User Facing)
-* An optional title is now available in the suite
+### Features (Plugins)
+* An optional title is now available in the suite for you to display
 
 ## 0.13.2 (2018-08-02)
 
