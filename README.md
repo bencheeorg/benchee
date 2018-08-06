@@ -163,7 +163,7 @@ The available options are the following (also documented in [hexdocs](https://he
 * `time` - the time in seconds for how long each individual benchmarking job should be run for measuring the execution times (run time performance). Defaults to 5.
 * `memory_time` - the time in seconds for how long [memory measurements](measuring-memory-consumption) should be conducted. Defaults to 0 (turned off).
 * `inputs` - a map from descriptive input names to some different input, your benchmarking jobs will then be run with each of these inputs. For this to work your benchmarking function gets the current input passed in as an argument into the function. Defaults to `nil`, aka no input specified and functions are called without an argument. See [Inputs](#inputs).
-* `formatters` - list of formatters either as module implementing the formatter behaviour or formatter functions. They are run when using `Benchee.run/2`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter `Benchee.Formatters.Console`. See [Formatters](#formatters).
+* `formatters` - list of formatters either as a module implementing the formatter behaviour, a tuple of said module and options it should take or formatter functions. They are run when using `Benchee.run/2` or you can invoktem them through `Benchee.Formatter.output/1`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter `Benchee.Formatters.Console`. See [Formatters](#formatters).
 * `pre_check` - whether or not to run each job with each input - including all given before or after scenario or each hooks - before the benchmarks are measured to ensure that your code executes without error. This can save time while developing your suites. Defaults to `false`.
 * `parallel` - the function of each benchmarking job will be executed in `parallel` number processes. If `parallel: 4` then 4 processes will be spawned that all execute the _same_ function for the given time. When these finish/the time is up 4 new processes will be spawned for the next job/function. This gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking). Defaults to 1 (no parallel execution).
 * `save` - specify a `path` where to store the results of the current benchmarking suite, tagged with the specified `tag`. See [Saving & Loading](#saving-loading-and-comparing-previous-runs).
@@ -251,7 +251,8 @@ Therefore, I **highly recommend** using this feature and checking different real
 Among all the configuration options, one that you probably want to use are the formatters. They format and print out the results of the benchmarking suite.
 
 The `:formatters` option is specified a list of:
-* modules implementing the `Benchee.Formatter` behaviour, or...
+* modules implementing the `Benchee.Formatter` behaviour
+* a tuple of a module specified above and options for it `{module, options}`
 * functions that take one argument (the benchmarking suite with all its results) and then do whatever you want them to
 
 So if you are using the [HTML plugin](https://github.com/PragTob/benchee_html) and you want to run both the console formatter and the HTML formatter this looks like this (after you installed it of course):
@@ -265,10 +266,9 @@ Benchee.run(%{
   "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
 },
   formatters: [
-    Benchee.Formatters.HTML,
+    {Benchee.Formatters.HTML, file: "samples_output/my.html"},
     Benchee.Formatters.Console
-  ],
-  formatter_options: [html: [file: "samples_output/my.html"]]
+  ]
 )
 ```
 
@@ -283,7 +283,7 @@ map_fun = fn(i) -> [i, i * i] end
 Benchee.run(%{
   "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
   "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
-}, time: 10, formatter_options: %{console: %{extended_statistics: true}})
+}, time: 10, formatters: [{Benchee.Formatters.Console, extended_statistics: true}])
 ```
 
 Which produces:
@@ -640,7 +640,9 @@ Benchee.init(time: 3)
 |> Benchee.measure
 |> Benchee.statistics
 |> Benchee.load # can be omitted when you don't want to/need to load scenarios
-|> Benchee.Formatters.Console.output
+|> Benchee.Formatter.output(Benchee.Formatters.Console, %{})
+# Instead of the last call you could also just use Benchee.Formatter.output()
+# to just output all configured formatters
 ```
 
 This is a take on the _functional transformation_ of data applied to benchmarks:
