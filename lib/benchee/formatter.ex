@@ -7,10 +7,9 @@ defmodule Benchee.Formatter do
   behaviour, as it helps with uniformity and also allows at least the `.format`
   function of formatters to be run in parallel.
 
-  Even better, do `use Benchee.Formatter` which will already implement
-  the `output/1` function for you. This is recommended as `output/1`
-  really shouldn't have any more logic than that, logic/features should
-  be in either `format/1` or `write/1`.
+  The module itself then has functions to deal with formatters defined in this way
+  allowing for parallel output through `output/1` or just output a single formatter
+  through `output/3`.
   """
 
   alias Benchee.{Suite, Utility.Parallel}
@@ -65,16 +64,6 @@ defmodule Benchee.Formatter do
     suite
   end
 
-  @spec output(Suite.t(), module, options) :: Suite.t()
-  def output(suite, formatter, options) do
-    :ok =
-      suite
-      |> formatter.format(options)
-      |> formatter.write(options)
-
-    suite
-  end
-
   @default_opts %{}
   defp normalize_module_configuration(module_configuration)
   defp normalize_module_configuration({module, opts}), do: {module, DeepConvert.to_map(opts)}
@@ -94,6 +83,23 @@ defmodule Benchee.Formatter do
   end
 
   defp is_formatter_module?(_), do: false
+
+  @doc """
+  Output a suite with a given formatter and options.
+
+  Replacement for the old `Formatter.output/1` - calls `format/2` and `write/2` one after another
+  to create the output defined by the given formatter module. For the given options please refer
+  to the documentation of the formatters you use.
+  """
+  @spec output(Suite.t(), module, options) :: Suite.t()
+  def output(suite, formatter, options) do
+    :ok =
+      suite
+      |> formatter.format(options)
+      |> formatter.write(options)
+
+    suite
+  end
 
   # Invokes `format/2` and `write/2` as defined by the `Benchee.Formatter`
   # behaviour. The output for all formatters is generated in parallel, and then
