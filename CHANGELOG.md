@@ -5,9 +5,23 @@
 
 ### Features (User Facing)
 * benchee now uses the maximum precision available to measure which on Linux and OSX is nanoseonds instead of microseconds. Somewhat surprisingly `:timer.tc/1` always cut down to microseconds although better precision is available.
+* Add the concept of a benchmarking title that formatters can pick up
+* the displayed percentiles can now be adjusted
 
 ### Breaking Changes (Plugins)
 * all reported times are now in nanoseconds instead of microseconds
+
+### Features (User Facing)
+* An optional title is now available in the suite
+
+## 0.13.2 (2018-08-02)
+
+Mostly fixing memory measurement bugs and delivering them to you asap ;)
+
+### Bugfixes (User Facing)
+* Remove race condition that caused us to sometimes miss garbage collection events and hence report even negative or N/A results
+* restructure measuring code to produce less overhead (micro memory benchmarks should be much better now)
+* make console formatter more resilient to faulty memory measurements aka don't crash
 
 ## 0.13.1 (2018-05-02)
 
