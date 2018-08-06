@@ -3,6 +3,9 @@ defmodule Benchee.Formatters.TaggedSaveTest do
 
   alias Benchee.{Suite, Statistics}
   alias Benchee.Benchmark.Scenario
+  alias Benchee.Formatter
+  alias Benchee.Formatters.TaggedSave
+
   import Benchee.Formatters.TaggedSave
   import Benchee.Benchmark, only: [no_input: 0]
   import ExUnit.CaptureIO
@@ -139,9 +142,9 @@ defmodule Benchee.Formatters.TaggedSaveTest do
     end
   end
 
-  describe ".output/2" do
+  describe "Integreating with Formatter.output/3" do
     test "able to restore fully from file" do
-      capture_io(fn -> output(@suite, @options) end)
+      capture_io(fn -> Formatter.output(@suite, TaggedSave, @options) end)
 
       etf_data = File.read!(@filename)
 
