@@ -57,6 +57,7 @@ defmodule Benchee.Formatters.Console do
   ```
 
   """
+  @impl true
   @spec format(Suite.t(), map) :: [any]
   def format(%Suite{scenarios: scenarios, configuration: config}, options \\ %{}) do
     if Map.has_key?(options, :unit_scaling), do: warn_unit_scaling()
@@ -78,6 +79,7 @@ defmodule Benchee.Formatters.Console do
   @doc """
   Takes the output of `format/1` and writes that to the console.
   """
+  @impl true
   @spec write(any, map) :: :ok | {:error, String.t()}
   def write(output, _options \\ %{}) do
     IO.write(output)
