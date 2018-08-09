@@ -9,6 +9,8 @@ defmodule Benchee.Formatters.Console do
   alias Benchee.{Statistics, Suite}
   alias Benchee.Formatters.Console.{Memory, RunTime}
 
+  def format(suite), do: format(suite, %{})
+
   @doc """
   Formats the benchmark statistics to a report suitable for output on the CLI.
 
@@ -59,7 +61,7 @@ defmodule Benchee.Formatters.Console do
   """
   @impl true
   @spec format(Suite.t(), map) :: [any]
-  def format(%Suite{scenarios: scenarios, configuration: config}, options \\ %{}) do
+  def format(%Suite{scenarios: scenarios, configuration: config}, options) do
     if Map.has_key?(options, :unit_scaling), do: warn_unit_scaling()
 
     config =
@@ -76,12 +78,14 @@ defmodule Benchee.Formatters.Console do
     end)
   end
 
+  def write(suite), do: write(suite, %{})
+
   @doc """
   Takes the output of `format/1` and writes that to the console.
   """
   @impl true
   @spec write(any, map) :: :ok | {:error, String.t()}
-  def write(output, _options \\ %{}) do
+  def write(output, _options) do
     IO.write(output)
   rescue
     _ -> {:error, "Unknown Error"}
