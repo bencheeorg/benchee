@@ -1,7 +1,7 @@
 defmodule Benchee.Statistics do
   @moduledoc """
   Statistics related functionality that is meant to take the raw benchmark run
-  times and then compute statistics like the average and the standard devaition.
+  times and then compute statistics like the average and the standard deviation.
   """
 
   alias Benchee.{Benchmark.Scenario, Conversion.Duration, Statistics, Suite, Utility.Parallel}
@@ -86,7 +86,7 @@ defmodule Benchee.Statistics do
       is a value for which 99% of the run times are shorter.
     * mode          - the run time(s) that occur the most. Often one value, but
       can be multiple values if they occur the same amount of times. If no value
-      occures at least twice, this value will be nil.
+      occurs at least twice, this value will be nil.
     * minimum       - the smallest (fastest) run time measured for the job
     * maximum       - the biggest (slowest) run time measured for the job
     * sample_size   - the number of run time measurements taken
