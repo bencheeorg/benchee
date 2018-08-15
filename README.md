@@ -64,7 +64,7 @@ The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/Pr
 ## Features
 
 * first runs the functions for a given warmup time without recording the results, to simulate a _"warm"_ running system
-* [measures memory](measuring-memory-consumption)
+* [measures memory](#measuring-memory-consumption)
 * provides you with lots of statistics - check the next list
 * plugin/extensible friendly architecture so you can use different formatters to generate [CSV, HTML and more](#plugins)
 * nicely formatted console output with units scaled to appropriate units
