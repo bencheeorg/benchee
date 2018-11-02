@@ -68,6 +68,12 @@ defmodule Benchee.ConfigurationTest do
 
       assert [{Benchee.Formatters.Console, %{a: :b}}] == suite.configuration.formatters
     end
+
+    test "legacy formatter options default to just the module if no options are given" do
+      suite = init(formatters: [Benchee.Formatter.CSV])
+
+      assert [Benchee.Formatter.CSV] == suite.configuration.formatters
+    end
   end
 
   describe ".deep_merge behaviour" do

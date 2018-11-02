@@ -315,8 +315,8 @@ defmodule BencheeTest do
     end)
 
     assert_received_exactly([
-      {:write, "output of `format/1` with %{}"},
-      {:write, "output of `format/1` with %{}"},
+      {:write, "output of `format/1` with %{}", %{}},
+      {:write, "output of `format/1` with %{}", %{}},
       :other
     ])
   end

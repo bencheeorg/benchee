@@ -6,25 +6,25 @@ defmodule Benchee.FormatterTest do
     test "calls `write/1` with the output of `format/1` on each module" do
       Formatter.output(%Suite{configuration: %{formatters: [{FakeFormatter, %{}}]}})
 
-      assert_receive {:write, "output of `format/1` with %{}"}
+      assert_receive {:write, "output of `format/1` with %{}", %{}}
     end
 
-    test "works with just modules without option tuple" do
+    test "works with just modules without option tuple, defaults to empty map" do
       Formatter.output(%Suite{configuration: %{formatters: [FakeFormatter]}})
 
-      assert_receive {:write, "output of `format/1` with %{}"}
+      assert_receive {:write, "output of `format/1` with %{}", %{}}
     end
 
     test "options are passed on correctly" do
       Formatter.output(%Suite{configuration: %{formatters: [{FakeFormatter, %{a: :b}}]}})
 
-      assert_receive {:write, "output of `format/1` with %{a: :b}"}
+      assert_receive {:write, "output of `format/1` with %{a: :b}", %{a: :b}}
     end
 
     test "keyword list options are deep converted to maps" do
       Formatter.output(%Suite{configuration: %{formatters: [{FakeFormatter, [a: [b: :c]]}]}})
 
-      assert_receive {:write, "output of `format/1` with %{a: %{b: :c}}"}
+      assert_receive {:write, "output of `format/1` with %{a: %{b: :c}}", %{a: %{b: :c}}}
     end
 
     test "mixing functions and formatters works" do
@@ -39,7 +39,7 @@ defmodule Benchee.FormatterTest do
 
       Formatter.output(suite)
 
-      assert_receive {:write, "output of `format/1` with %{}"}
+      assert_receive {:write, "output of `format/1` with %{}", %{}}
       assert_receive {:fun, ^suite, "me"}
     end
 

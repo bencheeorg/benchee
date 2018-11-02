@@ -3,11 +3,11 @@ defmodule Benchee.Test.FakeFormatter do
 
   @behaviour Benchee.Formatter
 
-  def format(_, opts) do
-    "output of `format/1` with #{inspect(opts)}"
+  def format(_, options) do
+    "output of `format/1` with #{inspect(options)}"
   end
 
-  def write(output, _) do
-    send(self(), {:write, output})
+  def write(output, options) do
+    send(self(), {:write, output, options})
   end
 end
