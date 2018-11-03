@@ -337,12 +337,20 @@ defmodule Benchee.Configuration do
   # backwards compatible formatter definition without leaving the burden on every formatter
   defp formatter_options_to_tuples(config) do
     update_in(config, [Access.key(:formatters), Access.all()], fn
-      Console -> {Console, config.formatter_options[:console]}
-      CSV -> {CSV, config.formatter_options[:csv]}
-      JSON -> {JSON, config.formatter_options[:json]}
-      HTML -> {HTML, config.formatter_options[:html]}
+      Console -> formatter_configuration_from_options(config, Console, :console)
+      CSV -> formatter_configuration_from_options(config, CSV, :csv)
+      JSON -> formatter_configuration_from_options(config, JSON, :json)
+      HTML -> formatter_configuration_from_options(config, HTML, :html)
       formatter -> formatter
     end)
+  end
+
+  defp formatter_configuration_from_options(config, module, legacy_option_key) do
+    if Map.has_key?(config.formatter_options, legacy_option_key) do
+      {module, config.formatter_options[legacy_option_key]}
+    else
+      module
+    end
   end
 
   defp force_string_input_keys(config = %{inputs: inputs}) do
