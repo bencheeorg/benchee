@@ -44,6 +44,11 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     end
 
     def run(config, jobs) when is_map(jobs) do
+      IO.puts("""
+      Passing configuration as the first argument to `run/2` is deprecated.
+      Please see the documentation for `run/2` for updated usage instructions.
+      """)
+
       # pre 0.6.0 way of passing in the config first and as a map
       do_run(jobs, config)
     end

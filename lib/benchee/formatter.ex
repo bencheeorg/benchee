@@ -74,7 +74,20 @@ defmodule Benchee.Formatter do
     {formatter, @default_opts}
   end
 
-  defp normalize_module_configuration(formatter), do: formatter
+  defp normalize_module_configuration(formatter) when is_function(formatter, 1), do: formatter
+
+  defp normalize_module_configuration(formatter) do
+    IO.puts("""
+
+    All formaters that are not modules implementing the `Benchee.Formatter`
+    behaviour or functions with an arity of 1 are deprecated.
+    Please see the documentation for `Benchee.Configuration.init/1` for
+    current usage instructions.
+
+    """)
+
+    formatter
+  end
 
   defp is_formatter_module?({formatter, _options}) when is_atom(formatter) do
     module_attributes = formatter.module_info(:attributes)
