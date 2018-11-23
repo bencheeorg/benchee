@@ -2,7 +2,7 @@ defmodule Benchee.Formatters.Console.MemoryTest do
   use ExUnit.Case, async: true
   doctest Benchee.Formatters.Console.Memory
 
-  alias Benchee.{Formatters.Console.Memory, Statistics, Benchmark.Scenario}
+  alias Benchee.{Benchmark.Scenario, Formatters.Console.Memory, Statistics}
 
   @console_config %{
     comparison: true,

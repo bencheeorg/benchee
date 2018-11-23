@@ -3,13 +3,15 @@ defmodule Benchee.Configuration do
   Functions to handle the configuration of Benchee, exposes `init/1` function.
   """
 
+  alias Benchee.Formatters.{Console, CSV, HTML, JSON}
+
   alias Benchee.{
-    Suite,
     Configuration,
     Conversion.Duration,
     Conversion.Scale,
-    Utility.DeepConvert,
-    Formatters.Console
+    Formatters.Console,
+    Suite,
+    Utility.DeepConvert
   }
 
   defstruct parallel: 1,
@@ -53,7 +55,7 @@ defmodule Benchee.Configuration do
           pre_check: boolean,
           formatters: [(Suite.t() -> Suite.t())],
           print: map,
-          inputs: %{Suite.key() => any} | nil,
+          inputs: %{Suite.key() => any} | [{String.t(), any}] | nil,
           save: map | false,
           load: String.t() | [String.t()] | false,
           formatter_options: map,
@@ -273,7 +275,7 @@ defmodule Benchee.Configuration do
             parallel: 2,
             time: 1_000_000_000.0,
             warmup: 200_000_000.0,
-            inputs: %{"Small" => 5, "Big" => 9999},
+            inputs: [{"Big", 9999}, {"Small", 5}],
             save: false,
             load: false,
             formatters: [&IO.puts/1],
@@ -319,7 +321,7 @@ defmodule Benchee.Configuration do
 
   defp standardized_user_configuration(config) do
     config
-    |> DeepConvert.to_map([:formatters])
+    |> DeepConvert.to_map([:formatters, :inputs])
     |> translate_formatter_keys
     |> force_string_input_keys
   end
@@ -331,8 +333,6 @@ defmodule Benchee.Configuration do
     {formatter_options, config} = Map.split(config, @formatter_keys)
     DeepMerge.deep_merge(%{formatter_options: formatter_options}, config)
   end
-
-  alias Benchee.Formatters.{Console, CSV, JSON, HTML}
 
   # backwards compatible formatter definition without leaving the burden on every formatter
   defp formatter_options_to_tuples(config) do
@@ -355,9 +355,17 @@ defmodule Benchee.Configuration do
 
   defp force_string_input_keys(config = %{inputs: inputs}) do
     standardized_inputs =
-      for {name, value} <- inputs, into: %{} do
-        {to_string(name), value}
-      end
+      inputs
+      |> Enum.reduce([], fn {name, value}, acc ->
+        normalized_name = to_string(name)
+
+        if List.keymember?(acc, normalized_name, 0) do
+          acc
+        else
+          [{normalized_name, value} | acc]
+        end
+      end)
+      |> Enum.reverse()
 
     %{config | inputs: standardized_inputs}
   end

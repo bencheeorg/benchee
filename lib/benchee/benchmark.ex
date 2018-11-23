@@ -4,7 +4,7 @@ defmodule Benchee.Benchmark do
   Exposes `benchmark/4` and `measure/3` functions.
   """
 
-  alias Benchee.Benchmark.{Scenario, ScenarioContext, Runner}
+  alias Benchee.Benchmark.{Runner, Scenario, ScenarioContext}
   alias Benchee.Output.BenchmarkPrinter, as: Printer
   alias Benchee.Suite
   alias Benchee.Utility.DeepConvert

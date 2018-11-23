@@ -4,12 +4,8 @@ defmodule Benchee.Benchmark.Runner do
   # This module actually runs our benchmark scenarios, adding information about
   # run time and memory usage to each scenario.
 
-  alias Benchee.Benchmark
-  alias Benchee.Benchmark.{Scenario, ScenarioContext, Measure, Hooks, RepeatedMeasurement}
-  alias Benchee.Configuration
-  alias Benchee.Conversion
-  alias Benchee.Statistics
-  alias Benchee.Utility.Parallel
+  alias Benchee.{Benchmark, Configuration, Conversion, Statistics, Utility.Parallel}
+  alias Benchmark.{Hooks, Measure, RepeatedMeasurement, Scenario, ScenarioContext}
 
   @doc """
   Executes the benchmarks defined before by first running the defined functions

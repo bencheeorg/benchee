@@ -94,7 +94,7 @@ Add benchee to your list of dependencies in `mix.exs`:
 
 ```elixir
 defp deps do
-  [{:benchee, "~> 0.11", only: :dev}]
+  [{:benchee, "~> 0.13", only: :dev}]
 end
 ```
 
@@ -162,7 +162,7 @@ The available options are the following (also documented in [hexdocs](https://he
 * `warmup` - the time in seconds for which a benchmarking job should be run without measuring times before "real" measurements start. This simulates a _"warm"_ running system. Defaults to 2.
 * `time` - the time in seconds for how long each individual benchmarking job should be run for measuring the execution times (run time performance). Defaults to 5.
 * `memory_time` - the time in seconds for how long [memory measurements](measuring-memory-consumption) should be conducted. Defaults to 0 (turned off).
-* `inputs` - a map from descriptive input names to some different input, your benchmarking jobs will then be run with each of these inputs. For this to work your benchmarking function gets the current input passed in as an argument into the function. Defaults to `nil`, aka no input specified and functions are called without an argument. See [Inputs](#inputs).
+* `inputs` - a map or list of two element tuples. If a map, they keys are descriptive input names and values are the actual input values. If a list of tuples, the first element in each tuple is the input name, and the second element in each tuple is the actual input value. Your benchmarking jobs will then be run with each of these inputs. For this to work your benchmarking function gets the current input passed in as an argument into the function. Defaults to `nil`, aka no input specified and functions are called without an argument. See [Inputs](#inputs).
 * `formatters` - list of formatters either as a module implementing the formatter behaviour, a tuple of said module and options it should take or formatter functions. They are run when using `Benchee.run/2` or you can invoktem them through `Benchee.Formatter.output/1`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter `Benchee.Formatters.Console`. See [Formatters](#formatters).
 * `pre_check` - whether or not to run each job with each input - including all given before or after scenario or each hooks - before the benchmarks are measured to ensure that your code executes without error. This can save time while developing your suites. Defaults to `false`.
 * `parallel` - the function of each benchmarking job will be executed in `parallel` number processes. If `parallel: 4` then 4 processes will be spawned that all execute the _same_ function for the given time. When these finish/the time is up 4 new processes will be spawned for the next job/function. This gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking). Defaults to 1 (no parallel execution).
@@ -218,17 +218,25 @@ A full example, including an example of the console output, can be found
 
 ### Inputs
 
-`:inputs` is a very useful configuration that allows you to run the same benchmarking jobs with different inputs. You specify the inputs as a map from name (String or atom) to the actual input value. Functions can have different performance characteristics on differently shaped inputs - be that structure or input size.
+`:inputs` is a very useful configuration that allows you to run the same benchmarking jobs with different inputs. You specify the inputs as either a map from name (String or atom) to the actual input value or a list of tuples where the first element in each tuple is the name and the second element in the tuple is the value. Functions can have different performance characteristics on differently shaped inputs - be that structure or input size.
 
 One of such cases is comparing tail-recursive and body-recursive implementations of `map`. More information in the [repository with the benchmark](https://github.com/PragTob/elixir_playground/blob/master/bench/tco_blog_post_focussed_inputs.exs) and the [blog post](https://pragtob.wordpress.com/2016/06/16/tail-call-optimization-in-elixir-erlang-not-as-efficient-and-important-as-you-probably-think/).
 
 ```elixir
 map_fun = fn(i) -> i + 1 end
 inputs = %{
-  "Small (1 Thousand)"    => Enum.to_list(1..1_000),
+  "Small (1 Thousand)" => Enum.to_list(1..1_000),
   "Middle (100 Thousand)" => Enum.to_list(1..100_000),
-  "Big (10 Million)"      => Enum.to_list(1..10_000_000),
+  "Big (10 Million)" => Enum.to_list(1..10_000_000)
 }
+
+# Or inputs could also look like this:
+#
+# inputs = [
+#   {"Small (1 Thousand)", Enum.to_list(1..1_000)},
+#   {"Middle (100 Thousand)", Enum.to_list(1..100_000)},
+#   {"Big (10 Million)", Enum.to_list(1..10_000_000)}
+# ]
 
 Benchee.run %{
   "map tail-recursive" =>

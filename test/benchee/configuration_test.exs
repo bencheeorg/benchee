@@ -9,26 +9,29 @@ defmodule Benchee.ConfigurationTest do
 
   @default_config %Configuration{}
 
-  describe ".init/1" do
-    test "it crashes for values that are going to be ignored" do
+  describe "init/1" do
+    test "crashes for values that are going to be ignored" do
       assert_raise KeyError, fn ->
         init(runntime: 2)
       end
     end
 
-    test "it converts input keys to strings" do
+    test "converts maps to lists and input keys to strings" do
       suite = init(inputs: %{"map" => %{}, list: []})
 
-      assert %Suite{
-               configuration: %{inputs: %{"list" => [], "map" => %{}}}
-             } = suite
+      assert %Suite{configuration: %{inputs: [{"list", []}, {"map", %{}}]}} = suite
     end
 
-    test "it loses duplicated inputs keys after normalization" do
+    test "doesn't convert input lists to maps" do
+      suite = init(inputs: [{"map", %{}}, {:list, []}])
+      assert %Suite{configuration: %{inputs: [{"map", %{}}, {"list", []}]}} = suite
+    end
+
+    test "loses duplicated inputs keys after normalization" do
       suite = init(inputs: %{"map" => %{}, map: %{}})
 
       assert %Suite{configuration: %{inputs: inputs}} = suite
-      assert %{"map" => %{}} == inputs
+      assert [{"map", %{}}] == inputs
     end
 
     test "uses information from :save to setup the external term formattter" do

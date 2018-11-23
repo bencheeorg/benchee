@@ -70,7 +70,17 @@ defmodule Benchee.Formatters.Console do
       |> Map.merge(options)
 
     scenarios
-    |> Enum.group_by(fn scenario -> scenario.input_name end)
+    |> Enum.reduce([], fn scenario, grouped ->
+      case List.keyfind(grouped, scenario.input_name, 0) do
+        {_, group} ->
+          new_tuple = {scenario.input_name, [scenario | group]}
+          List.keyreplace(grouped, scenario.input_name, 0, new_tuple)
+
+        _ ->
+          [{scenario.input_name, [scenario]} | grouped]
+      end
+    end)
+    |> Enum.reverse()
     |> Enum.map(fn {input, scenarios} ->
       scenarios
       |> Statistics.sort()

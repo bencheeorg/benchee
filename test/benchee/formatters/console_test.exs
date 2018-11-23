@@ -3,8 +3,7 @@ defmodule Benchee.Formatters.ConsoleTest do
   doctest Benchee.Formatters.Console
 
   import ExUnit.CaptureIO
-  alias Benchee.{Formatters.Console, Suite, Statistics, Benchmark.Scenario}
-  alias Benchee.Formatter
+  alias Benchee.{Benchmark.Scenario, Formatter, Formatters.Console, Statistics, Suite}
 
   @config %Benchee.Configuration{
     title: "A comprehensive benchmarking of inputs"
@@ -68,7 +67,7 @@ defmodule Benchee.Formatters.ConsoleTest do
     end
   end
 
-  describe ".format" do
+  describe "format/2" do
     @header_regex ~r/Name.+ips.+average.+deviation.+median.+99th %.*/
     test "with multiple inputs and just one job" do
       scenarios = [
@@ -103,6 +102,52 @@ defmodule Benchee.Formatters.ConsoleTest do
       ]
 
       [my_arg, other_arg] =
+        Console.format(%Suite{scenarios: scenarios, configuration: @config}, @options)
+
+      [input_header, header, result] = my_arg
+      assert input_header =~ "My Arg"
+      assert header =~ @header_regex
+      assert result =~ ~r/Job.+5.+200.+10\.00%.+195\.5.+400\.1/
+
+      [input_header_2, header_2, result_2] = other_arg
+      assert input_header_2 =~ "Other Arg"
+      assert header_2 =~ @header_regex
+      assert result_2 =~ ~r/Job.+2\.5.+400.+15\.00%.+395.+500\.1/
+    end
+
+    test "retains the order of scenarios" do
+      scenarios = [
+        %Scenario{
+          name: "Job",
+          input_name: "Other Arg",
+          input: "Other Arg",
+          run_time_statistics: %Statistics{
+            average: 400.0,
+            ips: 2_500.0,
+            std_dev_ratio: 0.15,
+            median: 395.0,
+            percentiles: %{99 => 500.1},
+            sample_size: 200
+          },
+          memory_usage_statistics: %Statistics{}
+        },
+        %Scenario{
+          name: "Job",
+          input_name: "My Arg",
+          input: "My Arg",
+          run_time_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 400.1},
+            sample_size: 200
+          },
+          memory_usage_statistics: %Statistics{}
+        }
+      ]
+
+      [other_arg, my_arg] =
         Console.format(%Suite{scenarios: scenarios, configuration: @config}, @options)
 
       [input_header, header, result] = my_arg

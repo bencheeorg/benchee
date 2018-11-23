@@ -72,7 +72,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
 
   defp inputs_out(inputs) do
     inputs
-    |> Map.keys()
+    |> Enum.map(fn {name, _} -> name end)
     |> Enum.join(", ")
   end
 

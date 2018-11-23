@@ -10,8 +10,8 @@ defmodule Benchee.Formatters.Console.RunTime do
     Benchmark.Scenario,
     Conversion,
     Conversion.Count,
-    Conversion.Unit,
     Conversion.Duration,
+    Conversion.Unit,
     Formatters.Console.Helpers,
     Statistics
   }

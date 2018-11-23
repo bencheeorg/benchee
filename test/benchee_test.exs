@@ -1,13 +1,17 @@
 defmodule BencheeTest do
   use ExUnit.Case, async: true
+
+  alias Benchee.{
+    Conversion.Duration,
+    Formatter,
+    Formatters.Console,
+    Statistics,
+    Suite,
+    Test.FakeFormatter
+  }
+
   import ExUnit.CaptureIO
   import Benchee.TestHelpers
-  alias Benchee.Test.FakeFormatter
-  alias Benchee.Statistics
-  alias Benchee.Formatter
-  alias Benchee.Formatters.Console
-  alias Benchee.Suite
-  alias Benchee.Conversion.Duration
 
   doctest Benchee
 
@@ -400,6 +404,35 @@ defmodule BencheeTest do
             "medium list" => Enum.to_list(1..1_000),
             "bigger list" => Enum.to_list(1..10_000)
           }
+        ]
+
+        configuration = Keyword.merge(@test_configuration, inputs)
+
+        Benchee.run(
+          %{
+            "flat_map" => fn input -> Enum.flat_map(input, map_fun) end,
+            "map.flatten" => fn input -> input |> Enum.map(map_fun) |> List.flatten() end
+          },
+          configuration
+        )
+      end)
+
+    assert String.contains?(output, ["small list", "medium list", "bigger list"])
+    occurences = Regex.scan(body_regex("flat_map"), output)
+    assert length(occurences) == 3
+  end
+
+  test "inputs can also be a list of 2-tuples" do
+    output =
+      capture_io(fn ->
+        map_fun = fn i -> [i, i * i] end
+
+        inputs = [
+          inputs: [
+            {"small list", Enum.to_list(1..100)},
+            {"medium list", Enum.to_list(1..1_000)},
+            {"bigger list", Enum.to_list(1..10_000)}
+          ]
         ]
 
         configuration = Keyword.merge(@test_configuration, inputs)

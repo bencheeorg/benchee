@@ -1,6 +1,6 @@
 defmodule Benchee.FormatterTest do
   use ExUnit.Case, async: true
-  alias Benchee.{Suite, Formatter, Test.FakeFormatter}
+  alias Benchee.{Formatter, Suite, Test.FakeFormatter}
 
   describe "output/1" do
     test "calls `write/1` with the output of `format/1` on each module" do

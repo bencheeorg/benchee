@@ -6,7 +6,7 @@ defmodule Benchee.Conversion do
   """
 
   alias Benchee.Benchmark.Scenario
-  alias Benchee.Conversion.{Duration, Count, Memory}
+  alias Benchee.Conversion.{Count, Duration, Memory}
 
   @doc """
   Takes scenarios and a given scaling_strategy, returns the best units for the

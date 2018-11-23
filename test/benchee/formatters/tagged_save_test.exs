@@ -1,12 +1,15 @@
 defmodule Benchee.Formatters.TaggedSaveTest do
   use ExUnit.Case
 
-  alias Benchee.{Suite, Statistics}
-  alias Benchee.Benchmark.Scenario
-  alias Benchee.Formatter
-  alias Benchee.Formatters.TaggedSave
+  alias Benchee.{
+    Benchmark.Scenario,
+    Formatter,
+    Formatters.TaggedSave,
+    Statistics,
+    Suite
+  }
 
-  import Benchee.Formatters.TaggedSave
+  import TaggedSave
   import Benchee.Benchmark, only: [no_input: 0]
   import ExUnit.CaptureIO
   import Benchee.TestHelpers, only: [suite_without_scenario_tags: 1]
