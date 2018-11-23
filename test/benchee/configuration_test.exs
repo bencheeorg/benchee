@@ -6,86 +6,45 @@ defmodule Benchee.ConfigurationTest do
 
   import DeepMerge
   import Benchee.Configuration
-  import ExUnit.CaptureIO
 
   @default_config %Configuration{}
 
   describe "init/1" do
     test "crashes for values that are going to be ignored" do
-      assert_raise KeyError, fn ->
-        init(runntime: 2)
-      end
+      assert_raise KeyError, fn -> init(runntime: 2) end
     end
 
     test "converts inputs map to a list and input keys to strings" do
-      suite = init(inputs: %{"map" => %{}, list: []})
-
-      assert %Suite{configuration: %{inputs: [{"list", []}, {"map", %{}}]}} = suite
+      assert %Suite{configuration: %{inputs: [{"list", []}, {"map", %{}}]}} =
+               init(inputs: %{"map" => %{}, list: []})
     end
 
-    test "doesn't convert input lists to maps" do
-      suite = init(inputs: [{"map", %{}}, {:list, []}])
-      assert %Suite{configuration: %{inputs: [{"map", %{}}, {"list", []}]}} = suite
+    test "doesn't convert input lists to maps and retains the order of input lists" do
+      assert %Suite{configuration: %{inputs: [{"map", %{}}, {"list", []}]}} =
+               init(inputs: [{"map", %{}}, {:list, []}])
     end
 
     test "loses duplicated inputs keys after normalization" do
-      suite = init(inputs: %{"map" => %{}, map: %{}})
-
-      assert %Suite{configuration: %{inputs: inputs}} = suite
-      assert [{"map", %{}}] == inputs
+      assert %Suite{configuration: %{inputs: [{"map", %{}}]}} =
+               init(inputs: %{"map" => %{}, map: %{}})
     end
 
     test "uses information from :save to setup the external term formattter" do
-      suite = init(save: [path: "save_one.benchee", tag: "master"])
-
-      assert suite.configuration.formatters == [
-               Benchee.Formatters.Console,
-               {Benchee.Formatters.TaggedSave, %{path: "save_one.benchee", tag: "master"}}
-             ]
+      assert %Suite{
+               configuration: %{
+                 formatters: [
+                   Benchee.Formatters.Console,
+                   {Benchee.Formatters.TaggedSave, %{path: "save_one.benchee", tag: "master"}}
+                 ]
+               }
+             } = init(save: [path: "save_one.benchee", tag: "master"])
     end
 
     test ":save tag defaults to date" do
-      suite = init(save: [path: "save_one.benchee"])
+      assert %Suite{configuration: %{formatters: [_, {_, %{tag: tag, path: "save_one.benchee"}}]}} =
+               init(save: [path: "save_one.benchee"])
 
-      [_, {_, etf_options}] = suite.configuration.formatters
-
-      assert etf_options.tag =~ ~r/\d\d\d\d-\d\d?-\d\d?--\d\d?-\d\d?-\d\d?/
-      assert etf_options.path == "save_one.benchee"
-    end
-
-    test "takes formatter_options to build tuple list" do
-      suite =
-        init(
-          formatter_options: %{console: %{foo: :bar}},
-          formatters: [Benchee.Formatters.Console]
-        )
-
-      assert [{Benchee.Formatters.Console, %{foo: :bar}}] = suite.configuration.formatters
-    end
-
-    test "formatters already specified as a tuple are left alone" do
-      suite =
-        init(
-          formatter_options: %{console: %{foo: :bar}},
-          formatters: [{Benchee.Formatters.Console, %{a: :b}}]
-        )
-
-      assert [{Benchee.Formatters.Console, %{a: :b}}] == suite.configuration.formatters
-    end
-
-    test "legacy formatter options default to just the module if no options are given" do
-      suite = init(formatters: [Benchee.Formatter.CSV])
-
-      assert [Benchee.Formatter.CSV] == suite.configuration.formatters
-    end
-
-    test "it doesn't print anything in the default case" do
-      output =
-        capture_io(fn ->
-          init()
-        end)
-
-      assert output == ""
+      assert tag =~ ~r/\d\d\d\d-\d\d?-\d\d?--\d\d?-\d\d?-\d\d?/
     end
   end
 
@@ -114,9 +73,9 @@ defmodule Benchee.ConfigurationTest do
     end
 
     test "it just replaces when given another configuration" do
-      other_config = %Configuration{formatter_options: %{some: %{value: true}}}
+      other_config = %Configuration{print: %{some: %{value: true}}}
       result = deep_merge(@default_config, other_config)
-      expected = %Configuration{formatter_options: %{some: %{value: true}}}
+      expected = %Configuration{print: %{some: %{value: true}}}
 
       assert ^expected = result
     end

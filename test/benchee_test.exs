@@ -79,23 +79,6 @@ defmodule BencheeTest do
     assert Regex.match?(body_regex("Magic"), output)
   end
 
-  test "integration high level README example old school map config" do
-    output =
-      capture_io(fn ->
-        list = Enum.to_list(1..10_000)
-        map_fun = fn i -> [i, i * i] end
-
-        map_config = Enum.into(@test_configuration, %{})
-
-        Benchee.run(map_config, %{
-          "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
-          "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
-        })
-      end)
-
-    readme_sample_asserts(output)
-  end
-
   test "integration high level README example but with formatter options" do
     output =
       capture_io(fn ->
@@ -234,7 +217,7 @@ defmodule BencheeTest do
             @test_configuration,
             time: 0.01,
             warmup: 0,
-            console: [comparison: false]
+            formatters: [{Console, %{comparison: false}}]
           )
         )
       end)
@@ -282,7 +265,7 @@ defmodule BencheeTest do
     readme_sample_asserts(output)
   end
 
-  test "formatters can be supplied with the Formatter.output/3 function" do
+  test "formatters can be supplied as a function with arity 1" do
     output =
       capture_io(fn ->
         list = Enum.to_list(1..10_000)

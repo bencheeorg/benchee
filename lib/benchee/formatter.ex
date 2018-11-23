@@ -34,12 +34,10 @@ defmodule Benchee.Formatter do
   """
   @callback write(any, options) :: :ok | {:error, String.t()}
 
-  @typep module_configuration :: module | {module, options}
-
   @doc """
   Format and output all configured formatters and formatting functions.
 
-  Expects a suite that already has been run through all previous steps so has the aggregated
+  Expects a suite that already has been run through all previous functions so has the aggregated
   statistics etc. that the formatters rely on.
 
   Works by invoking the `format/2` and `write/2` functions defined in this module. The `format/2`
@@ -55,7 +53,7 @@ defmodule Benchee.Formatter do
     {parallelizable, serial} =
       formatters
       |> Enum.map(&normalize_module_configuration/1)
-      |> Enum.split_with(&is_formatter_module?/1)
+      |> Enum.split_with(&is_tuple/1)
 
     # why do we ignore this suite? It shouldn't be changed anyway.
     # We assign it because dialyzer would complain otherwise :D
@@ -66,38 +64,38 @@ defmodule Benchee.Formatter do
     suite
   end
 
-  @default_opts %{}
-  defp normalize_module_configuration(module_configuration)
-  defp normalize_module_configuration({module, opts}), do: {module, DeepConvert.to_map(opts)}
-
-  defp normalize_module_configuration(formatter) when is_atom(formatter) do
-    {formatter, @default_opts}
-  end
-
   defp normalize_module_configuration(formatter) when is_function(formatter, 1), do: formatter
 
-  defp normalize_module_configuration(formatter) do
-    IO.puts("""
-
-    All formaters that are not modules implementing the Benchee.Formatter
-    behaviour or functions with an arity of 1 are deprecated.
-    Please see the documentation for Benchee.Configuration.init/1 for
-    current usage instructions.
-
-    """)
-
-    formatter
+  defp normalize_module_configuration({module, opts}) do
+    normalize_module_configuration(module, DeepConvert.to_map(opts))
   end
 
-  defp is_formatter_module?({formatter, _options}) when is_atom(formatter) do
-    module_attributes = formatter.module_info(:attributes)
+  defp normalize_module_configuration(module) when is_atom(module) do
+    normalize_module_configuration(module, %{})
+  end
 
-    module_attributes
+  defp normalize_module_configuration(module, opts) do
+    if formatter_module?(module) do
+      {module, opts}
+    else
+      raise_behaviour_not_implemented(module)
+    end
+  end
+
+  defp formatter_module?(module) do
+    :attributes
+    |> module.module_info()
     |> Keyword.get(:behaviour, [])
     |> Enum.member?(Benchee.Formatter)
   end
 
-  defp is_formatter_module?(_), do: false
+  @spec raise_behaviour_not_implemented(atom) :: no_return()
+  defp raise_behaviour_not_implemented(module) do
+    raise """
+    The module you're attempting to use as a formatter - #{module} - does
+    not implement the `Benchee.Formatter` behaviour.
+    """
+  end
 
   @doc """
   Output a suite with a given formatter and options.
@@ -119,7 +117,6 @@ defmodule Benchee.Formatter do
   # Invokes `format/2` and `write/2` as defined by the `Benchee.Formatter`
   # behaviour. The output for all formatters is generated in parallel, and then
   # the results of that formatting are written in sequence.
-  @spec parallel_output(Suite.t(), [module_configuration]) :: Suite.t()
   defp parallel_output(suite, module_configurations) do
     module_configurations
     |> Parallel.map(fn {module, options} -> {module, options, module.format(suite, options)} end)
