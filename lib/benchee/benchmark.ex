@@ -48,19 +48,6 @@ defmodule Benchee.Benchmark do
     %Suite{suite | scenarios: List.flatten([scenarios | new_scenarios])}
   end
 
-  defp build_scenarios_for_job(job_name, function, config)
-
-  defp build_scenarios_for_job(job_name, function, nil) do
-    [
-      build_scenario(%{
-        job_name: job_name,
-        function: function,
-        input: @no_input,
-        input_name: @no_input
-      })
-    ]
-  end
-
   defp build_scenarios_for_job(job_name, function, %{inputs: nil}) do
     [
       build_scenario(%{
