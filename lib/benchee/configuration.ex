@@ -55,7 +55,7 @@ defmodule Benchee.Configuration do
           pre_check: boolean,
           formatters: [(Suite.t() -> Suite.t())],
           print: map,
-          inputs: %{Suite.key() => any} | [{String.t(), any}] | nil,
+          inputs: %{Suite.key() => any} | [{Suite.key(), any}] | nil,
           save: map | false,
           load: String.t() | [String.t()] | false,
           formatter_options: map,
@@ -322,8 +322,8 @@ defmodule Benchee.Configuration do
   defp standardized_user_configuration(config) do
     config
     |> DeepConvert.to_map([:formatters, :inputs])
-    |> translate_formatter_keys
-    |> force_string_input_keys
+    |> translate_formatter_keys()
+    |> standardize_inputs()
   end
 
   # backwards compatible translation of formatter keys to go into
@@ -353,24 +353,26 @@ defmodule Benchee.Configuration do
     end
   end
 
-  defp force_string_input_keys(config = %{inputs: inputs}) do
+  defp standardize_inputs(config = %{inputs: inputs}) do
     standardized_inputs =
       inputs
-      |> Enum.reduce([], fn {name, value}, acc ->
-        normalized_name = to_string(name)
-
-        if List.keymember?(acc, normalized_name, 0) do
-          acc
-        else
-          [{normalized_name, value} | acc]
-        end
-      end)
+      |> Enum.reduce([], &standardize_inputs/2)
       |> Enum.reverse()
 
     %{config | inputs: standardized_inputs}
   end
 
-  defp force_string_input_keys(config), do: config
+  defp standardize_inputs(config), do: config
+
+  defp standardize_inputs({name, value}, acc) do
+    normalized_name = to_string(name)
+
+    if List.keymember?(acc, normalized_name, 0) do
+      acc
+    else
+      [{normalized_name, value} | acc]
+    end
+  end
 
   defp merge_with_defaults(user_config) do
     DeepMerge.deep_merge(%Configuration{}, user_config)

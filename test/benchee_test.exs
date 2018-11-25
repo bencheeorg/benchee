@@ -446,7 +446,7 @@ defmodule BencheeTest do
         )
       end)
 
-    assert String.contains?(output, ["small list", "medium list", "bigger list"])
+    assert output =~ ~r/With input small list .*With input medium list.*With input bigger list/s
     occurences = Regex.scan(body_regex("flat_map"), output)
     assert length(occurences) == 3
   end

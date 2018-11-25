@@ -16,7 +16,7 @@ defmodule Benchee.ConfigurationTest do
       end
     end
 
-    test "converts maps to lists and input keys to strings" do
+    test "converts inputs map to a list and input keys to strings" do
       suite = init(inputs: %{"map" => %{}, list: []})
 
       assert %Suite{configuration: %{inputs: [{"list", []}, {"map", %{}}]}} = suite

@@ -9,7 +9,7 @@ defmodule Benchee.Formatters.TaggedSaveTest do
     Suite
   }
 
-  import TaggedSave
+  import Benchee.Formatters.TaggedSave
   import Benchee.Benchmark, only: [no_input: 0]
   import ExUnit.CaptureIO
   import Benchee.TestHelpers, only: [suite_without_scenario_tags: 1]
