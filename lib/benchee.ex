@@ -68,11 +68,11 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     defdelegate init(), to: Benchee.Configuration
     defdelegate init(config), to: Benchee.Configuration
     defdelegate system(suite), to: Benchee.System
+    defdelegate benchmark(suite, name, function), to: Benchee.Benchmark
+    defdelegate benchmark(suite, name, function, printer), to: Benchee.Benchmark
     defdelegate measure(suite), to: Benchee.Benchmark
     defdelegate measure(suite, printer), to: Benchee.Benchmark
-    defdelegate benchmark(suite, name, function), to: Benchee.Benchmark
     defdelegate statistics(suite), to: Benchee.Statistics
     defdelegate load(suite), to: Benchee.ScenarioLoader
-    defdelegate benchmark(suite, name, function, printer), to: Benchee.Benchmark
   end
 end

@@ -70,12 +70,24 @@ defmodule Benchee.Formatters.Console do
       |> Map.merge(options)
 
     scenarios
-    |> Enum.group_by(fn scenario -> scenario.input_name end)
+    |> Enum.reduce([], &update_grouped_list/2)
+    |> Enum.reverse()
     |> Enum.map(fn {input, scenarios} ->
       scenarios
       |> Statistics.sort()
       |> generate_output(config, input)
     end)
+  end
+
+  defp update_grouped_list(scenario, grouped_scenarios) do
+    case List.keyfind(grouped_scenarios, scenario.input_name, 0) do
+      {_, group} ->
+        new_tuple = {scenario.input_name, [scenario | group]}
+        List.keyreplace(grouped_scenarios, scenario.input_name, 0, new_tuple)
+
+      _ ->
+        [{scenario.input_name, [scenario]} | grouped_scenarios]
+    end
   end
 
   def write(suite), do: write(suite, %{})

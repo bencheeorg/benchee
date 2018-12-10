@@ -21,7 +21,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
   # with too high variance. Therefore determine an n how often it should be
   # executed in the measurement cycle.
 
-  alias Benchee.Benchmark.{Hooks, Runner, Scenario, ScenarioContext, Measure}
+  alias Benchee.Benchmark.{Hooks, Measure, Runner, Scenario, ScenarioContext}
   alias Benchee.Utility.RepeatN
 
   @minimum_execution_time 10

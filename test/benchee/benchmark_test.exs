@@ -1,11 +1,16 @@
 defmodule Benchee.BenchmarkTest do
   use ExUnit.Case, async: true
-  alias Benchee.Benchmark
-  alias Benchee.Configuration
-  alias Benchee.Benchmark.{Scenario, ScenarioContext}
+
+  alias Benchee.{
+    Benchmark,
+    Benchmark.Scenario,
+    Benchmark.ScenarioContext,
+    Configuration,
+    Suite
+  }
+
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
   alias Benchee.Test.FakeBenchmarkRunner, as: TestRunner
-  alias Benchee.Suite
 
   describe ".benchmark" do
     test "can add jobs with atom keys but converts them to string" do

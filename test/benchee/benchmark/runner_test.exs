@@ -1,9 +1,10 @@
 defmodule Benchee.Benchmark.RunnerTest do
   use ExUnit.Case, async: true
+
   import Benchee.TestHelpers
   import ExUnit.CaptureIO
-  alias Benchee.{Suite, Benchmark, Configuration}
-  alias Benchee.Benchmark.Scenario
+
+  alias Benchee.{Benchmark, Benchmark.Scenario, Configuration, Suite}
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
 
   @config %Configuration{
