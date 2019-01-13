@@ -4,7 +4,7 @@ defmodule Benchee.Statistics do
   times and then compute statistics like the average and the standard deviation.
   """
 
-  alias Benchee.{Benchmark.Scenario, Conversion.Duration, Statistics, Suite, Utility.Parallel}
+  alias Benchee.{Benchmark.Scenario, Conversion.Duration, Suite, Utility.Parallel}
 
   alias Benchee.Statistics.Mode
   alias Benchee.Statistics.Percentile
@@ -41,27 +41,6 @@ defmodule Benchee.Statistics do
         }
 
   @type samples :: [number]
-
-  @doc """
-  Sorts the given scenarios fastest to slowest by run_time average.
-
-  ## Examples
-
-      iex> scenario_1 = %Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 100.0}}
-      iex> scenario_2 = %Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 200.0}}
-      iex> scenario_3 = %Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 400.0}}
-      iex> scenarios = [scenario_2, scenario_3, scenario_1]
-      iex> Benchee.Statistics.sort(scenarios)
-      [%Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 100.0}},
-       %Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 200.0}},
-       %Benchee.Benchmark.Scenario{run_time_statistics: %Statistics{average: 400.0}}]
-  """
-  @spec sort([%Scenario{}]) :: [%Scenario{}]
-  def sort(scenarios) do
-    Enum.sort_by(scenarios, fn %Scenario{run_time_statistics: %Statistics{average: average}} ->
-      average
-    end)
-  end
 
   @doc """
   Takes a job suite with job run times, returns a map representing the
@@ -167,7 +146,7 @@ defmodule Benchee.Statistics do
         }
       end)
 
-    %Suite{suite | scenarios: scenarios_with_statistics}
+    %Suite{suite | scenarios: sort(scenarios_with_statistics)}
   end
 
   @doc """
@@ -346,5 +325,12 @@ defmodule Benchee.Statistics do
       end)
 
     %Suite{suite | scenarios: new_scenarios}
+  end
+
+  @spec sort([Scenario.t()]) :: [Scenario.t()]
+  defp sort(scenarios) do
+    Enum.sort_by(scenarios, fn scenario ->
+      {scenario.run_time_statistics.average, scenario.memory_usage_statistics.average}
+    end)
   end
 end

@@ -164,6 +164,41 @@ defmodule Benchee.StatistcsTest do
       assert memory_stats.sample_size == 5
     end
 
+    test "sorts them by their average run time fastest to slowest" do
+      fourth = %Scenario{name: "4", run_times: [400.1]}
+      second = %Scenario{name: "2", run_times: [200.0]}
+      third = %Scenario{name: "3", run_times: [400.0]}
+      first = %Scenario{name: "1", run_times: [100.0]}
+      scenarios = [fourth, third, second, first]
+
+      sorted = Statistics.statistics(%Suite{scenarios: scenarios}).scenarios
+
+      assert Enum.map(sorted, fn scenario -> scenario.name end) == ["1", "2", "3", "4"]
+    end
+
+    test "sorts them by their average memory usage least to most" do
+      fourth = %Scenario{name: "4", memory_usages: [400.1]}
+      second = %Scenario{name: "2", memory_usages: [200.0]}
+      third = %Scenario{name: "3", memory_usages: [400.0]}
+      first = %Scenario{name: "1", memory_usages: [100.0]}
+      scenarios = [fourth, third, second, first]
+
+      sorted = Statistics.statistics(%Suite{scenarios: scenarios}).scenarios
+
+      assert Enum.map(sorted, fn scenario -> scenario.name end) == ["1", "2", "3", "4"]
+    end
+
+    test "sorts them by their average run time using memory as a tie breaker" do
+      second = %Scenario{name: "2", run_times: [100.0], memory_usages: [100.0]}
+      third = %Scenario{name: "3", run_times: [100.0], memory_usages: [100.1]}
+      first = %Scenario{name: "1", run_times: [100.0], memory_usages: [99.9]}
+      scenarios = [third, second, first]
+
+      sorted = Statistics.statistics(%Suite{scenarios: scenarios}).scenarios
+
+      assert Enum.map(sorted, fn scenario -> scenario.name end) == ["1", "2", "3"]
+    end
+
     defp stats_for(suite, job_name, input_name) do
       %Scenario{run_time_statistics: stats} =
         Enum.find(suite.scenarios, fn scenario ->
@@ -195,18 +230,6 @@ defmodule Benchee.StatistcsTest do
       assert stats.maximum == 23
       assert stats.sample_size == 6
       assert stats.mode == nil
-    end
-  end
-
-  describe ".sort" do
-    test "sorts the benchmarks correctly and retains all data" do
-      fourth = %Scenario{run_time_statistics: %Statistics{average: 400.1}}
-      second = %Scenario{run_time_statistics: %Statistics{average: 200.0}}
-      third = %Scenario{run_time_statistics: %Statistics{average: 400.0}}
-      first = %Scenario{run_time_statistics: %Statistics{average: 100.0}}
-      scenarios = [fourth, second, third, first]
-
-      assert Statistics.sort(scenarios) == [first, second, third, fourth]
     end
   end
 end
