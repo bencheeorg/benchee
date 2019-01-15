@@ -164,20 +164,6 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "with multiple inputs and two jobs" do
       scenarios = [
         %Scenario{
-          name: "Job",
-          input_name: "My Arg",
-          input: "My Arg",
-          run_time_statistics: %Statistics{
-            average: 200.0,
-            ips: 5_000.0,
-            std_dev_ratio: 0.1,
-            median: 195.5,
-            percentiles: %{99 => 300.1},
-            sample_size: 200
-          },
-          memory_usage_statistics: %Statistics{}
-        },
-        %Scenario{
           name: "Other Job",
           input_name: "My Arg",
           input: "My Arg",
@@ -193,14 +179,14 @@ defmodule Benchee.Formatters.ConsoleTest do
         },
         %Scenario{
           name: "Job",
-          input_name: "Other Arg",
-          input: "Other Arg",
+          input_name: "My Arg",
+          input: "My Arg",
           run_time_statistics: %Statistics{
-            average: 400.0,
-            ips: 2_500.0,
-            std_dev_ratio: 0.15,
-            median: 395.0,
-            percentiles: %{99 => 500.1},
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1},
             sample_size: 200
           },
           memory_usage_statistics: %Statistics{}
@@ -215,6 +201,20 @@ defmodule Benchee.Formatters.ConsoleTest do
             std_dev_ratio: 0.31,
             median: 225.5,
             percentiles: %{99 => 300.1},
+            sample_size: 200
+          },
+          memory_usage_statistics: %Statistics{}
+        },
+        %Scenario{
+          name: "Job",
+          input_name: "Other Arg",
+          input: "Other Arg",
+          run_time_statistics: %Statistics{
+            average: 400.0,
+            ips: 2_500.0,
+            std_dev_ratio: 0.15,
+            median: 395.0,
+            percentiles: %{99 => 500.1},
             sample_size: 200
           },
           memory_usage_statistics: %Statistics{}
@@ -242,20 +242,6 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "with and without a tag" do
       scenarios = [
         %Scenario{
-          name: "job",
-          input_name: @no_input,
-          input: @no_input,
-          run_time_statistics: %Statistics{
-            average: 200.0,
-            ips: 5_000.0,
-            std_dev_ratio: 0.1,
-            median: 195.5,
-            percentiles: %{99 => 300.1},
-            sample_size: 200
-          },
-          memory_usage_statistics: %Statistics{}
-        },
-        %Scenario{
           name: "job (improved)",
           input_name: @no_input,
           input: @no_input,
@@ -265,6 +251,20 @@ defmodule Benchee.Formatters.ConsoleTest do
             std_dev_ratio: 0.1,
             median: 90.0,
             percentiles: %{99 => 200.1},
+            sample_size: 200
+          },
+          memory_usage_statistics: %Statistics{}
+        },
+        %Scenario{
+          name: "job",
+          input_name: @no_input,
+          input: @no_input,
+          run_time_statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 300.1},
             sample_size: 200
           },
           memory_usage_statistics: %Statistics{}

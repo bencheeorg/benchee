@@ -6,7 +6,7 @@ defmodule Benchee.Formatters.Console do
 
   @behaviour Benchee.Formatter
 
-  alias Benchee.{Statistics, Suite}
+  alias Benchee.Suite
   alias Benchee.Formatters.Console.{Memory, RunTime}
 
   def format(suite), do: format(suite, %{})
@@ -71,22 +71,22 @@ defmodule Benchee.Formatters.Console do
 
     scenarios
     |> Enum.reduce([], &update_grouped_list/2)
-    |> Enum.reverse()
     |> Enum.map(fn {input, scenarios} ->
-      scenarios
-      |> Statistics.sort()
-      |> generate_output(config, input)
+      generate_output(scenarios, config, input)
     end)
   end
 
+  # Normally one would prepend to lists and not append. In this case this lead to 2
+  # `Enum.reverse` scattered around. As these lists are usually very small (mostly less
+  # than 10 elements) I opted for `++` here.
   defp update_grouped_list(scenario, grouped_scenarios) do
     case List.keyfind(grouped_scenarios, scenario.input_name, 0) do
       {_, group} ->
-        new_tuple = {scenario.input_name, [scenario | group]}
+        new_tuple = {scenario.input_name, group ++ [scenario]}
         List.keyreplace(grouped_scenarios, scenario.input_name, 0, new_tuple)
 
       _ ->
-        [{scenario.input_name, [scenario]} | grouped_scenarios]
+        grouped_scenarios ++ [{scenario.input_name, [scenario]}]
     end
   end
 
