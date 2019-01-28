@@ -3,6 +3,14 @@ defmodule Benchee.Benchmark.Measure.Memory do
 
   # Measure memory consumption of a function.
   #
+  # This is somewhat tricky and hence some resources can be recommended reading alongside
+  # this code:
+  # * description of the approach: https://devonestes.herokuapp.com/using-erlang-trace-3
+  # * devon describing the journey that this feature put us through (includes remarks
+  #   on why certain parts are very important: https://www.youtube.com/watch?v=aqLujfzvUgM)
+  # * erlang docs on the info data structure we use:
+  #   http://erlang.org/doc/man/erlang.html#gc_minor_start
+  #
   # Returns `{nil, return_value}` in case the memory measurement went bad.
 
   @behaviour Benchee.Benchmark.Measure
