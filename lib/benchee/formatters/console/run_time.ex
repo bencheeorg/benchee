@@ -38,19 +38,23 @@ defmodule Benchee.Formatters.Console.RunTime do
   iex> scenarios = [
   ...>   %Benchee.Benchmark.Scenario{
   ...>     name: "My Job",
-  ...>     run_time_statistics: %Benchee.Statistics{
-  ...>       average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0, percentiles: %{99 => 300.1},
-  ...>       minimum: 100.1, maximum: 200.2, sample_size: 10_101, mode: 333.2
+  ...>     run_time_data: %{
+  ...>       statistics: %Benchee.Statistics{
+  ...>         average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0, percentiles: %{99 => 300.1},
+  ...>         minimum: 100.1, maximum: 200.2, sample_size: 10_101, mode: 333.2
+  ...>       },
   ...>     },
-  ...>     memory_usage_statistics: memory_statistics
+  ...>     memory_usage_data: %{statistics: memory_statistics}
   ...>   },
   ...>   %Benchee.Benchmark.Scenario{
   ...>     name: "Job 2",
-  ...>     run_time_statistics: %Benchee.Statistics{
-  ...>       average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0, percentiles: %{99 => 500.1},
-  ...>       minimum: 200.2, maximum: 400.4, sample_size: 20_202, mode: [612.3, 554.1]
+  ...>     run_time_data: %{
+  ...>       statistics: %Benchee.Statistics{
+  ...>         average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0, percentiles: %{99 => 500.1},
+  ...>         minimum: 200.2, maximum: 400.4, sample_size: 20_202, mode: [612.3, 554.1]
+  ...>       }
   ...>     },
-  ...>     memory_usage_statistics: memory_statistics
+  ...>     memory_usage_data: %{statistics: memory_statistics}
   ...>   }
   ...> ]
   iex> configuration = %{comparison: false, unit_scaling: :best, extended_statistics: true}
@@ -77,7 +81,7 @@ defmodule Benchee.Formatters.Console.RunTime do
 
   defp run_time_measurements_present?(scenarios) do
     Enum.any?(scenarios, fn scenario ->
-      scenario.run_time_statistics.sample_size > 0
+      scenario.run_time_data.statistics.sample_size > 0
     end)
   end
 
@@ -120,11 +124,13 @@ defmodule Benchee.Formatters.Console.RunTime do
   defp format_scenario_extended(scenario, %{run_time: run_time_unit}, label_width) do
     %Scenario{
       name: name,
-      run_time_statistics: %Statistics{
-        minimum: minimum,
-        maximum: maximum,
-        sample_size: sample_size,
-        mode: mode
+      run_time_data: %{
+        statistics: %Statistics{
+          minimum: minimum,
+          maximum: maximum,
+          sample_size: sample_size,
+          mode: mode
+        }
       }
     } = scenario
 
@@ -193,12 +199,14 @@ defmodule Benchee.Formatters.Console.RunTime do
   defp format_scenario(scenario, %{run_time: run_time_unit, ips: ips_unit}, label_width) do
     %Scenario{
       name: name,
-      run_time_statistics: %Statistics{
-        average: average,
-        ips: ips,
-        std_dev_ratio: std_dev_ratio,
-        median: median,
-        percentiles: %{99 => percentile_99}
+      run_time_data: %{
+        statistics: %Statistics{
+          average: average,
+          ips: ips,
+          std_dev_ratio: std_dev_ratio,
+          median: median,
+          percentiles: %{99 => percentile_99}
+        }
       }
     } = scenario
 
@@ -236,10 +244,7 @@ defmodule Benchee.Formatters.Console.RunTime do
   end
 
   defp reference_report(scenario, %{ips: ips_unit}, label_width) do
-    %Scenario{
-      name: name,
-      run_time_statistics: %Statistics{ips: ips}
-    } = scenario
+    %Scenario{name: name, run_time_data: %{statistics: %Statistics{ips: ips}}} = scenario
 
     "~*s~*s\n"
     |> :io_lib.format([-label_width, name, @ips_width, Helpers.count_output(ips, ips_unit)])
@@ -248,16 +253,19 @@ defmodule Benchee.Formatters.Console.RunTime do
 
   @spec comparisons(Scenario.t(), unit_per_statistic, integer, [Scenario.t()]) :: [String.t()]
   defp comparisons(scenario, units, label_width, scenarios_to_compare) do
-    %Scenario{run_time_statistics: reference_stats} = scenario
+    %Scenario{run_time_data: %{statistics: reference_stats}} = scenario
 
-    Enum.map(scenarios_to_compare, fn scenario = %Scenario{run_time_statistics: job_stats} ->
-      slower = reference_stats.ips / job_stats.ips
-      format_comparison(scenario, units, label_width, slower)
-    end)
+    Enum.map(
+      scenarios_to_compare,
+      fn scenario = %Scenario{run_time_data: %{statistics: job_stats}} ->
+        slower = reference_stats.ips / job_stats.ips
+        format_comparison(scenario, units, label_width, slower)
+      end
+    )
   end
 
   defp format_comparison(scenario, %{ips: ips_unit}, label_width, slower) do
-    %Scenario{name: name, run_time_statistics: %Statistics{ips: ips}} = scenario
+    %Scenario{name: name, run_time_data: %{statistics: %Statistics{ips: ips}}} = scenario
     ips_format = Helpers.count_output(ips, ips_unit)
 
     "~*s~*s - ~.2fx slower\n"

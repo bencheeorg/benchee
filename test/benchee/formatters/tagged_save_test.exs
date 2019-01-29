@@ -23,12 +23,14 @@ defmodule Benchee.Formatters.TaggedSaveTest do
         job_name: "Second",
         input_name: no_input(),
         input: no_input(),
-        run_time_statistics: %Statistics{
-          average: 200.0,
-          ips: 5_000.0,
-          std_dev_ratio: 0.1,
-          median: 195.5,
-          percentiles: %{99 => 400.1}
+        run_time_data: %{
+          statistics: %Statistics{
+            average: 200.0,
+            ips: 5_000.0,
+            std_dev_ratio: 0.1,
+            median: 195.5,
+            percentiles: %{99 => 400.1}
+          }
         }
       },
       %Scenario{
@@ -36,12 +38,14 @@ defmodule Benchee.Formatters.TaggedSaveTest do
         job_name: "First",
         input_name: no_input(),
         input: no_input(),
-        run_time_statistics: %Statistics{
-          average: 100.0,
-          ips: 10_000.0,
-          std_dev_ratio: 0.1,
-          median: 90.0,
-          percentiles: %{99 => 300.1}
+        run_time_data: %{
+          statistics: %Statistics{
+            average: 100.0,
+            ips: 10_000.0,
+            std_dev_ratio: 0.1,
+            median: 90.0,
+            percentiles: %{99 => 300.1}
+          }
         }
       }
     ]

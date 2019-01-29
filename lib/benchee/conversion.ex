@@ -20,8 +20,8 @@ defmodule Benchee.Conversion do
 
       iex> statistics = %Benchee.Statistics{average: 1_000_000.0, ips: 1000.0}
       iex> scenario = %Benchee.Benchmark.Scenario{
-      ...>   run_time_statistics: statistics,
-      ...>   memory_usage_statistics: statistics
+      ...>   run_time_data: %{statistics: statistics},
+      ...>   memory_usage_data: %{statistics: statistics}
       ...> }
       iex> Benchee.Conversion.units([scenario], :best)
       %{
@@ -48,16 +48,16 @@ defmodule Benchee.Conversion do
   def units(scenarios, scaling_strategy) do
     run_time_measurements =
       scenarios
-      |> Enum.flat_map(fn scenario -> Map.to_list(scenario.run_time_statistics) end)
+      |> Enum.flat_map(fn scenario -> Map.to_list(scenario.run_time_data.statistics) end)
       |> Enum.group_by(fn {stat_name, _} -> stat_name end, fn {_, value} -> value end)
 
     memory_measurements =
       scenarios
       |> Enum.flat_map(fn
-        %Scenario{memory_usage_statistics: nil} ->
+        %Scenario{memory_usage_data: %{statistics: nil}} ->
           []
 
-        %Scenario{memory_usage_statistics: memory_usage_statistics} ->
+        %Scenario{memory_usage_data: %{statistics: memory_usage_statistics}} ->
           Map.to_list(memory_usage_statistics)
       end)
       |> Enum.group_by(fn {stat_name, _} -> stat_name end, fn {_, value} -> value end)

@@ -5,7 +5,7 @@ defmodule Benchee.Benchmark.Runner do
   # run time and memory usage to each scenario.
 
   alias Benchee.{Benchmark, Configuration, Conversion, Statistics, Utility.Parallel}
-  alias Benchmark.{Hooks, Collect, RepeatedMeasurement, Scenario, ScenarioContext}
+  alias Benchmark.{Collect, Hooks, RepeatedMeasurement, Scenario, ScenarioContext}
 
   @doc """
   Executes the benchmarks defined before by first running the defined functions
@@ -94,7 +94,11 @@ defmodule Benchee.Benchmark.Runner do
     run_times = Enum.flat_map(measurements, fn {run_times, _} -> run_times end)
     memory_usages = Enum.flat_map(measurements, fn {_, memory_usages} -> memory_usages end)
 
-    %Scenario{scenario | run_times: run_times, memory_usages: memory_usages}
+    %{
+      scenario
+      | run_time_data: %{scenario.run_time_data | samples: run_times},
+        memory_usage_data: %{scenario.memory_usage_data | samples: memory_usages}
+    }
   end
 
   defp measure_scenario(scenario, scenario_context) do

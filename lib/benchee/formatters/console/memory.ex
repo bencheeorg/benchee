@@ -45,7 +45,7 @@ defmodule Benchee.Formatters.Console.Memory do
 
   defp memory_measurements_present?(scenarios) do
     Enum.any?(scenarios, fn scenario ->
-      scenario.memory_usage_statistics.sample_size > 0
+      scenario.memory_usage_data.statistics.sample_size > 0
     end)
   end
 
@@ -66,7 +66,7 @@ defmodule Benchee.Formatters.Console.Memory do
 
   defp all_have_deviation_of_0?(scenarios) do
     Enum.all?(scenarios, fn scenario ->
-      scenario.memory_usage_statistics.std_dev == 0.0
+      scenario.memory_usage_data.statistics.std_dev == 0.0
     end)
   end
 
@@ -123,7 +123,7 @@ defmodule Benchee.Formatters.Console.Memory do
   defp format_scenario(scenario, units, label_width, hide_statistics)
 
   defp format_scenario(
-         scenario = %Scenario{memory_usage_statistics: %{sample_size: 0}},
+         scenario = %Scenario{memory_usage_data: %{statistics: %{sample_size: 0}}},
          _,
          label_width,
          _
@@ -149,11 +149,13 @@ defmodule Benchee.Formatters.Console.Memory do
   defp format_scenario(scenario, %{memory: memory_unit}, label_width, false) do
     %Scenario{
       name: name,
-      memory_usage_statistics: %Statistics{
-        average: average,
-        std_dev_ratio: std_dev_ratio,
-        median: median,
-        percentiles: %{99 => percentile_99}
+      memory_usage_data: %{
+        statistics: %Statistics{
+          average: average,
+          std_dev_ratio: std_dev_ratio,
+          median: median,
+          percentiles: %{99 => percentile_99}
+        }
       }
     } = scenario
 
@@ -176,8 +178,10 @@ defmodule Benchee.Formatters.Console.Memory do
   defp format_scenario(scenario, %{memory: memory_unit}, label_width, true) do
     %Scenario{
       name: name,
-      memory_usage_statistics: %Statistics{
-        average: average
+      memory_usage_data: %{
+        statistics: %Statistics{
+          average: average
+        }
       }
     } = scenario
 
@@ -210,10 +214,8 @@ defmodule Benchee.Formatters.Console.Memory do
   end
 
   defp reference_report(scenario, %{memory: memory_unit}, label_width) do
-    %Scenario{
-      name: name,
-      memory_usage_statistics: %Statistics{median: median}
-    } = scenario
+    %Scenario{name: name, memory_usage_data: %{statistics: %Statistics{median: median}}} =
+      scenario
 
     "~*s~*s\n"
     |> :io_lib.format([
@@ -227,13 +229,16 @@ defmodule Benchee.Formatters.Console.Memory do
 
   @spec comparisons(Scenario.t(), unit_per_statistic, integer, [Scenario.t()]) :: [String.t()]
   defp comparisons(scenario, units, label_width, scenarios_to_compare) do
-    %Scenario{memory_usage_statistics: reference_stats} = scenario
+    %Scenario{memory_usage_data: %{statistics: reference_stats}} = scenario
 
-    Enum.map(scenarios_to_compare, fn scenario = %Scenario{memory_usage_statistics: job_stats} ->
-      slower = calculate_slower_value(job_stats.median, reference_stats.median)
+    Enum.map(
+      scenarios_to_compare,
+      fn scenario = %Scenario{memory_usage_data: %{statistics: job_stats}} ->
+        slower = calculate_slower_value(job_stats.median, reference_stats.median)
 
-      format_comparison(scenario, units, label_width, slower)
-    end)
+        format_comparison(scenario, units, label_width, slower)
+      end
+    )
   end
 
   defp calculate_slower_value(job_median, reference_median)
@@ -247,7 +252,9 @@ defmodule Benchee.Formatters.Console.Memory do
   end
 
   defp format_comparison(scenario, %{memory: memory_unit}, label_width, @na) do
-    %Scenario{name: name, memory_usage_statistics: %Statistics{median: median}} = scenario
+    %Scenario{name: name, memory_usage_data: %{statistics: %Statistics{median: median}}} =
+      scenario
+
     median_format = memory_output(median, memory_unit)
 
     "~*s~*s\n"
@@ -256,7 +263,9 @@ defmodule Benchee.Formatters.Console.Memory do
   end
 
   defp format_comparison(scenario, %{memory: memory_unit}, label_width, slower) do
-    %Scenario{name: name, memory_usage_statistics: %Statistics{median: median}} = scenario
+    %Scenario{name: name, memory_usage_data: %{statistics: %Statistics{median: median}}} =
+      scenario
+
     median_format = memory_output(median, memory_unit)
 
     "~*s~*s - ~.2fx memory usage\n"
@@ -307,11 +316,13 @@ defmodule Benchee.Formatters.Console.Memory do
   defp format_scenario_extended(scenario, %{memory: memory_unit}, label_width) do
     %Scenario{
       name: name,
-      memory_usage_statistics: %Statistics{
-        minimum: minimum,
-        maximum: maximum,
-        sample_size: sample_size,
-        mode: mode
+      memory_usage_data: %{
+        statistics: %Statistics{
+          minimum: minimum,
+          maximum: maximum,
+          sample_size: sample_size,
+          mode: mode
+        }
       }
     } = scenario
 

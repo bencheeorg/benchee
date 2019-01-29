@@ -80,8 +80,12 @@ defmodule Benchee.Statistics do
       iex> scenarios = [
       ...>   %Benchee.Benchmark.Scenario{
       ...>     job_name: "My Job",
-      ...>     run_times: [200, 400, 400, 400, 500, 500, 500, 700, 900],
-      ...>     memory_usages: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+      ...>     run_time_data: %Benchee.CollectionData{
+      ...>       samples: [200, 400, 400, 400, 500, 500, 500, 700, 900]
+      ...>     },
+      ...>     memory_usage_data: %Benchee.CollectionData{
+      ...>       samples: [200, 400, 400, 400, 500, 500, 500, 700, 900]
+      ...>     },
       ...>     input_name: "Input",
       ...>     input: "Input"
       ...>   }
@@ -92,35 +96,39 @@ defmodule Benchee.Statistics do
         scenarios: [
           %Benchee.Benchmark.Scenario{
             job_name: "My Job",
-            run_times: [200, 400, 400, 400, 500, 500, 500, 700, 900],
-            memory_usages: [200, 400, 400, 400, 500, 500, 500, 700, 900],
             input_name: "Input",
             input: "Input",
-            run_time_statistics: %Benchee.Statistics{
-              average:       500.0,
-              ips:           2000_000.0,
-              std_dev:       200.0,
-              std_dev_ratio: 0.4,
-              std_dev_ips:   800_000.0,
-              median:        500.0,
-              percentiles:   %{50 => 500.0, 99 => 900.0},
-              mode:          [500, 400],
-              minimum:       200,
-              maximum:       900,
-              sample_size:   9
+            run_time_data: %Benchee.CollectionData{
+              samples: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+              statistics: %Benchee.Statistics{
+                average:       500.0,
+                ips:           2000_000.0,
+                std_dev:       200.0,
+                std_dev_ratio: 0.4,
+                std_dev_ips:   800_000.0,
+                median:        500.0,
+                percentiles:   %{50 => 500.0, 99 => 900.0},
+                mode:          [500, 400],
+                minimum:       200,
+                maximum:       900,
+                sample_size:   9
+              }
             },
-            memory_usage_statistics: %Benchee.Statistics{
-              average:       500.0,
-              ips:           nil,
-              std_dev:       200.0,
-              std_dev_ratio: 0.4,
-              std_dev_ips:   nil,
-              median:        500.0,
-              percentiles:   %{50 => 500.0, 99 => 900.0},
-              mode:          [500, 400],
-              minimum:       200,
-              maximum:       900,
-              sample_size:   9
+            memory_usage_data: %Benchee.CollectionData{
+              samples: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+              statistics: %Benchee.Statistics{
+                average:       500.0,
+                ips:           nil,
+                std_dev:       200.0,
+                std_dev_ratio: 0.4,
+                std_dev_ips:   nil,
+                median:        500.0,
+                percentiles:   %{50 => 500.0, 99 => 900.0},
+                mode:          [500, 400],
+                minimum:       200,
+                maximum:       900,
+                sample_size:   9
+              }
             }
           }
         ],
@@ -136,13 +144,13 @@ defmodule Benchee.Statistics do
 
     scenarios_with_statistics =
       Parallel.map(scenarios, fn scenario ->
-        run_time_stats = scenario.run_times |> job_statistics(percentiles) |> add_ips
-        memory_stats = job_statistics(scenario.memory_usages, percentiles)
+        run_time_stats = scenario.run_time_data.samples |> job_statistics(percentiles) |> add_ips
+        memory_stats = job_statistics(scenario.memory_usage_data.samples, percentiles)
 
-        %Scenario{
+        %{
           scenario
-          | run_time_statistics: run_time_stats,
-            memory_usage_statistics: memory_stats
+          | run_time_data: %{scenario.run_time_data | statistics: run_time_stats},
+            memory_usage_data: %{scenario.memory_usage_data | statistics: memory_stats}
         }
       end)
 
@@ -259,17 +267,21 @@ defmodule Benchee.Statistics do
   end
 
   @doc """
-  Calculate additional percentiles and add them to the `run_time_statistics`.
-  Should only be used after `statistics/1`, to calculate extra values that
-  may be needed for reporting.
+  Calculate additional percentiles and add them to the
+  `run_time_data.statistics`. Should only be used after `statistics/1`, to
+  calculate extra values that may be needed for reporting.
 
   ## Examples
 
       iex> scenarios = [
       ...>   %Benchee.Benchmark.Scenario{
       ...>     job_name: "My Job",
-      ...>     run_times: [200, 400, 400, 400, 500, 500, 500, 700, 900],
-      ...>     memory_usages: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+      ...>     run_time_data: %Benchee.CollectionData{
+      ...>       samples: [200, 400, 400, 400, 500, 500, 500, 700, 900]
+      ...>     },
+      ...>     memory_usage_data: %Benchee.CollectionData{
+      ...>       samples: [200, 400, 400, 400, 500, 500, 500, 700, 900]
+      ...>     },
       ...>     input_name: "Input",
       ...>     input: "Input"
       ...>   }
@@ -281,45 +293,47 @@ defmodule Benchee.Statistics do
         scenarios: [
           %Benchee.Benchmark.Scenario{
             job_name: "My Job",
-            run_times: [200, 400, 400, 400, 500, 500, 500, 700, 900],
-            memory_usages: [200, 400, 400, 400, 500, 500, 500, 700, 900],
             input_name: "Input",
             input: "Input",
-            run_time_statistics: %Benchee.Statistics{
-              average:       500.0,
-              ips:           2_000_000.0,
-              std_dev:       200.0,
-              std_dev_ratio: 0.4,
-              std_dev_ips:   800_000.0,
-              median:        500.0,
-              percentiles:   %{25 => 400.0, 50 => 500.0, 75 => 600.0, 99 => 900.0},
-              mode:          [500, 400],
-              minimum:       200,
-              maximum:       900,
-              sample_size:   9
+            run_time_data: %Benchee.CollectionData{
+              samples: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+              statistics: %Benchee.Statistics{
+                average:       500.0,
+                ips:           2_000_000.0,
+                std_dev:       200.0,
+                std_dev_ratio: 0.4,
+                std_dev_ips:   800_000.0,
+                median:        500.0,
+                percentiles:   %{25 => 400.0, 50 => 500.0, 75 => 600.0, 99 => 900.0},
+                mode:          [500, 400],
+                minimum:       200,
+                maximum:       900,
+                sample_size:   9
+              }
             },
-            memory_usage_statistics: %Benchee.Statistics{
-              average:       500.0,
-              ips:           nil,
-              std_dev:       200.0,
-              std_dev_ratio: 0.4,
-              std_dev_ips:   nil,
-              median:        500.0,
-              percentiles:   %{50 => 500.0, 99 => 900.0},
-              mode:          [500, 400],
-              minimum:       200,
-              maximum:       900,
-              sample_size:   9
+            memory_usage_data: %Benchee.CollectionData{
+              samples: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+              statistics: %Benchee.Statistics{
+                average:       500.0,
+                ips:           nil,
+                std_dev:       200.0,
+                std_dev_ratio: 0.4,
+                std_dev_ips:   nil,
+                median:        500.0,
+                percentiles:   %{50 => 500.0, 99 => 900.0},
+                mode:          [500, 400],
+                minimum:       200,
+                maximum:       900,
+                sample_size:   9
+              }
             }
-          }
-        ]
       }
   """
   def add_percentiles(suite = %Suite{scenarios: scenarios}, percentile_ranks) do
     new_scenarios =
       Parallel.map(scenarios, fn scenario ->
-        update_in(scenario.run_time_statistics.percentiles, fn existing ->
-          new = Percentile.percentiles(scenario.run_times, percentile_ranks)
+        update_in(scenario.run_time_data.statistics.percentiles, fn existing ->
+          new = Percentile.percentiles(scenario.run_time_data.samples, percentile_ranks)
           Map.merge(existing, new)
         end)
       end)
@@ -330,7 +344,7 @@ defmodule Benchee.Statistics do
   @spec sort([Scenario.t()]) :: [Scenario.t()]
   defp sort(scenarios) do
     Enum.sort_by(scenarios, fn scenario ->
-      {scenario.run_time_statistics.average, scenario.memory_usage_statistics.average}
+      {scenario.run_time_data.statistics.average, scenario.memory_usage_data.statistics.average}
     end)
   end
 end

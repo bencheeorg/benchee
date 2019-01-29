@@ -120,7 +120,7 @@ defmodule Benchee.BenchmarkTest do
         suite
         |> Benchmark.collect(TestPrinter, TestRunner)
         |> (fn suite -> suite.scenarios end).()
-        |> Enum.map(fn scenario -> scenario.run_times end)
+        |> Enum.map(fn scenario -> scenario.run_time_data.samples end)
 
       assert length(run_times) == 1
       refute Enum.any?(run_times, fn run_time -> Enum.empty?(run_time) end)

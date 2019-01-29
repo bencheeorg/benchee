@@ -32,7 +32,9 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
     test "it repeats the function calls until a suitable time is reached" do
       function = fn -> send(self(), :called) end
       scenario = %Scenario{function: function}
-      {num_iterations, time} = determine_n_times(scenario, @scenario_context, false, FakeCollector)
+
+      {num_iterations, time} =
+        determine_n_times(scenario, @scenario_context, false, FakeCollector)
 
       assert num_iterations == 10
       # 50 adjusted by the 10 iteration factor
@@ -47,7 +49,8 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
       scenario = %Scenario{function: function}
       Process.put(:test_measurement_time, 10)
 
-      {num_iterations, time} = determine_n_times(scenario, @scenario_context, false, FakeCollector)
+      {num_iterations, time} =
+        determine_n_times(scenario, @scenario_context, false, FakeCollector)
 
       assert num_iterations == 1
       assert time == 10

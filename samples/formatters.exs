@@ -4,7 +4,7 @@ map_fun = fn(i) -> [i, i * i] end
 format_fun = fn(%{scenarios: scenarios}) ->
   IO.puts ""
   Enum.each scenarios, fn(scenario) ->
-    sample_size = scenario.run_time_statistics.sample_size
+    sample_size = scenario.run_time_data.statistics.sample_size
     IO.puts "Benchee recorded #{sample_size} run times for #{scenario.job_name}!"
   end
 end

@@ -20,18 +20,20 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First job",
-          run_time_statistics: %Statistics{
-            average: 200.0,
-            ips: 5_000.0,
-            std_dev_ratio: 0.1,
-            median: 195.5,
-            percentiles: %{99 => 300.1},
-            minimum: 111.1,
-            maximum: 333.3,
-            mode: 201.2,
-            sample_size: 50_000
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{99 => 300.1},
+              minimum: 111.1,
+              maximum: 333.3,
+              mode: 201.2,
+              sample_size: 50_000
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         }
       ]
 
@@ -54,18 +56,20 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First job",
-          run_time_statistics: %Statistics{
-            average: 200.0,
-            ips: 5_000.0,
-            std_dev_ratio: 0.1,
-            median: 195.5,
-            percentiles: %{99 => 300.1},
-            minimum: 111.1,
-            maximum: 333.3,
-            mode: [201.2, 205.55],
-            sample_size: 50_000
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{99 => 300.1},
+              minimum: 111.1,
+              maximum: 333.3,
+              mode: [201.2, 205.55],
+              sample_size: 50_000
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         }
       ]
 
@@ -80,17 +84,19 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First job",
-          run_time_statistics: %Statistics{
-            average: 200.0,
-            ips: 5_000.0,
-            std_dev_ratio: 0.1,
-            median: 195.5,
-            percentiles: %{99 => 300.1},
-            minimum: 111.1,
-            maximum: 333.3,
-            sample_size: 50_000
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{99 => 300.1},
+              minimum: 111.1,
+              maximum: 333.3,
+              sample_size: 50_000
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         }
       ]
 
@@ -104,27 +110,31 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First",
-          run_time_statistics: %Statistics{
-            average: 200.0,
-            ips: 5_000.0,
-            std_dev_ratio: 0.1,
-            median: 195.5,
-            percentiles: %{99 => 300.1},
-            sample_size: 200
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{99 => 300.1},
+              sample_size: 200
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         },
         %Scenario{
           name: "Second",
-          run_time_statistics: %Statistics{
-            average: 400.0,
-            ips: 2_500.0,
-            std_dev_ratio: 0.1,
-            median: 375.0,
-            percentiles: %{99 => 400.1},
-            sample_size: 300
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 400.0,
+              ips: 2_500.0,
+              std_dev_ratio: 0.1,
+              median: 375.0,
+              percentiles: %{99 => 400.1},
+              sample_size: 300
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         }
       ]
 
@@ -142,15 +152,17 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
 
       long_scenario = %Scenario{
         name: third_name,
-        run_time_statistics: %Statistics{
-          average: 400.1,
-          ips: 2_500.0,
-          std_dev_ratio: 0.1,
-          median: 375.0,
-          percentiles: %{99 => 500.1},
-          sample_size: 200
+        run_time_data: %{
+          statistics: %Statistics{
+            average: 400.1,
+            ips: 2_500.0,
+            std_dev_ratio: 0.1,
+            median: 375.0,
+            percentiles: %{99 => 500.1},
+            sample_size: 200
+          }
         },
-        memory_usage_statistics: %Statistics{}
+        memory_usage_data: %{statistics: %Statistics{}}
       }
 
       longer_scenarios = scenarios ++ [long_scenario]
@@ -169,27 +181,31 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First",
-          run_time_statistics: %Statistics{
-            average: 100.0,
-            ips: 10_000.0,
-            std_dev_ratio: 0.1,
-            median: 90.0,
-            percentiles: %{99 => 500.1},
-            sample_size: 400
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 100.0,
+              ips: 10_000.0,
+              std_dev_ratio: 0.1,
+              median: 90.0,
+              percentiles: %{99 => 500.1},
+              sample_size: 400
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         },
         %Scenario{
           name: "Second",
-          run_time_statistics: %Statistics{
-            average: 200.0,
-            ips: 5_000.0,
-            std_dev_ratio: 0.1,
-            median: 195.5,
-            percentiles: %{99 => 500.1},
-            sample_size: 200
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{99 => 500.1},
+              sample_size: 200
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         }
       ]
 
@@ -205,26 +221,30 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "Second",
-          run_time_statistics: %Statistics{
-            average: 200.0,
-            ips: 5_000.0,
-            std_dev_ratio: 0.1,
-            median: 195.5,
-            percentiles: %{99 => 300.1},
-            sample_size: 200
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{99 => 300.1},
+              sample_size: 200
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         },
         %Scenario{
           name: "First",
-          run_time_statistics: %Statistics{
-            average: 100.0,
-            ips: 10_000.0,
-            std_dev_ratio: 0.1,
-            median: 90.0,
-            percentiles: %{99 => 200.1}
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 100.0,
+              ips: 10_000.0,
+              std_dev_ratio: 0.1,
+              median: 90.0,
+              percentiles: %{99 => 200.1}
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         }
       ]
 
@@ -248,27 +268,31 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First",
-          run_time_statistics: %Statistics{
-            average: 100.0,
-            ips: 10_000.0,
-            std_dev_ratio: 0.1,
-            median: 90.0,
-            percentiles: %{99 => 200.1},
-            sample_size: 200
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 100.0,
+              ips: 10_000.0,
+              std_dev_ratio: 0.1,
+              median: 90.0,
+              percentiles: %{99 => 200.1},
+              sample_size: 200
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         },
         %Scenario{
           name: second_name,
-          run_time_statistics: %Statistics{
-            average: 200.0,
-            ips: 5_000.0,
-            std_dev_ratio: 0.1,
-            median: 195.5,
-            percentiles: %{99 => 300.1},
-            sample_size: 200
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{99 => 300.1},
+              sample_size: 200
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         }
       ]
 
@@ -285,15 +309,17 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First",
-          run_time_statistics: %Statistics{
-            average: 100.0,
-            ips: 10_000.0,
-            std_dev_ratio: 0.1,
-            median: 90.0,
-            percentiles: %{99 => 200.1},
-            sample_size: 200
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 100.0,
+              ips: 10_000.0,
+              std_dev_ratio: 0.1,
+              median: 90.0,
+              percentiles: %{99 => 200.1},
+              sample_size: 200
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         }
       ]
 
@@ -305,15 +331,17 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First",
-          run_time_statistics: %Statistics{
-            average: 0.15,
-            ips: 10_000.0,
-            std_dev_ratio: 0.1,
-            median: 0.0125,
-            percentiles: %{99 => 0.0234},
-            sample_size: 200
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 0.15,
+              ips: 10_000.0,
+              std_dev_ratio: 0.1,
+              median: 0.0125,
+              percentiles: %{99 => 0.0234},
+              sample_size: 200
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         }
       ]
 
@@ -327,15 +355,17 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "Job",
-          run_time_statistics: %Statistics{
-            average: 11_000_000.0,
-            ips: 12_000.0,
-            std_dev_ratio: 13_000.0,
-            median: 140_000_000.0,
-            percentiles: %{99 => 200_000_000.1},
-            sample_size: 200
+          run_time_data: %{
+            statistics: %Statistics{
+              average: 11_000_000.0,
+              ips: 12_000.0,
+              std_dev_ratio: 13_000.0,
+              median: 140_000_000.0,
+              percentiles: %{99 => 200_000_000.1},
+              sample_size: 200
+            }
           },
-          memory_usage_statistics: %Statistics{}
+          memory_usage_data: %{statistics: %Statistics{}}
         }
       ]
 
@@ -350,7 +380,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
     end
 
     test "does nothing when there's no statistics to format" do
-      scenarios = [%Scenario{run_time_statistics: %Statistics{sample_size: 0}}]
+      scenarios = [%Scenario{run_time_data: %{statistics: %Statistics{sample_size: 0}}}]
 
       assert [] = RunTime.format_scenarios(scenarios, %{})
     end

@@ -35,7 +35,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       scenario.job_name == job_name && scenario.input_name == input_name
     end
 
-    map_fun = fn scenario -> scenario.run_times end
+    map_fun = fn scenario -> scenario.run_time_data.samples end
 
     suite.scenarios
     |> Enum.filter(filter_fun)
@@ -114,7 +114,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         end)
         |> Benchmark.collect(TestPrinter)
 
-      memory_usages = List.first(new_suite.scenarios).memory_usages
+      memory_usages = List.first(new_suite.scenarios).memory_usage_data.samples
 
       assert length(memory_usages) > 0
     end
@@ -130,7 +130,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         end)
         |> Benchmark.collect(TestPrinter)
 
-      memory_usages = List.first(new_suite.scenarios).memory_usages
+      memory_usages = List.first(new_suite.scenarios).memory_usage_data.samples
 
       assert length(memory_usages) > 0
     end
@@ -144,7 +144,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> Benchmark.benchmark("Boom", fn -> Enum.map([1, 2, 3], fn i -> i + 1 end) end)
         |> Benchmark.collect(TestPrinter)
 
-      memory_usages = List.first(new_suite.scenarios).memory_usages
+      memory_usages = List.first(new_suite.scenarios).memory_usage_data.samples
 
       assert [memory_consumption] = Enum.uniq(memory_usages)
       assert memory_consumption >= 1
@@ -176,7 +176,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> Benchmark.collect(TestPrinter)
         |> Benchee.statistics()
 
-      [%{run_time_statistics: %{median: median}}] = suite.scenarios
+      [%{run_time_data: %{statistics: %{median: median}}}] = suite.scenarios
 
       # around ~78 on my machine, CI is awful for performance
       assert median < 1500
@@ -190,7 +190,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> Benchmark.collect(TestPrinter)
         |> Benchee.statistics()
 
-      [%{run_time_statistics: %{median: median}}] = suite.scenarios
+      [%{run_time_data: %{statistics: %{median: median}}}] = suite.scenarios
 
       # Should be 0 if it works correctly, give a bit of leeway - especially the appveyor CI
       # with Windows has a tougher time here as it repeats the function call
@@ -240,7 +240,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> Benchmark.benchmark("don't care", fn -> 0 end)
         |> Benchmark.collect(TestPrinter)
 
-      assert scenario.run_times == []
+      assert scenario.run_time_data.samples == []
     end
 
     @no_input Benchmark.no_input()
@@ -347,7 +347,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       suite = %Suite{
         scenarios: [
           %Scenario{
-            run_times: [1_000_000],
+            run_time_data: %{samples: [1_000_000]},
             function: fn -> 1 + 1 end,
             input: @no_input
           }
@@ -360,7 +360,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> Benchmark.collect(TestPrinter)
 
       # our previous run time isn't there anymore
-      refute Enum.member?(scenario.run_times, 1_000_000)
+      refute Enum.member?(scenario.run_time_data.samples, 1_000_000)
     end
 
     test "global hooks triggers" do
@@ -675,7 +675,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       # should be closer to 10 by you know slow CI systems...
       assert hook_call_count >= 2
       # for every sample that we have, we should have run a hook
-      [%{run_times: run_times}] = result.scenarios
+      [%{run_time_data: %{samples: run_times}}] = result.scenarios
       sample_size = length(run_times)
       assert sample_size == hook_call_count
     end
@@ -727,7 +727,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       # we repeat the call but report it back as just one time (average) but
       # we need to run the hooks more often than that (for every iteration)
-      [%{run_times: run_times}] = result.scenarios
+      [%{run_time_data: %{samples: run_times}}] = result.scenarios
       sample_size = length(run_times)
       assert hook_call_count > sample_size + 10
     end

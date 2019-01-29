@@ -1,6 +1,6 @@
 defmodule Benchee.StatistcsTest do
   use ExUnit.Case, async: true
-  alias Benchee.{Benchmark.Scenario, Configuration, Statistics, Suite}
+  alias Benchee.{Benchmark.Scenario, CollectionData, Configuration, Statistics, Suite}
   doctest Benchee.Statistics
 
   @sample_1 [600, 470, 170, 430, 300]
@@ -12,15 +12,15 @@ defmodule Benchee.StatistcsTest do
           input: "Input",
           input_name: "Input",
           job_name: "Job 1",
-          run_times: @sample_1,
-          memory_usages: @sample_1
+          run_time_data: %CollectionData{samples: @sample_1},
+          memory_usage_data: %CollectionData{samples: @sample_1}
         },
         %Scenario{
           input: "Input",
           input_name: "Input",
           job_name: "Job 2",
-          run_times: @sample_2,
-          memory_usages: @sample_2
+          run_time_data: %CollectionData{samples: @sample_2},
+          memory_usage_data: %CollectionData{samples: @sample_2}
         }
       ]
 
@@ -40,15 +40,15 @@ defmodule Benchee.StatistcsTest do
           input: "Input 1",
           input_name: "Input 1",
           job_name: "Job",
-          run_times: @sample_1,
-          memory_usages: @sample_1
+          run_time_data: %CollectionData{samples: @sample_1},
+          memory_usage_data: %CollectionData{samples: @sample_1}
         },
         %Scenario{
           input: "Input 2",
           input_name: "Input 2",
           job_name: "Job",
-          run_times: @sample_2,
-          memory_usages: @sample_2
+          run_time_data: %CollectionData{samples: @sample_2},
+          memory_usage_data: %CollectionData{samples: @sample_2}
         }
       ]
 
@@ -64,10 +64,16 @@ defmodule Benchee.StatistcsTest do
 
     @mode_sample [55, 40, 67, 55, 44, 40, 10, 8, 55, 90, 67]
     test "mode is calculated correctly" do
-      scenarios = [%Scenario{run_times: @mode_sample, memory_usages: @mode_sample}]
+      scenarios = [
+        %Scenario{
+          run_time_data: %CollectionData{samples: @mode_sample},
+          memory_usage_data: %CollectionData{samples: @mode_sample}
+        }
+      ]
+
       suite = Statistics.statistics(%Suite{scenarios: scenarios})
 
-      [%Scenario{run_time_statistics: stats}] = suite.scenarios
+      [%Scenario{run_time_data: %{statistics: stats}}] = suite.scenarios
       assert stats.mode == 55
     end
 
@@ -75,14 +81,14 @@ defmodule Benchee.StatistcsTest do
     test "statistical standard deviation is calculated correctly" do
       scenarios = [
         %Scenario{
-          run_times: @standard_deviation_sample,
-          memory_usages: @standard_deviation_sample
+          run_time_data: %CollectionData{samples: @standard_deviation_sample},
+          memory_usage_data: %CollectionData{samples: @standard_deviation_sample}
         }
       ]
 
       suite = Statistics.statistics(%Suite{scenarios: scenarios})
 
-      [%Scenario{run_time_statistics: stats}] = suite.scenarios
+      [%Scenario{run_time_data: %{statistics: stats}}] = suite.scenarios
       assert_in_delta stats.std_dev, 164.7, 0.1
       assert_in_delta stats.std_dev_ratio, 0.41, 0.01
     end
@@ -103,8 +109,8 @@ defmodule Benchee.StatistcsTest do
         },
         scenarios: [
           %Scenario{
-            run_times: [1, 2],
-            memory_usages: [1, 2]
+            run_time_data: %CollectionData{samples: [1, 2]},
+            memory_usage_data: %CollectionData{samples: [1, 2]}
           }
         ]
       }
@@ -112,11 +118,13 @@ defmodule Benchee.StatistcsTest do
       %Suite{
         scenarios: [
           %Scenario{
-            run_time_statistics: %Statistics{
-              percentiles: %{
-                25 => _,
-                50 => _,
-                75 => _
+            run_time_data: %{
+              statistics: %Statistics{
+                percentiles: %{
+                  25 => _,
+                  50 => _,
+                  75 => _
+                }
               }
             }
           }
@@ -131,8 +139,8 @@ defmodule Benchee.StatistcsTest do
         },
         scenarios: [
           %Scenario{
-            run_times: [1, 2],
-            memory_usages: [1, 2]
+            run_time_data: %CollectionData{samples: [1, 2]},
+            memory_usage_data: %CollectionData{samples: [1, 2]}
           }
         ]
       }
@@ -140,11 +148,13 @@ defmodule Benchee.StatistcsTest do
       %Suite{
         scenarios: [
           %Scenario{
-            run_time_statistics: %Statistics{
-              percentiles: %{
-                25 => _,
-                50 => _,
-                75 => _
+            run_time_data: %{
+              statistics: %Statistics{
+                percentiles: %{
+                  25 => _,
+                  50 => _,
+                  75 => _
+                }
               }
             }
           }
@@ -154,21 +164,31 @@ defmodule Benchee.StatistcsTest do
 
     @all_zeros [0, 0, 0, 0, 0]
     test "doesn't blow up when all measurements are zeros (mostly memory measurement)" do
-      scenarios = [%Scenario{run_times: @all_zeros, memory_usages: @all_zeros}]
+      scenarios = [
+        %Scenario{
+          run_time_data: %CollectionData{samples: @all_zeros},
+          memory_usage_data: %CollectionData{samples: @all_zeros}
+        }
+      ]
+
       suite = Statistics.statistics(%Suite{scenarios: scenarios})
 
-      [%Scenario{run_time_statistics: run_time_stats, memory_usage_statistics: memory_stats}] =
-        suite.scenarios
+      [
+        %Scenario{
+          run_time_data: %{statistics: run_time_stats},
+          memory_usage_data: %{statistics: memory_stats}
+        }
+      ] = suite.scenarios
 
       assert run_time_stats.sample_size == 5
       assert memory_stats.sample_size == 5
     end
 
     test "sorts them by their average run time fastest to slowest" do
-      fourth = %Scenario{name: "4", run_times: [400.1]}
-      second = %Scenario{name: "2", run_times: [200.0]}
-      third = %Scenario{name: "3", run_times: [400.0]}
-      first = %Scenario{name: "1", run_times: [100.0]}
+      fourth = %Scenario{name: "4", run_time_data: %CollectionData{samples: [400.1]}}
+      second = %Scenario{name: "2", run_time_data: %CollectionData{samples: [200.0]}}
+      third = %Scenario{name: "3", run_time_data: %CollectionData{samples: [400.0]}}
+      first = %Scenario{name: "1", run_time_data: %CollectionData{samples: [100.0]}}
       scenarios = [fourth, third, second, first]
 
       sorted = Statistics.statistics(%Suite{scenarios: scenarios}).scenarios
@@ -177,10 +197,10 @@ defmodule Benchee.StatistcsTest do
     end
 
     test "sorts them by their average memory usage least to most" do
-      fourth = %Scenario{name: "4", memory_usages: [400.1]}
-      second = %Scenario{name: "2", memory_usages: [200.0]}
-      third = %Scenario{name: "3", memory_usages: [400.0]}
-      first = %Scenario{name: "1", memory_usages: [100.0]}
+      fourth = %Scenario{name: "4", memory_usage_data: %CollectionData{samples: [400.1]}}
+      second = %Scenario{name: "2", memory_usage_data: %CollectionData{samples: [200.0]}}
+      third = %Scenario{name: "3", memory_usage_data: %CollectionData{samples: [400.0]}}
+      first = %Scenario{name: "1", memory_usage_data: %CollectionData{samples: [100.0]}}
       scenarios = [fourth, third, second, first]
 
       sorted = Statistics.statistics(%Suite{scenarios: scenarios}).scenarios
@@ -189,9 +209,24 @@ defmodule Benchee.StatistcsTest do
     end
 
     test "sorts them by their average run time using memory as a tie breaker" do
-      second = %Scenario{name: "2", run_times: [100.0], memory_usages: [100.0]}
-      third = %Scenario{name: "3", run_times: [100.0], memory_usages: [100.1]}
-      first = %Scenario{name: "1", run_times: [100.0], memory_usages: [99.9]}
+      second = %Scenario{
+        name: "2",
+        run_time_data: %CollectionData{samples: [100.0]},
+        memory_usage_data: %CollectionData{samples: [100.0]}
+      }
+
+      third = %Scenario{
+        name: "3",
+        run_time_data: %CollectionData{samples: [100.0]},
+        memory_usage_data: %CollectionData{samples: [100.1]}
+      }
+
+      first = %Scenario{
+        name: "1",
+        run_time_data: %CollectionData{samples: [100.0]},
+        memory_usage_data: %CollectionData{samples: [99.9]}
+      }
+
       scenarios = [third, second, first]
 
       sorted = Statistics.statistics(%Suite{scenarios: scenarios}).scenarios
@@ -200,7 +235,7 @@ defmodule Benchee.StatistcsTest do
     end
 
     defp stats_for(suite, job_name, input_name) do
-      %Scenario{run_time_statistics: stats} =
+      %Scenario{run_time_data: %{statistics: stats}} =
         Enum.find(suite.scenarios, fn scenario ->
           scenario.job_name == job_name && scenario.input_name == input_name
         end)
