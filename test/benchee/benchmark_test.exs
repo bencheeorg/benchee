@@ -94,9 +94,9 @@ defmodule Benchee.BenchmarkTest do
     end
   end
 
-  describe ".measure" do
+  describe "collect/3" do
     test "prints the configuration information" do
-      Benchmark.measure(%Suite{}, TestPrinter, TestRunner)
+      Benchmark.collect(%Suite{}, TestPrinter, TestRunner)
 
       assert_receive :configuration_information
     end
@@ -107,7 +107,7 @@ defmodule Benchee.BenchmarkTest do
       suite = %Suite{scenarios: scenarios, configuration: config}
       scenario_context = %ScenarioContext{config: config, printer: TestPrinter}
 
-      Benchmark.measure(suite, TestPrinter, TestRunner)
+      Benchmark.collect(suite, TestPrinter, TestRunner)
 
       assert_receive {:run_scenarios, ^scenarios, ^scenario_context}
     end
@@ -118,7 +118,7 @@ defmodule Benchee.BenchmarkTest do
 
       run_times =
         suite
-        |> Benchmark.measure(TestPrinter, TestRunner)
+        |> Benchmark.collect(TestPrinter, TestRunner)
         |> (fn suite -> suite.scenarios end).()
         |> Enum.map(fn scenario -> scenario.run_times end)
 

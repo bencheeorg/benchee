@@ -1,8 +1,8 @@
-defmodule Benchee.Benchmark.Measure do
+defmodule Benchee.Benchmark.Collect do
   @moduledoc false
 
-  # A thing that measures something about a function execution - like time or
-  # memory needed.
+  # A thing that collects a data point about a function execution - like time
+  # or memory needed.
 
   @doc """
   Takes an anonymous 0 arity function to measure and returns the measurement
@@ -11,5 +11,5 @@ defmodule Benchee.Benchmark.Measure do
   The returned measurement may be `nil` if the measurement failed for some
   reason - it will then be ignored and not counted.
   """
-  @callback measure((() -> any)) :: {non_neg_integer | nil, any}
+  @callback collect((() -> any)) :: {non_neg_integer | nil, any}
 end

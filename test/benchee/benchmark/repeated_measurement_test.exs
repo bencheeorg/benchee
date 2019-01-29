@@ -1,7 +1,7 @@
-defmodule Bencheee.Benchmark.RepeatedMeasurementTest.FakeMeasurer do
-  @behaviour Benchee.Benchmark.Measure
+defmodule Bencheee.Benchmark.RepeatedMeasurementTest.FakeCollector do
+  @behaviour Benchee.Benchmark.Collect
 
-  def measure(function) do
+  def collect(function) do
     value = function.()
     time = Process.get(:test_measurement_time, 5)
     next_value = time * 10
@@ -18,7 +18,7 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
   import Benchee.Benchmark.RepeatedMeasurement
   alias Benchee.Benchmark.{Scenario, ScenarioContext}
   alias Benchee.Test.FakeBenchmarkPrinter
-  alias Bencheee.Benchmark.RepeatedMeasurementTest.FakeMeasurer
+  alias Bencheee.Benchmark.RepeatedMeasurementTest.FakeCollector
 
   @no_input Benchee.Benchmark.no_input()
   @scenario_context %ScenarioContext{
@@ -32,7 +32,7 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
     test "it repeats the function calls until a suitable time is reached" do
       function = fn -> send(self(), :called) end
       scenario = %Scenario{function: function}
-      {num_iterations, time} = determine_n_times(scenario, @scenario_context, false, FakeMeasurer)
+      {num_iterations, time} = determine_n_times(scenario, @scenario_context, false, FakeCollector)
 
       assert num_iterations == 10
       # 50 adjusted by the 10 iteration factor
@@ -47,7 +47,7 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
       scenario = %Scenario{function: function}
       Process.put(:test_measurement_time, 10)
 
-      {num_iterations, time} = determine_n_times(scenario, @scenario_context, false, FakeMeasurer)
+      {num_iterations, time} = determine_n_times(scenario, @scenario_context, false, FakeCollector)
 
       assert num_iterations == 1
       assert time == 10
@@ -57,7 +57,7 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
     end
   end
 
-  describe ".measure" do
+  describe "collect/3" do
     test "scales reported times approproately" do
       scenario_context = %ScenarioContext{
         @scenario_context
@@ -71,7 +71,7 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
 
       Process.put(:test_measurement_time, 50)
 
-      time = measure(scenario, scenario_context, FakeMeasurer)
+      time = collect(scenario, scenario_context, FakeCollector)
 
       assert time == 5
     end
@@ -103,7 +103,7 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
 
       Process.put(:test_measurement_time, 50)
 
-      time = measure(scenario, scenario_context, FakeMeasurer)
+      time = collect(scenario, scenario_context, FakeCollector)
 
       assert time == 5
 

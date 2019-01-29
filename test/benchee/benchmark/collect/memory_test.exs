@@ -1,17 +1,17 @@
-defmodule Benchee.MemoryMeasureTest do
+defmodule Benchee.Collect.MemoryTest do
   # We cannot use async: true because of the test that we're running to ensure
   # there aren't any leaked processes if functions fail while we're tracing
   # them.
   use ExUnit.Case
-  alias Benchee.Benchmark.Measure.Memory
+  alias Benchee.Benchmark.Collect.Memory
   import ExUnit.CaptureIO
 
   @moduletag :memory_measure
 
-  describe "measure/1" do
+  describe "collect/1" do
     test "returns the result of the function and the memory used (in bytes)" do
       fun_to_run = fn -> Enum.to_list(1..10) end
-      assert {memory_used, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} = Memory.measure(fun_to_run)
+      assert {memory_used, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} = Memory.collect(fun_to_run)
       # We need to have some wiggle room here because memory used varies from
       # system to system. It's consistent in an environment, but changes
       # between environments.
@@ -21,7 +21,7 @@ defmodule Benchee.MemoryMeasureTest do
 
     test "doesn't return broken values" do
       fun = fn -> BenchKeyword.delete_v0(Enum.map(1..100, &{:"k#{&1}", &1}), :k100) end
-      assert {memory_used, _} = Memory.measure(fun)
+      assert {memory_used, _} = Memory.collect(fun)
 
       assert memory_used >= 8_000
       assert memory_used <= 14_000
@@ -36,7 +36,7 @@ defmodule Benchee.MemoryMeasureTest do
       # a separate process, so we need to wait for that to emit so we can
       # capture it.
       capture_io(fn ->
-        Memory.measure(fn -> exit(:kill) end)
+        Memory.collect(fn -> exit(:kill) end)
         Process.sleep(10)
       end)
 

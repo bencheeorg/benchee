@@ -1,4 +1,4 @@
-defmodule Benchee.Benchmark.Measure.Time do
+defmodule Benchee.Benchmark.Collect.Time do
   @moduledoc false
 
   # Measure the time elapsed while executing a given function.
@@ -9,9 +9,9 @@ defmodule Benchee.Benchmark.Measure.Time do
   # [forfeits this precision](
   # https://github.com/erlang/otp/blob/master/lib/stdlib/src/timer.erl#L164-L169).
 
-  @behaviour Benchee.Benchmark.Measure
+  @behaviour Benchee.Benchmark.Collect
 
-  def measure(function) do
+  def collect(function) do
     start = :erlang.monotonic_time()
     result = function.()
     finish = :erlang.monotonic_time()

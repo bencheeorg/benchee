@@ -21,7 +21,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
   # with too high variance. Therefore determine an n how often it should be
   # executed in the measurement cycle.
 
-  alias Benchee.Benchmark.{Hooks, Measure, Runner, Scenario, ScenarioContext}
+  alias Benchee.Benchmark.{Hooks, Collect, Runner, Scenario, ScenarioContext}
   alias Benchee.Utility.RepeatN
 
   @minimum_execution_time 10
@@ -33,9 +33,9 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
           printer: printer
         },
         fast_warning,
-        measurer \\ Measure.NativeTime
+        collector \\ Collect.NativeTime
       ) do
-    run_time = measure_iteration(scenario, scenario_context, measurer)
+    run_time = measure_iteration(scenario, scenario_context, collector)
 
     if run_time >= @minimum_execution_time do
       {num_iterations, adjust_for_iterations(run_time, num_iterations)}
@@ -47,21 +47,21 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
         | num_iterations: num_iterations * @times_multiplier
       }
 
-      determine_n_times(scenario, new_context, false, measurer)
+      determine_n_times(scenario, new_context, false, collector)
     end
   end
 
   defp adjust_for_iterations(measurement, 1), do: measurement
   defp adjust_for_iterations(measurement, num_iterations), do: measurement / num_iterations
 
-  def measure(
+  def collect(
         scenario,
         scenario_context = %ScenarioContext{
           num_iterations: num_iterations
         },
-        measurer
+        collector
       ) do
-    measurement = measure_iteration(scenario, scenario_context, measurer)
+    measurement = measure_iteration(scenario, scenario_context, collector)
 
     adjust_for_iterations(measurement, num_iterations)
   end
@@ -71,9 +71,9 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
          scenario_context = %ScenarioContext{
            num_iterations: 1
          },
-         measurer
+         collector
        ) do
-    Runner.measure(scenario, scenario_context, measurer)
+    Runner.collect(scenario, scenario_context, collector)
   end
 
   defp measure_iteration(
@@ -81,7 +81,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
          scenario_context = %ScenarioContext{
            num_iterations: iterations
          },
-         measurer
+         collector
        )
        when iterations > 1 do
     # When we have more than one iteration, then the repetition and calling
@@ -89,7 +89,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
     # `build_benchmarking_function/2`
     function = build_benchmarking_function(scenario, scenario_context)
 
-    {measurement, _return_value} = measurer.measure(function)
+    {measurement, _return_value} = collector.collect(function)
 
     measurement
   end

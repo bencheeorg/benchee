@@ -5,7 +5,7 @@ defmodule Benchee.Benchmark.Runner do
   # run time and memory usage to each scenario.
 
   alias Benchee.{Benchmark, Configuration, Conversion, Statistics, Utility.Parallel}
-  alias Benchmark.{Hooks, Measure, RepeatedMeasurement, Scenario, ScenarioContext}
+  alias Benchmark.{Hooks, Collect, RepeatedMeasurement, Scenario, ScenarioContext}
 
   @doc """
   Executes the benchmarks defined before by first running the defined functions
@@ -47,7 +47,7 @@ defmodule Benchee.Benchmark.Runner do
   defp pre_check(scenario, scenario_context) do
     scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
-    _ = measure(scenario, scenario_context, Measure.Time)
+    _ = collect(scenario, scenario_context, Collect.Time)
     _ = Hooks.run_after_scenario(scenario, scenario_context)
     nil
   end
@@ -164,7 +164,7 @@ defmodule Benchee.Benchmark.Runner do
         end_time: end_time
     }
 
-    do_benchmark(scenario, new_context, Measure.Memory, [])
+    do_benchmark(scenario, new_context, Collect.Memory, [])
   end
 
   defp measure_runtimes(scenario, context, run_time, fast_warning)
@@ -184,7 +184,7 @@ defmodule Benchee.Benchmark.Runner do
         num_iterations: num_iterations
     }
 
-    do_benchmark(scenario, new_context, Measure.Time, [initial_run_time])
+    do_benchmark(scenario, new_context, Collect.Time, [initial_run_time])
   end
 
   defp current_time, do: :erlang.system_time(:nano_seconds)
@@ -200,7 +200,7 @@ defmodule Benchee.Benchmark.Runner do
            current_time: current_time,
            end_time: end_time
          },
-         _measurer,
+         _collector,
          measurements
        )
        when current_time > end_time do
@@ -208,14 +208,14 @@ defmodule Benchee.Benchmark.Runner do
     Enum.reverse(measurements)
   end
 
-  defp do_benchmark(scenario, scenario_context, measurer, measurements) do
-    measurement = measure(scenario, scenario_context, measurer)
+  defp do_benchmark(scenario, scenario_context, collector, measurements) do
+    measurement = collect(scenario, scenario_context, collector)
     updated_context = %ScenarioContext{scenario_context | current_time: current_time()}
 
     do_benchmark(
       scenario,
       updated_context,
-      measurer,
+      collector,
       updated_measurements(measurement, measurements)
     )
   end
@@ -225,35 +225,35 @@ defmodule Benchee.Benchmark.Runner do
   defp updated_measurements(measurement, measurements), do: [measurement | measurements]
 
   @doc """
-  Takes one measure with the given measurer.
+  Takes one measure with the given collector.
 
   Correctly dispatches based on the number of iterations to perform.
   """
-  def measure(
+  def collect(
         scenario = %Scenario{function: function},
         scenario_context = %ScenarioContext{
           num_iterations: 1
         },
-        measurer
+        collector
       ) do
     new_input = Hooks.run_before_each(scenario, scenario_context)
     function = main_function(function, new_input)
 
-    {measurement, return_value} = measurer.measure(function)
+    {measurement, return_value} = collector.collect(function)
 
     Hooks.run_after_each(return_value, scenario, scenario_context)
     measurement
   end
 
-  def measure(
+  def collect(
         scenario,
         scenario_context = %ScenarioContext{
           num_iterations: iterations
         },
-        measurer
+        collector
       )
       when iterations > 1 do
-    RepeatedMeasurement.measure(scenario, scenario_context, measurer)
+    RepeatedMeasurement.collect(scenario, scenario_context, collector)
   end
 
   def main_function(function, @no_input), do: function
