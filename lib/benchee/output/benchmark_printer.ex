@@ -36,7 +36,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
          available_memory: available_memory
        }) do
     IO.puts("""
-    Operating System: #{os}"
+    Operating System: #{os}
     CPU Information: #{cpu_speed}
     Number of Available Cores: #{num_cores}
     Available memory: #{available_memory}
