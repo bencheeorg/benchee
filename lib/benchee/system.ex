@@ -63,6 +63,7 @@ defmodule Benchee.System do
 
   defp os(:darwin), do: :macOS
   defp os(:nt), do: :Windows
+  defp os(:freebsd), do: :FreeBSD
   defp os(_), do: :Linux
 
   @doc """
@@ -79,6 +80,10 @@ defmodule Benchee.System do
     parse_cpu_for(:macOS, system_cmd("sysctl", ["-n", "machdep.cpu.brand_string"]))
   end
 
+  defp cpu_speed(:FreeBSD) do
+    parse_cpu_for(:FreeBSD, system_cmd("sysctl", ["-n", "hw.model"]))
+  end
+
   defp cpu_speed(:Linux) do
     parse_cpu_for(:Linux, system_cmd("cat", ["/proc/cpuinfo"]))
   end
@@ -93,6 +98,8 @@ defmodule Benchee.System do
   end
 
   def parse_cpu_for(:macOS, raw_output), do: String.trim(raw_output)
+
+  def parse_cpu_for(:FreeBSD, raw_output), do: String.trim(raw_output)
 
   def parse_cpu_for(:Linux, raw_output) do
     match_info = Regex.run(@linux_cpuinfo_regex, raw_output, capture: :all_but_first)
@@ -120,6 +127,10 @@ defmodule Benchee.System do
     parse_memory_for(:macOS, system_cmd("sysctl", ["-n", "hw.memsize"]))
   end
 
+  defp available_memory(:FreeBSD) do
+    parse_memory_for(:FreeBSD, system_cmd("sysctl", ["-n", "hw.physmem"]))
+  end
+
   defp available_memory(:Linux) do
     parse_memory_for(:Linux, system_cmd("cat", ["/proc/meminfo"]))
   end
@@ -133,6 +144,11 @@ defmodule Benchee.System do
   end
 
   defp parse_memory_for(:macOS, raw_output) do
+    {memory, _} = Integer.parse(raw_output)
+    Memory.format(memory)
+  end
+
+  defp parse_memory_for(:FreeBSD, raw_output) do
     {memory, _} = Integer.parse(raw_output)
     Memory.format(memory)
   end
