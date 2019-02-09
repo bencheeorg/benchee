@@ -11,6 +11,11 @@
 * New `Formatter.output/1` function that takes a suite and uses all configured formatters to output their results
 * Add the concept of a benchmarking title that formatters can pick up
 * the displayed percentiles can now be adjusted
+* inputs option can now be an ordered list of tuples, this way you can determine their order
+* support FreeBSD properly (system metrics) - thanks @[kimshrier](/kimshrier)
+
+### Bugfixes (User Facing)
+* Remove extra double quotes in operating system report line - thanks @[kimshrier](/kimshrier)
 
 ### Breaking Changes (Plugins)
 * all reported times are now in nanoseconds instead of microseconds
@@ -19,6 +24,7 @@
 
 ### Features (Plugins)
 * An optional title is now available in the suite for you to display
+* Scenarios are now sorted already sorted (first by run time, then memory usage) - no need to sort them yourself!
 
 ## 0.13.2 (2018-08-02)
 
