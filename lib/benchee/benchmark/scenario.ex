@@ -91,7 +91,7 @@ defmodule Benchee.Benchmark.Scenario do
       iex> Scenario.data_processed?(scenario, :memory)
       false
   """
-  @spec data_processed?(t, :run_time | :memory) :: bool
+  @spec data_processed?(t, :run_time | :memory) :: boolean
   def data_processed?(scenario, :run_time) do
     scenario.run_time_statistics.sample_size > 0
   end
