@@ -67,4 +67,36 @@ defmodule Benchee.Benchmark.Scenario do
   def display_name(%{job_name: job_name, tag: nil}), do: job_name
   def display_name(%{job_name: job_name, tag: tag}), do: "#{job_name} (#{tag})"
   def display_name(%{job_name: job_name}), do: job_name
+
+  @doc """
+  Returns `true` if data of the provided type has been fully procsessed, `false` otherwise.
+
+  Current available types are `run_time` and `memory`. Reasons they might not have been processed
+  yet are:
+  * Suite wasn't configured to collect them at all
+  * `Benchee.statistics/1` hasn't been called yet so that data was collected but statistics
+    aren't present yet
+
+  ## Examples
+
+      iex> alias Benchee.Benchmark.Scenario
+      iex> alias Benchee.Statistics
+      iex> scenario = %Scenario{run_time_statistics: %Statistics{sample_size: 100}}
+      iex> Scenario.data_processed?(scenario, :run_time)
+      true
+      iex> scenario = %Scenario{memory_usage_statistics: %Statistics{sample_size: 1}}
+      iex> Scenario.data_processed?(scenario, :memory)
+      true
+      iex> scenario = %Scenario{memory_usage_statistics: %Statistics{sample_size: 0}}
+      iex> Scenario.data_processed?(scenario, :memory)
+      false
+  """
+  @spec data_processed?(t, :run_time | :memory) :: boolean
+  def data_processed?(scenario, :run_time) do
+    scenario.run_time_statistics.sample_size > 0
+  end
+
+  def data_processed?(scenario, :memory) do
+    scenario.memory_usage_statistics.sample_size > 0
+  end
 end
