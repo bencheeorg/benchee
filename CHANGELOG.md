@@ -1,4 +1,4 @@
-## 0.14.0 (unreleased)
+## 0.14.0 (2019-02-10)
 
 ### Breaking Changes (User Facing)
 * dropped support for Erlang 18.x
