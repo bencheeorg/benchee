@@ -265,55 +265,55 @@ defmodule Benchee.Statistics do
 
   ## Examples
 
-  iex> scenarios = [
-  ...>   %Benchee.Benchmark.Scenario{
-  ...>     job_name: "My Job",
-  ...>     run_times: [200, 400, 400, 400, 500, 500, 500, 700, 900],
-  ...>     memory_usages: [200, 400, 400, 400, 500, 500, 500, 700, 900],
-  ...>     input_name: "Input",
-  ...>     input: "Input"
-  ...>   }
-  ...> ]
-  iex> %Benchee.Suite{scenarios: scenarios}
-  ...> |> Benchee.Statistics.statistics
-  ...> |> Benchee.Statistics.add_percentiles([25, 75])
-  %Benchee.Suite{
-    scenarios: [
-      %Benchee.Benchmark.Scenario{
-        job_name: "My Job",
-        run_times: [200, 400, 400, 400, 500, 500, 500, 700, 900],
-        memory_usages: [200, 400, 400, 400, 500, 500, 500, 700, 900],
-        input_name: "Input",
-        input: "Input",
-        run_time_statistics: %Benchee.Statistics{
-          average:       500.0,
-          ips:           2_000_000.0,
-          std_dev:       200.0,
-          std_dev_ratio: 0.4,
-          std_dev_ips:   800_000.0,
-          median:        500.0,
-          percentiles:   %{25 => 400.0, 50 => 500.0, 75 => 600.0, 99 => 900.0},
-          mode:          [500, 400],
-          minimum:       200,
-          maximum:       900,
-          sample_size:   9
-        },
-        memory_usage_statistics: %Benchee.Statistics{
-          average:       500.0,
-          ips:           nil,
-          std_dev:       200.0,
-          std_dev_ratio: 0.4,
-          std_dev_ips:   nil,
-          median:        500.0,
-          percentiles:   %{50 => 500.0, 99 => 900.0},
-          mode:          [500, 400],
-          minimum:       200,
-          maximum:       900,
-          sample_size:   9
-        }
+      iex> scenarios = [
+      ...>   %Benchee.Benchmark.Scenario{
+      ...>     job_name: "My Job",
+      ...>     run_times: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+      ...>     memory_usages: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+      ...>     input_name: "Input",
+      ...>     input: "Input"
+      ...>   }
+      ...> ]
+      iex> %Benchee.Suite{scenarios: scenarios}
+      ...> |> Benchee.Statistics.statistics
+      ...> |> Benchee.Statistics.add_percentiles([25, 75])
+      %Benchee.Suite{
+        scenarios: [
+          %Benchee.Benchmark.Scenario{
+            job_name: "My Job",
+            run_times: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+            memory_usages: [200, 400, 400, 400, 500, 500, 500, 700, 900],
+            input_name: "Input",
+            input: "Input",
+            run_time_statistics: %Benchee.Statistics{
+              average:       500.0,
+              ips:           2_000_000.0,
+              std_dev:       200.0,
+              std_dev_ratio: 0.4,
+              std_dev_ips:   800_000.0,
+              median:        500.0,
+              percentiles:   %{25 => 400.0, 50 => 500.0, 75 => 600.0, 99 => 900.0},
+              mode:          [500, 400],
+              minimum:       200,
+              maximum:       900,
+              sample_size:   9
+            },
+            memory_usage_statistics: %Benchee.Statistics{
+              average:       500.0,
+              ips:           nil,
+              std_dev:       200.0,
+              std_dev_ratio: 0.4,
+              std_dev_ips:   nil,
+              median:        500.0,
+              percentiles:   %{50 => 500.0, 99 => 900.0},
+              mode:          [500, 400],
+              minimum:       200,
+              maximum:       900,
+              sample_size:   9
+            }
+          }
+        ]
       }
-    ]
-  }
   """
   def add_percentiles(suite = %Suite{scenarios: scenarios}, percentile_ranks) do
     new_scenarios =
