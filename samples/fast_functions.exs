@@ -6,15 +6,21 @@ range = 1..10
 integer1 = :rand.uniform(100)
 integer2 = :rand.uniform(100)
 
-Benchee.run(%{
-  "Integer addition (wrong)"          => fn -> 1 + 1 end,
-  "Integer addition"                  => fn -> integer1 + integer2 end,
-  "String concatention (wrong)"       => fn -> "1" <> "1" end,
-  "adding a head to an array (wrong)" => fn -> [1 | [1]] end,
-  "++ array concat (wrong)"           => fn -> [1] ++ [1] end,
-  "noop"                              => fn -> 0 end,
-  "Enum.map(10)"                      => fn -> Enum.map(range, fn(i) -> i end) end
-}, time: 1, warmup: 1, memory_time: 1)
+Benchee.run(
+  %{
+    "Integer addition (wrong)" => fn -> 1 + 1 end,
+    "Integer addition" => fn -> integer1 + integer2 end,
+    "String concatention (wrong)" => fn -> "1" <> "1" end,
+    "adding a head to an array (wrong)" => fn -> [1 | [1]] end,
+    "++ array concat (wrong)" => fn -> [1] ++ [1] end,
+    "noop" => fn -> 0 end,
+    "Enum.map(10)" => fn -> Enum.map(range, fn i -> i end) end
+  },
+  time: 1,
+  warmup: 1,
+  memory_time: 1,
+  formatters: [{Benchee.Formatters.Console, extended_statistics: true}]
+)
 
 # See how the median of almost all options is 0 or 1 because they essentially do the same thing.
 # Randomizing values prevents these optimizations but is still very fast (see the high standard
@@ -35,7 +41,6 @@ Benchee.run(%{
 # parallel: 1
 # inputs: none specified
 # Estimated total run time: 21 s
-
 
 # Benchmarking ++ array concat (wrong)...
 # Benchmarking Enum.map(10)...
