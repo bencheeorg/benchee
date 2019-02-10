@@ -25,6 +25,7 @@
 ### Features (Plugins)
 * An optional title is now available in the suite for you to display
 * Scenarios are now sorted already sorted (first by run time, then memory usage) - no need to sort them yourself!
+* Add `Scenario.data_processed?/2` to check if either run time or memory data has had statistics generated
 
 ## 0.13.2 (2018-08-02)
 
