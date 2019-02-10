@@ -52,7 +52,7 @@ defmodule Benchee.Mixfile do
       {:deep_merge, "~> 0.1"},
       {:ex_guard, "~> 1.3", only: :dev},
       {:credo, "~> 1.0.0", only: :dev},
-      {:ex_doc, "~> 0.18.0", only: :dev},
+      {:ex_doc, "~> 0.19.0", only: :dev},
       {:earmark, "~> 1.0", only: :dev},
       {:excoveralls, "~> 0.7", only: :test},
       {:inch_ex, "~> 0.5", only: :docs},
