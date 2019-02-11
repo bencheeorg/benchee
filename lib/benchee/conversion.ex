@@ -20,8 +20,8 @@ defmodule Benchee.Conversion do
 
       iex> statistics = %Benchee.Statistics{average: 1_000_000.0, ips: 1000.0}
       iex> scenario = %Benchee.Benchmark.Scenario{
-      ...>   run_time_data: %{statistics: statistics},
-      ...>   memory_usage_data: %{statistics: statistics}
+      ...>   run_time_data: %Benchee.CollectionData{statistics: statistics},
+      ...>   memory_usage_data: %Benchee.CollectionData{statistics: statistics}
       ...> }
       iex> Benchee.Conversion.units([scenario], :best)
       %{

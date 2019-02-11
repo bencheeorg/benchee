@@ -3,7 +3,15 @@ defmodule Benchee.Formatters.ConsoleTest do
   doctest Benchee.Formatters.Console
 
   import ExUnit.CaptureIO
-  alias Benchee.{Benchmark.Scenario, Formatter, Formatters.Console, Statistics, Suite}
+
+  alias Benchee.{
+    Benchmark.Scenario,
+    CollectionData,
+    Formatter,
+    Formatters.Console,
+    Statistics,
+    Suite
+  }
 
   @config %Benchee.Configuration{
     title: "A comprehensive benchmarking of inputs"
@@ -21,7 +29,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           name: "Second",
           input_name: @no_input,
           input: @no_input,
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -31,13 +39,13 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         },
         %Scenario{
           name: "First",
           input_name: @no_input,
           input: @no_input,
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 100.0,
               ips: 10_000.0,
@@ -47,7 +55,7 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -79,7 +87,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           name: "Job",
           input_name: "My Arg",
           input: "My Arg",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -89,13 +97,13 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         },
         %Scenario{
           name: "Job",
           input_name: "Other Arg",
           input: "Other Arg",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 400.0,
               ips: 2_500.0,
@@ -105,7 +113,7 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -129,7 +137,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           name: "Job",
           input_name: "Other Arg",
           input: "Other Arg",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 400.0,
               ips: 2_500.0,
@@ -139,13 +147,13 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         },
         %Scenario{
           name: "Job",
           input_name: "My Arg",
           input: "My Arg",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -155,7 +163,7 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -179,7 +187,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           name: "Other Job",
           input_name: "My Arg",
           input: "My Arg",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 100.0,
               ips: 10_000.0,
@@ -189,13 +197,13 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         },
         %Scenario{
           name: "Job",
           input_name: "My Arg",
           input: "My Arg",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -205,13 +213,13 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         },
         %Scenario{
           name: "Other Job",
           input_name: "Other Arg",
           input: "Other Arg",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 250.0,
               ips: 4_000.0,
@@ -221,13 +229,13 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         },
         %Scenario{
           name: "Job",
           input_name: "Other Arg",
           input: "Other Arg",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 400.0,
               ips: 2_500.0,
@@ -237,7 +245,7 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -265,7 +273,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           name: "job (improved)",
           input_name: @no_input,
           input: @no_input,
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 100.0,
               ips: 10_000.0,
@@ -275,13 +283,13 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         },
         %Scenario{
           name: "job",
           input_name: @no_input,
           input: @no_input,
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -291,7 +299,7 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -309,7 +317,7 @@ defmodule Benchee.Formatters.ConsoleTest do
           name: "job",
           input_name: @no_input,
           input: @no_input,
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -319,7 +327,7 @@ defmodule Benchee.Formatters.ConsoleTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 

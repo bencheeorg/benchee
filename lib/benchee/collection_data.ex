@@ -7,6 +7,6 @@ defmodule Benchee.CollectionData do
 
   @type t :: %__MODULE__{
           samples: [float | non_neg_integer],
-          statistics: Benchee.Statistics.t() | nil
+          statistics: Benchee.Statistics.t()
         }
 end

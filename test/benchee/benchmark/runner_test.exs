@@ -347,7 +347,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       suite = %Suite{
         scenarios: [
           %Scenario{
-            run_time_data: %{samples: [1_000_000]},
+            run_time_data: %Benchee.CollectionData{samples: [1_000_000]},
             function: fn -> 1 + 1 end,
             input: @no_input
           }
@@ -675,7 +675,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       # should be closer to 10 by you know slow CI systems...
       assert hook_call_count >= 2
       # for every sample that we have, we should have run a hook
-      [%{run_time_data: %{samples: run_times}}] = result.scenarios
+      [%{run_time_data: %Benchee.CollectionData{samples: run_times}}] = result.scenarios
       sample_size = length(run_times)
       assert sample_size == hook_call_count
     end

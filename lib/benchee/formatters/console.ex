@@ -23,7 +23,7 @@ defmodule Benchee.Formatters.Console do
   ```
   iex> scenarios = [
   ...>   %Benchee.Benchmark.Scenario{
-  ...>     name: "My Job", input_name: "My input", run_time_data: %{
+  ...>     name: "My Job", input_name: "My input", run_time_data: %Benchee.CollectionData{
   ...>       statistics: %Benchee.Statistics{
   ...>         average: 200.0,
   ...>         ips: 5000.0,
@@ -32,11 +32,10 @@ defmodule Benchee.Formatters.Console do
   ...>         percentiles: %{99 => 300.1},
   ...>         sample_size: 200
   ...>       }
-  ...>     },
-  ...>     memory_usage_data: %{statistics: %Benchee.Statistics{}}
+  ...>     }
   ...>   },
   ...>   %Benchee.Benchmark.Scenario{
-  ...>     name: "Job 2", input_name: "My input", run_time_data: %{
+  ...>     name: "Job 2", input_name: "My input", run_time_data: %Benchee.CollectionData{
   ...>       statistics: %Benchee.Statistics{
   ...>         average: 400.0,
   ...>         ips: 2500.0,
@@ -45,8 +44,7 @@ defmodule Benchee.Formatters.Console do
   ...>         percentiles: %{99 => 500.1},
   ...>         sample_size: 200
   ...>       }
-  ...>     },
-  ...>     memory_usage_data: %{statistics: %Benchee.Statistics{}}
+  ...>     }
   ...>   }
   ...> ]
   iex> suite = %Benchee.Suite{

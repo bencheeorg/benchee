@@ -327,6 +327,8 @@ defmodule Benchee.Statistics do
                 sample_size:   9
               }
             }
+          }
+        ]
       }
   """
   def add_percentiles(suite = %Suite{scenarios: scenarios}, percentile_ranks) do

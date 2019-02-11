@@ -38,23 +38,23 @@ defmodule Benchee.Formatters.Console.RunTime do
   iex> scenarios = [
   ...>   %Benchee.Benchmark.Scenario{
   ...>     name: "My Job",
-  ...>     run_time_data: %{
+  ...>     run_time_data: %Benchee.CollectionData{
   ...>       statistics: %Benchee.Statistics{
   ...>         average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0, percentiles: %{99 => 300.1},
   ...>         minimum: 100.1, maximum: 200.2, sample_size: 10_101, mode: 333.2
   ...>       },
   ...>     },
-  ...>     memory_usage_data: %{statistics: memory_statistics}
+  ...>     memory_usage_data: %Benchee.CollectionData{statistics: memory_statistics}
   ...>   },
   ...>   %Benchee.Benchmark.Scenario{
   ...>     name: "Job 2",
-  ...>     run_time_data: %{
+  ...>     run_time_data: %Benchee.CollectionData{
   ...>       statistics: %Benchee.Statistics{
   ...>         average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0, percentiles: %{99 => 500.1},
   ...>         minimum: 200.2, maximum: 400.4, sample_size: 20_202, mode: [612.3, 554.1]
   ...>       }
   ...>     },
-  ...>     memory_usage_data: %{statistics: memory_statistics}
+  ...>     memory_usage_data: %Benchee.CollectionData{statistics: memory_statistics}
   ...>   }
   ...> ]
   iex> configuration = %{comparison: false, unit_scaling: :best, extended_statistics: true}

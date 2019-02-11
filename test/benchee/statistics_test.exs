@@ -73,7 +73,7 @@ defmodule Benchee.StatistcsTest do
 
       suite = Statistics.statistics(%Suite{scenarios: scenarios})
 
-      [%Scenario{run_time_data: %{statistics: stats}}] = suite.scenarios
+      [%Scenario{run_time_data: %CollectionData{statistics: stats}}] = suite.scenarios
       assert stats.mode == 55
     end
 
@@ -88,7 +88,7 @@ defmodule Benchee.StatistcsTest do
 
       suite = Statistics.statistics(%Suite{scenarios: scenarios})
 
-      [%Scenario{run_time_data: %{statistics: stats}}] = suite.scenarios
+      [%Scenario{run_time_data: %CollectionData{statistics: stats}}] = suite.scenarios
       assert_in_delta stats.std_dev, 164.7, 0.1
       assert_in_delta stats.std_dev_ratio, 0.41, 0.01
     end
@@ -118,7 +118,7 @@ defmodule Benchee.StatistcsTest do
       %Suite{
         scenarios: [
           %Scenario{
-            run_time_data: %{
+            run_time_data: %CollectionData{
               statistics: %Statistics{
                 percentiles: %{
                   25 => _,
@@ -148,7 +148,7 @@ defmodule Benchee.StatistcsTest do
       %Suite{
         scenarios: [
           %Scenario{
-            run_time_data: %{
+            run_time_data: %CollectionData{
               statistics: %Statistics{
                 percentiles: %{
                   25 => _,
@@ -175,8 +175,8 @@ defmodule Benchee.StatistcsTest do
 
       [
         %Scenario{
-          run_time_data: %{statistics: run_time_stats},
-          memory_usage_data: %{statistics: memory_stats}
+          run_time_data: %CollectionData{statistics: run_time_stats},
+          memory_usage_data: %CollectionData{statistics: memory_stats}
         }
       ] = suite.scenarios
 
@@ -235,7 +235,7 @@ defmodule Benchee.StatistcsTest do
     end
 
     defp stats_for(suite, job_name, input_name) do
-      %Scenario{run_time_data: %{statistics: stats}} =
+      %Scenario{run_time_data: %CollectionData{statistics: stats}} =
         Enum.find(suite.scenarios, fn scenario ->
           scenario.job_name == job_name && scenario.input_name == input_name
         end)

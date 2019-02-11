@@ -79,22 +79,22 @@ defmodule Benchee.Benchmark.Scenario do
 
       iex> alias Benchee.Benchmark.Scenario
       iex> alias Benchee.Statistics
-      iex> scenario = %Scenario{run_time_statistics: %Statistics{sample_size: 100}}
+      iex> scenario = %Scenario{run_time_data: %Benchee.CollectionData{statistics: %Statistics{sample_size: 100}}}
       iex> Scenario.data_processed?(scenario, :run_time)
       true
-      iex> scenario = %Scenario{memory_usage_statistics: %Statistics{sample_size: 1}}
+      iex> scenario = %Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Statistics{sample_size: 1}}}
       iex> Scenario.data_processed?(scenario, :memory)
       true
-      iex> scenario = %Scenario{memory_usage_statistics: %Statistics{sample_size: 0}}
+      iex> scenario = %Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Statistics{sample_size: 0}}}
       iex> Scenario.data_processed?(scenario, :memory)
       false
   """
   @spec data_processed?(t, :run_time | :memory) :: boolean
   def data_processed?(scenario, :run_time) do
-    scenario.run_time_statistics.sample_size > 0
+    scenario.run_time_data.statistics.sample_size > 0
   end
 
   def data_processed?(scenario, :memory) do
-    scenario.memory_usage_statistics.sample_size > 0
+    scenario.memory_usage_data.statistics.sample_size > 0
   end
 end

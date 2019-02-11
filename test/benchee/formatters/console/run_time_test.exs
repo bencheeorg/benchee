@@ -2,7 +2,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
   use ExUnit.Case, async: true
   doctest Benchee.Formatters.Console.RunTime
 
-  alias Benchee.{Benchmark.Scenario, Formatters.Console.RunTime, Statistics}
+  alias Benchee.{Benchmark.Scenario, CollectionData, Formatters.Console.RunTime, Statistics}
 
   @console_config %{
     comparison: true,
@@ -20,7 +20,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First job",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -33,7 +33,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 50_000
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -56,7 +56,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First job",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -69,7 +69,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 50_000
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -84,7 +84,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First job",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -96,7 +96,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 50_000
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -110,7 +110,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -120,11 +120,11 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         },
         %Scenario{
           name: "Second",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 400.0,
               ips: 2_500.0,
@@ -134,7 +134,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 300
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -152,7 +152,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
 
       long_scenario = %Scenario{
         name: third_name,
-        run_time_data: %{
+        run_time_data: %CollectionData{
           statistics: %Statistics{
             average: 400.1,
             ips: 2_500.0,
@@ -162,7 +162,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             sample_size: 200
           }
         },
-        memory_usage_data: %{statistics: %Statistics{}}
+        memory_usage_data: %CollectionData{statistics: %Statistics{}}
       }
 
       longer_scenarios = scenarios ++ [long_scenario]
@@ -181,7 +181,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 100.0,
               ips: 10_000.0,
@@ -191,11 +191,11 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 400
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         },
         %Scenario{
           name: "Second",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -205,7 +205,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -221,7 +221,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "Second",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -231,11 +231,11 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         },
         %Scenario{
           name: "First",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 100.0,
               ips: 10_000.0,
@@ -244,7 +244,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               percentiles: %{99 => 200.1}
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -268,7 +268,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 100.0,
               ips: 10_000.0,
@@ -278,11 +278,11 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         },
         %Scenario{
           name: second_name,
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 200.0,
               ips: 5_000.0,
@@ -292,7 +292,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -309,7 +309,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 100.0,
               ips: 10_000.0,
@@ -319,7 +319,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -331,7 +331,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "First",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 0.15,
               ips: 10_000.0,
@@ -341,7 +341,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -355,7 +355,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       scenarios = [
         %Scenario{
           name: "Job",
-          run_time_data: %{
+          run_time_data: %CollectionData{
             statistics: %Statistics{
               average: 11_000_000.0,
               ips: 12_000.0,
@@ -365,7 +365,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               sample_size: 200
             }
           },
-          memory_usage_data: %{statistics: %Statistics{}}
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
         }
       ]
 
@@ -380,7 +380,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
     end
 
     test "does nothing when there's no statistics to format" do
-      scenarios = [%Scenario{run_time_data: %{statistics: %Statistics{sample_size: 0}}}]
+      scenarios = [
+        %Scenario{run_time_data: %CollectionData{statistics: %Statistics{sample_size: 0}}}
+      ]
 
       assert [] = RunTime.format_scenarios(scenarios, %{})
     end
