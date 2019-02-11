@@ -104,8 +104,8 @@ defmodule Benchee.Benchmark do
   information on how bencharmks are actually run, see
   `Benchee.Benchmark.Runner.run_scenarios/2`.
   """
-  @spec measure(Suite.t(), module, module) :: Suite.t()
-  def measure(
+  @spec collect(Suite.t(), module, module) :: Suite.t()
+  def collect(
         suite = %Suite{scenarios: scenarios, configuration: config},
         printer \\ Printer,
         runner \\ Runner

@@ -43,7 +43,7 @@ defmodule BencheeTest do
         |> Benchee.init()
         |> Benchee.system()
         |> Benchee.benchmark("Sleeps", fn -> :timer.sleep(10) end)
-        |> Benchee.measure()
+        |> Benchee.collect()
         |> Statistics.statistics()
         |> Console.format()
 
@@ -144,7 +144,7 @@ defmodule BencheeTest do
         |> Benchee.system()
         |> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
         |> Benchee.benchmark("map.flatten", fn -> list |> Enum.map(map_fun) |> List.flatten() end)
-        |> Benchee.measure()
+        |> Benchee.collect()
         |> Benchee.statistics()
         |> Console.format()
         |> IO.puts()
@@ -166,7 +166,7 @@ defmodule BencheeTest do
         |> Benchee.system()
         |> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
         |> Benchee.benchmark("map.flatten", fn -> list |> Enum.map(map_fun) |> List.flatten() end)
-        |> Benchee.measure()
+        |> Benchee.collect()
         |> Benchee.statistics()
         |> Formatter.output()
       end)
@@ -333,7 +333,7 @@ defmodule BencheeTest do
       formatter_one = fn suite ->
         run_time =
           suite.scenarios
-          |> (fn [scenario | _] -> List.last(scenario.run_times) end).()
+          |> (fn [scenario | _] -> List.last(scenario.run_time_data.samples) end).()
           |> Duration.format()
 
         IO.puts("Run time: #{run_time}")
@@ -342,7 +342,7 @@ defmodule BencheeTest do
       formatter_two = fn suite ->
         average =
           suite.scenarios
-          |> (fn [scenario | _] -> scenario.run_time_statistics.average end).()
+          |> (fn [scenario | _] -> scenario.run_time_data.statistics.average end).()
           |> Duration.format()
 
         IO.puts("Average: #{average}")
@@ -588,7 +588,7 @@ defmodule BencheeTest do
           )
         )
 
-      assert length(scenario.run_times) > 0
+      assert length(scenario.run_time_data.samples) > 0
     end)
   end
 

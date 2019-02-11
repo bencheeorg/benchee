@@ -1,4 +1,4 @@
-defmodule Benchee.Benchmark.Measure.Memory do
+defmodule Benchee.Benchmark.Collect.Memory do
   @moduledoc false
 
   # Measure memory consumption of a function.
@@ -13,9 +13,9 @@ defmodule Benchee.Benchmark.Measure.Memory do
   #
   # Returns `{nil, return_value}` in case the memory measurement went bad.
 
-  @behaviour Benchee.Benchmark.Measure
+  @behaviour Benchee.Benchmark.Collect
 
-  def measure(fun) do
+  def collect(fun) do
     ref = make_ref()
     Process.flag(:trap_exit, true)
     start_runner(fun, ref)

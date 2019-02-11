@@ -5,7 +5,7 @@ defmodule Benchee.Test.FakeBenchmarkRunner do
     send(self(), {:run_scenarios, scenarios, scenario_context})
 
     Enum.map(scenarios, fn scenario ->
-      %Benchee.Benchmark.Scenario{scenario | run_times: [1.0]}
+      %{scenario | run_time_data: %{scenario.run_time_data | samples: [1.0]}}
     end)
   end
 end

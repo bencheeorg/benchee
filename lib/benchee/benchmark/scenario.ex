@@ -5,24 +5,24 @@ defmodule Benchee.Benchmark.Scenario do
   `function`) in combination with a specific input (`input_name` and `input`).
 
   It then gathers all data measured for this particular combination during
-  `Benchee.Benchmark.measure/3` (`run_times` and `memory_usages`),
-  which are then used later in the process by `Benchee.Statistics` to compute
-  the relevant statistics (`run_time_statistics` and `memory_usage_statistics`).
+  `Benchee.Benchmark.collect/3`, which are then used later in the process by
+  `Benchee.Statistics` to compute the relevant statistics.
 
   `name` is the name that should be used by formatters to display scenarios as
   it potentially includes the `tag` present when loading scenarios that were
   saved before. See `display_name/1`.
   """
+
+  alias Benchee.CollectionData
+
   defstruct [
     :name,
     :job_name,
     :function,
     :input_name,
     :input,
-    :run_time_statistics,
-    :memory_usage_statistics,
-    run_times: [],
-    memory_usages: [],
+    run_time_data: %CollectionData{},
+    memory_usage_data: %CollectionData{},
     before_each: nil,
     after_each: nil,
     before_scenario: nil,
@@ -36,10 +36,8 @@ defmodule Benchee.Benchmark.Scenario do
           function: fun,
           input_name: String.t() | nil,
           input: any | nil,
-          run_times: [float],
-          run_time_statistics: Benchee.Statistics.t() | nil,
-          memory_usages: [non_neg_integer],
-          memory_usage_statistics: Benchee.Statistics.t() | nil,
+          run_time_data: CollectionData.t(),
+          memory_usage_data: CollectionData.t(),
           before_each: fun | nil,
           after_each: fun | nil,
           before_scenario: fun | nil,
@@ -81,22 +79,22 @@ defmodule Benchee.Benchmark.Scenario do
 
       iex> alias Benchee.Benchmark.Scenario
       iex> alias Benchee.Statistics
-      iex> scenario = %Scenario{run_time_statistics: %Statistics{sample_size: 100}}
+      iex> scenario = %Scenario{run_time_data: %Benchee.CollectionData{statistics: %Statistics{sample_size: 100}}}
       iex> Scenario.data_processed?(scenario, :run_time)
       true
-      iex> scenario = %Scenario{memory_usage_statistics: %Statistics{sample_size: 1}}
+      iex> scenario = %Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Statistics{sample_size: 1}}}
       iex> Scenario.data_processed?(scenario, :memory)
       true
-      iex> scenario = %Scenario{memory_usage_statistics: %Statistics{sample_size: 0}}
+      iex> scenario = %Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Statistics{sample_size: 0}}}
       iex> Scenario.data_processed?(scenario, :memory)
       false
   """
   @spec data_processed?(t, :run_time | :memory) :: boolean
   def data_processed?(scenario, :run_time) do
-    scenario.run_time_statistics.sample_size > 0
+    scenario.run_time_data.statistics.sample_size > 0
   end
 
   def data_processed?(scenario, :memory) do
-    scenario.memory_usage_statistics.sample_size > 0
+    scenario.memory_usage_data.statistics.sample_size > 0
   end
 end

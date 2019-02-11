@@ -1,4 +1,4 @@
-defmodule Benchee.Benchmark.Measure.NativeTime do
+defmodule Benchee.Benchmark.Collect.NativeTime do
   @moduledoc false
 
   # Measure the time elapsed while executing a given function.
@@ -6,9 +6,9 @@ defmodule Benchee.Benchmark.Measure.NativeTime do
   # Uses only the time unit native to the platform. Used for determining how many times a function
   # should be repeated in `Benchee.Benchmark.Runner.determine_n_times/3` (private method though).
 
-  @behaviour Benchee.Benchmark.Measure
+  @behaviour Benchee.Benchmark.Collect
 
-  def measure(function) do
+  def collect(function) do
     start = :erlang.monotonic_time()
     result = function.()
     finish = :erlang.monotonic_time()
