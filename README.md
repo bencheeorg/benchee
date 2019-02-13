@@ -640,15 +640,15 @@ It is important to note that the benchmarking code shown in the beginning is the
 list = Enum.to_list(1..10_000)
 map_fun = fn(i) -> [i, i * i] end
 
-Benchee.init(time: 3)
-|> Benchee.system
-|> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
-|> Benchee.benchmark("map.flatten",
-                     fn -> list |> Enum.map(map_fun) |> List.flatten end)
-|> Benchee.measure
-|> Benchee.statistics
-|> Benchee.load # can be omitted when you don't want to/need to load scenarios
-|> Benchee.Formatter.output(Benchee.Formatters.Console, %{})
+Benchee.init(time: 3) |> 
+Benchee.system |> 
+Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end) |> 
+Benchee.benchmark("map.flatten",
+                     fn -> list |> Enum.map(map_fun) |> List.flatten end) |> 
+Benchee.measure |> 
+Benchee.statistics |> 
+Benchee.load |>  # can be omitted when you don't want to/need to load scenarios 
+Benchee.Formatter.output(Benchee.Formatters.Console, %{})
 # Instead of the last call you could also just use Benchee.Formatter.output()
 # to just output all configured formatters
 ```
