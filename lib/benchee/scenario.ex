@@ -1,4 +1,4 @@
-defmodule Benchee.Benchmark.Scenario do
+defmodule Benchee.Scenario do
   @moduledoc """
   A Scenario in Benchee is a particular case of a whole benchmarking suite. That
   is the combination of a particular function to benchmark (`job_name` and
@@ -53,7 +53,7 @@ defmodule Benchee.Benchmark.Scenario do
 
   ## Examples
 
-      iex> alias Benchee.Benchmark.Scenario
+      iex> alias Benchee.Scenario
       iex> Scenario.display_name(%Scenario{job_name: "flat_map"})
       "flat_map"
       iex> Scenario.display_name(%Scenario{job_name: "flat_map", tag: "master"})
@@ -77,7 +77,7 @@ defmodule Benchee.Benchmark.Scenario do
 
   ## Examples
 
-      iex> alias Benchee.Benchmark.Scenario
+      iex> alias Benchee.Scenario
       iex> alias Benchee.Statistics
       iex> scenario = %Scenario{run_time_data: %Benchee.CollectionData{statistics: %Statistics{sample_size: 100}}}
       iex> Scenario.data_processed?(scenario, :run_time)

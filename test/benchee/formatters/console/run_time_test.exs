@@ -2,7 +2,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
   use ExUnit.Case, async: true
   doctest Benchee.Formatters.Console.RunTime
 
-  alias Benchee.{Benchmark.Scenario, CollectionData, Formatters.Console.RunTime, Statistics}
+  alias Benchee.{CollectionData, Formatters.Console.RunTime, Scenario, Statistics}
 
   @console_config %{
     comparison: true,

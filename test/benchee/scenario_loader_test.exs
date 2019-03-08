@@ -1,7 +1,7 @@
 defmodule Benchee.ScenarioLoaderTest do
   use ExUnit.Case
   import Benchee.ScenarioLoader
-  alias Benchee.{Benchmark.Scenario, Configuration, Suite}
+  alias Benchee.{Configuration, Scenario, Suite}
 
   test "`load` indeed loads scenarios into the suite" do
     scenarios = [%Scenario{tag: "old"}]

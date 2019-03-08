@@ -5,10 +5,10 @@ defmodule Benchee.Formatters.ConsoleTest do
   import ExUnit.CaptureIO
 
   alias Benchee.{
-    Benchmark.Scenario,
     CollectionData,
     Formatter,
     Formatters.Console,
+    Scenario,
     Statistics,
     Suite
   }

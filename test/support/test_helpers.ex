@@ -31,7 +31,7 @@ defmodule Benchee.TestHelpers do
   def suite_without_scenario_tags(suite) do
     scenarios =
       Enum.map(suite.scenarios, fn scenario ->
-        %Benchee.Benchmark.Scenario{scenario | tag: nil, name: scenario.job_name}
+        %Benchee.Scenario{scenario | tag: nil, name: scenario.job_name}
       end)
 
     %Benchee.Suite{suite | scenarios: scenarios}

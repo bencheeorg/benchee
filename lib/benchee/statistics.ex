@@ -4,7 +4,7 @@ defmodule Benchee.Statistics do
   times and then compute statistics like the average and the standard deviation.
   """
 
-  alias Benchee.{Benchmark.Scenario, Conversion.Duration, Suite, Utility.Parallel}
+  alias Benchee.{Conversion.Duration, Scenario, Suite, Utility.Parallel}
 
   alias Benchee.Statistics.Mode
   alias Benchee.Statistics.Percentile
@@ -78,7 +78,7 @@ defmodule Benchee.Statistics do
   ## Examples
 
       iex> scenarios = [
-      ...>   %Benchee.Benchmark.Scenario{
+      ...>   %Benchee.Scenario{
       ...>     job_name: "My Job",
       ...>     run_time_data: %Benchee.CollectionData{
       ...>       samples: [200, 400, 400, 400, 500, 500, 500, 700, 900]
@@ -94,7 +94,7 @@ defmodule Benchee.Statistics do
       iex> Benchee.Statistics.statistics(suite)
       %Benchee.Suite{
         scenarios: [
-          %Benchee.Benchmark.Scenario{
+          %Benchee.Scenario{
             job_name: "My Job",
             input_name: "Input",
             input: "Input",
@@ -274,7 +274,7 @@ defmodule Benchee.Statistics do
   ## Examples
 
       iex> scenarios = [
-      ...>   %Benchee.Benchmark.Scenario{
+      ...>   %Benchee.Scenario{
       ...>     job_name: "My Job",
       ...>     run_time_data: %Benchee.CollectionData{
       ...>       samples: [200, 400, 400, 400, 500, 500, 500, 700, 900]
@@ -291,7 +291,7 @@ defmodule Benchee.Statistics do
       ...> |> Benchee.Statistics.add_percentiles([25, 75])
       %Benchee.Suite{
         scenarios: [
-          %Benchee.Benchmark.Scenario{
+          %Benchee.Scenario{
             job_name: "My Job",
             input_name: "Input",
             input: "Input",

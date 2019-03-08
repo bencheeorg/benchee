@@ -4,7 +4,7 @@ defmodule Benchee.Benchmark.RunnerTest do
   import Benchee.TestHelpers
   import ExUnit.CaptureIO
 
-  alias Benchee.{Benchmark, Benchmark.Scenario, Configuration, Suite}
+  alias Benchee.{Benchmark, Configuration, Scenario, Suite}
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
 
   @config %Configuration{

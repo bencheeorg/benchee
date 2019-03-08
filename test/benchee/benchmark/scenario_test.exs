@@ -1,4 +1,4 @@
-defmodule Benchee.Benchmark.ScenarioTest do
+defmodule Benchee.ScenarioTest do
   use ExUnit.Case, async: true
-  doctest Benchee.Benchmark.Scenario
+  doctest Benchee.Scenario
 end
