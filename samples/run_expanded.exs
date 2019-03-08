@@ -11,7 +11,7 @@ map_fun = fn i -> [i, i * i] end
 )
 |> Benchee.measure()
 |> Benchee.statistics()
-|> Benchee.Formatters.Console.output()
+|> Benchee.Formatter.output(Benchee.Formatters.Console)
 
 # tobi@happy ~/github/benchee $ mix run samples/run_expanded_output.exs
 # Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
