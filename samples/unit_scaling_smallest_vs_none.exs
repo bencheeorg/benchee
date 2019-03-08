@@ -1,14 +1,17 @@
 # Due to the wide spread of values in unit_scaling.exs there is no difference
 # between :none and :smallest -let's fix that here!
 
-list_10k  = 1..10_000    |> Enum.to_list |> Enum.shuffle
-list_100k = 1..100_000   |> Enum.to_list |> Enum.shuffle
+list_10k = 1..10_000 |> Enum.to_list() |> Enum.shuffle()
+list_100k = 1..100_000 |> Enum.to_list() |> Enum.shuffle()
 
 # options document in README
-Benchee.run %{
-  "10k"  => fn -> Enum.sort(list_10k) end,
-  "100k" => fn -> Enum.sort(list_100k) end,
-}, console: [unit_scaling: :none]
+Benchee.run(
+  %{
+    "10k" => fn -> Enum.sort(list_10k) end,
+    "100k" => fn -> Enum.sort(list_100k) end
+  },
+  console: [unit_scaling: :none]
+)
 
 # :smallest
 # Name           ips        average    deviation         median

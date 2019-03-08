@@ -15,13 +15,15 @@ defmodule BenchKeyword do
 
   defp do_delete([{key, _} | rest], key, _deleted?),
     do: do_delete(rest, key, true)
+
   defp do_delete([{_, _} = pair | rest], key, deleted?),
     do: [pair | do_delete(rest, key, deleted?)]
+
   defp do_delete([], _key, _deleted? = true),
     do: []
+
   defp do_delete([], _key, _deleted? = false),
     do: throw(:not_deleted)
-
 
   def delete_v2(keywords, key) when is_list(keywords) and is_atom(key) do
     delete_v2_key(keywords, key, [])
@@ -95,4 +97,10 @@ inputs = %{
   "huge hit" => {Enum.map(1..10000, &{:"k#{&1}", &1}), :k10000}
 }
 
-Benchee.run(benches, inputs: inputs, print: [fast_warning: false], memory_time: 0.001, warmup: 1, time: 2)
+Benchee.run(benches,
+  inputs: inputs,
+  print: [fast_warning: false],
+  memory_time: 0.001,
+  warmup: 1,
+  time: 2
+)

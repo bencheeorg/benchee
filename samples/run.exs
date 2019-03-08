@@ -1,10 +1,14 @@
 list = Enum.to_list(1..10_000)
-map_fun = fn(i) -> [i, i * i] end
+map_fun = fn i -> [i, i * i] end
 
-Benchee.run(%{
-  "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
-  "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
-}, time: 10, memory_time: 2)
+Benchee.run(
+  %{
+    "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
+    "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
+  },
+  time: 10,
+  memory_time: 2
+)
 
 # tobi@speedy:~/github/benchee(master)$ mix run samples/run.exs
 # Operating System: Linux"
@@ -41,4 +45,3 @@ Benchee.run(%{
 # map.flatten       781.85 KB - 1.25x memory usage
 #
 # **All measurements for memory usage were the same**
-
