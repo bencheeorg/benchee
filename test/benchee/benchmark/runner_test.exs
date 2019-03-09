@@ -184,9 +184,9 @@ defmodule Benchee.Benchmark.RunnerTest do
 
     test "very fast function times are almost 0 with function call overhead elimination" do
       suite =
-        %{configuration: %{measure_function_call_overhead: true}}
+        %{configuration: %{measure_function_call_overhead: true, time: 200_000_000}}
         |> test_suite()
-        |> Benchmark.benchmark("", fn -> 1 end)
+        |> Benchmark.benchmark("", fn -> nil end)
         |> Benchmark.collect(TestPrinter)
         |> Benchee.statistics()
 
