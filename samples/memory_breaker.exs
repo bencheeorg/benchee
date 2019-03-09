@@ -97,7 +97,8 @@ inputs = %{
   "huge hit" => {Enum.map(1..10000, &{:"k#{&1}", &1}), :k10000}
 }
 
-Benchee.run(benches,
+Benchee.run(
+  benches,
   inputs: inputs,
   print: [fast_warning: false],
   memory_time: 0.001,
