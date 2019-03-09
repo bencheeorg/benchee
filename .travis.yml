@@ -13,7 +13,7 @@ script:
   - mix credo --strict
   - mix format --check-formatted
   - mix dialyzer --halt-exit-status
-  - mix safe_coveralls.travis
+  - mix coveralls.travis
 after_script:
   - mix deps.get --only docs
   - MIX_ENV=docs mix inch.report
