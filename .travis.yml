@@ -15,8 +15,7 @@ script:
   - mix dialyzer --halt-exit-status
   - mix coveralls.travis
 after_script:
-  - mix deps.get --only docs
-  - MIX_ENV=docs mix inch.report
+  - if [[ "$TRAVIS_ELIXIR_VERSION" == "1.8"* ]]; then mix deps.get --only docs && MIX_ENV=docs mix inch.report; fi
 sudo: required
 dist: trusty
 cache:
