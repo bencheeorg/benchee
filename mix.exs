@@ -44,7 +44,7 @@ defmodule Benchee.Mixfile do
   defp elixirc_paths(_), do: ["lib"]
 
   def application do
-    [applications: [:logger, :deep_merge]]
+    []
   end
 
   defp deps do
