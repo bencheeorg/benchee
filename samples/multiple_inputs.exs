@@ -1,13 +1,15 @@
-map_fun = fn(i) -> [i, i * i] end
+map_fun = fn i -> [i, i * i] end
 
-Benchee.run(%{
-  "flat_map"    => fn(input) -> Enum.flat_map(input, map_fun) end,
-  "map.flatten" => fn(input) -> input |> Enum.map(map_fun) |> List.flatten end
-},
-inputs: %{
-  "Small" => Enum.to_list(1..1000),
-  "Bigger" => Enum.to_list(1..100_000)
-})
+Benchee.run(
+  %{
+    "flat_map" => fn input -> Enum.flat_map(input, map_fun) end,
+    "map.flatten" => fn input -> input |> Enum.map(map_fun) |> List.flatten() end
+  },
+  inputs: %{
+    "Small" => Enum.to_list(1..1000),
+    "Bigger" => Enum.to_list(1..100_000)
+  }
+)
 
 # tobi@speedy ~/github/benchee $ time mix run samples/multiple_inputs.exs
 # Erlang/OTP 19 [erts-8.1] [source] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]

@@ -1,9 +1,10 @@
-list  = 1..10_000 |> Enum.to_list |> Enum.shuffle
+list = 1..10_000 |> Enum.to_list() |> Enum.shuffle()
 
-Benchee.run %{
-  "sort |> reverse"  => fn -> list |> Enum.sort |> Enum.reverse  end,
-  "sort(fun)"        => fn -> Enum.sort(list, &(&1 > &2)) end,
-  "sort_by(-value)"  => fn -> Enum.sort_by(list, fn(val) -> -val end) end}
+Benchee.run(%{
+  "sort |> reverse" => fn -> list |> Enum.sort() |> Enum.reverse() end,
+  "sort(fun)" => fn -> Enum.sort(list, &(&1 > &2)) end,
+  "sort_by(-value)" => fn -> Enum.sort_by(list, fn val -> -val end) end
+})
 
 # tobi@airship ~/github/benchee $ mix run samples/descending_sort.exs
 # Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]

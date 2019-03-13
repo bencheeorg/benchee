@@ -1,19 +1,22 @@
-list_10   = 1..10        |> Enum.to_list |> Enum.shuffle
-list_100  = 1..100       |> Enum.to_list |> Enum.shuffle
-list_1k   = 1..1_000     |> Enum.to_list |> Enum.shuffle
-list_10k  = 1..10_000    |> Enum.to_list |> Enum.shuffle
-list_100k = 1..100_000   |> Enum.to_list |> Enum.shuffle
-list_1M   = 1..1_000_000 |> Enum.to_list |> Enum.shuffle
+list_10 = 1..10 |> Enum.to_list() |> Enum.shuffle()
+list_100 = 1..100 |> Enum.to_list() |> Enum.shuffle()
+list_1k = 1..1_000 |> Enum.to_list() |> Enum.shuffle()
+list_10k = 1..10_000 |> Enum.to_list() |> Enum.shuffle()
+list_100k = 1..100_000 |> Enum.to_list() |> Enum.shuffle()
+list_1M = 1..1_000_000 |> Enum.to_list() |> Enum.shuffle()
 
 # options documented in README
-Benchee.run %{
-  "10"   => fn -> Enum.sort(list_10) end,
-  "100"  => fn -> Enum.sort(list_100) end,
-  "1k"   => fn -> Enum.sort(list_1k) end,
-  "10k"  => fn -> Enum.sort(list_10k) end,
-  "100k" => fn -> Enum.sort(list_100k) end,
-  "1M"   => fn -> Enum.sort(list_1M) end
-},  console: [unit_scaling: :largest]
+Benchee.run(
+  %{
+    "10" => fn -> Enum.sort(list_10) end,
+    "100" => fn -> Enum.sort(list_100) end,
+    "1k" => fn -> Enum.sort(list_1k) end,
+    "10k" => fn -> Enum.sort(list_10k) end,
+    "100k" => fn -> Enum.sort(list_100k) end,
+    "1M" => fn -> Enum.sort(list_1M) end
+  },
+  console: [unit_scaling: :largest]
+)
 
 # With :best scaling (default)
 # Name           ips        average    deviation         median

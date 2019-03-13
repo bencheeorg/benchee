@@ -8,12 +8,16 @@ Benchee has a nice and concise main interface, its behavior can be altered throu
 
 ```elixir
 list = Enum.to_list(1..10_000)
-map_fun = fn(i) -> [i, i * i] end
+map_fun = fn i -> [i, i * i] end
 
-Benchee.run(%{
-  "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
-  "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
-}, time: 10, memory_time: 2)
+Benchee.run(
+  %{
+    "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
+    "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
+  },
+  time: 10,
+  memory_time: 2
+)
 ```
 
 Produces the following output on the console:
@@ -108,12 +112,14 @@ After installing just write a little Elixir benchmarking script:
 
 ```elixir
 list = Enum.to_list(1..10_000)
-map_fun = fn(i) -> [i, i * i] end
+map_fun = fn i -> [i, i * i] end
 
-Benchee.run(%{
-  "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
-  "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
-})
+Benchee.run(
+  %{
+    "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
+    "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
+  }
+)
 ```
 
 (names can also be specified as `:atoms` if you want to)
@@ -206,9 +212,12 @@ In cases where all measurements of memory consumption are identical, which happe
 Memory measurement is disabled by default, and you can choose to enable it by passing `memory_time: your_seconds` option to `Benchee.run/2`:
 
 ```elixir
-Benchee.run(%{
-  "something_great" => fn -> cool_stuff end
-}, memory_time: 2)
+Benchee.run(
+  %{
+    "something_great" => fn -> cool_stuff end
+  },
+  memory_time: 2
+)
 ```
 
 Memory time can be specified separately as it will often be constant - so it might not need as much measuring time.
@@ -223,7 +232,7 @@ A full example, including an example of the console output, can be found
 One of such cases is comparing tail-recursive and body-recursive implementations of `map`. More information in the [repository with the benchmark](https://github.com/PragTob/elixir_playground/blob/master/bench/tco_blog_post_focussed_inputs.exs) and the [blog post](https://pragtob.wordpress.com/2016/06/16/tail-call-optimization-in-elixir-erlang-not-as-efficient-and-important-as-you-probably-think/).
 
 ```elixir
-map_fun = fn(i) -> i + 1 end
+map_fun = fn i -> i + 1 end
 inputs = %{
   "Small (1 Thousand)" => Enum.to_list(1..1_000),
   "Middle (100 Thousand)" => Enum.to_list(1..100_000),
@@ -238,16 +247,21 @@ inputs = %{
 #   {"Big (10 Million)", Enum.to_list(1..10_000_000)}
 # ]
 
-Benchee.run %{
-  "map tail-recursive" =>
-    fn(list) -> MyMap.map_tco(list, map_fun) end,
-  "stdlib map" =>
-    fn(list) -> Enum.map(list, map_fun) end,
-  "map simple body-recursive" =>
-    fn(list) -> MyMap.map_body(list, map_fun) end,
-  "map tail-recursive different argument order" =>
-    fn(list) -> MyMap.map_tco_arg_order(list, map_fun) end
-}, time: 15, warmup: 5, inputs: inputs
+Benchee.run(
+  %{
+    "map tail-recursive" =>
+      fn list -> MyMap.map_tco(list, map_fun) end,
+    "stdlib map" =>
+      fn list -> Enum.map(list, map_fun) end,
+    "map simple body-recursive" =>
+      fn list -> MyMap.map_body(list, map_fun) end,
+    "map tail-recursive different argument order" =>
+      fn list -> MyMap.map_tco_arg_order(list, map_fun) end
+  },
+  time: 15,
+  warmup: 5,
+  inputs: inputs
+)
 ```
 
 This means each function will be benchmarked with each input that is specified in the inputs. Then you'll get the output divided by input so you can see which function is fastest for which input.
@@ -267,12 +281,13 @@ So if you are using the [HTML plugin](https://github.com/PragTob/benchee_html) a
 
 ```elixir
 list = Enum.to_list(1..10_000)
-map_fun = fn(i) -> [i, i * i] end
+map_fun = fn i -> [i, i * i] end
 
-Benchee.run(%{
-  "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
-  "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
-},
+Benchee.run(
+  %{
+    "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
+    "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
+  },
   formatters: [
     {Benchee.Formatters.HTML, file: "samples_output/my.html"},
     Benchee.Formatters.Console
@@ -286,12 +301,16 @@ Showing more statistics such as `minimum`, `maximum`, `sample_size` and `mode` i
 
 ```elixir
 list = Enum.to_list(1..10_000)
-map_fun = fn(i) -> [i, i * i] end
+map_fun = fn i -> [i, i * i] end
 
-Benchee.run(%{
-  "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
-  "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
-}, time: 10, formatters: [{Benchee.Formatters.Console, extended_statistics: true}])
+Benchee.run(
+  %{
+    "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
+    "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
+  },
+  time: 10,
+  formatters: [{Benchee.Formatters.Console, extended_statistics: true}]
+)
 ```
 
 Which produces:
@@ -317,9 +336,10 @@ Benchee can store the results of previous runs in a file and then load them agai
 load (for instance `benchmark.benchee`). You can also specify multiple files to load through a list of paths (`["my.benchee", "master_save.benchee"]`) - each one of those can also be a glob expression to match even more files glob (`"save_number*.benchee"`).
 
 ```elixir
-Benchee.run(%{
-  "something_great" => fn -> cool_stuff end
-},
+Benchee.run(
+  %{
+    "something_great" => fn -> cool_stuff end
+  },
   save: [path: "save.benchee", tag: "first-try"]
 )
 
@@ -348,7 +368,7 @@ It is very easy in benchee to do setup and teardown for the whole benchmarking s
 ```elixir
 your_setup()
 
-Benchee.run %{"Awesome stuff" => fn -> magic end }
+Benchee.run(%{"Awesome stuff" => fn -> magic end})
 
 your_teardown()
 ```
@@ -367,13 +387,16 @@ For the following discussions, it's important to know what benchee considers a "
 A scenario is the combination of one benchmarking function and one input. So, given this benchmark:
 
 ```elixir
-Benchee.run %{
-  "foo" => fn(input) -> ... end,
-  "bar" => fn(input) -> ... end
-}, inputs: %{
-  "input 1" => 1,
-  "input 2" => 2
-}
+Benchee.run(
+  %{
+    "foo" => fn input -> ... end,
+    "bar" => fn input -> ... end
+  },
+  inputs: %{
+    "input 1" => 1,
+    "input 2" => 2
+  }
+)
 ```
 
 there are 4 scenarios:
@@ -400,22 +423,24 @@ For before scenario hooks, the _global_ hook is invoked first, then the _local_ 
 Usage:
 
 ```elixir
-Benchee.run %{
-  "foo" =>
-    {
-      fn({input, resource}) -> foo(input, resource) end,
-      before_scenario: fn({input, resource}) ->
-        resource = alter_resource(resource)
-        {input, resource}
-      end
-    },
-  "bar" =>
-    fn({input, resource}) -> bar(input, resource) end
-}, inputs: %{"input 1" => 1},
-   before_scenario: fn(input) ->
-     resource = start_expensive_resource()
-     {input, resource}
-   end
+Benchee.run(
+  %{
+    "foo" =>
+      {
+        fn {input, resource} -> foo(input, resource) end,
+        before_scenario: fn {input, resource} ->
+          resource = alter_resource(resource)
+          {input, resource}
+        end
+      },
+    "bar" =>
+      fn {input, resource} -> bar(input, resource) end
+  },
+  inputs: %{"input 1" => 1},
+  before_scenario: fn input ->
+    resource = start_expensive_resource()
+    {input, resource}
+  end
 ```
 
 _When might this be useful?_
@@ -433,9 +458,12 @@ For after scenario hooks, the _local_ hook is invoked first, then the _global_ (
 Usage:
 
 ```elixir
-Benchee.run %{
-  "bar" => fn -> bar() end
-}, after_scenario: fn(_input) -> bust_my_cache() end
+Benchee.run(
+  %{
+    "bar" => fn -> bar() end
+  },
+  after_scenario: fn _input -> bust_my_cache() end
+)
 ```
 
 _When might this be useful?_
@@ -457,10 +485,12 @@ For before each hooks, the _global_ hook is invoked first, then the _local_ (see
 Usage:
 
 ```elixir
-Benchee.run %{
-  "bar" => fn(record) -> bar(record) end
-}, inputs: %{ "record id" => 1},
-   before_each: fn(input) -> get_from_db(input) end
+Benchee.run(
+  %{
+    "bar" => fn record -> bar(record) end
+  }, inputs: %{ "record id" => 1},
+  before_each: fn input -> get_from_db(input) end
+)
 ```
 
 _When might this be useful?_
@@ -478,10 +508,12 @@ For after each hooks, the _local_ hook is invoked first, then the _global_ (see 
 Usage:
 
 ```elixir
-Benchee.run %{
-  "bar" => fn(input) -> bar(input) end
-}, inputs: %{ "input 1" => 1}.
-   after_each: fn(result) -> assert result == 42 end
+Benchee.run(
+  %{
+    "bar" => fn input -> bar(input) end
+  }, inputs: %{ "input 1" => 1}.
+  after_each: fn result -> assert result == 42 end
+)
 ```
 
 _When might this be useful?_
@@ -507,14 +539,17 @@ Hooks can be defined either _globally_ as part of the configuration or _locally_
 Global hooks are specified as part of the general benchee configuration:
 
 ```elixir
-Benchee.run %{
-  "foo" => fn(input) -> ... end,
-  "bar" => fn(input) -> ... end
-}, inputs: %{
-     "input 1" => 1,
-     "input 2" => 2,
+Benchee.run(
+  %{
+    "foo" => fn input -> ... end,
+    "bar" => fn input -> ... end
   },
-  before_scenario: fn(input) -> ... end
+  inputs: %{
+    "input 1" => 1,
+    "input 2" => 2,
+  },
+  before_scenario: fn input -> ... end
+)
 ```
 
 Here the `before_scenario` function will be executed for all 4 scenarios present in this benchmarking suite.
@@ -524,13 +559,16 @@ Here the `before_scenario` function will be executed for all 4 scenarios present
 Local hooks are defined alongside the benchmarking function. To define a local hook, pass a tuple in the initial map, instead of just a single function. The benchmarking function comes first, followed by a keyword list specifying the hooks to run:
 
 ```elixir
-Benchee.run %{
-  "foo" => {fn(input) -> ... end, before_scenario: fn(input) -> ... end},
-  "bar" => fn(input) -> ... end
-}, inputs: %{
-  "input 1" => 1,
-  "input 2" => 2
-}
+Benchee.run(
+  %{
+    "foo" => {fn input -> ... end, before_scenario: fn input -> ... end},
+    "bar" => fn input -> ... end
+  },
+  inputs: %{
+    "input 1" => 1,
+    "input 2" => 2
+  }
+)
 ```
 
 Here `before_scenario` is only run for the 2 scenarios associated with `"foo"`, i.e. foo with input 1 and foo with input 2. It is _not_ run for any `"bar"` benchmarks.
@@ -546,42 +584,45 @@ Given the following code:
 
 suite_set_up()
 
-Benchee.run %{
-  "foo" =>
-    {
-      fn(input) -> foo(input) end,
-      before_scenario: fn(input) ->
-        local_before_scenario(input)
-        input + 1
-      end,
-      before_each: fn(input) ->
-        local_before_each(input)
-        input + 1
-      end,
-      after_each: fn(value) ->
-        local_after_each(value)
-      end,
-      after_scenario: fn(input) ->
-        local_after_scenario(input)
-      end
-    },
-  "bar" =>
-    fn(input) -> bar(input) end
-}, inputs: %{"input 1" => 1},
-   before_scenario: fn(input) ->
-     global_before_scenario(input)
-     input + 1
-   end,
-   before_each: fn(input) ->
-     global_before_each(input)
-     input + 1
-   end,
-   after_each: fn(value) ->
-     global_after_each(value)
-   end,
-   after_scenario: fn(input) ->
-     global_after_scenario(input)
-   end
+Benchee.run(
+  %{
+    "foo" =>
+      {
+        fn input -> foo(input) end,
+        before_scenario: fn input ->
+          local_before_scenario(input)
+          input + 1
+        end,
+        before_each: fn input ->
+          local_before_each(input)
+          input + 1
+        end,
+        after_each: fn value ->
+          local_after_each(value)
+        end,
+        after_scenario: fn input ->
+          local_after_scenario(input)
+        end
+      },
+    "bar" =>
+      fn input -> bar(input) end
+  },
+  inputs: %{"input 1" => 1},
+  before_scenario: fn input ->
+    global_before_scenario(input)
+    input + 1
+  end,
+  before_each: fn input ->
+    global_before_each(input)
+    input + 1
+  end,
+  after_each: fn value ->
+    global_after_each(value)
+  end,
+  after_scenario: fn input ->
+    global_after_scenario(input)
+  end
+)
 
 suite_tear_down()
 ```
@@ -638,17 +679,19 @@ It is important to note that the benchmarking code shown in the beginning is the
 
 ```elixir
 list = Enum.to_list(1..10_000)
-map_fun = fn(i) -> [i, i * i] end
+map_fun = fn i -> [i, i * i] end
 
-Benchee.init(time: 3)
-|> Benchee.system
+[time: 3]
+|> Benchee.init()
+|> Benchee.system()
 |> Benchee.benchmark("flat_map", fn -> Enum.flat_map(list, map_fun) end)
-|> Benchee.benchmark("map.flatten",
-                     fn -> list |> Enum.map(map_fun) |> List.flatten end)
-|> Benchee.measure
-|> Benchee.statistics
-|> Benchee.load # can be omitted when you don't want to/need to load scenarios
-|> Benchee.Formatter.output(Benchee.Formatters.Console, %{})
+|> Benchee.benchmark(
+  "map.flatten",
+  fn -> list |> Enum.map(map_fun) |> List.flatten() end
+)
+|> Benchee.collect()
+|> Benchee.statistics()
+|> Benchee.Formatter.output(Benchee.Formatters.Console)
 # Instead of the last call you could also just use Benchee.Formatter.output()
 # to just output all configured formatters
 ```
@@ -664,7 +707,7 @@ This is a take on the _functional transformation_ of data applied to benchmarks:
 
 This is also part of the **official API** and allows for more **fine grained control**. (It's also what benchee does internally when you use `Benchee.run/2`).
 
-Do you just want to have all the raw run times? Just work with the result of `Benchee.measure/1`! Just want to have the calculated statistics and use your own formatting? Grab the result of `Benchee.statistics/1`! Or, maybe you want to write to a file or send an HTTP post to some online service? Just grab the complete suite after statistics were generated.
+Do you just want to have all the raw run times? Just work with the result of `Benchee.collect/1`! Just want to have the calculated statistics and use your own formatting? Grab the result of `Benchee.statistics/1`! Or, maybe you want to write to a file or send an HTTP post to some online service? Just grab the complete suite after statistics were generated.
 
 It also allows you to alter behaviour, normally `Benchee.load/1` is called right before the formatters so that neither the benchmarks are run again or statistics are computed again. However, you might want to run the benchmarks again or recompute the statistics. Then you can call `Benchee.load/1` right at the start.
 

@@ -1,9 +1,9 @@
 # When passing a flag parallel with value >1 then multiple processes
 # will be handled for benchmarking provided function.
 
-Benchee.run %{"one" => fn -> :timer.sleep(1000) end}, parallel: 1, time: 10
-Benchee.run %{"three" => fn -> :timer.sleep(1000) end}, parallel: 3, time: 10
-Benchee.run %{"five" => fn -> :timer.sleep(1000) end}, parallel: 5, time: 10
+Benchee.run(%{"one" => fn -> :timer.sleep(1000) end}, parallel: 1, time: 10)
+Benchee.run(%{"three" => fn -> :timer.sleep(1000) end}, parallel: 3, time: 10)
+Benchee.run(%{"five" => fn -> :timer.sleep(1000) end}, parallel: 5, time: 10)
 
 # Operating System: Linux
 # CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz

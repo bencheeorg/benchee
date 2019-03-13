@@ -1,15 +1,15 @@
 n = 1_000
 range = 1..n
-list  = Enum.to_list range
-fun   = fn -> 0 end
+list = Enum.to_list(range)
+fun = fn -> 0 end
 
-Benchee.run %{
-  "Enum.each (range)" => fn -> Enum.each(range, fn(_) -> fun.() end) end,
+Benchee.run(%{
+  "Enum.each (range)" => fn -> Enum.each(range, fn _ -> fun.() end) end,
   "List comprehension (range)" => fn -> for _ <- range, do: fun.() end,
-  "Enum.each (list)" => fn -> Enum.each(list, fn(_) -> fun.() end) end,
+  "Enum.each (list)" => fn -> Enum.each(list, fn _ -> fun.() end) end,
   "List comprehension (list)" => fn -> for _ <- list, do: fun.() end,
   "Recursion" => fn -> Benchee.Utility.RepeatN.repeat_n(fun, n) end
-}
+})
 
 # tobi@happy ~/github/benchee $ mix run samples/repat_n.exs
 # Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]

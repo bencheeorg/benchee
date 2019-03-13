@@ -93,7 +93,7 @@ defmodule Benchee.Formatter do
   to the documentation of the formatters you use.
   """
   @spec output(Suite.t(), module, options) :: Suite.t()
-  def output(suite, formatter, options) do
+  def output(suite, formatter, options \\ %{}) do
     :ok =
       suite
       |> formatter.format(options)

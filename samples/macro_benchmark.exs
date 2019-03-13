@@ -1,13 +1,19 @@
+# Intentionally not a real fibonacci to make it both slower and more memory hungry
 defmodule Fib do
-  def fib(0) do 0 end
-  def fib(1) do 1 end
-  def fib(n) do "#{fib(n-1)} #{fib(n-2)}" end
+  def fib(0), do: 0
+  def fib(1), do: 1
+  def fib(n), do: "#{fib(n - 1)} #{fib(n - 2)}"
 end
 
-Benchee.run(%{
-  "35 fibonacci numbers" => fn -> Fib.fib(35) end,
-  "43 fibonacci numbers" => fn -> Fib.fib(43) end
-}, time: 10, warmup: 0, memory_time: 10)
+Benchee.run(
+  %{
+    "35 fibonacci numbers" => fn -> Fib.fib(35) end,
+    "43 fibonacci numbers" => fn -> Fib.fib(43) end
+  },
+  time: 10,
+  warmup: 0,
+  memory_time: 10
+)
 
 # Operating System: macOS
 # CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
@@ -21,7 +27,6 @@ Benchee.run(%{
 # parallel: 1
 # inputs: none specified
 # Estimated total run time: 20 s
-
 
 # Benchmarking 35 fibonacci numbers...
 # Benchmarking 43 fibonacci numbers...

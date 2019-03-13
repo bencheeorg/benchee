@@ -1,19 +1,21 @@
 # Deactivate the fast warnings if they annoy you
 # You can also deactivate the comparison report
-Benchee.run(%{
-  "fast" => fn -> 1 + 1 end,
-  "also" => fn -> 20 * 20 end
-},
-time: 2,
-warmup: 1,
-print: [
-  benchmarking:  false,
-  configuration: false,
-  fast_warning:  false
-],
-console: [
-  comparison: false
-])
+Benchee.run(
+  %{
+    "fast" => fn -> 1 + 1 end,
+    "also" => fn -> 20 * 20 end
+  },
+  time: 2,
+  warmup: 1,
+  print: [
+    benchmarking: false,
+    configuration: false,
+    fast_warning: false
+  ],
+  console: [
+    comparison: false
+  ]
+)
 
 # tobi@speedy ~/github/benchee $ mix run samples/deactivate_output.exs
 #

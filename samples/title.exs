@@ -1,10 +1,14 @@
 list = Enum.to_list(1..10_000)
-map_fun = fn(i) -> [i, i * i] end
+map_fun = fn i -> [i, i * i] end
 
-Benchee.run(%{
-  "flat_map"    => fn -> Enum.flat_map(list, map_fun) end,
-  "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten end
-}, time: 2, title: "Comparing map.flatten and flat_map")
+Benchee.run(
+  %{
+    "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
+    "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
+  },
+  time: 2,
+  title: "Comparing map.flatten and flat_map"
+)
 
 # $ mix run samples/title.exs
 # Operating System: macOS"
@@ -21,7 +25,6 @@ Benchee.run(%{
 # parallel: 1
 # inputs: none specified
 # Estimated total run time: 8 s
-
 
 # Benchmarking flat_map...
 # Benchmarking map.flatten...
