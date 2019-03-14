@@ -1,6 +1,6 @@
 defmodule Benchee.Formatters.Console.Helpers do
   @moduledoc false
-  
+
   # These are common functions shared between the formatting of the run time and
   # memory usage statistics.
 

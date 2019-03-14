@@ -47,6 +47,12 @@ defmodule Benchee.Configuration do
             measure_function_call_overhead: true,
             title: nil
 
+  @typedoc """
+  Generated configuration struct from the user supplied configuration options.
+
+  Filled in with a lot of defaults. Also notably every option is already converted to
+  a map or struct at this point for easier handling in benchee.
+  """
   @type t :: %__MODULE__{
           parallel: integer,
           time: number,
@@ -69,15 +75,10 @@ defmodule Benchee.Configuration do
           title: String.t() | nil
         }
 
-  @type user_configuration :: map | keyword
-  @time_keys [:time, :warmup, :memory_time]
+  @typedoc """
+  The configuration supplied by the user as either a map or a keyword list
 
-  @doc """
-  Returns the initial benchmark configuration for Benchee, composed of defaults
-  and an optional custom configuration.
-
-  Configuration times are given in seconds, but are converted to microseconds
-  internally.
+  Possible options are:
 
   Possible options:
 
@@ -157,6 +158,18 @@ defmodule Benchee.Configuration do
       equivalent to the behaviour Benchee had pre 0.5.0)
     * `:before_scenario`/`after_scenario`/`before_each`/`after_each` - read up on them in the hooks section in the README
     * `:measure_function_call_overhead` - Measure how long an empty function call takes and deduct this from each measure run time. Defaults to true.
+  """
+  @type user_configuration :: map | keyword
+  @time_keys [:time, :warmup, :memory_time]
+
+  @doc """
+  Returns the initial benchmark configuration for Benchee, composed of defaults
+  and an optional custom configuration.
+
+  Configuration times are given in seconds, but are converted to microseconds
+  internally.
+
+  For a list of all possible options see `t:user_configuration/0`
 
   ## Examples
 

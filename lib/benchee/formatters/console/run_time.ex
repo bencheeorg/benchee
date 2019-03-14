@@ -1,6 +1,6 @@
 defmodule Benchee.Formatters.Console.RunTime do
   @moduledoc false
-  
+
   # This deals with just the formatting of the run time results. They are similar
   # to the way the memory results are formatted, but different enough to where the
   # abstractions start to break down pretty significantly, so I wanted to extract

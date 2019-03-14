@@ -16,11 +16,18 @@ defmodule Benchee.Suite do
     scenarios: []
   ]
 
-  @type key :: atom | String.t()
-  @type optional_map :: map | nil
+  @typedoc """
+  Valid key for either input or benchmarking job names.
+  """
+  @type key :: String.t() | atom
+
+  @typedoc """
+  The main suite consisting of the configuration data, information about the system and most
+  importantly a list of `t:Benchee.Scenario.t/0`.
+  """
   @type t :: %__MODULE__{
           configuration: Benchee.Configuration.t() | nil,
-          system: optional_map,
+          system: map | nil,
           scenarios: [] | [Benchee.Scenario.t()]
         }
 end

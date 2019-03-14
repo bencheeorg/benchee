@@ -10,7 +10,6 @@ defmodule Benchee.Benchmark do
   alias Benchee.Suite
   alias Benchee.Utility.DeepConvert
 
-  @type job_name :: String.t() | atom
   @no_input :__no_input
 
   @doc """
@@ -24,7 +23,7 @@ defmodule Benchee.Benchmark do
   If there are inputs in the suite's config, a scenario will be added for the given
   function for each input.
   """
-  @spec benchmark(Suite.t(), job_name, fun, module) :: Suite.t()
+  @spec benchmark(Suite.t(), Suite.key(), fun, module) :: Suite.t()
   def benchmark(suite = %Suite{scenarios: scenarios}, job_name, function, printer \\ Printer) do
     normalized_name = to_string(job_name)
 
@@ -101,7 +100,7 @@ defmodule Benchee.Benchmark do
 
   @doc """
   Kicks off the benchmarking of all scenarios defined in the given suite.
-  
+
   Hence, this might take a while ;) Passes a list of scenarios and a scenario context to our
   benchmark runner. For more information on how benchmarks are actually run, see the
   `Benchee.Benchmark.Runner` code (API considered private).

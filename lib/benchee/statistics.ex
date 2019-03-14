@@ -26,27 +26,15 @@ defmodule Benchee.Statistics do
     sample_size: 0
   ]
 
+  @typedoc """
+  Careful with the mode, might be multiple values, one value or nothing.😱
+  """
   @type mode :: [number] | number | nil
 
-  @type t :: %__MODULE__{
-          average: float,
-          ips: float | nil,
-          std_dev: float,
-          std_dev_ratio: float,
-          std_dev_ips: float | nil,
-          median: number,
-          percentiles: %{number => float},
-          mode: mode,
-          minimum: number,
-          maximum: number,
-          sample_size: integer
-        }
+  @typedoc """
+  All the statistics `statistics/1` computes from the samples.
 
-  @type samples :: [number]
-
-  @doc """
-  Takes a suite with scenarios and their data samples, adds the statistics to the
-  scenarios with the following statistics:
+  Overview of all the statistics benchee currently provides:
 
     * average       - average run time of the job in μs (the lower the better)
     * ips           - iterations per second, how often can the given function be
@@ -71,6 +59,29 @@ defmodule Benchee.Statistics do
     * minimum       - the smallest (fastest) run time measured for the job
     * maximum       - the biggest (slowest) run time measured for the job
     * sample_size   - the number of run time measurements taken
+  """
+  @type t :: %__MODULE__{
+          average: float,
+          ips: float | nil,
+          std_dev: float,
+          std_dev_ratio: float,
+          std_dev_ips: float | nil,
+          median: number,
+          percentiles: %{number => float},
+          mode: mode,
+          minimum: number,
+          maximum: number,
+          sample_size: integer
+        }
+
+  @typedoc """
+  The samples a `Benchee.Collect` collected to compute statistics from.
+  """
+  @type samples :: [number]
+
+  @doc """
+  Takes a suite with scenarios and their data samples, adds the statistics to the
+  scenarios. For an overview of what the statistics mean see `t:t/0`.
 
   Note that this will also sort the scenarios fastest to slowest to ensure a consistent order
   of scenarios in all used formatters.
@@ -211,18 +222,6 @@ defmodule Benchee.Statistics do
       | ips: ips,
         std_dev_ips: standard_dev_ips
     }
-  end
-
-  defp add_percentiles(suite = %Suite{scenarios: scenarios}, percentile_ranks) do
-    new_scenarios =
-      Parallel.map(scenarios, fn scenario ->
-        update_in(scenario.run_time_data.statistics.percentiles, fn existing ->
-          new = Percentile.percentiles(scenario.run_time_data.samples, percentile_ranks)
-          Map.merge(existing, new)
-        end)
-      end)
-
-    %Suite{suite | scenarios: new_scenarios}
   end
 
   @spec sort([Scenario.t()]) :: [Scenario.t()]

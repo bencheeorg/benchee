@@ -7,6 +7,11 @@ defmodule Benchee.CollectionData do
 
   defstruct statistics: %Benchee.Statistics{}, samples: []
 
+  @typedoc """
+  Samples and statistics.
+
+  Statistics might only come later when they are computed.
+  """
   @type t :: %__MODULE__{
           samples: [float | non_neg_integer],
           statistics: Benchee.Statistics.t() | nil

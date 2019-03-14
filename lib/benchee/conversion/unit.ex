@@ -3,7 +3,7 @@ defmodule Benchee.Conversion.Unit do
   A representation of the different units used in `Benchee.Conversion.Format`
   and `Benchee.Conversion.Scale` as well as the modules implementing these
   behaviours.
-  
+
   A unit is characterized by:
 
   * name - an atom representation of the unit for easy access (`:microseconds`,

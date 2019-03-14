@@ -1,7 +1,7 @@
 defmodule Benchee.Scenario do
   @moduledoc """
   Core data structure representing one particular case (combination of function and input).
-  
+
   Represents the combination of a particular function to benchmark (also called "job" defined
   by `job_name` and `function`) in combination with a specific input (`input_name` and `input`).
   When no input is given, the combined value is representative of "no input".
@@ -33,6 +33,13 @@ defmodule Benchee.Scenario do
     tag: nil
   ]
 
+  @typedoc """
+  All the data collected for a scenario (combination of function and input)
+
+  Among all the data required to execute the scenario (function, input, all the hooks aka
+  after_*/before_*), data needed to display (name, job_name, input_name, tag) and of course
+  run_time_data and memory_data with all the samples and computed statistics.
+  """
   @type t :: %__MODULE__{
           name: String.t(),
           job_name: String.t(),

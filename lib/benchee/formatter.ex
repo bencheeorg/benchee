@@ -14,6 +14,9 @@ defmodule Benchee.Formatter do
   alias Benchee.{Suite, Utility.Parallel}
   alias Benchee.Utility.DeepConvert
 
+  @typedoc """
+  Options given to formatters, entirely defined by formatter authors.
+  """
   @type options :: any
 
   @doc """

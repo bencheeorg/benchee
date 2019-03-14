@@ -9,7 +9,7 @@ defmodule Benchee.Utility.FileCreation do
   Open a file for write for all key/value pairs, interleaves the file name with
   the key and calls the given function with file, content and filename.
 
-  Uses `Benchee.Utility.FileCreation.interlave/2` to get the base filename and
+  Uses `interleave/2` to get the base filename and
   the given keys together to one nice file name, then creates these files and
   calls the function with the file and the content from the given map so that
   data can be written to the file.
