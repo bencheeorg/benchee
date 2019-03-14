@@ -2,7 +2,8 @@ defmodule Benchee.Benchmark.Hooks do
   @moduledoc false
   # Non benchee code should not rely on this module.
 
-  alias Benchee.Benchmark.{Scenario, ScenarioContext}
+  alias Benchee.Benchmark.ScenarioContext
+  alias Benchee.Scenario
 
   def run_before_scenario(
         %Scenario{

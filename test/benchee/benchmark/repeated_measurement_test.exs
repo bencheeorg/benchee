@@ -16,7 +16,8 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
   use ExUnit.Case
 
   import Benchee.Benchmark.RepeatedMeasurement
-  alias Benchee.Benchmark.{Scenario, ScenarioContext}
+  alias Benchee.Benchmark.ScenarioContext
+  alias Benchee.Scenario
   alias Benchee.Test.FakeBenchmarkPrinter
   alias Bencheee.Benchmark.RepeatedMeasurementTest.FakeCollector
 

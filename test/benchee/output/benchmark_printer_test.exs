@@ -1,7 +1,7 @@
 defmodule Benchee.Output.BenchmarkPrintertest do
   use ExUnit.Case, async: true
 
-  alias Benchee.{Benchmark, Benchmark.Scenario, Configuration}
+  alias Benchee.{Benchmark, Configuration, Scenario}
 
   import ExUnit.CaptureIO
   import Benchee.Output.BenchmarkPrinter

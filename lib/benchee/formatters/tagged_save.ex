@@ -10,7 +10,7 @@ defmodule Benchee.Formatters.TaggedSave do
 
   @behaviour Benchee.Formatter
 
-  alias Benchee.Benchmark.Scenario
+  alias Benchee.Scenario
   alias Benchee.Suite
   alias Benchee.Utility.FileCreation
 

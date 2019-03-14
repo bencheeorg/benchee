@@ -22,7 +22,7 @@ defmodule Benchee.Formatters.Console do
 
   ```
   iex> scenarios = [
-  ...>   %Benchee.Benchmark.Scenario{
+  ...>   %Benchee.Scenario{
   ...>     name: "My Job", input_name: "My input", run_time_data: %Benchee.CollectionData{
   ...>       statistics: %Benchee.Statistics{
   ...>         average: 200.0,
@@ -34,7 +34,7 @@ defmodule Benchee.Formatters.Console do
   ...>       }
   ...>     }
   ...>   },
-  ...>   %Benchee.Benchmark.Scenario{
+  ...>   %Benchee.Scenario{
   ...>     name: "Job 2", input_name: "My input", run_time_data: %Benchee.CollectionData{
   ...>       statistics: %Benchee.Statistics{
   ...>         average: 400.0,

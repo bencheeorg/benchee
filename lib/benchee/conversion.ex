@@ -5,7 +5,7 @@ defmodule Benchee.Conversion do
   Can be used by plugins to use benchee unit scaling logic.
   """
 
-  alias Benchee.Benchmark.Scenario
+  alias Benchee.Scenario
   alias Benchee.Conversion.{Count, Duration, Memory}
 
   @doc """
@@ -19,7 +19,7 @@ defmodule Benchee.Conversion do
   ## Examples
 
       iex> statistics = %Benchee.Statistics{average: 1_000_000.0, ips: 1000.0}
-      iex> scenario = %Benchee.Benchmark.Scenario{
+      iex> scenario = %Benchee.Scenario{
       ...>   run_time_data: %Benchee.CollectionData{statistics: statistics},
       ...>   memory_usage_data: %Benchee.CollectionData{statistics: statistics}
       ...> }

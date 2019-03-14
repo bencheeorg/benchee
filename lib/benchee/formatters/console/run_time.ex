@@ -7,12 +7,12 @@ defmodule Benchee.Formatters.Console.RunTime do
   """
 
   alias Benchee.{
-    Benchmark.Scenario,
     Conversion,
     Conversion.Count,
     Conversion.Duration,
     Conversion.Unit,
     Formatters.Console.Helpers,
+    Scenario,
     Statistics
   }
 
@@ -36,7 +36,7 @@ defmodule Benchee.Formatters.Console.RunTime do
   ```
   iex> memory_statistics = %Benchee.Statistics{average: 100.0}
   iex> scenarios = [
-  ...>   %Benchee.Benchmark.Scenario{
+  ...>   %Benchee.Scenario{
   ...>     name: "My Job",
   ...>     run_time_data: %Benchee.CollectionData{
   ...>       statistics: %Benchee.Statistics{
@@ -46,7 +46,7 @@ defmodule Benchee.Formatters.Console.RunTime do
   ...>     },
   ...>     memory_usage_data: %Benchee.CollectionData{statistics: memory_statistics}
   ...>   },
-  ...>   %Benchee.Benchmark.Scenario{
+  ...>   %Benchee.Scenario{
   ...>     name: "Job 2",
   ...>     run_time_data: %Benchee.CollectionData{
   ...>       statistics: %Benchee.Statistics{

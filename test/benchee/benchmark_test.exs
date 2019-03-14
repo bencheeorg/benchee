@@ -3,12 +3,12 @@ defmodule Benchee.BenchmarkTest do
 
   alias Benchee.{
     Benchmark,
-    Benchmark.Scenario,
-    Benchmark.ScenarioContext,
     Configuration,
+    Scenario,
     Suite
   }
 
+  alias Benchee.Benchmark.ScenarioContext
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
   alias Benchee.Test.FakeBenchmarkRunner, as: TestRunner
 

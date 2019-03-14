@@ -7,12 +7,12 @@ defmodule Benchee.Formatters.Console.Memory do
   """
 
   alias Benchee.{
-    Benchmark.Scenario,
     Conversion,
     Conversion.Count,
     Conversion.Memory,
     Conversion.Unit,
     Formatters.Console.Helpers,
+    Scenario,
     Statistics
   }
 

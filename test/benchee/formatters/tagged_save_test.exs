@@ -2,9 +2,9 @@ defmodule Benchee.Formatters.TaggedSaveTest do
   use ExUnit.Case
 
   alias Benchee.{
-    Benchmark.Scenario,
     Formatter,
     Formatters.TaggedSave,
+    Scenario,
     Statistics,
     Suite
   }
