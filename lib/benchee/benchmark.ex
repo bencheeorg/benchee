@@ -1,7 +1,7 @@
 defmodule Benchee.Benchmark do
   @moduledoc """
   Functions related to building and running benchmarking scenarios.
-  Exposes `benchmark/4` and `measure/3` functions.
+  Exposes `benchmark/4` and `collect/3` functions.
   """
 
   alias Benchee.Benchmark.{Runner, ScenarioContext}
@@ -14,15 +14,15 @@ defmodule Benchee.Benchmark do
   @no_input :__no_input
 
   @doc """
-  Public access for the key representing no input for a scenario.
+  Public access for the special key representing no input for a scenario.
   """
   def no_input, do: @no_input
 
   @doc """
   Takes the current suite and adds a new benchmarking scenario (represented by a
-  %Scenario{} struct) to the suite's scenarios. If there are inputs in the
-  suite's config, a scenario will be added for the given function for each
-  input.
+  %Scenario{} struct) with the given name and function to the suite's scenarios.
+  If there are inputs in the suite's config, a scenario will be added for the given
+  function for each input.
   """
   @spec benchmark(Suite.t(), job_name, fun, module) :: Suite.t()
   def benchmark(suite = %Suite{scenarios: scenarios}, job_name, function, printer \\ Printer) do
@@ -100,10 +100,11 @@ defmodule Benchee.Benchmark do
   end
 
   @doc """
-  Kicks off the benchmarking of all scenarios in the suite by passing the list
-  of scenarios and a scenario context to our benchmark runner. For more
-  information on how bencharmks are actually run, see
-  `Benchee.Benchmark.Runner.run_scenarios/2`.
+  Kicks off the benchmarking of all scenarios defined in the given suite.
+  
+  Hence, this might take a while ;) Passes a list of scenarios and a scenario context to our
+  benchmark runner. For more information on how benchmarks are actually run, see the
+  `Benchee.Benchmark.Runner` code (API considered private).
   """
   @spec collect(Suite.t(), module, module) :: Suite.t()
   def collect(

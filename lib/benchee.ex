@@ -3,7 +3,7 @@
 # https://github.com/PragTob/benchee/commit/b3ddbc132e641cdf1eec0928b322ced1dab8553f#commitcomment-23381474
 
 elixir_doc = """
-Top level module providing convenience access to needed functions as well
+Top level module providing convenience access to needed functions as well
 as the very high level `Benchee.run` API.
 
 Intended Elixir interface.

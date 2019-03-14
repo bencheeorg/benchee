@@ -1,13 +1,13 @@
 defmodule Benchee.Utility.FileCreation do
   @moduledoc """
-  Methods to create files used in plugins.
+  Methods to easily handle file creation used in plugins.
   """
 
   alias Benchee.Benchmark
 
   @doc """
-  Open a file for write for all key/value pairs, interleaves the file name and
-  calls function with file, content and filename.
+  Open a file for write for all key/value pairs, interleaves the file name with
+  the key and calls the given function with file, content and filename.
 
   Uses `Benchee.Utility.FileCreation.interlave/2` to get the base filename and
   the given keys together to one nice file name, then creates these files and
@@ -22,7 +22,8 @@ defmodule Benchee.Utility.FileCreation do
   the corresponding file
   * filename - the base file name as desired by the user
   * function - a function that is then called for every file with the associated
-  file content from the map
+  file content from the map, defaults to just writing the file content via
+  `IO.write/2` and printing where it put the file.
 
   ## Examples
 

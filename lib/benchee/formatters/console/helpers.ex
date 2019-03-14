@@ -1,8 +1,8 @@
 defmodule Benchee.Formatters.Console.Helpers do
-  @moduledoc """
-  These are common functions shared between the formatting of the run time and
-  memory usage statistics.
-  """
+  @moduledoc false
+  
+  # These are common functions shared between the formatting of the run time and
+  # memory usage statistics.
 
   alias Benchee.Conversion.{Count, DeviationPercent, Format, Scale, Unit}
   alias Benchee.Statistics

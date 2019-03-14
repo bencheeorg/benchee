@@ -4,8 +4,8 @@ defmodule Benchee.Suite do
 
   Different layers of the benchmarking rely on different data being present
   here. For instance for `Benchee.Statistics.statistics/1` to work the
-  `run_times` key needs to be filled with the results from
-  `Benchee.Benchmark.measure/1`.
+  `run_time_data` key of each scenario needs to be filled with the samples
+  collected by `Benchee.Benchmark.collect/1`.
 
   Formatters can then use the data to display all of the results and the
   configuration.

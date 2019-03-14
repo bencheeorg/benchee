@@ -184,6 +184,31 @@ defmodule Benchee.StatistcsTest do
       assert memory_stats.sample_size == 5
     end
 
+    @nothing []
+    test "doesn't blow up whenthere are no measurements" do
+      scenarios = [
+        %Scenario{
+          run_time_data: %CollectionData{samples: @nothing},
+          memory_usage_data: %CollectionData{samples: @nothing}
+        }
+      ]
+
+      suite = Statistics.statistics(%Suite{scenarios: scenarios})
+
+      [
+        %Scenario{
+          run_time_data: %CollectionData{statistics: run_time_stats},
+          memory_usage_data: %CollectionData{statistics: memory_stats}
+        }
+      ] = suite.scenarios
+
+      assert run_time_stats.sample_size == 0
+      assert memory_stats.sample_size == 0
+
+      assert run_time_stats.average == nil
+      assert memory_stats.average == nil
+    end
+
     test "sorts them by their average run time fastest to slowest" do
       fourth = %Scenario{name: "4", run_time_data: %CollectionData{samples: [400.1]}}
       second = %Scenario{name: "2", run_time_data: %CollectionData{samples: [200.0]}}

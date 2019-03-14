@@ -1,7 +1,6 @@
 defmodule Benchee.Formatter do
   @moduledoc """
-  Defines a behaviour for formatters in Benchee, and also defines functions to
-  handle invoking that defined behavior.
+  Defines a behaviour for formatters in benchee, and functions to work with these.
 
   When implementing a benchee formatter as a behaviour please adopt this
   behaviour, as it helps with uniformity and also allows at least the `.format`
@@ -37,7 +36,7 @@ defmodule Benchee.Formatter do
   @doc """
   Format and output all configured formatters and formatting functions.
 
-  Expects a suite that already has been run through all previous functions so has the aggregated
+  Expects a suite that already has been run through all previous steps so has the aggregated
   statistics etc. that the formatters rely on.
 
   Works by invoking the `format/2` and `write/2` functions defined in this module. The `format/2`
@@ -46,8 +45,7 @@ defmodule Benchee.Formatter do
 
   Also handles pure functions that will then be called with the suite.
 
-  You can't rely on the formatters being called in pre determined order. Right now first those
-  that are parallelizable (benchee formatter modules) are called, then normal functions.
+  You can't rely on the formatters being called in pre determined order.
   """
   @spec output(Suite.t()) :: Suite.t()
   def output(suite = %{configuration: %{formatters: formatters}}) do

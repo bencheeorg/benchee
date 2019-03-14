@@ -1,12 +1,15 @@
 defmodule Benchee.Scenario do
   @moduledoc """
-  A Scenario in Benchee is a particular case of a whole benchmarking suite. That
-  is the combination of a particular function to benchmark (`job_name` and
-  `function`) in combination with a specific input (`input_name` and `input`).
+  Core data structure representing one particular case (combination of function and input).
+  
+  Represents the combination of a particular function to benchmark (also called "job" defined
+  by `job_name` and `function`) in combination with a specific input (`input_name` and `input`).
+  When no input is given, the combined value is representative of "no input".
 
-  It then gathers all data measured for this particular combination during
-  `Benchee.Benchmark.collect/3`, which are then used later in the process by
-  `Benchee.Statistics` to compute the relevant statistics.
+  A scenario then further gathers all data collected for this particular combination during
+  `Benchee.Benchmark.collect/3`, which are then used later in the process by `Benchee.Statistics`
+  to compute the relevant statistics which are then also added to the scenario.
+  It is the home of the aggregated knowledge regarding this particular case/scenario.
 
   `name` is the name that should be used by formatters to display scenarios as
   it potentially includes the `tag` present when loading scenarios that were

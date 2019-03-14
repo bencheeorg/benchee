@@ -1,6 +1,10 @@
 defmodule Benchee.System do
   @moduledoc """
   Provides information about the system the benchmarks are run on.
+
+  Includes information such as elixir/erlang version, OS, CPU and memory.
+
+  So far supports/should work for Linux, MacOS, FreeBSD and Windows.
   """
 
   alias Benchee.Conversion.Memory
