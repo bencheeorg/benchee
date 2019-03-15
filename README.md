@@ -782,6 +782,7 @@ Benchee only has small runtime dependencies that were initially extracted from i
 * [benchee_html](//github.com/PragTob/benchee_html) - generate HTML including a data table and many different graphs with the possibility to export individual graphs as PNG :)
 * [benchee_csv](//github.com/PragTob/benchee_csv) - generate CSV from your Benchee benchmark results so you can import them into your favorite spreadsheet tool and make fancy graphs
 * [benchee_json](//github.com/PragTob/benchee_json) - export suite results as JSON to feed anywhere or feed it to your JavaScript and make magic happen :)
+* [benchee_markdown](//github.com/hrzndhrn/benchee_markdown) - write markdown files containing your benchmarking results
 
 With the HTML plugin for instance you can get fancy graphs like this boxplot:
 
