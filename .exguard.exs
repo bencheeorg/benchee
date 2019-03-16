@@ -3,6 +3,12 @@ use ExGuard.Config
 project_files = ~r{\.(erl|ex|exs|eex|xrl|yrl)\z}i
 deps = ~r{deps}
 
+guard("compile and warn", run_on_start: true)
+|> command("MIX_ENV=test mix compile --warnings-as-errors")
+|> watch(project_files)
+|> ignore(deps)
+|> notification(:auto)
+
 guard("credo", run_on_start: true)
 |> command("mix credo --strict")
 |> watch(project_files)

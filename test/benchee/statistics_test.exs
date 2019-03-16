@@ -39,27 +39,51 @@ defmodule Benchee.StatistcsTest do
         %Scenario{
           input: "Input 1",
           input_name: "Input 1",
-          job_name: "Job",
+          job_name: "Job 1",
+          run_time_data: %CollectionData{samples: @sample_1},
+          memory_usage_data: %CollectionData{samples: @sample_1}
+        },
+        %Scenario{
+          input: "Input 1",
+          input_name: "Input 1",
+          job_name: "Job 2",
+          run_time_data: %CollectionData{samples: @sample_2},
+          memory_usage_data: %CollectionData{samples: @sample_2}
+        },
+        %Scenario{
+          input: "Input 2",
+          input_name: "Input 2",
+          job_name: "Job 1",
           run_time_data: %CollectionData{samples: @sample_1},
           memory_usage_data: %CollectionData{samples: @sample_1}
         },
         %Scenario{
           input: "Input 2",
           input_name: "Input 2",
-          job_name: "Job",
+          job_name: "Job 2",
           run_time_data: %CollectionData{samples: @sample_2},
           memory_usage_data: %CollectionData{samples: @sample_2}
         }
       ]
 
-      suite = %Suite{scenarios: scenarios}
+      suite = %Suite{
+        scenarios: scenarios,
+        configuration: %Benchee.Configuration{
+          inputs: %{"Input 1" => "Input 1", "Input 2" => "Input2"}
+        }
+      }
+
       new_suite = Statistics.statistics(suite)
 
-      stats_1 = stats_for(new_suite, "Job", "Input 1")
-      stats_2 = stats_for(new_suite, "Job", "Input 2")
+      stats_1_1 = stats_for(new_suite, "Job 1", "Input 1")
+      stats_1_2 = stats_for(new_suite, "Job 2", "Input 1")
+      stats_2_1 = stats_for(new_suite, "Job 1", "Input 2")
+      stats_2_2 = stats_for(new_suite, "Job 2", "Input 2")
 
-      sample_1_asserts(stats_1)
-      sample_2_asserts(stats_2)
+      sample_1_asserts(stats_1_1)
+      sample_2_asserts(stats_1_2)
+      sample_1_asserts(stats_2_1)
+      sample_2_asserts(stats_2_2)
     end
 
     @mode_sample [55, 40, 67, 55, 44, 40, 10, 8, 55, 90, 67]
@@ -166,8 +190,10 @@ defmodule Benchee.StatistcsTest do
     test "doesn't blow up when all measurements are zeros (mostly memory measurement)" do
       scenarios = [
         %Scenario{
-          run_time_data: %CollectionData{samples: @all_zeros},
-          memory_usage_data: %CollectionData{samples: @all_zeros}
+          run_time_data: %CollectionData{samples: @all_zeros}
+        },
+        %Scenario{
+          run_time_data: %CollectionData{samples: @all_zeros}
         }
       ]
 
@@ -175,13 +201,19 @@ defmodule Benchee.StatistcsTest do
 
       [
         %Scenario{
-          run_time_data: %CollectionData{statistics: run_time_stats},
-          memory_usage_data: %CollectionData{statistics: memory_stats}
+          run_time_data: %CollectionData{statistics: run_time_stats_1}
+        },
+        %Scenario{
+          run_time_data: %CollectionData{statistics: run_time_stats_2}
         }
       ] = suite.scenarios
 
-      assert run_time_stats.sample_size == 5
-      assert memory_stats.sample_size == 5
+      assert run_time_stats_1.average == 0.0
+      assert run_time_stats_2.sample_size == 5
+
+      assert run_time_stats_2.relative_more == :infinity
+      assert run_time_stats_2.relative_less == :infinity
+      assert run_time_stats_2.absolute_difference == 0.0
     end
 
     @nothing []
@@ -278,6 +310,9 @@ defmodule Benchee.StatistcsTest do
       assert stats.maximum == 600
       assert stats.sample_size == 5
       assert stats.mode == nil
+      assert_in_delta stats.relative_more, 28.14, 0.01
+      assert_in_delta stats.relative_less, 0.0355, 0.001
+      assert stats.absolute_difference == 380.0
     end
 
     defp sample_2_asserts(stats) do
@@ -290,6 +325,9 @@ defmodule Benchee.StatistcsTest do
       assert stats.maximum == 23
       assert stats.sample_size == 6
       assert stats.mode == nil
+      assert stats.relative_more == nil
+      assert stats.relative_less == nil
+      assert stats.absolute_difference == nil
     end
   end
 end

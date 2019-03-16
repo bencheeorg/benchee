@@ -49,4 +49,38 @@ defmodule Benchee.Formatters.Console.Helpers do
 
   @spec descriptor(String.t()) :: String.t()
   def descriptor(header_str), do: "\n#{header_str}: \n"
+
+  def format_comparison(
+        name,
+        statistics,
+        display_value,
+        comparison_name,
+        label_width,
+        column_width
+      ) do
+    "~*s~*s ~s"
+    |> :io_lib.format([
+      -label_width,
+      name,
+      column_width,
+      display_value,
+      comparison_display(statistics, comparison_name)
+    ])
+    |> to_string
+  end
+
+  defp comparison_display(%Statistics{relative_more: nil, absolute_difference: nil}, _), do: ""
+
+  defp comparison_display(statistics, comparison_name) do
+    "- #{comparison_text(statistics, comparison_name)}\n"
+  end
+
+  defp comparison_text(%Statistics{relative_more: :infinity}, name), do: "infinity x #{name}"
+  defp comparison_text(%Statistics{relative_more: nil}, _), do: "N/A"
+
+  defp comparison_text(statistics, comparison_name) do
+    "~.2fx ~s"
+    |> :io_lib.format([statistics.relative_more, comparison_name])
+    |> to_string
+  end
 end

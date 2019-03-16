@@ -131,7 +131,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               std_dev_ratio: 0.1,
               median: 375.0,
               percentiles: %{99 => 400.1},
-              sample_size: 300
+              sample_size: 300,
+              relative_more: 2.0,
+              absolute_difference: 200.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -159,7 +161,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 375.0,
             percentiles: %{99 => 500.1},
-            sample_size: 200
+            sample_size: 200,
+            relative_more: 2.005,
+            absolute_difference: 200.1
           }
         },
         memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -202,7 +206,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               std_dev_ratio: 0.1,
               median: 195.5,
               percentiles: %{99 => 500.1},
-              sample_size: 200
+              sample_size: 200,
+              relative_more: 2.0,
+              absolute_difference: 100.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -289,7 +295,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               std_dev_ratio: 0.1,
               median: 195.5,
               percentiles: %{99 => 300.1},
-              sample_size: 200
+              sample_size: 200,
+              relative_more: 2.0,
+              absolute_difference: 100.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}

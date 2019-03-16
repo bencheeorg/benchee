@@ -26,22 +26,6 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "formats and prints the results right to the console" do
       scenarios = [
         %Scenario{
-          name: "Second",
-          input_name: @no_input,
-          input: @no_input,
-          run_time_data: %CollectionData{
-            statistics: %Statistics{
-              average: 200.0,
-              ips: 5_000.0,
-              std_dev_ratio: 0.1,
-              median: 195.5,
-              percentiles: %{99 => 400.1},
-              sample_size: 200
-            }
-          },
-          memory_usage_data: %CollectionData{statistics: %Statistics{}}
-        },
-        %Scenario{
           name: "First",
           input_name: @no_input,
           input: @no_input,
@@ -53,6 +37,24 @@ defmodule Benchee.Formatters.ConsoleTest do
               median: 90.0,
               percentiles: %{99 => 300.1},
               sample_size: 200
+            }
+          },
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
+        },
+        %Scenario{
+          name: "Second",
+          input_name: @no_input,
+          input: @no_input,
+          run_time_data: %CollectionData{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{99 => 400.1},
+              sample_size: 200,
+              relative_more: 2.0,
+              absolute_difference: 100.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -210,7 +212,9 @@ defmodule Benchee.Formatters.ConsoleTest do
               std_dev_ratio: 0.1,
               median: 195.5,
               percentiles: %{99 => 300.1},
-              sample_size: 200
+              sample_size: 200,
+              relative_more: 2.0,
+              absolute_difference: 100.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -242,7 +246,9 @@ defmodule Benchee.Formatters.ConsoleTest do
               std_dev_ratio: 0.15,
               median: 395.0,
               percentiles: %{99 => 500.1},
-              sample_size: 200
+              sample_size: 200,
+              relative_more: 1.6,
+              absolute_difference: 150.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -296,7 +302,9 @@ defmodule Benchee.Formatters.ConsoleTest do
               std_dev_ratio: 0.1,
               median: 195.5,
               percentiles: %{99 => 300.1},
-              sample_size: 200
+              sample_size: 200,
+              relative_more: 2.0,
+              absolute_difference: 100.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}

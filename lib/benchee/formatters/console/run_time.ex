@@ -239,7 +239,7 @@ defmodule Benchee.Formatters.Console.RunTime do
     [
       Helpers.descriptor("Comparison"),
       reference_report(scenario, units, label_width)
-      | comparisons(scenario, units, label_width, other_scenarios)
+      | comparisons(other_scenarios, units, label_width)
     ]
   end
 
@@ -251,26 +251,24 @@ defmodule Benchee.Formatters.Console.RunTime do
     |> to_string
   end
 
-  @spec comparisons(Scenario.t(), unit_per_statistic, integer, [Scenario.t()]) :: [String.t()]
-  defp comparisons(scenario, units, label_width, scenarios_to_compare) do
-    %Scenario{run_time_data: %{statistics: reference_stats}} = scenario
-
+  @spec comparisons([Scenario.t()], unit_per_statistic, integer) :: [String.t()]
+  defp comparisons(scenarios_to_compare, units, label_width) do
     Enum.map(
       scenarios_to_compare,
-      fn scenario = %Scenario{run_time_data: %{statistics: job_stats}} ->
-        slower = reference_stats.ips / job_stats.ips
-        format_comparison(scenario, units, label_width, slower)
+      fn scenario ->
+        statistics = scenario.run_time_data.statistics
+        ips_format = Helpers.count_output(statistics.ips, units.ips)
+
+        Helpers.format_comparison(
+          scenario.name,
+          statistics,
+          ips_format,
+          "slower",
+          label_width,
+          @ips_width
+        )
       end
     )
-  end
-
-  defp format_comparison(scenario, %{ips: ips_unit}, label_width, slower) do
-    %Scenario{name: name, run_time_data: %{statistics: %Statistics{ips: ips}}} = scenario
-    ips_format = Helpers.count_output(ips, ips_unit)
-
-    "~*s~*s - ~.2fx slower\n"
-    |> :io_lib.format([-label_width, name, @ips_width, ips_format, slower])
-    |> to_string
   end
 
   defp duration_output(duration, unit) do

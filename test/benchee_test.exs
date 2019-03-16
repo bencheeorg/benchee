@@ -422,7 +422,7 @@ defmodule BencheeTest do
     assert length(occurences) == 3
   end
 
-  test "inputs can also be a list of 2-tuples" do
+  test "inputs can also be a list of 2-tuples and it then keeps the order" do
     output =
       capture_io(fn ->
         map_fun = fn i -> [i, i * i] end
@@ -592,20 +592,34 @@ defmodule BencheeTest do
     end)
   end
 
-  test "does not blow up setting all times to 0 and never executes a function" do
-    output =
-      capture_io(fn ->
-        Benchee.run(
-          %{
-            "never execute me" => fn -> raise "BOOOOM" end
-          },
-          time: 0,
-          warmup: 0,
-          memory_time: 0
-        )
-      end)
+  describe "edge cases" do
+    test "does not blow up setting all times to 0 and never executes a function" do
+      output =
+        capture_io(fn ->
+          Benchee.run(
+            %{
+              "never execute me" => fn -> raise "BOOOOM" end
+            },
+            time: 0,
+            warmup: 0,
+            memory_time: 0
+          )
+        end)
 
-    refute output =~ "never execute me"
+      refute output =~ "never execute me"
+    end
+
+    test "does not blow up if nothing is specified" do
+      output =
+        capture_io(fn ->
+          Benchee.run(
+            %{},
+            @test_configuration
+          )
+        end)
+
+      refute output =~ "Benchmarking"
+    end
   end
 
   describe "save & load" do
