@@ -11,13 +11,13 @@ Benchee.run(
 )
 
 # tobi@speedy:~/github/benchee(master)$ mix run samples/run.exs
-# Operating System: Linux"
+# Operating System: Linux
 # CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
 # Number of Available Cores: 8
 # Available memory: 15.61 GB
-# Elixir 1.6.4
-# Erlang 20.3
-#
+# Elixir 1.8.1
+# Erlang 21.2.7
+
 # Benchmark suite executing with the following configuration:
 # warmup: 2 s
 # time: 10 s
@@ -25,23 +25,23 @@ Benchee.run(
 # parallel: 1
 # inputs: none specified
 # Estimated total run time: 28 s
-#
-#
+
+
 # Benchmarking flat_map...
 # Benchmarking map.flatten...
-#
+
 # Name                  ips        average  deviation         median         99th %
-# flat_map           2.31 K      433.25 μs     ±8.64%         428 μs         729 μs
-# map.flatten        1.22 K      822.22 μs    ±16.43%         787 μs        1203 μs
-#
+# flat_map           2.36 K      424.38 μs    ±13.24%      411.19 μs      761.59 μs
+# map.flatten        1.24 K      806.83 μs    ±16.60%      767.85 μs     1189.10 μs
+
 # Comparison:
-# flat_map           2.31 K
-# map.flatten        1.22 K - 1.90x slower
-#
+# flat_map           2.36 K
+# map.flatten        1.24 K - 1.90x slower - +382.45 μs
+
 # Memory usage statistics:
-#
+
 # Name           Memory usage
-# flat_map          625.54 KB
-# map.flatten       781.85 KB - 1.25x memory usage
-#
+# flat_map          624.97 KB
+# map.flatten       781.25 KB - 1.25x memory usage - +156.28 KB
+
 # **All measurements for memory usage were the same**
