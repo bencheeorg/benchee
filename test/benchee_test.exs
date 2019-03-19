@@ -768,12 +768,14 @@ defmodule BencheeTest do
       benches = %{
         "delete old" => fn {kv, key} -> BenchKeyword.delete_v0(kv, key) end,
         "delete reverse" => fn {kv, key} -> BenchKeyword.delete_v2(kv, key) end,
-        "delete keymember reverse" => fn {kv, key} -> BenchKeyword.delete_v3(kv, key) end
+        "delete keymember reverse" => fn {kv, key} -> BenchKeyword.delete_v3(kv, key) end,
+        "delete throw" => fn {kv, key} -> BenchKeyword.delete_v1(kv, key) end
       }
 
       inputs = %{
         "large miss" => {Enum.map(1..100, &{:"k#{&1}", &1}), :k101},
-        "large hit" => {Enum.map(1..100, &{:"k#{&1}", &1}), :k100}
+        "large hit" => {Enum.map(1..100, &{:"k#{&1}", &1}), :k100},
+        "small miss" => {Enum.map(1..10, &{:"k#{&1}", &1}), :k11}
       }
 
       output =
@@ -796,6 +798,9 @@ defmodule BencheeTest do
       assert output =~ "large hit"
       # Byte
       assert output =~ "B"
+
+      assert output =~ "1.00x memory"
+      assert output =~ "infinity x memo"
     end
   end
 

@@ -211,8 +211,8 @@ defmodule Benchee.StatistcsTest do
       assert run_time_stats_1.average == 0.0
       assert run_time_stats_2.sample_size == 5
 
-      assert run_time_stats_2.relative_more == :infinity
-      assert run_time_stats_2.relative_less == :infinity
+      assert run_time_stats_2.relative_more == 1.0
+      assert run_time_stats_2.relative_less == 1.0
       assert run_time_stats_2.absolute_difference == 0.0
     end
 
