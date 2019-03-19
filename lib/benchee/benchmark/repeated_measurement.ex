@@ -39,7 +39,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
     run_time = measure_iteration(scenario, scenario_context, collector)
 
     if run_time >= @minimum_execution_time do
-      {num_iterations, adjust_for_iterations(run_time, num_iterations)}
+      {num_iterations, report_time(run_time, num_iterations)}
     else
       if fast_warning, do: printer.fast_warning()
 
@@ -50,6 +50,14 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
 
       determine_n_times(scenario, new_context, false, collector)
     end
+  end
+
+  # we need to convert the time here since we measure native time to see when we have enough
+  # repetitions but the first time is used in the actual samples
+  defp report_time(measurement, num_iterations) do
+    measurement
+    |> :erlang.convert_time_unit(:native, :nanosecond)
+    |> adjust_for_iterations(num_iterations)
   end
 
   defp adjust_for_iterations(measurement, 1), do: measurement
