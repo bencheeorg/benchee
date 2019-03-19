@@ -70,14 +70,16 @@ defmodule Benchee.Formatters.ConsoleTest do
           )
         end)
 
-      assert output =~ ~r/First/
-      assert output =~ ~r/Second/
-      assert output =~ ~r/200/
-      assert output =~ ~r/5 K/
-      assert output =~ ~r/10.00%/
-      assert output =~ ~r/195.5/
-      assert output =~ ~r/300.1/
-      assert output =~ ~r/400.1/
+      assert output =~ "First"
+      assert output =~ "Second"
+      assert output =~ "200"
+      assert output =~ "5 K"
+      assert output =~ "10.00%"
+      assert output =~ "195.5"
+      assert output =~ "300.1"
+      assert output =~ "400.1"
+      assert output =~ "2.00x slower"
+      assert output =~ "+100 ns"
     end
   end
 
@@ -263,14 +265,14 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert other_job =~ ~r/Other Job.+10.+100.+30\.00%.+98.+200\.1/
       assert job =~ ~r/Job.+5.+200.+10\.00%.+195\.5/
       ref =~ ~r/Other Job/
-      slower =~ ~r/Job.+slower/
+      slower =~ ~r/Job.+slower \+100/
 
       [input_header_2, _, other_job_2, job_2, _, ref_2, slower_2] = other_arg
       assert input_header_2 =~ "Other Arg"
       assert other_job_2 =~ ~r/Other Job.+4.+250.+31\.00%.+225\.5.+300\.1/
       assert job_2 =~ ~r/Job.+2\.5.+400.+15\.00%.+395/
       ref_2 =~ ~r/Other Job/
-      slower_2 =~ ~r/Job.+slower/
+      slower_2 =~ ~r/Job.+slower \+150/
     end
 
     test "with and without a tag" do

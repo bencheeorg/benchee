@@ -264,6 +264,7 @@ defmodule Benchee.Formatters.Console.RunTime do
           statistics,
           ips_format,
           "slower",
+          units.run_time,
           label_width,
           @ips_width
         )

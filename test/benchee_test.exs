@@ -800,11 +800,11 @@ defmodule BencheeTest do
       assert output =~ "B"
 
       assert output =~ "1.00x memory"
-      assert output =~ "infinity x memo"
+      assert output =~ "∞ x memo"
     end
   end
 
-  @slower_regex "\\s+- \\d+\\.\\d+x slower"
+  @slower_regex "\\s+- \\d+\\.\\d+x slower - \\+\\d+\\.\\d+.+"
   defp readme_sample_asserts(output, tag_string \\ "") do
     assert output =~ "warmup: 5 ms"
     assert output =~ "time: 10 ms"
@@ -820,7 +820,7 @@ defmodule BencheeTest do
 
     # In windows time resolution seems to be milliseconds, hence even
     # standard examples produce a fast warning.
-    # So we skip this basic is everything going fine test on windows
+    # So we skip this "basically everything is going fine" test on windows
     unless windows?(), do: refute(output =~ ~r/fast/i)
   end
 

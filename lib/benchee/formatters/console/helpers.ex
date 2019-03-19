@@ -55,32 +55,43 @@ defmodule Benchee.Formatters.Console.Helpers do
         statistics,
         display_value,
         comparison_name,
+        display_unit,
         label_width,
         column_width
       ) do
-    "~*s~*s ~s"
+    "~*s~*s ~ts"
     |> :io_lib.format([
       -label_width,
       name,
       column_width,
       display_value,
-      comparison_display(statistics, comparison_name)
+      comparison_display(statistics, comparison_name, display_unit)
     ])
     |> to_string
   end
 
-  defp comparison_display(%Statistics{relative_more: nil, absolute_difference: nil}, _), do: ""
+  defp comparison_display(%Statistics{relative_more: nil, absolute_difference: nil}, _, _), do: ""
 
-  defp comparison_display(statistics, comparison_name) do
-    "- #{comparison_text(statistics, comparison_name)}\n"
+  defp comparison_display(statistics, comparison_name, unit) do
+    "- #{comparison_text(statistics, comparison_name)} - #{
+      absolute_difference_text(statistics, unit)
+    }\n"
   end
 
-  defp comparison_text(%Statistics{relative_more: :infinity}, name), do: "infinity x #{name}"
+  defp comparison_text(%Statistics{relative_more: :infinity}, name), do: " 	∞ x #{name}"
   defp comparison_text(%Statistics{relative_more: nil}, _), do: "N/A"
 
   defp comparison_text(statistics, comparison_name) do
     "~.2fx ~s"
     |> :io_lib.format([statistics.relative_more, comparison_name])
     |> to_string
+  end
+
+  defp absolute_difference_text(statistics, unit) do
+    formatted_value = Format.format({Scale.scale(statistics.absolute_difference, unit), unit})
+
+    # currently the fastest/least consuming is always first so everything else eats more
+    # resources hence this is always +
+    "+#{formatted_value}"
   end
 end

@@ -106,7 +106,7 @@ defmodule Benchee.Formatters.Console.Memory do
   defp scenario_reports([scenario | other_scenarios], units, label_width, true) do
     [
       reference_report(scenario, units, label_width),
-      comparisons(scenario, units, label_width, other_scenarios),
+      comparisons(other_scenarios, units, label_width),
       "\n**All measurements for memory usage were the same**\n"
     ]
   end
@@ -209,7 +209,7 @@ defmodule Benchee.Formatters.Console.Memory do
     [
       Helpers.descriptor("Comparison"),
       reference_report(scenario, units, label_width)
-      | comparisons(scenario, units, label_width, other_scenarios)
+      | comparisons(other_scenarios, units, label_width)
     ]
   end
 
@@ -227,10 +227,8 @@ defmodule Benchee.Formatters.Console.Memory do
     |> to_string
   end
 
-  @spec comparisons(Scenario.t(), unit_per_statistic, integer, [Scenario.t()]) :: [String.t()]
-  defp comparisons(scenario, units, label_width, scenarios_to_compare) do
-    %Scenario{memory_usage_data: %{statistics: reference_stats}} = scenario
-
+  @spec comparisons([Scenario.t()], unit_per_statistic, integer) :: [String.t()]
+  defp comparisons(scenarios_to_compare, units, label_width) do
     Enum.map(
       scenarios_to_compare,
       fn scenario ->
@@ -242,6 +240,7 @@ defmodule Benchee.Formatters.Console.Memory do
           statistics,
           memory_format,
           "memory usage",
+          units.memory,
           label_width,
           @median_width
         )

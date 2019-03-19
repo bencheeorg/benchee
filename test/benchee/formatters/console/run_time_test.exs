@@ -218,9 +218,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       [_, _, _, comp_header, reference, slower] =
         RunTime.format_scenarios(scenarios, @console_config)
 
-      assert Regex.match?(~r/Comparison/, comp_header)
-      assert Regex.match?(~r/^First\s+10 K$/m, reference)
-      assert Regex.match?(~r/^Second\s+5 K\s+- 2.00x slower/, slower)
+      assert comp_header =~ ~r/Comparison/
+      assert reference =~ ~r/^First\s+10 K$/m
+      assert slower =~ ~r/^Second\s+5 K\s+- 2.00x slower - \+100 ns$/m
     end
 
     test "can omit the comparisons" do
@@ -263,9 +263,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
           })
         )
 
-      refute Regex.match?(~r/Comparison/i, output)
-      refute Regex.match?(~r/^First\s+10 K$/m, output)
-      refute Regex.match?(~r/^Second\s+5 K\s+- 2.00x slower/, output)
+      refute output =~ ~r/Comparison/i
+      refute output =~ ~r/^First\s+10 K$/m
+      refute output =~ ~r/^Second\s+5 K\s+- 2.00x slower/
     end
 
     test "adjusts the label width to longest name for comparisons" do
