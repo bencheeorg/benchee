@@ -45,7 +45,8 @@ defmodule Benchee.Configuration do
             before_scenario: nil,
             after_scenario: nil,
             measure_function_call_overhead: true,
-            title: nil
+            title: nil,
+            reference_job: nil
 
   @type t :: %__MODULE__{
           parallel: integer,
@@ -66,7 +67,8 @@ defmodule Benchee.Configuration do
           before_scenario: fun | nil,
           after_scenario: fun | nil,
           measure_function_call_overhead: boolean,
-          title: String.t() | nil
+          title: String.t() | nil,
+          reference_job: String.t() | nil
         }
 
   @type user_configuration :: map | keyword
@@ -157,6 +159,7 @@ defmodule Benchee.Configuration do
       equivalent to the behaviour Benchee had pre 0.5.0)
     * `:before_scenario`/`after_scenario`/`before_each`/`after_each` - read up on them in the hooks section in the README
     * `:measure_function_call_overhead` - Measure how long an empty function call takes and deduct this from each measure run time. Defaults to true.
+    * `:reference_job` - Set which function in the benchmark to compare against all other runs.
 
   ## Examples
 

@@ -64,10 +64,11 @@ defmodule Benchee.Formatters.ConsoleTest do
           Formatter.output(
             %Suite{scenarios: scenarios, configuration: @config},
             Console,
-            @options
+            Map.put(@options, :reference_job, "First")
           )
         end)
 
+      assert output =~ ~r/Comparison:.*\s.*First.*\s.*Second/
       assert output =~ ~r/First/
       assert output =~ ~r/Second/
       assert output =~ ~r/200/
