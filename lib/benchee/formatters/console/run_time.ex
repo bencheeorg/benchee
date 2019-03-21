@@ -235,12 +235,49 @@ defmodule Benchee.Formatters.Console.RunTime do
   defp comparison_report([_scenario], _, _, _), do: []
   defp comparison_report(_, _, _, %{comparison: false}), do: []
 
+  defp comparison_report([scenario | other_scenarios], units, label_width, %{
+         reference_job: reference_job
+       })
+       when is_binary(reference_job) do
+    %{found_job: found_job, other_scenarios: other_scenarios} =
+      find_reference_job([scenario | other_scenarios], reference_job)
+
+    scenario =
+      if found_job != nil do
+        found_job
+      else
+        scenario
+      end
+
+    [
+      Helpers.descriptor("Comparison"),
+      reference_report(scenario, units, label_width)
+      | comparisons(scenario, units, label_width, other_scenarios)
+    ]
+  end
+
   defp comparison_report([scenario | other_scenarios], units, label_width, _) do
     [
       Helpers.descriptor("Comparison"),
       reference_report(scenario, units, label_width)
       | comparisons(scenario, units, label_width, other_scenarios)
     ]
+  end
+
+  defp find_reference_job(scenarios, reference_job) do
+    scenarios
+    |> Enum.reduce(%{found_job: nil, other_scenarios: []}, fn scenario, acc ->
+      filter_reference_job(acc, scenario, reference_job)
+    end)
+  end
+
+  defp filter_reference_job(acc, %Scenario{name: name} = scenario, reference_job)
+       when name === reference_job do
+    Map.put(acc, :found_job, scenario)
+  end
+
+  defp filter_reference_job(acc, scenario, _) do
+    Map.put(acc, :other_scenarios, [scenario | acc.other_scenarios])
   end
 
   defp reference_report(scenario, %{ips: ips_unit}, label_width) do
