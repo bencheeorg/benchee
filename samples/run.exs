@@ -26,7 +26,6 @@ Benchee.run(
 # inputs: none specified
 # Estimated total run time: 28 s
 
-
 # Benchmarking flat_map...
 # Benchmarking map.flatten...
 

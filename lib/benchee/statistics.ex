@@ -59,8 +59,17 @@ defmodule Benchee.Statistics do
     * mode          - the run time(s) that occur the most. Often one value, but
       can be multiple values if they occur the same amount of times. If no value
       occurs at least twice, this value will be nil.
-    * minimum       - the smallest (fastest) run time measured for the job
-    * maximum       - the biggest (slowest) run time measured for the job
+    * minimum       - the smallest sample measured for the scenario
+    * maximum       - the biggest sample measured for the scenario
+    * relative_more - relative to the reference (usually the fastest scenario) how much more
+      was the average of this scenario. E.g. for reference at 100, this scenario 200 then it
+      is 2.0.
+    * relative_less - relative to the reference (usually the fastest scenario) how much less
+      was the average of this scenario. E.g. for reference at 100, this scenario 200 then it
+      is 0.5.
+    * absolute_difference - relative to the reference (usually the fastest scenario) what is
+      the difference of the averages of the scenarios. e.g. for reference at 100, this
+      scenario 200 then it is 100.
     * sample_size   - the number of run time measurements taken
   """
   @type t :: %__MODULE__{
