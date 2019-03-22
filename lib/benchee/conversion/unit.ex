@@ -1,7 +1,10 @@
 defmodule Benchee.Conversion.Unit do
   @moduledoc """
-  A representation of the different units used in `Benchee.Conversion.Duration`
-  and `Benchee.Conversion.Count`. A unit is characterized by:
+  A representation of the different units used in `Benchee.Conversion.Format`
+  and `Benchee.Conversion.Scale` as well as the modules implementing these
+  behaviours.
+
+  A unit is characterized by:
 
   * name - an atom representation of the unit for easy access (`:microseconds`,
   `thousand`)

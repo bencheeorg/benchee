@@ -4,8 +4,8 @@ defmodule Benchee.Suite do
 
   Different layers of the benchmarking rely on different data being present
   here. For instance for `Benchee.Statistics.statistics/1` to work the
-  `run_times` key needs to be filled with the results from
-  `Benchee.Benchmark.measure/1`.
+  `run_time_data` key of each scenario needs to be filled with the samples
+  collected by `Benchee.Benchmark.collect/1`.
 
   Formatters can then use the data to display all of the results and the
   configuration.
@@ -16,11 +16,18 @@ defmodule Benchee.Suite do
     scenarios: []
   ]
 
-  @type key :: atom | String.t()
-  @type optional_map :: map | nil
+  @typedoc """
+  Valid key for either input or benchmarking job names.
+  """
+  @type key :: String.t() | atom
+
+  @typedoc """
+  The main suite consisting of the configuration data, information about the system and most
+  importantly a list of `t:Benchee.Scenario.t/0`.
+  """
   @type t :: %__MODULE__{
           configuration: Benchee.Configuration.t() | nil,
-          system: optional_map,
+          system: map | nil,
           scenarios: [] | [Benchee.Scenario.t()]
         }
 end

@@ -1,7 +1,24 @@
 defmodule Benchee.Formatters.Console do
   @moduledoc """
-  Formatter to transform the statistics output into a structure suitable for
-  output through `IO.write` on the console.
+  Formatter to print out the results of benchmarking suite to the console.
+
+  Example:
+
+      Name                  ips        average  deviation         median         99th %
+      flat_map           2.40 K      417.00 μs     ±9.40%      411.45 μs      715.21 μs
+      map.flatten        1.24 K      806.89 μs    ±16.62%      768.02 μs     1170.67 μs
+
+      Comparison: 
+      flat_map           2.40 K
+      map.flatten        1.24 K - 1.93x slower
+
+      Memory usage statistics:
+
+      Name           Memory usage
+      flat_map          624.97 KB
+      map.flatten       781.25 KB - 1.25x memory usage
+
+      **All measurements for memory usage were the same**
   """
 
   @behaviour Benchee.Formatter

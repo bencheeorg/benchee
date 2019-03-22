@@ -1,10 +1,10 @@
 defmodule Benchee.Formatters.Console.Memory do
-  @moduledoc """
-  This deals with just the formatting of the run time results. They are similar
-  to the way the memory results are formatted, but different enough to where the
-  abstractions start to break down pretty significantly, so I wanted to extract
-  these two things into separate modules to avoid confusion.
-  """
+  @moduledoc false
+
+  # This deals with just the formatting of the run time results. They are similar
+  # to the way the memory results are formatted, but different enough to where the
+  # abstractions start to break down pretty significantly, so I wanted to extract
+  # these two things into separate modules to avoid confusion.
 
   alias Benchee.{
     Conversion,

@@ -1,7 +1,9 @@
 defmodule Benchee.Statistics do
   @moduledoc """
-  Statistics related functionality that is meant to take the raw benchmark run
-  times and then compute statistics like the average and the standard deviation.
+  Statistics related functionality that is meant to take the raw benchmark data
+  and then compute statistics like the average and the standard deviation etc.
+
+  See `statistics/1` for a breakdown of the included statistics.
   """
 
   alias Benchee.{Conversion.Duration, Scenario, Suite, Utility.Parallel}
@@ -24,27 +26,15 @@ defmodule Benchee.Statistics do
     sample_size: 0
   ]
 
+  @typedoc """
+  Careful with the mode, might be multiple values, one value or nothing.😱
+  """
   @type mode :: [number] | number | nil
 
-  @type t :: %__MODULE__{
-          average: float,
-          ips: float | nil,
-          std_dev: float,
-          std_dev_ratio: float,
-          std_dev_ips: float | nil,
-          median: number,
-          percentiles: %{number => float},
-          mode: mode,
-          minimum: number,
-          maximum: number,
-          sample_size: integer
-        }
+  @typedoc """
+  All the statistics `statistics/1` computes from the samples.
 
-  @type samples :: [number]
-
-  @doc """
-  Takes a job suite with job run times, returns a map representing the
-  statistics of the job suite as follows:
+  Overview of all the statistics benchee currently provides:
 
     * average       - average run time of the job in μs (the lower the better)
     * ips           - iterations per second, how often can the given function be
@@ -69,11 +59,32 @@ defmodule Benchee.Statistics do
     * minimum       - the smallest (fastest) run time measured for the job
     * maximum       - the biggest (slowest) run time measured for the job
     * sample_size   - the number of run time measurements taken
+  """
+  @type t :: %__MODULE__{
+          average: float,
+          ips: float | nil,
+          std_dev: float,
+          std_dev_ratio: float,
+          std_dev_ips: float | nil,
+          median: number,
+          percentiles: %{number => float},
+          mode: mode,
+          minimum: number,
+          maximum: number,
+          sample_size: integer
+        }
 
-  ## Parameters
+  @typedoc """
+  The samples a `Benchee.Collect` collected to compute statistics from.
+  """
+  @type samples :: [number]
 
-  * `suite` - the job suite represented as a map after running the measurements,
-    required to have the run_times available under the `run_times` key
+  @doc """
+  Takes a suite with scenarios and their data samples, adds the statistics to the
+  scenarios. For an overview of what the statistics mean see `t:t/0`.
+
+  Note that this will also sort the scenarios fastest to slowest to ensure a consistent order
+  of scenarios in all used formatters.
 
   ## Examples
 
@@ -157,65 +168,12 @@ defmodule Benchee.Statistics do
     %Suite{suite | scenarios: sort(scenarios_with_statistics)}
   end
 
-  @doc """
-  Calculates statistical data based on a series of run times for a job
-  in microseconds.
-
-  ## Examples
-
-      iex> run_times = [200, 400, 400, 400, 500, 500, 500, 700, 900]
-      iex> Benchee.Statistics.job_statistics(run_times, [50, 99])
-      %Benchee.Statistics{
-        average:       500.0,
-        ips:           nil,
-        std_dev:       200.0,
-        std_dev_ratio: 0.4,
-        std_dev_ips:   nil,
-        median:        500.0,
-        percentiles:   %{50 => 500.0, 99 => 900.0},
-        mode:          [500, 400],
-        minimum:       200,
-        maximum:       900,
-        sample_size:   9
-      }
-
-      iex> Benchee.Statistics.job_statistics([100], [50, 99])
-      %Benchee.Statistics{
-        average:       100.0,
-        ips:           nil,
-        std_dev:       0,
-        std_dev_ratio: 0.0,
-        std_dev_ips:   nil,
-        median:        100.0,
-        percentiles:   %{50 => 100.0, 99 => 100.0},
-        mode:          nil,
-        minimum:       100,
-        maximum:       100,
-        sample_size:   1
-      }
-
-      iex> Benchee.Statistics.job_statistics([], [])
-      %Benchee.Statistics{
-        average:       nil,
-        ips:           nil,
-        std_dev:       nil,
-        std_dev_ratio: nil,
-        std_dev_ips:   nil,
-        median:        nil,
-        percentiles:   nil,
-        mode:          nil,
-        minimum:       nil,
-        maximum:       nil,
-        sample_size:   0
-      }
-
-  """
   @spec job_statistics(samples, list) :: __MODULE__.t()
-  def job_statistics([], _) do
+  defp job_statistics([], _) do
     %__MODULE__{sample_size: 0}
   end
 
-  def job_statistics(measurements, percentiles) do
+  defp job_statistics(measurements, percentiles) do
     total = Enum.sum(measurements)
     num_iterations = length(measurements)
     average = total / num_iterations
@@ -264,83 +222,6 @@ defmodule Benchee.Statistics do
       | ips: ips,
         std_dev_ips: standard_dev_ips
     }
-  end
-
-  @doc """
-  Calculate additional percentiles and add them to the
-  `run_time_data.statistics`. Should only be used after `statistics/1`, to
-  calculate extra values that may be needed for reporting.
-
-  ## Examples
-
-      iex> scenarios = [
-      ...>   %Benchee.Scenario{
-      ...>     job_name: "My Job",
-      ...>     run_time_data: %Benchee.CollectionData{
-      ...>       samples: [200, 400, 400, 400, 500, 500, 500, 700, 900]
-      ...>     },
-      ...>     memory_usage_data: %Benchee.CollectionData{
-      ...>       samples: [200, 400, 400, 400, 500, 500, 500, 700, 900]
-      ...>     },
-      ...>     input_name: "Input",
-      ...>     input: "Input"
-      ...>   }
-      ...> ]
-      iex> %Benchee.Suite{scenarios: scenarios}
-      ...> |> Benchee.Statistics.statistics
-      ...> |> Benchee.Statistics.add_percentiles([25, 75])
-      %Benchee.Suite{
-        scenarios: [
-          %Benchee.Scenario{
-            job_name: "My Job",
-            input_name: "Input",
-            input: "Input",
-            run_time_data: %Benchee.CollectionData{
-              samples: [200, 400, 400, 400, 500, 500, 500, 700, 900],
-              statistics: %Benchee.Statistics{
-                average:       500.0,
-                ips:           2_000_000.0,
-                std_dev:       200.0,
-                std_dev_ratio: 0.4,
-                std_dev_ips:   800_000.0,
-                median:        500.0,
-                percentiles:   %{25 => 400.0, 50 => 500.0, 75 => 600.0, 99 => 900.0},
-                mode:          [500, 400],
-                minimum:       200,
-                maximum:       900,
-                sample_size:   9
-              }
-            },
-            memory_usage_data: %Benchee.CollectionData{
-              samples: [200, 400, 400, 400, 500, 500, 500, 700, 900],
-              statistics: %Benchee.Statistics{
-                average:       500.0,
-                ips:           nil,
-                std_dev:       200.0,
-                std_dev_ratio: 0.4,
-                std_dev_ips:   nil,
-                median:        500.0,
-                percentiles:   %{50 => 500.0, 99 => 900.0},
-                mode:          [500, 400],
-                minimum:       200,
-                maximum:       900,
-                sample_size:   9
-              }
-            }
-          }
-        ]
-      }
-  """
-  def add_percentiles(suite = %Suite{scenarios: scenarios}, percentile_ranks) do
-    new_scenarios =
-      Parallel.map(scenarios, fn scenario ->
-        update_in(scenario.run_time_data.statistics.percentiles, fn existing ->
-          new = Percentile.percentiles(scenario.run_time_data.samples, percentile_ranks)
-          Map.merge(existing, new)
-        end)
-      end)
-
-    %Suite{suite | scenarios: new_scenarios}
   end
 
   @spec sort([Scenario.t()]) :: [Scenario.t()]

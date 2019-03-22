@@ -3,7 +3,7 @@ defmodule Benchee.Conversion.Format do
   Functions for formatting values and their unit labels. Different domains
   handle this task differently, for example durations and counts.
 
-  See `Benchee.Conversion.Count` and `Benchee.Conversion.Duration` for examples
+  See `Benchee.Conversion.Count` and `Benchee.Conversion.Duration` for examples.
   """
 
   alias Benchee.Conversion.Unit

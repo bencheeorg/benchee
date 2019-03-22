@@ -1,6 +1,8 @@
 defmodule Benchee.Conversion.Duration do
   @moduledoc """
   Unit scaling for duration converting from microseconds to minutes and others.
+
+  Only benchee plugins should use this code.
   """
 
   alias Benchee.Conversion.{Format, Scale, Unit}

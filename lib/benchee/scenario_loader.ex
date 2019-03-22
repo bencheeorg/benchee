@@ -5,15 +5,15 @@ defmodule Benchee.ScenarioLoader do
   Usually this is done right before the formatters run (that's when it happens
   in `Benchee.run/2`) as all measurements and statistics should be there.
   However, if you want to recompute statistics or others you can load them at
-  any time. Just be aware that if you load them before `Benchee.measure/1` then
+  any time. Just be aware that if you load them before `Benchee.collect/1` then
   they'll be rerun and measurements overridden.
   """
 
   alias Benchee.Suite
 
   @doc """
-  Load the file(s) specified as `load_path` and add the scenarios to the list of
-  the current scenarios.
+  Load the file(s) specified as `load_path` and add the scenarios to the list of the
+  current scenarios in the suite.
   """
   def load(suite = %{configuration: %{load: load_path}, scenarios: scenarios}) do
     loaded = load_scenarios(load_path)
