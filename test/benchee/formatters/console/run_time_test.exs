@@ -220,7 +220,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
 
       assert comp_header =~ ~r/Comparison/
       assert reference =~ ~r/^First\s+10 K$/m
-      assert slower =~ ~r/^Second\s+5 K\s+- 2.00x slower - \+100 ns$/m
+      assert slower =~ ~r/^Second\s+5 K\s+- 2.00x slower \+100 ns$/m
     end
 
     test "can omit the comparisons" do

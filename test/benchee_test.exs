@@ -803,7 +803,7 @@ defmodule BencheeTest do
     end
   end
 
-  @slower_regex "\\s+- \\d+\\.\\d+x slower - \\+\\d+(\\.\\d+)?.+"
+  @slower_regex "\\s+- \\d+\\.\\d+x slower \\+\\d+(\\.\\d+)?.+"
   defp readme_sample_asserts(output, tag_string \\ "") do
     assert output =~ "warmup: 5 ms"
     assert output =~ "time: 10 ms"

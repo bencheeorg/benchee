@@ -125,7 +125,7 @@ defmodule Benchee.Formatters.Console.MemoryTest do
 
       assert comp_header =~ ~r/Comparison/
       assert reference =~ ~r/^First\s+90 B$/m
-      assert slower =~ ~r/^Second\s+195.50 B\s+- 2.17x memory usage - \+105\.50 B$/m
+      assert slower =~ ~r/^Second\s+195.50 B\s+- 2.17x memory usage \+105\.50 B$/m
     end
 
     test "can omit the comparisons" do

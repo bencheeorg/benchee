@@ -364,7 +364,7 @@ defmodule Benchee.Formatters.ConsoleTest do
       [_, _header, _job_with_tag, _job, _, comparison, slower] = result
 
       assert comparison =~ ~r/job\s+ 5 K$/
-      assert slower =~ ~r/job \(improved\)\s+10 K\s+- 0\.50x slower - -100 ns$/
+      assert slower =~ ~r/job \(improved\)\s+10 K\s+- 0\.50x slower -100 ns$/
     end
 
     test "includes the suite's title" do
