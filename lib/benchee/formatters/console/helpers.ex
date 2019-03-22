@@ -78,7 +78,7 @@ defmodule Benchee.Formatters.Console.Helpers do
     }\n"
   end
 
-  defp comparison_text(%Statistics{relative_more: :infinity}, name), do: " 	∞ x #{name}"
+  defp comparison_text(%Statistics{relative_more: :infinity}, name), do: "∞ x #{name}"
   defp comparison_text(%Statistics{relative_more: nil}, _), do: "N/A"
 
   defp comparison_text(statistics, comparison_name) do
@@ -90,8 +90,10 @@ defmodule Benchee.Formatters.Console.Helpers do
   defp absolute_difference_text(statistics, unit) do
     formatted_value = Format.format({Scale.scale(statistics.absolute_difference, unit), unit})
 
-    # currently the fastest/least consuming is always first so everything else eats more
-    # resources hence this is always +
-    "+#{formatted_value}"
+    if statistics.absolute_difference >= 0 do
+      "+#{formatted_value}"
+    else
+      formatted_value
+    end
   end
 end

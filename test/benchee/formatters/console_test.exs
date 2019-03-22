@@ -321,6 +321,52 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert comparison =~ ~r/job \(improved\)\s+ 10 K/
     end
 
+    test "Correctly displays difference even if it is negative" do
+      scenarios = [
+        %Scenario{
+          name: "job",
+          input_name: @no_input,
+          input: @no_input,
+          run_time_data: %CollectionData{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{99 => 300.1},
+              sample_size: 200
+            }
+          },
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
+        },
+        %Scenario{
+          name: "job (improved)",
+          input_name: @no_input,
+          input: @no_input,
+          run_time_data: %CollectionData{
+            statistics: %Statistics{
+              average: 100.0,
+              ips: 10_000.0,
+              std_dev_ratio: 0.1,
+              median: 90.0,
+              percentiles: %{99 => 200.1},
+              sample_size: 200,
+              relative_more: 0.5,
+              relative_less: 2.0,
+              absolute_difference: -100.0
+            }
+          },
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
+        }
+      ]
+
+      [result] = Console.format(%Suite{scenarios: scenarios, configuration: @config}, @options)
+      [_, _header, _job_with_tag, _job, _, comparison, slower] = result
+
+      assert comparison =~ ~r/job\s+ 5 K$/
+      assert slower =~ ~r/job \(improved\)\s+10 K\s+- 0\.50x slower - -100 ns$/
+    end
+
     test "includes the suite's title" do
       scenarios = [
         %Scenario{
