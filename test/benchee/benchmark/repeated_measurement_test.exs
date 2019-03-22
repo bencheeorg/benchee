@@ -38,8 +38,12 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
         determine_n_times(scenario, @scenario_context, false, FakeCollector)
 
       assert num_iterations == 10
+
       # 50 adjusted by the 10 iteration factor
-      assert time == 5
+      # we need to use convert_time_unit cos windows is funny, see:
+      # https://twitter.com/PragTob/status/1108024728734838784
+      expected_time = :erlang.convert_time_unit(5, :native, :nanosecond)
+      assert_in_delta time, expected_time, 1
 
       # 1 initial + 10 more after repeat
       assert_received_exactly_n_times(:called, 11)
@@ -54,7 +58,10 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
         determine_n_times(scenario, @scenario_context, false, FakeCollector)
 
       assert num_iterations == 1
-      assert time == 10
+
+      # Why erlang time conversion? See test above.
+      expected_time = :erlang.convert_time_unit(10, :native, :nanosecond)
+      assert_in_delta time, expected_time, 1
 
       # 1 initial + 10 more after repeat
       assert_received_exactly_n_times(:called, 1)

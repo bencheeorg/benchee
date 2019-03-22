@@ -131,7 +131,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               std_dev_ratio: 0.1,
               median: 375.0,
               percentiles: %{99 => 400.1},
-              sample_size: 300
+              sample_size: 300,
+              relative_more: 2.0,
+              absolute_difference: 200.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -159,7 +161,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
             std_dev_ratio: 0.1,
             median: 375.0,
             percentiles: %{99 => 500.1},
-            sample_size: 200
+            sample_size: 200,
+            relative_more: 2.005,
+            absolute_difference: 200.1
           }
         },
         memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -202,7 +206,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               std_dev_ratio: 0.1,
               median: 195.5,
               percentiles: %{99 => 500.1},
-              sample_size: 200
+              sample_size: 200,
+              relative_more: 2.0,
+              absolute_difference: 100.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -212,9 +218,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       [_, _, _, comp_header, reference, slower] =
         RunTime.format_scenarios(scenarios, @console_config)
 
-      assert Regex.match?(~r/Comparison/, comp_header)
-      assert Regex.match?(~r/^First\s+10 K$/m, reference)
-      assert Regex.match?(~r/^Second\s+5 K\s+- 2.00x slower/, slower)
+      assert comp_header =~ ~r/Comparison/
+      assert reference =~ ~r/^First\s+10 K$/m
+      assert slower =~ ~r/^Second\s+5 K\s+- 2.00x slower \+100 ns$/m
     end
 
     test "can omit the comparisons" do
@@ -257,9 +263,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
           })
         )
 
-      refute Regex.match?(~r/Comparison/i, output)
-      refute Regex.match?(~r/^First\s+10 K$/m, output)
-      refute Regex.match?(~r/^Second\s+5 K\s+- 2.00x slower/, output)
+      refute output =~ ~r/Comparison/i
+      refute output =~ ~r/^First\s+10 K$/m
+      refute output =~ ~r/^Second\s+5 K\s+- 2.00x slower/
     end
 
     test "adjusts the label width to longest name for comparisons" do
@@ -289,7 +295,9 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
               std_dev_ratio: 0.1,
               median: 195.5,
               percentiles: %{99 => 300.1},
-              sample_size: 200
+              sample_size: 200,
+              relative_more: 2.0,
+              absolute_difference: 100.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}

@@ -36,7 +36,9 @@ defmodule Benchee.Formatters.Console.MemoryTest do
               std_dev_ratio: 0.1,
               median: 375.0,
               percentiles: %{99 => 400.1},
-              sample_size: 10
+              sample_size: 10,
+              relative_more: 2.0,
+              absolute_difference: 200.0
             }
           },
           run_time_data: %CollectionData{statistics: %Statistics{average: 100.0, ips: 1_000.0}}
@@ -64,7 +66,9 @@ defmodule Benchee.Formatters.Console.MemoryTest do
             std_dev_ratio: 0.1,
             median: 375.0,
             percentiles: %{99 => 500.1},
-            sample_size: 10
+            sample_size: 10,
+            relative_more: 2.005,
+            absolute_difference: 200.1
           }
         },
         run_time_data: %CollectionData{statistics: %Statistics{average: 100.0, ips: 1_000.0}}
@@ -88,7 +92,7 @@ defmodule Benchee.Formatters.Console.MemoryTest do
           name: "First",
           memory_usage_data: %CollectionData{
             statistics: %Statistics{
-              average: 100.0,
+              average: 90.0,
               ips: 10_000.0,
               std_dev_ratio: 0.1,
               median: 90.0,
@@ -102,12 +106,14 @@ defmodule Benchee.Formatters.Console.MemoryTest do
           name: "Second",
           memory_usage_data: %CollectionData{
             statistics: %Statistics{
-              average: 200.0,
+              average: 195.5,
               ips: 5_000.0,
               std_dev_ratio: 0.1,
               median: 195.5,
               percentiles: %{99 => 500.1},
-              sample_size: 10
+              sample_size: 10,
+              relative_more: 2.17,
+              absolute_difference: 105.5
             }
           },
           run_time_data: %CollectionData{statistics: %Statistics{average: 100.0, ips: 1_000.0}}
@@ -117,9 +123,9 @@ defmodule Benchee.Formatters.Console.MemoryTest do
       output = Memory.format_scenarios(scenarios, @console_config)
       [_, _, _, _, comp_header, reference, slower] = output
 
-      assert Regex.match?(~r/Comparison/, comp_header)
-      assert Regex.match?(~r/^First\s+90 B$/m, reference)
-      assert Regex.match?(~r/^Second\s+195.50 B\s+- 2.17x memory usage/, slower)
+      assert comp_header =~ ~r/Comparison/
+      assert reference =~ ~r/^First\s+90 B$/m
+      assert slower =~ ~r/^Second\s+195.50 B\s+- 2.17x memory usage \+105\.50 B$/m
     end
 
     test "can omit the comparisons" do
@@ -163,9 +169,9 @@ defmodule Benchee.Formatters.Console.MemoryTest do
           })
         )
 
-      refute Regex.match?(~r/Comparison/i, output)
-      refute Regex.match?(~r/^First\s+90 B$/m, output)
-      refute Regex.match?(~r/^Second\s+195.50 B\s+- 2.17x memory usage/, output)
+      refute output =~ ~r/Comparison/i
+      refute output =~ ~r/^First\s+90 B$/m
+      refute output =~ ~r/^Second\s+195.50 B\s+- 2.17x memory usage/
     end
 
     test "adjusts the label width to longest name for comparisons" do
@@ -195,7 +201,9 @@ defmodule Benchee.Formatters.Console.MemoryTest do
               std_dev_ratio: 0.1,
               median: 195.5,
               percentiles: %{99 => 300.1},
-              sample_size: 10
+              sample_size: 10,
+              relative_more: 2.0,
+              absolute_difference: 100.0
             }
           },
           run_time_data: %CollectionData{statistics: %Statistics{average: 100.0, ips: 1_000.0}}
@@ -258,7 +266,9 @@ defmodule Benchee.Formatters.Console.MemoryTest do
               std_dev_ratio: 0.0,
               median: 200.0,
               percentiles: %{99 => 200.0},
-              sample_size: 10
+              sample_size: 10,
+              relative_more: 2.0,
+              absolute_difference: 100.0
             }
           },
           run_time_data: %CollectionData{statistics: %Statistics{average: 100.0, ips: 1_000.0}}
@@ -308,16 +318,16 @@ defmodule Benchee.Formatters.Console.MemoryTest do
       output = Memory.format_scenarios(scenarios, params)
       [_memory_title, _header1, _result1, title, header2, result2] = output
 
-      assert title =~ ~r/Extended statistics: /
-      assert header2 =~ ~r/minimum/
-      assert header2 =~ ~r/maximum/
-      assert header2 =~ ~r/sample size/
-      assert header2 =~ ~r/mode/
-      assert result2 =~ ~r/First job/
-      assert result2 =~ ~r/111.10/
-      assert result2 =~ ~r/333.30/
-      assert result2 =~ ~r/50 K/
-      assert result2 =~ ~r/201.20/
+      assert title =~ "Extended statistics: "
+      assert header2 =~ "minimum"
+      assert header2 =~ "maximum"
+      assert header2 =~ "sample size"
+      assert header2 =~ "mode"
+      assert result2 =~ "First job"
+      assert result2 =~ "111.10"
+      assert result2 =~ "333.30"
+      assert result2 =~ "50 K"
+      assert result2 =~ "201.20"
     end
 
     test "does nothing when there's no statistics to format" do
@@ -392,7 +402,9 @@ defmodule Benchee.Formatters.Console.MemoryTest do
               sample_size: 5,
               percentiles: %{99 => 100.0},
               std_dev: 5.0,
-              std_dev_ratio: 0.10
+              std_dev_ratio: 0.10,
+              relative_more: :infinity,
+              absolute_difference: 100.0
             }
           },
           run_time_data: %CollectionData{statistics: %Statistics{}}
@@ -410,7 +422,7 @@ defmodule Benchee.Formatters.Console.MemoryTest do
 
       assert output =~ "First"
       assert output =~ "Second"
-      refute output =~ "x memory usage"
+      assert output =~ "∞ x memory usage"
     end
 
     test "it doesn't blow up if some come back with a median et. al. of nil" do

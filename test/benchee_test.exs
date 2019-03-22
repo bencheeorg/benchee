@@ -186,7 +186,6 @@ defmodule BencheeTest do
 
     assert output =~ ~r/fast/
     assert output =~ ~r/unreliable/
-    assert output =~ ~r/^Constant\s+\d+.+\s+[0-2]\.\d+ ns/m
   end
 
   @tag :needs_fast_function_repetition
@@ -422,7 +421,7 @@ defmodule BencheeTest do
     assert length(occurences) == 3
   end
 
-  test "inputs can also be a list of 2-tuples" do
+  test "inputs can also be a list of 2-tuples and it then keeps the order" do
     output =
       capture_io(fn ->
         map_fun = fn i -> [i, i * i] end
@@ -592,20 +591,34 @@ defmodule BencheeTest do
     end)
   end
 
-  test "does not blow up setting all times to 0 and never executes a function" do
-    output =
-      capture_io(fn ->
-        Benchee.run(
-          %{
-            "never execute me" => fn -> raise "BOOOOM" end
-          },
-          time: 0,
-          warmup: 0,
-          memory_time: 0
-        )
-      end)
+  describe "edge cases" do
+    test "does not blow up setting all times to 0 and never executes a function" do
+      output =
+        capture_io(fn ->
+          Benchee.run(
+            %{
+              "never execute me" => fn -> raise "BOOOOM" end
+            },
+            time: 0,
+            warmup: 0,
+            memory_time: 0
+          )
+        end)
 
-    refute output =~ "never execute me"
+      refute output =~ "never execute me"
+    end
+
+    test "does not blow up if nothing is specified" do
+      output =
+        capture_io(fn ->
+          Benchee.run(
+            %{},
+            @test_configuration
+          )
+        end)
+
+      refute output =~ "Benchmarking"
+    end
   end
 
   describe "save & load" do
@@ -754,12 +767,14 @@ defmodule BencheeTest do
       benches = %{
         "delete old" => fn {kv, key} -> BenchKeyword.delete_v0(kv, key) end,
         "delete reverse" => fn {kv, key} -> BenchKeyword.delete_v2(kv, key) end,
-        "delete keymember reverse" => fn {kv, key} -> BenchKeyword.delete_v3(kv, key) end
+        "delete keymember reverse" => fn {kv, key} -> BenchKeyword.delete_v3(kv, key) end,
+        "delete throw" => fn {kv, key} -> BenchKeyword.delete_v1(kv, key) end
       }
 
       inputs = %{
         "large miss" => {Enum.map(1..100, &{:"k#{&1}", &1}), :k101},
-        "large hit" => {Enum.map(1..100, &{:"k#{&1}", &1}), :k100}
+        "large hit" => {Enum.map(1..100, &{:"k#{&1}", &1}), :k100},
+        "small miss" => {Enum.map(1..10, &{:"k#{&1}", &1}), :k11}
       }
 
       output =
@@ -782,10 +797,13 @@ defmodule BencheeTest do
       assert output =~ "large hit"
       # Byte
       assert output =~ "B"
+
+      assert output =~ "1.00x memory"
+      assert output =~ "∞ x memo"
     end
   end
 
-  @slower_regex "\\s+- \\d+\\.\\d+x slower"
+  @slower_regex "\\s+- \\d+\\.\\d+x slower \\+\\d+(\\.\\d+)?.+"
   defp readme_sample_asserts(output, tag_string \\ "") do
     assert output =~ "warmup: 5 ms"
     assert output =~ "time: 10 ms"
@@ -801,7 +819,7 @@ defmodule BencheeTest do
 
     # In windows time resolution seems to be milliseconds, hence even
     # standard examples produce a fast warning.
-    # So we skip this basic is everything going fine test on windows
+    # So we skip this "basically everything is going fine" test on windows
     unless windows?(), do: refute(output =~ ~r/fast/i)
   end
 

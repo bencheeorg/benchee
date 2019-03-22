@@ -49,4 +49,51 @@ defmodule Benchee.Formatters.Console.Helpers do
 
   @spec descriptor(String.t()) :: String.t()
   def descriptor(header_str), do: "\n#{header_str}: \n"
+
+  def format_comparison(
+        name,
+        statistics,
+        display_value,
+        comparison_name,
+        display_unit,
+        label_width,
+        column_width
+      ) do
+    "~*s~*s ~ts"
+    |> :io_lib.format([
+      -label_width,
+      name,
+      column_width,
+      display_value,
+      comparison_display(statistics, comparison_name, display_unit)
+    ])
+    |> to_string
+  end
+
+  defp comparison_display(%Statistics{relative_more: nil, absolute_difference: nil}, _, _), do: ""
+
+  defp comparison_display(statistics, comparison_name, unit) do
+    "- #{comparison_text(statistics, comparison_name)} #{
+      absolute_difference_text(statistics, unit)
+    }\n"
+  end
+
+  defp comparison_text(%Statistics{relative_more: :infinity}, name), do: "∞ x #{name}"
+  defp comparison_text(%Statistics{relative_more: nil}, _), do: "N/A"
+
+  defp comparison_text(statistics, comparison_name) do
+    "~.2fx ~s"
+    |> :io_lib.format([statistics.relative_more, comparison_name])
+    |> to_string
+  end
+
+  defp absolute_difference_text(statistics, unit) do
+    formatted_value = Format.format({Scale.scale(statistics.absolute_difference, unit), unit})
+
+    if statistics.absolute_difference >= 0 do
+      "+#{formatted_value}"
+    else
+      formatted_value
+    end
+  end
 end

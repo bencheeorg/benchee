@@ -106,7 +106,7 @@ defmodule Benchee.Formatters.Console.Memory do
   defp scenario_reports([scenario | other_scenarios], units, label_width, true) do
     [
       reference_report(scenario, units, label_width),
-      comparisons(scenario, units, label_width, other_scenarios),
+      comparisons(other_scenarios, units, label_width),
       "\n**All measurements for memory usage were the same**\n"
     ]
   end
@@ -209,7 +209,7 @@ defmodule Benchee.Formatters.Console.Memory do
     [
       Helpers.descriptor("Comparison"),
       reference_report(scenario, units, label_width)
-      | comparisons(scenario, units, label_width, other_scenarios)
+      | comparisons(other_scenarios, units, label_width)
     ]
   end
 
@@ -227,50 +227,25 @@ defmodule Benchee.Formatters.Console.Memory do
     |> to_string
   end
 
-  @spec comparisons(Scenario.t(), unit_per_statistic, integer, [Scenario.t()]) :: [String.t()]
-  defp comparisons(scenario, units, label_width, scenarios_to_compare) do
-    %Scenario{memory_usage_data: %{statistics: reference_stats}} = scenario
-
+  @spec comparisons([Scenario.t()], unit_per_statistic, integer) :: [String.t()]
+  defp comparisons(scenarios_to_compare, units, label_width) do
     Enum.map(
       scenarios_to_compare,
-      fn scenario = %Scenario{memory_usage_data: %{statistics: job_stats}} ->
-        slower = calculate_slower_value(job_stats.median, reference_stats.median)
+      fn scenario ->
+        statistics = scenario.memory_usage_data.statistics
+        memory_format = memory_output(statistics.average, units.memory)
 
-        format_comparison(scenario, units, label_width, slower)
+        Helpers.format_comparison(
+          scenario.name,
+          statistics,
+          memory_format,
+          "memory usage",
+          units.memory,
+          label_width,
+          @median_width
+        )
       end
     )
-  end
-
-  defp calculate_slower_value(job_median, reference_median)
-       when job_median == 0 or is_nil(job_median) or reference_median == 0 or
-              is_nil(reference_median) do
-    @na
-  end
-
-  defp calculate_slower_value(job_median, reference_median) do
-    job_median / reference_median
-  end
-
-  defp format_comparison(scenario, %{memory: memory_unit}, label_width, @na) do
-    %Scenario{name: name, memory_usage_data: %{statistics: %Statistics{median: median}}} =
-      scenario
-
-    median_format = memory_output(median, memory_unit)
-
-    "~*s~*s\n"
-    |> :io_lib.format([-label_width, name, @median_width, median_format])
-    |> to_string
-  end
-
-  defp format_comparison(scenario, %{memory: memory_unit}, label_width, slower) do
-    %Scenario{name: name, memory_usage_data: %{statistics: %Statistics{median: median}}} =
-      scenario
-
-    median_format = memory_output(median, memory_unit)
-
-    "~*s~*s - ~.2fx memory usage\n"
-    |> :io_lib.format([-label_width, name, @median_width, median_format, slower])
-    |> to_string
   end
 
   defp memory_output(nil, _unit), do: "N/A"

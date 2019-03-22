@@ -26,22 +26,6 @@ defmodule Benchee.Formatters.ConsoleTest do
     test "formats and prints the results right to the console" do
       scenarios = [
         %Scenario{
-          name: "Second",
-          input_name: @no_input,
-          input: @no_input,
-          run_time_data: %CollectionData{
-            statistics: %Statistics{
-              average: 200.0,
-              ips: 5_000.0,
-              std_dev_ratio: 0.1,
-              median: 195.5,
-              percentiles: %{99 => 400.1},
-              sample_size: 200
-            }
-          },
-          memory_usage_data: %CollectionData{statistics: %Statistics{}}
-        },
-        %Scenario{
           name: "First",
           input_name: @no_input,
           input: @no_input,
@@ -53,6 +37,24 @@ defmodule Benchee.Formatters.ConsoleTest do
               median: 90.0,
               percentiles: %{99 => 300.1},
               sample_size: 200
+            }
+          },
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
+        },
+        %Scenario{
+          name: "Second",
+          input_name: @no_input,
+          input: @no_input,
+          run_time_data: %CollectionData{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{99 => 400.1},
+              sample_size: 200,
+              relative_more: 2.0,
+              absolute_difference: 100.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -68,14 +70,16 @@ defmodule Benchee.Formatters.ConsoleTest do
           )
         end)
 
-      assert output =~ ~r/First/
-      assert output =~ ~r/Second/
-      assert output =~ ~r/200/
-      assert output =~ ~r/5 K/
-      assert output =~ ~r/10.00%/
-      assert output =~ ~r/195.5/
-      assert output =~ ~r/300.1/
-      assert output =~ ~r/400.1/
+      assert output =~ "First"
+      assert output =~ "Second"
+      assert output =~ "200"
+      assert output =~ "5 K"
+      assert output =~ "10.00%"
+      assert output =~ "195.5"
+      assert output =~ "300.1"
+      assert output =~ "400.1"
+      assert output =~ "2.00x slower"
+      assert output =~ "+100 ns"
     end
   end
 
@@ -210,7 +214,9 @@ defmodule Benchee.Formatters.ConsoleTest do
               std_dev_ratio: 0.1,
               median: 195.5,
               percentiles: %{99 => 300.1},
-              sample_size: 200
+              sample_size: 200,
+              relative_more: 2.0,
+              absolute_difference: 100.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -242,7 +248,9 @@ defmodule Benchee.Formatters.ConsoleTest do
               std_dev_ratio: 0.15,
               median: 395.0,
               percentiles: %{99 => 500.1},
-              sample_size: 200
+              sample_size: 200,
+              relative_more: 1.6,
+              absolute_difference: 150.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -257,14 +265,14 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert other_job =~ ~r/Other Job.+10.+100.+30\.00%.+98.+200\.1/
       assert job =~ ~r/Job.+5.+200.+10\.00%.+195\.5/
       ref =~ ~r/Other Job/
-      slower =~ ~r/Job.+slower/
+      slower =~ ~r/Job.+slower \+100/
 
       [input_header_2, _, other_job_2, job_2, _, ref_2, slower_2] = other_arg
       assert input_header_2 =~ "Other Arg"
       assert other_job_2 =~ ~r/Other Job.+4.+250.+31\.00%.+225\.5.+300\.1/
       assert job_2 =~ ~r/Job.+2\.5.+400.+15\.00%.+395/
       ref_2 =~ ~r/Other Job/
-      slower_2 =~ ~r/Job.+slower/
+      slower_2 =~ ~r/Job.+slower \+150/
     end
 
     test "with and without a tag" do
@@ -296,7 +304,9 @@ defmodule Benchee.Formatters.ConsoleTest do
               std_dev_ratio: 0.1,
               median: 195.5,
               percentiles: %{99 => 300.1},
-              sample_size: 200
+              sample_size: 200,
+              relative_more: 2.0,
+              absolute_difference: 100.0
             }
           },
           memory_usage_data: %CollectionData{statistics: %Statistics{}}
@@ -309,6 +319,52 @@ defmodule Benchee.Formatters.ConsoleTest do
       assert job_with_tag =~ ~r/job \(improved\)\s+10 K/
       assert job =~ ~r/job\s+5 K/
       assert comparison =~ ~r/job \(improved\)\s+ 10 K/
+    end
+
+    test "Correctly displays difference even if it is negative" do
+      scenarios = [
+        %Scenario{
+          name: "job",
+          input_name: @no_input,
+          input: @no_input,
+          run_time_data: %CollectionData{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{99 => 300.1},
+              sample_size: 200
+            }
+          },
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
+        },
+        %Scenario{
+          name: "job (improved)",
+          input_name: @no_input,
+          input: @no_input,
+          run_time_data: %CollectionData{
+            statistics: %Statistics{
+              average: 100.0,
+              ips: 10_000.0,
+              std_dev_ratio: 0.1,
+              median: 90.0,
+              percentiles: %{99 => 200.1},
+              sample_size: 200,
+              relative_more: 0.5,
+              relative_less: 2.0,
+              absolute_difference: -100.0
+            }
+          },
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
+        }
+      ]
+
+      [result] = Console.format(%Suite{scenarios: scenarios, configuration: @config}, @options)
+      [_, _header, _job_with_tag, _job, _, comparison, slower] = result
+
+      assert comparison =~ ~r/job\s+ 5 K$/
+      assert slower =~ ~r/job \(improved\)\s+10 K\s+- 0\.50x slower -100 ns$/
     end
 
     test "includes the suite's title" do
