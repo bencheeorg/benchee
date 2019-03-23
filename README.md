@@ -1,10 +1,10 @@
 # Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee) [![docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/) [![Build Status Travis/Linux](https://travis-ci.org/bencheeorg/benchee.svg?branch=master)](https://travis-ci.org/bencheeorg/benchee) [![Appveyor/Windows Build status](https://ci.appveyor.com/api/projects/status/egujslxrg405bnr7?svg=true)](https://ci.appveyor.com/project/PragTob/benchee-8e4gw) [![Coverage Status](https://coveralls.io/repos/github/bencheeorg/benchee/badge.svg?branch=master)](https://coveralls.io/github/bencheeorg/benchee?branch=master)
 
-Library for easy and nice (micro) benchmarking in Elixir. It allows you to compare the performance of different pieces of code at a glance. Benchee is also versatile and extensible, relying only on functions! There are also a bunch of [plugins](#plugins) to draw pretty graphs and more!
+Library for easy and nice (micro) benchmarking in Elixir. Benchee allows you to compare the performance of different pieces of code at a glance. It is also versatile and extensible, relying only on functions. There are also a bunch of [plugins](#plugins) to draw pretty graphs and more!
 
-Benchee runs each of your functions for a given amount of time after an initial warmup, it then measures their run time and optionally memory consumption. It then shows different statistical values like average, iterations per second and the standard deviation.
+benchee runs each of your functions for a given amount of time after an initial warmup, it then measures their run time and optionally memory consumption. It then shows different statistical values like average, standard deviation etc. See [features](#features)
 
-Benchee has a nice and concise main interface, its behavior can be altered through lots of [configuration options](#configuration):
+benchee has a nice and concise main interface, its behavior can be altered through lots of [configuration options](#configuration):
 
 ```elixir
 list = Enum.to_list(1..10_000)
@@ -23,13 +23,13 @@ Benchee.run(
 Produces the following output on the console:
 
 ```
-tobi@speedy:~/github/benchee(master)$ mix run samples/run.exs
-Operating System: Linux"
+tobi@speedy:$ mix run samples/run.exs
+Operating System: Linux
 CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
 Number of Available Cores: 8
 Available memory: 15.61 GB
-Elixir 1.6.4
-Erlang 20.3
+Elixir 1.8.1
+Erlang 21.2.7
 
 Benchmark suite executing with the following configuration:
 warmup: 2 s
@@ -39,58 +39,56 @@ parallel: 1
 inputs: none specified
 Estimated total run time: 28 s
 
-
 Benchmarking flat_map...
 Benchmarking map.flatten...
 
 Name                  ips        average  deviation         median         99th %
-flat_map           2.31 K      433.25 μs     ±8.64%         428 μs         729 μs
-map.flatten        1.22 K      822.22 μs    ±16.43%         787 μs        1203 μs
+flat_map           2.34 K      426.84 μs     ±9.88%      418.72 μs      720.20 μs
+map.flatten        1.18 K      844.08 μs    ±19.73%      778.10 μs     1314.87 μs
 
 Comparison:
-flat_map           2.31 K
-map.flatten        1.22 K - 1.90x slower
+flat_map           2.34 K
+map.flatten        1.18 K - 1.98x slower +417.24 μs
 
 Memory usage statistics:
 
 Name           Memory usage
-flat_map          625.54 KB
-map.flatten       781.85 KB - 1.25x memory usage
+flat_map          624.97 KB
+map.flatten       781.25 KB - 1.25x memory usage +156.28 KB
 
 **All measurements for memory usage were the same**
-
 ```
 
-The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/PragTob/benchee_html) make it possible to generate nice looking [html reports](http://www.pragtob.info/benchee/flat_map.html), where individual graphs can also be exported as PNG images:
+The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/bencheeorg/benchee_html) make it possible to generate nice looking [html reports](http://www.pragtob.info/benchee/flat_map.html), where individual graphs can also be exported as PNG images:
 
 ![report](http://www.pragtob.info/benchee/images/report.png)
 
 ## Features
 
-* first runs the functions for a given warmup time without recording the results, to simulate a _"warm"_ running system
-* [measures memory](#measuring-memory-consumption)
+* first runs the functions for a given warmup time without recording the results, to simulate a _"warm"/running_ system
+* [measures memory usage](#measuring-memory-consumption)
 * provides you with lots of statistics - check the next list
-* plugin/extensible friendly architecture so you can use different formatters to generate [CSV, HTML and more](#plugins)
-* nicely formatted console output with units scaled to appropriate units
-* [hooks](#hooks-setup-teardown-etc) to execute something before/after a benchmark
+* plugin/extensible friendly architecture so you can use different formatters to display benchmarking results as [HTML, markdown, JSON and more](#plugins)
+* nicely formatted console output with units scaled to appropriately (nanoseconds to minutes)
+* measures the overhead of function calls so that the measured/reported times really are the execution time of _your_code_ without that overhead.
+* [hooks](#hooks-setup-teardown-etc) to execute something before/after a benchmarking invocation
 * execute benchmark jobs in parallel to gather more results in the same time, or simulate a system under load
-* well tested
-* well documented
+* well documented & well tested
 
 Provides you with the following **statistical data**:
 
-* **average**   - average execution time (the lower the better)
-* **ips**       - iterations per second, aka how often can the given function be executed within one second (the higher the better)
+* **average**   - average execution time/memory usage (the lower the better)
+* **ips**       - iterations per second, aka how often can the given function be executed within one second (the higher the better - good for graphing), only for run times
 * **deviation** - standard deviation (how much do the results vary), given as a percentage of the average (raw absolute values also available)
-* **median**    - when all measured times are sorted, this is the middle value (or average of the two middle values when the number of samples is even). More stable than the average and somewhat more likely to be a typical value you see. (the lower the better)
-* **99th %**    - 99th percentile, 99% of all run times are less than this
+* **median**    - when all measured values are sorted, this is the middle value. More stable than the average and somewhat more likely to be a typical value you see, for the msot typical value see mode. (the lower the better)
+* **99th %**    - 99th percentile, 99% of all measured values are less than this - worst case performance-ish
 
 In addition, you can optionally output an extended set of statistics:
 
-* **minimum**     - the smallest (fastest) run time measured for the job
-* **maximum**     - the biggest (slowest) run time measured for the job
-* **sample size** - the number of run time measurements taken
-* **mode**        - the run time(s) that occur the most. Often one value, but can be multiple values if they occur the same amount of times. If no value occurs at least twice, this value will be nil.
+* **minimum**     - the smallest value measured for the job (fastest/least consumption)
+* **maximum**     - the biggest run time measured for the job (slowest/most consumption)
+* **sample size** - the number of measurements taken
+* **mode**        - the measured values that occur the most. Often one value, but can be multiple values if they occur the same amount of times. If no value occurs at least twice, this value will be nil.
 
 ## Installation
 
@@ -98,13 +96,13 @@ Add benchee to your list of dependencies in `mix.exs`:
 
 ```elixir
 defp deps do
-  [{:benchee, "~> 0.13", only: :dev}]
+  [{:benchee, "~> 0.14", only: :dev}]
 end
 ```
 
 Install via `mix deps.get` and then happy benchmarking as described in [Usage](#usage) :)
 
-Elixir versions supported are 1.4+.
+Elixir versions supported/tested against are 1.6+. It _should_ theoretically still work with 1.4 & 1.5 but we don't actively test/support it.
 
 ## Usage
 
@@ -127,37 +125,43 @@ Benchee.run(
 This produces the following output:
 
 ```
-tobi@speedy ~/github/benchee $ mix run samples/run.exs
-Elixir 1.4.0
-Erlang 19.1
+tobi@speedy:$ mix run samples/run_defaults.exs
+Operating System: Linux
+CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
+Number of Available Cores: 8
+Available memory: 15.61 GB
+Elixir 1.8.1
+Erlang 21.2.7
+
 Benchmark suite executing with the following configuration:
-warmup: 2.0s
-time: 5.0s
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
 parallel: 1
 inputs: none specified
-Estimated total run time: 14.0s
+Estimated total run time: 14 s
 
 Benchmarking flat_map...
 Benchmarking map.flatten...
 
-Name                  ips        average  deviation         median
-flat_map           2.28 K      438.07 μs    ±16.66%         419 μs
-map.flatten        1.25 K      802.99 μs    ±13.40%         782 μs
+Name                  ips        average  deviation         median         99th %
+flat_map           2.34 K      427.78 μs    ±16.02%      406.29 μs      743.01 μs
+map.flatten        1.22 K      820.87 μs    ±19.29%      772.61 μs     1286.35 μs
 
 Comparison:
-flat_map           2.28 K
-map.flatten        1.25 K - 1.83x slower
+flat_map           2.34 K
+map.flatten        1.22 K - 1.92x slower +393.09 μs
 ```
 
 See [Features](#features) for a description of the different statistical values and what they mean.
 
-If you're looking to see how to make something specific work, please refer to the [samples](https://github.com/PragTob/benchee/tree/master/samples) directory. Also, especially when wanting to extend benchee check out the [hexdocs](https://hexdocs.pm/benchee/api-reference.html).
+If you're looking to see how to make something specific work, please refer to the [samples](https://github.com/PragTob/benchee/tree/master/samples) directory. Also, especially when wanting to extend benchee, check out the [hexdocs](https://hexdocs.pm/benchee/api-reference.html).
 
 ### Configuration
 
 Benchee takes a wealth of configuration options, however those are entirely optional. Benchee ships with sensible defaults for all of these.
 
-In the most common `Benchee.run/2` interface configuration options are passed as the second argument in the form of an optional keyword list:
+In the most common `Benchee.run/2` interface configuration options are passed as the second argument in the form of an keyword list:
 
 ```elixir
 Benchee.run(%{"some function" => fn -> magic end}, print: [benchmarking: false])
@@ -165,49 +169,44 @@ Benchee.run(%{"some function" => fn -> magic end}, print: [benchmarking: false])
 
 The available options are the following (also documented in [hexdocs](https://hexdocs.pm/benchee/Benchee.Configuration.html#init/1)).
 
-* `warmup` - the time in seconds for which a benchmarking job should be run without measuring times before "real" measurements start. This simulates a _"warm"_ running system. Defaults to 2.
-* `time` - the time in seconds for how long each individual benchmarking job should be run for measuring the execution times (run time performance). Defaults to 5.
+* `warmup` - the time in seconds for which a benchmarking job should be run without measuring anything before "real" measurements start. This simulates a _"warm"/running_ system. Defaults to 2.
+* `time` - the time in seconds for how long each individual scenario (benchmarking job x input) should be run for measuring the execution times (run time performance). Defaults to 5.
 * `memory_time` - the time in seconds for how long [memory measurements](measuring-memory-consumption) should be conducted. Defaults to 0 (turned off).
 * `inputs` - a map or list of two element tuples. If a map, they keys are descriptive input names and values are the actual input values. If a list of tuples, the first element in each tuple is the input name, and the second element in each tuple is the actual input value. Your benchmarking jobs will then be run with each of these inputs. For this to work your benchmarking function gets the current input passed in as an argument into the function. Defaults to `nil`, aka no input specified and functions are called without an argument. See [Inputs](#inputs).
-* `formatters` - list of formatters either as a module implementing the formatter behaviour, a tuple of said module and options it should take or formatter functions. They are run when using `Benchee.run/2` or you can invoktem them through `Benchee.Formatter.output/1`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins. Defaults to the builtin console formatter `Benchee.Formatters.Console`. See [Formatters](#formatters).
+* `formatters` - list of formatters either as a module implementing the formatter behaviour, a tuple of said module and options it should take or formatter functions. They are run when using `Benchee.run/2` or you can invoke them through `Benchee.Formatter.output/1`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins & configuration. Also allows the configuration of the console formatter to print extended statistics. Defaults to the builtin console formatter `Benchee.Formatters.Console`. See [Formatters](#formatters).
+* `:measure_function_call_overhead` - Measure how long an empty function call takes and deduct this from each measured run time. Defaults to true.
 * `pre_check` - whether or not to run each job with each input - including all given before or after scenario or each hooks - before the benchmarks are measured to ensure that your code executes without error. This can save time while developing your suites. Defaults to `false`.
-* `parallel` - the function of each benchmarking job will be executed in `parallel` number processes. If `parallel: 4` then 4 processes will be spawned that all execute the _same_ function for the given time. When these finish/the time is up 4 new processes will be spawned for the next job/function. This gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking). Defaults to 1 (no parallel execution).
+* `parallel` - the function of each benchmarking job will be executed in `parallel` number processes. If `parallel: 4` then 4 processes will be spawned that all execute the _same_ function for the given time. When these finish/the time is up 4 new processes will be spawned for the next scenario. This gives you more data in the same time, but also puts a load on the system interfering with benchmark results. For more on the pros and cons of parallel benchmarking [check the wiki](https://github.com/bencheeorg/benchee/wiki/Parallel-Benchmarking). Defaults to 1 (no parallel execution).
 * `save` - specify a `path` where to store the results of the current benchmarking suite, tagged with the specified `tag`. See [Saving & Loading](#saving-loading-and-comparing-previous-runs).
 * `load` - load saved suit or suits to compare your current benchmarks against. Can be a string or a list of strings or patterns. See [Saving & Loading](#saving-loading-and-comparing-previous-runs).
-* `print` - a map from atoms to `true` or `false` to configure if the output identified by the atom will be printed during the standard Benchee benchmarking process. All options are enabled by default (true). Options are:
-  * `:benchmarking`  - print when Benchee starts benchmarking a new job (Benchmarking name ..)
+* `print` - a map or keyword list from atoms to `true` or `false` to configure if the output identified by the atom will be printed during the standard benchee benchmarking process. All options are enabled by default (true). Options are:
+  * `:benchmarking`  - print when Benchee starts benchmarking a new job (`Benchmarking name ...`)
   * `:configuration` - a summary of configured benchmarking options including estimated total run time is printed before benchmarking starts
   * `:fast_warning` - warnings are displayed if functions are executed too fast leading to inaccurate measures
-* `console` - options for the built-in console formatter:
-  * `:comparison` - if the comparison of the different benchmarking jobs (x times slower than) is shown. Enabled by default.
-  * `extended_statistics` - display more statistics, aka `minimum`, `maximum`, `sample_size` and `mode`. Disabled by default.
-* `:unit_scaling` - the strategy for choosing a unit for durations and
-  counts. May or may not be implemented by a given formatter (The console
-  formatter implements it). When scaling a value, Benchee finds the "best fit"
+* `:unit_scaling` - the strategy for choosing a unit for durations,
+  counts & memory measurements. May or may not be implemented by a given formatter (The console formatter implements it).
+  When scaling a value, benchee finds the "best fit"
   unit (the largest unit for which the result is at least 1). For example,
   1_200_000 scales to `1.2 M`, while `800_000` scales to `800 K`. The
-  `unit_scaling` strategy determines how Benchee chooses the best fit unit for
+  `unit_scaling` strategy determines how benchee chooses the best fit unit for
   an entire list of values, when the individual values in the list may have
   different best fit units. There are four strategies, defaulting to `:best`:
     * `:best`     - the most frequent best fit unit will be used, a tie
     will result in the larger unit being selected.
-    * `:largest`  - the largest best fit unit will be used (i.e. thousand
-    and seconds if values are large enough).
-    * `:smallest` - the smallest best fit unit will be used (i.e.
-    millisecond and one)
-    * `:none`     - no unit scaling will occur. Durations will be displayed
-    in microseconds, and counts will be displayed in ones (this is
-    equivalent to the behaviour Benchee had pre 0.5.0)
+    * `:largest`  - the largest best fit unit will be used
+    * `:smallest` - the smallest best fit unit will be used
+    * `:none`     - no unit scaling will occur.
 * `:before_scenario`/`after_scenario`/`before_each`/`after_each` - read up on them in the [hooks section](#hooks-setup-teardown-etc)
-* `:measure_function_call_overhead` - Measure how long an empty function call takes and deduct this from each measure run time. Defaults to true.
 
 ### Measuring memory consumption
 
-Starting with version 0.13, users can now get measurements of how much memory their benchmarks use. This measurement is **not** the actual effect on the size of the BEAM VM size, but the total amount of memory that was allocated during the execution of a given scenario. This includes all memory that was garbage collected during the execution of that scenario. It **does not** include any memory used in any process other than the original one in which the scenario is run.
+Starting with version 0.13, users can now get measurements of how much memory their benchmarked scenarios use. The measurement is **limited to the process that benche executes your provided code in** - i.e. other processes (like worker pools)/the whole BEAM isn't taken into account.
+
+This measurement is **not** the actual effect on the size of the BEAM VM size, but the total amount of memory that was allocated during the execution of a given scenario. This includes all memory that was garbage collected during the execution of that scenario.
 
 This measurement of memory does not affect the measurement of run times.
 
-In cases where all measurements of memory consumption are identical, which happens very frequently, the full statistics will be omitted from the standard console formatter. If your function is deterministic, this will always be the case. Only in functions with some amount of randomness will there be variation in memory usage.
+In cases where all measurements of memory consumption are identical, which happens very frequently, the full statistics will be omitted from the standard console formatter. If your function is deterministic, this should always be the case. Only in functions with some amount of randomness will there be variation in memory usage.
 
 Memory measurement is disabled by default, and you can choose to enable it by passing `memory_time: your_seconds` option to `Benchee.run/2`:
 
@@ -227,46 +226,64 @@ A full example, including an example of the console output, can be found
 
 ### Inputs
 
-`:inputs` is a very useful configuration that allows you to run the same benchmarking jobs with different inputs. You specify the inputs as either a map from name (String or atom) to the actual input value or a list of tuples where the first element in each tuple is the name and the second element in the tuple is the value. Functions can have different performance characteristics on differently shaped inputs - be that structure or input size.
+`:inputs` is a very useful configuration that allows you to run the same benchmarking jobs with different inputs. We call this combination a _"scenario"_. You specify the inputs as either a map from name (String or atom) to the actual input value or a list of tuples where the first element in each tuple is the name and the second element in the tuple is the value.
 
-One of such cases is comparing tail-recursive and body-recursive implementations of `map`. More information in the [repository with the benchmark](https://github.com/PragTob/elixir_playground/blob/master/bench/tco_blog_post_focussed_inputs.exs) and the [blog post](https://pragtob.wordpress.com/2016/06/16/tail-call-optimization-in-elixir-erlang-not-as-efficient-and-important-as-you-probably-think/).
+Why do this? Functions can have different performance characteristics on differently shaped inputs - be that structure or input size. One of such cases is comparing tail-recursive and body-recursive implementations of `map`. More information in the [repository with the benchmark](https://github.com/PragTob/elixir_playground/blob/master/bench/tco_blog_post_focussed_inputs.exs) and the [blog post](https://pragtob.wordpress.com/2016/06/16/tail-call-optimization-in-elixir-erlang-not-as-efficient-and-important-as-you-probably-think/).
+
+As a little sample:
 
 ```elixir
-map_fun = fn i -> i + 1 end
-inputs = %{
-  "Small (1 Thousand)" => Enum.to_list(1..1_000),
-  "Middle (100 Thousand)" => Enum.to_list(1..100_000),
-  "Big (10 Million)" => Enum.to_list(1..10_000_000)
-}
-
-# Or inputs could also look like this:
-#
-# inputs = [
-#   {"Small (1 Thousand)", Enum.to_list(1..1_000)},
-#   {"Middle (100 Thousand)", Enum.to_list(1..100_000)},
-#   {"Big (10 Million)", Enum.to_list(1..10_000_000)}
-# ]
+map_fun = fn i -> [i, i * i] end
 
 Benchee.run(
   %{
-    "map tail-recursive" =>
-      fn list -> MyMap.map_tco(list, map_fun) end,
-    "stdlib map" =>
-      fn list -> Enum.map(list, map_fun) end,
-    "map simple body-recursive" =>
-      fn list -> MyMap.map_body(list, map_fun) end,
-    "map tail-recursive different argument order" =>
-      fn list -> MyMap.map_tco_arg_order(list, map_fun) end
+    "flat_map" => fn input -> Enum.flat_map(input, map_fun) end,
+    "map.flatten" => fn input -> input |> Enum.map(map_fun) |> List.flatten() end
   },
-  time: 15,
-  warmup: 5,
-  inputs: inputs
+  inputs: %{
+    "Small" => Enum.to_list(1..1_000),
+    "Medium" => Enum.to_list(1..10_000),
+    "Bigger" => Enum.to_list(1..100_000)
+  }
 )
 ```
 
-This means each function will be benchmarked with each input that is specified in the inputs. Then you'll get the output divided by input so you can see which function is fastest for which input.
+This means each function will be benchmarked with each input that is specified in the inputs. Then you'll get the output divided by input so you can see which function is fastest for which input, like so:
 
-Therefore, I **highly recommend** using this feature and checking different realistically structured and sized inputs for the functions you benchmark!
+```
+tobi@speedy:~/github/benchee(readme-overhaul)$ mix run samples/multiple_inputs.exs
+
+(... general information ...)
+
+##### With input Bigger #####
+Name                  ips        average  deviation         median         99th %
+flat_map           150.81        6.63 ms    ±12.65%        6.57 ms        8.74 ms
+map.flatten        114.05        8.77 ms    ±16.22%        8.42 ms       12.76 ms
+
+Comparison:
+flat_map           150.81
+map.flatten        114.05 - 1.32x slower +2.14 ms
+
+##### With input Medium #####
+Name                  ips        average  deviation         median         99th %
+flat_map           2.28 K      437.80 μs    ±10.72%      425.63 μs      725.09 μs
+map.flatten        1.78 K      561.18 μs     ±5.55%      553.98 μs      675.98 μs
+
+Comparison:
+flat_map           2.28 K
+map.flatten        1.78 K - 1.28x slower +123.37 μs
+
+##### With input Small #####
+Name                  ips        average  deviation         median         99th %
+flat_map          26.31 K       38.01 μs    ±15.47%       36.69 μs       67.08 μs
+map.flatten       18.65 K       53.61 μs    ±11.32%       52.79 μs       70.17 μs
+
+Comparison:
+flat_map          26.31 K
+map.flatten       18.65 K - 1.41x slower +15.61 μs
+```
+
+Therefore, we **highly recommend** using this feature and checking different realistically structured and sized inputs for the functions you benchmark!
 
 ### Formatters
 
@@ -277,7 +294,7 @@ The `:formatters` option is specified a list of:
 * a tuple of a module specified above and options for it `{module, options}`
 * functions that take one argument (the benchmarking suite with all its results) and then do whatever you want them to
 
-So if you are using the [HTML plugin](https://github.com/PragTob/benchee_html) and you want to run both the console formatter and the HTML formatter this looks like this (after you installed it of course):
+So if you are using the [HTML plugin](https://github.com/bencheeorg/benchee_html) and you want to run both the console formatter and the HTML formatter this looks like this (after you installed it of course):
 
 ```elixir
 list = Enum.to_list(1..10_000)
@@ -295,9 +312,14 @@ Benchee.run(
 )
 ```
 
-### Extended Console Formatter Statistics
+#### Console Formatter options
 
-Showing more statistics such as `minimum`, `maximum`, `sample_size` and `mode` is as simple as passing `extended_statistics: true` to the console formatter.
+The console formatter supports 2 configuration options:
+
+  * `:comparison` - if the comparison of the different benchmarking jobs (x times slower than) is shown. Enabled by default.
+  * `extended_statistics` - display more statistics, aka `minimum`, `maximum`, `sample_size` and `mode`. Disabled by default.
+
+So if you want to see more statistics you simple pass `extended_statistics: true` to the console formatter:
 
 ```elixir
 list = Enum.to_list(1..10_000)
@@ -316,12 +338,13 @@ Benchee.run(
 Which produces:
 
 ```
-# your normal output...
+(... normal output ...)
 
 Extended statistics:
+
 Name                minimum        maximum    sample size                     mode
-flat_map             365 μs        1371 μs        22.88 K                   430 μs
-map.flatten          514 μs        1926 μs        13.01 K                   517 μs
+flat_map          345.43 μs     1195.89 μs        23.73 K                405.64 μs
+map.flatten       522.99 μs     2105.56 μs        12.03 K     767.83 μs, 768.44 μs
 ```
 
 (Btw. notice how the modes of both are much closer and for `map.flatten` much less than the average of `766.99`, see `samples/run_extended_statistics`)

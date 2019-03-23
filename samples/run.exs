@@ -10,7 +10,6 @@ Benchee.run(
   memory_time: 2
 )
 
-# tobi@speedy:~/github/benchee(master)$ mix run samples/run.exs
 # Operating System: Linux
 # CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
 # Number of Available Cores: 8
@@ -30,17 +29,17 @@ Benchee.run(
 # Benchmarking map.flatten...
 
 # Name                  ips        average  deviation         median         99th %
-# flat_map           2.36 K      424.38 μs    ±13.24%      411.19 μs      761.59 μs
-# map.flatten        1.24 K      806.83 μs    ±16.60%      767.85 μs     1189.10 μs
+# flat_map           2.34 K      426.84 μs     ±9.88%      418.72 μs      720.20 μs
+# map.flatten        1.18 K      844.08 μs    ±19.73%      778.10 μs     1314.87 μs
 
 # Comparison:
-# flat_map           2.36 K
-# map.flatten        1.24 K - 1.90x slower - +382.45 μs
+# flat_map           2.34 K
+# map.flatten        1.18 K - 1.98x slower +417.24 μs
 
 # Memory usage statistics:
 
 # Name           Memory usage
 # flat_map          624.97 KB
-# map.flatten       781.25 KB - 1.25x memory usage - +156.28 KB
+# map.flatten       781.25 KB - 1.25x memory usage +156.28 KB
 
 # **All measurements for memory usage were the same**

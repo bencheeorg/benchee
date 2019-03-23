@@ -6,48 +6,58 @@ Benchee.run(
     "map.flatten" => fn input -> input |> Enum.map(map_fun) |> List.flatten() end
   },
   inputs: %{
-    "Small" => Enum.to_list(1..1000),
+    "Small" => Enum.to_list(1..1_000),
+    "Medium" => Enum.to_list(1..10_000),
     "Bigger" => Enum.to_list(1..100_000)
   }
 )
 
-# tobi@speedy ~/github/benchee $ time mix run samples/multiple_inputs.exs
-# Erlang/OTP 19 [erts-8.1] [source] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
-# Elixir 1.3.4
+# tobi@speedy:~/github/benchee(readme-overhaul)$ mix run samples/multiple_inputs.exs
+# Operating System: Linux
+# CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
+# Number of Available Cores: 8
+# Available memory: 15.61 GB
+# Elixir 1.8.1
+# Erlang 21.2.7
+
 # Benchmark suite executing with the following configuration:
-# warmup: 2.0s
-# time: 5.0s
+# warmup: 2 s
+# time: 5 s
+# memory time: 0 ns
 # parallel: 1
-# inputs: Bigger, Small
-# Estimated total run time: 28.0s
-#
-#
-# Benchmarking with input Bigger:
-# Benchmarking flat_map...
-# Benchmarking map.flatten...
-#
-# Benchmarking with input Small:
-# Benchmarking flat_map...
-# Benchmarking map.flatten...
-#
+# inputs: Bigger, Medium, Small
+# Estimated total run time: 42 s
+
+# Benchmarking flat_map with input Bigger...
+# Benchmarking flat_map with input Medium...
+# Benchmarking flat_map with input Small...
+# Benchmarking map.flatten with input Bigger...
+# Benchmarking map.flatten with input Medium...
+# Benchmarking map.flatten with input Small...
+
 # ##### With input Bigger #####
-# Name                  ips        average  deviation         median
-# map.flatten        139.35        7.18 ms     ±8.86%        7.06 ms
-# flat_map            70.91       14.10 ms    ±18.04%       14.37 ms
-#
+# Name                  ips        average  deviation         median         99th %
+# flat_map           150.81        6.63 ms    ±12.65%        6.57 ms        8.74 ms
+# map.flatten        114.05        8.77 ms    ±16.22%        8.42 ms       12.76 ms
+
 # Comparison:
-# map.flatten        139.35
-# flat_map            70.91 - 1.97x slower
-#
+# flat_map           150.81
+# map.flatten        114.05 - 1.32x slower +2.14 ms
+
+# ##### With input Medium #####
+# Name                  ips        average  deviation         median         99th %
+# flat_map           2.28 K      437.80 μs    ±10.72%      425.63 μs      725.09 μs
+# map.flatten        1.78 K      561.18 μs     ±5.55%      553.98 μs      675.98 μs
+
+# Comparison:
+# flat_map           2.28 K
+# map.flatten        1.78 K - 1.28x slower +123.37 μs
+
 # ##### With input Small #####
-# Name                  ips        average  deviation         median
-# map.flatten       18.14 K       55.13 μs     ±9.31%          54 μs
-# flat_map          10.65 K       93.91 μs     ±8.70%          94 μs
-#
+# Name                  ips        average  deviation         median         99th %
+# flat_map          26.31 K       38.01 μs    ±15.47%       36.69 μs       67.08 μs
+# map.flatten       18.65 K       53.61 μs    ±11.32%       52.79 μs       70.17 μs
+
 # Comparison:
-# map.flatten       18.14 K
-# flat_map          10.65 K - 1.70x slower
-#
-# real	0m28.434s
-# user	0m27.032s
-# sys	0m1.424s
+# flat_map          26.31 K
+# map.flatten       18.65 K - 1.41x slower +15.61 μs
