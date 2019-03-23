@@ -356,7 +356,7 @@ Benchee can store the results of previous runs in a file and then load them agai
 **Saving** is done through the `save` configuration option. You can specify a `path` where results are saved, or you can use the default option of`"benchmark.benchee"` if you don't pass a `path`. You can also pass a `tag` option which annotates these results (for instance with a branch name). The default option for the `tag` is a timestamp of when the benchmark was run.
 
 **Loading** is done through the `load` option specifying a path to the file to
-load (for instance `benchmark.benchee`). You can also specify multiple files to load through a list of paths (`["my.benchee", "master_save.benchee"]`) - each one of those can also be a glob expression to match even more files glob (`"save_number*.benchee"`).
+load (for instance `"benchmark.benchee"`). You can also specify multiple files to load through a list of paths (`["my.benchee", "master_save.benchee"]`) - each one of those can also be a glob expression to match even more files glob (`"save_number*.benchee"`).
 
 ```elixir
 Benchee.run(
@@ -373,7 +373,7 @@ In the more verbose API this is triggered via `Benchee.load/1`.
 
 ### Hooks (Setup, Teardown etc.)
 
-Most of the time, it's best to keep your benchmarks as simple as possible: plain old immutable functions work best. But sometimes you need other things to happen. When you want to add before or after hooks to your benchmarks, we've got you covered! Before you dig into this section, **you usually don't need hooks**.
+Most of the time, it's best to keep your benchmarks as simple as possible: plain old immutable functions work best. But sometimes you need other things to happen. When you want to add before or after hooks to your benchmarks, we've got you covered! Before you dig into this section though remember one thing: **you usually don't need hooks!**
 
 Benchee has three types of hooks:
 
@@ -382,7 +382,7 @@ Benchee has three types of hooks:
 * [Benchmarking function hooks](#benchmarking-function-hooks)
 
 
-Of course, **hooks are not included in the measured run times**. So they are there especially if you want to do something and want it to **not be included in the measured times**. Sadly there is the notable exception of _too_fast_functions_ (the ones that execute in less than 10 microseconds). As we need to measure their repeated invocations to get halfway good measurements `before_each` and `after_each` hooks are included there.
+Of course, **hooks are not included in the measurements**. So they are there especially if you want to do something and want it to **not be included in the measurements**. Sadly there is the notable exception of _too_fast_functions_ (the ones that execute faster than we can measure in _native_ resolution). As we need to measure their repeated invocations to get halfway good measurements `before_each` and `after_each` hooks are included there. However, to the best of our knowledge this should only ever happen on Windows (because of the bad run time measurement accuracy).
 
 #### Suite hooks
 
@@ -429,11 +429,11 @@ there are 4 scenarios:
 3. bar with input 1
 4. bar with input 2
 
-A scenario includes warmup and actual run time.
+A scenario includes warmup and actual run time (+ other measurements like memory).
 
 ##### before_scenario
 
-Is executed before every [scenario](#what-is-a-scenario) that it applies to (see [hook configuration](#hook-configuration-global-versus-local)). Before scenario hooks take the input of the scenario as an argument.
+Is executed before every [scenario](#what-is-a-scenario) that it applies to (see [hook configuration](#hook-configuration-global-versus-local)). `before_scenario` hooks take the input of the scenario as an argument.
 
 Since the return value of a `before_scenario` becomes the input for next steps (see [hook arguments and return values](#hook-arguments-and-return-values)),  there usually are 3 kinds of before scenarios:
 
@@ -464,6 +464,7 @@ Benchee.run(
     resource = start_expensive_resource()
     {input, resource}
   end
+)
 ```
 
 _When might this be useful?_
@@ -511,16 +512,18 @@ Usage:
 Benchee.run(
   %{
     "bar" => fn record -> bar(record) end
-  }, inputs: %{ "record id" => 1},
+  },
+  inputs: %{ "record id" => 1},
   before_each: fn input -> get_from_db(input) end
 )
 ```
 
 _When might this be useful?_
 
-* Retrieving a record from the database and passing it on to the benchmarking function to do something(tm) without the retrieval from the database adding to the benchmark measurement
+* Retrieving a record from the database and passing it on to the benchmarking function to do _something(tm)_ without the retrieval from the database adding to the benchmark measurement
 * Busting caches so that all measurements are taken in an uncached state
 * Picking a random value from a collection and passing it to the benchmarking function for measuring performance with a wider spread of values
+* you could also use this to benchmark with random data like `StreamData`, [devon shows how it's done here](https://devonestes.herokuapp.com/benchmarking-with-stream-data)
 
 ##### after_each
 
@@ -534,7 +537,8 @@ Usage:
 Benchee.run(
   %{
     "bar" => fn input -> bar(input) end
-  }, inputs: %{ "input 1" => 1}.
+  },
+  inputs: %{ "input 1" => 1},
   after_each: fn result -> assert result == 42 end
 )
 ```
@@ -803,7 +807,7 @@ This doesn't seem to be too reliable right now, so suggestions and input are ver
 Benchee only has small runtime dependencies that were initially extracted from it. Further functionality is provided through plugins that then pull in dependencies, such as HTML generation and CSV export. They help provide excellent visualization or interoperability.
 
 * [benchee_html](//github.com/PragTob/benchee_html) - generate HTML including a data table and many different graphs with the possibility to export individual graphs as PNG :)
-* [benchee_csv](//github.com/PragTob/benchee_csv) - generate CSV from your Benchee benchmark results so you can import them into your favorite spreadsheet tool and make fancy graphs
+* [benchee_csv](//github.com/PragTob/benchee_csv) - generate CSV from your benchee benchmark results so you can import them into your favorite spreadsheet tool and make fancy graphs
 * [benchee_json](//github.com/PragTob/benchee_json) - export suite results as JSON to feed anywhere or feed it to your JavaScript and make magic happen :)
 * [benchee_markdown](//github.com/hrzndhrn/benchee_markdown) - write markdown files containing your benchmarking results
 
@@ -815,23 +819,17 @@ Of course there also are normal bar charts including standard deviation:
 
 ![flat_map_ips](http://www.pragtob.info/benchee/images/flat_map_ips.png)
 
-## Presentation + general benchmarking advice
-
-If you're into watching videos of conference talks and also want to learn more about benchmarking in general I can recommend watching my talk from [ElixirLive 2016](http://www.elixirlive.com/). [Slides can be found here](https://pragtob.wordpress.com/2016/12/03/slides-how-fast-is-it-really-benchmarking-in-elixir/), video - click the washed out image below ;)
-
-[![Benchee Video](http://www.pragtob.info/images/elixir_live_slide.png)](https://www.youtube.com/watch?v=7-mE5CKXjkw)
-
 ## Contributing [![Open Source Helpers](https://www.codetriage.com/pragtob/benchee/badges/users.svg)](https://www.codetriage.com/pragtob/benchee)
 
 Contributions to benchee are **very welcome**! Bug reports, documentation, spelling corrections, whole features, feature ideas, bugfixes, new plugins, fancy graphics... all of those (and probably more) are much appreciated contributions!
 
 Keep in mind that the [plugins](#plugins) live in their own repositories with their own issue tracker and they also like to get contributions :)
 
-Please respect the [Code of Conduct](//github.com/PragTob/benchee/blob/master/CODE_OF_CONDUCT.md).
+Please respect the [Code of Conduct](//github.com/bencheeorg/benchee/blob/master/CODE_OF_CONDUCT.md).
 
 In addition to contributing code, you can help to triage issues. This can include reproducing bug reports, or asking for vital information such as version numbers or reproduction instructions. If you would like to start triaging issues, one easy way to get started is to [subscribe to pragtob/benchee on CodeTriage](https://www.codetriage.com/pragtob/benchee).
 
-You can also look directly at the [open issues](https://github.com/PragTob/benchee/issues). There are `help wanted` and `good first issue` labels - those are meant as guidance, of course other issues can be tackled :)
+You can also look directly at the [open issues](https://github.com/bencheeorg/benchee/issues). There are `help wanted` and `good first issue` labels - those are meant as guidance, of course other issues can be tackled :)
 
 A couple of (hopefully) helpful points:
 
