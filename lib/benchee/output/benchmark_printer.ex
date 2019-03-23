@@ -64,7 +64,6 @@ defmodule Benchee.Output.BenchmarkPrinter do
     parallel: #{parallel}
     inputs: #{inputs_out(inputs)}
     Estimated total run time: #{Duration.format(total_time)}
-
     """)
   end
 
