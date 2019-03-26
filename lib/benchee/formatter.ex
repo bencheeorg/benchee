@@ -79,9 +79,9 @@ defmodule Benchee.Formatter do
   defp normalize_module_configuration(formatter) do
     IO.puts("""
 
-    All formaters that are not modules implementing the `Benchee.Formatter`
+    All formaters that are not modules implementing the Benchee.Formatter
     behaviour or functions with an arity of 1 are deprecated.
-    Please see the documentation for `Benchee.Configuration.init/1` for
+    Please see the documentation for Benchee.Configuration.init/1 for
     current usage instructions.
 
     """)

@@ -362,9 +362,9 @@ defmodule Benchee.Configuration do
     if Map.has_key?(config.formatter_options, legacy_option_key) do
       IO.puts("""
 
-      Using `:formatter_options` to configure formatters is now deprecated.
-      Please see the documentation for `Benchee.Configuration.init/1` for
-      current usage instructions.
+      Using :formatter_options to configure formatters is now deprecated.
+      Please configure them in `:formatters` - see the documentation for
+      Benchee.Configuration.init/1 for details.
 
       """)
 
