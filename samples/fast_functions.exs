@@ -26,13 +26,11 @@ Benchee.run(
 # Randomizing values prevents these optimizations but is still very fast (see the high standard
 # deviation)
 #
-# tobi@speedy:~$ mix run samples/fast_functions.exs
-# Operating System: Linux"
 # CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
 # Number of Available Cores: 8
 # Available memory: 15.61 GB
-# Elixir 1.6.4
-# Erlang 20.3
+# Elixir 1.8.1
+# Erlang 21.2.7
 
 # Benchmark suite executing with the following configuration:
 # warmup: 1 s
@@ -51,30 +49,43 @@ Benchee.run(
 # Benchmarking noop...
 
 # Name                                        ips        average  deviation         median         99th %
-# Integer addition (wrong)               358.83 M        2.79 ns  ±1551.16%           0 ns          36 ns
-# noop                                   334.28 M        2.99 ns  ±1397.50%           0 ns          41 ns
-# adding a head to an array (wrong)      316.02 M        3.16 ns  ±1198.18%           0 ns          37 ns
-# ++ array concat (wrong)                307.24 M        3.25 ns   ±939.38%           0 ns          45 ns
-# String concatention (wrong)            268.45 M        3.73 ns   ±845.54%           1 ns          39 ns
-# Integer addition                        61.74 M       16.20 ns   ±235.69%          18 ns          59 ns
-# Enum.map(10)                             2.26 M      442.05 ns  ±2153.23%         364 ns         813 ns
+# String concatention (wrong)           1008.75 M        0.99 ns  ±3006.13%           0 ns          23 ns
+# ++ array concat (wrong)                715.26 M        1.40 ns  ±1900.44%           0 ns          28 ns
+# adding a head to an array (wrong)      681.71 M        1.47 ns  ±1760.70%           0 ns          34 ns
+# noop                                   598.00 M        1.67 ns  ±7354.09%           0 ns          22 ns
+# Integer addition (wrong)               560.71 M        1.78 ns  ±6908.19%           0 ns          28 ns
+# Integer addition                       361.27 M        2.77 ns  ±1187.75%           0 ns          43 ns
+# Enum.map(10)                             2.23 M      448.05 ns  ±3255.01%         351 ns         760 ns
 
 # Comparison:
-# Integer addition (wrong)               358.83 M
-# noop                                   334.28 M - 1.07x slower
-# adding a head to an array (wrong)      316.02 M - 1.14x slower
-# ++ array concat (wrong)                307.24 M - 1.17x slower
-# String concatention (wrong)            268.45 M - 1.34x slower
-# Integer addition                        61.74 M - 5.81x slower
-# Enum.map(10)                             2.26 M - 158.62x slower
+# String concatention (wrong)           1008.75 M
+# ++ array concat (wrong)                715.26 M - 1.41x slower +0.41 ns
+# adding a head to an array (wrong)      681.71 M - 1.48x slower +0.48 ns
+# noop                                   598.00 M - 1.69x slower +0.68 ns
+# Integer addition (wrong)               560.71 M - 1.80x slower +0.79 ns
+# Integer addition                       361.27 M - 2.79x slower +1.78 ns
+# Enum.map(10)                             2.23 M - 451.97x slower +447.06 ns
+
+# Extended statistics:
+
+# Name                                      minimum        maximum    sample size                     mode
+# String concatention (wrong)                  0 ns        9236 ns         1.55 M                     0 ns
+# ++ array concat (wrong)                      0 ns        9246 ns         1.55 M                     0 ns
+# adding a head to an array (wrong)            0 ns        9019 ns         1.55 M                     0 ns
+# noop                                         0 ns       62524 ns         1.55 M                     0 ns
+# Integer addition (wrong)                     0 ns       67609 ns         1.55 M                     0 ns
+# Integer addition                             0 ns        9297 ns         1.55 M                     0 ns
+# Enum.map(10)                               330 ns     9091442 ns       942.59 K                   348 ns
 
 # Memory usage statistics:
 
 # Name                                 Memory usage
-# Integer addition (wrong)                    616 B
-# noop                                        616 B - 1.00x memory usage
-# adding a head to an array (wrong)           616 B - 1.00x memory usage
-# ++ array concat (wrong)                     616 B - 1.00x memory usage
-# String concatention (wrong)                 616 B - 1.00x memory usage
-# Integer addition                            616 B - 1.00x memory usage
-# Enum.map(10)                                424 B - 0.69x memory usage
+# String concatention (wrong)                   0 B
+# ++ array concat (wrong)                       0 B - 1.00x memory usage +0 B
+# adding a head to an array (wrong)             0 B - 1.00x memory usage +0 B
+# noop                                          0 B - 1.00x memory usage +0 B
+# Integer addition (wrong)                      0 B - 1.00x memory usage +0 B
+# Integer addition                              0 B - 1.00x memory usage +0 B
+# Enum.map(10)                                424 B - ∞ x memory usage +424 B
+
+# **All measurements for memory usage were the same**

@@ -6,13 +6,12 @@ Benchee.run(%{
   "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
 })
 
-# tobi@speedy:~/github/benchee(readme-overhaul)$ mix run samples/run_defaults.exs
 # Operating System: Linux
 # CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
 # Number of Available Cores: 8
 # Available memory: 15.61 GB
 # Elixir 1.8.1
-# Erlang 21.2.7
+# Erlang 21.3.2
 
 # Benchmark suite executing with the following configuration:
 # warmup: 2 s
@@ -26,9 +25,9 @@ Benchee.run(%{
 # Benchmarking map.flatten...
 
 # Name                  ips        average  deviation         median         99th %
-# flat_map           2.34 K      427.78 μs    ±16.02%      406.29 μs      743.01 μs
-# map.flatten        1.22 K      820.87 μs    ±19.29%      772.61 μs     1286.35 μs
+# flat_map           2.36 K      423.20 μs    ±16.84%      405.89 μs      771.85 μs
+# map.flatten        1.26 K      795.99 μs    ±20.06%      745.23 μs     1260.17 μs
 
 # Comparison:
-# flat_map           2.34 K
-# map.flatten        1.22 K - 1.92x slower +393.09 μs
+# flat_map           2.36 K
+# map.flatten        1.26 K - 1.88x slower +372.79 μs

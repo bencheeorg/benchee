@@ -15,34 +15,36 @@ Benchee.run(
   memory_time: 10
 )
 
-# Operating System: macOS
-# CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
-# Number of Available Cores: 4
-# Available memory: 8 GB
-# Elixir 1.6.0
-# Erlang 20.2
+# Operating System: Linux
+# CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
+# Number of Available Cores: 8
+# Available memory: 15.61 GB
+# Elixir 1.8.1
+# Erlang 21.3.2
+
 # Benchmark suite executing with the following configuration:
-# warmup: 0 μs
+# warmup: 0 ns
 # time: 10 s
+# memory time: 10 s
 # parallel: 1
 # inputs: none specified
-# Estimated total run time: 20 s
+# Estimated total run time: 40 s
 
 # Benchmarking 35 fibonacci numbers...
 # Benchmarking 43 fibonacci numbers...
 
 # Name                           ips        average  deviation         median         99th %
-# 35 fibonacci numbers         0.164      0.102 min     ±0.00%      0.102 min      0.102 min
-# 43 fibonacci numbers       0.00343       4.86 min     ±0.00%       4.86 min       4.86 min
+# 35 fibonacci numbers          0.32     0.0525 min     ±1.49%     0.0525 min     0.0534 min
+# 43 fibonacci numbers       0.00674       2.47 min     ±0.00%       2.47 min       2.47 min
 
 # Comparison:
-# 35 fibonacci numbers         0.164
-# 43 fibonacci numbers       0.00343 - 47.92x slower
+# 35 fibonacci numbers          0.32
+# 43 fibonacci numbers       0.00674 - 47.06x slower +2.42 min
 
 # Memory usage statistics:
 
 # Name                    Memory usage
-# 35 fibonacci numbers         1.15 GB
-# 43 fibonacci numbers        53.78 GB - 46.98x memory usage
+# 35 fibonacci numbers         1.14 GB
+# 43 fibonacci numbers        53.78 GB - 46.98x memory usage +52.64 GB
 
 # **All measurements for memory usage were the same**
