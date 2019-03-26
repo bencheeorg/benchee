@@ -49,7 +49,7 @@ defmodule Benchee.Mixfile do
 
   defp deps do
     [
-      {:deep_merge, "~> 0.1"},
+      {:deep_merge, "~> 1.0"},
       {:ex_guard, "~> 1.3", only: :dev},
       {:credo, "~> 1.0.0", only: :dev},
       {:ex_doc, "~> 0.19.0", only: :dev},
