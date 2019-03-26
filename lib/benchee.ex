@@ -70,6 +70,14 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
       end)
     end
 
+    def measure(suite) do
+      IO.puts("""
+      Benchee.measure/1 is deprecated, please use Benchee.collect/1.
+      """)
+
+      Benchee.Benchmark.collect(suite)
+    end
+
     defdelegate init(), to: Benchee.Configuration
     defdelegate init(config), to: Benchee.Configuration
     defdelegate system(suite), to: Benchee.System
@@ -77,7 +85,6 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     defdelegate benchmark(suite, name, function, printer), to: Benchee.Benchmark
     defdelegate collect(suite), to: Benchee.Benchmark
     defdelegate collect(suite, printer), to: Benchee.Benchmark
-    defdelegate measure(suite), to: Benchee.Benchmark, as: :collect
     defdelegate statistics(suite), to: Benchee.Statistics
     defdelegate load(suite), to: Benchee.ScenarioLoader
   end
