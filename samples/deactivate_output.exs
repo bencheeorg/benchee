@@ -2,8 +2,7 @@
 # You can also deactivate the comparison report
 Benchee.run(
   %{
-    "fast" => fn -> 1 + 1 end,
-    "also" => fn -> 20 * 20 end
+    "something" => fn -> Enum.map([1, 2, 3], fn i -> i * i end) end
   },
   time: 2,
   warmup: 1,
@@ -12,13 +11,8 @@ Benchee.run(
     configuration: false,
     fast_warning: false
   ],
-  console: [
-    comparison: false
-  ]
+  formatters: [{Benchee.Formatters.Console, comparison: false}]
 )
 
-# tobi@speedy ~/github/benchee $ mix run samples/deactivate_output.exs
-#
-# Name           ips        average  deviation         median
-# fast       88.43 M      0.0113 μs    ±64.63%      0.0110 μs
-# also       87.23 M      0.0115 μs    ±57.19%      0.0110 μs
+# Name                ips        average  deviation         median         99th %
+# something        6.62 M      151.08 ns ±11000.02%         100 ns         253 ns

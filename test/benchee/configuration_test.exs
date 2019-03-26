@@ -6,6 +6,7 @@ defmodule Benchee.ConfigurationTest do
 
   import DeepMerge
   import Benchee.Configuration
+  import ExUnit.CaptureIO
 
   @default_config %Configuration{}
 
@@ -38,7 +39,7 @@ defmodule Benchee.ConfigurationTest do
       suite = init(save: [path: "save_one.benchee", tag: "master"])
 
       assert suite.configuration.formatters == [
-               {Benchee.Formatters.Console, %{comparison: true, extended_statistics: false}},
+               Benchee.Formatters.Console,
                {Benchee.Formatters.TaggedSave, %{path: "save_one.benchee", tag: "master"}}
              ]
     end
@@ -77,15 +78,24 @@ defmodule Benchee.ConfigurationTest do
 
       assert [Benchee.Formatter.CSV] == suite.configuration.formatters
     end
+
+    test "it doesn't print anything in the default case" do
+      output =
+        capture_io(fn ->
+          init()
+        end)
+
+      assert output == ""
+    end
   end
 
   describe ".deep_merge behaviour" do
     test "it can be adjusted with a map" do
       user_options = %{
         time: 10,
-        formatter_options: %{
-          custom: %{option: true},
-          console: %{extended_statistics: true}
+        print: %{
+          configuration: false,
+          fast_warning: false
         }
       }
 
@@ -93,12 +103,10 @@ defmodule Benchee.ConfigurationTest do
 
       expected = %Configuration{
         time: 10,
-        formatter_options: %{
-          custom: %{option: true},
-          console: %{
-            comparison: true,
-            extended_statistics: true
-          }
+        print: %{
+          configuration: false,
+          fast_warning: false,
+          benchmarking: true
         }
       }
 

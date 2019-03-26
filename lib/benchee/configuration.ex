@@ -31,12 +31,7 @@ defmodule Benchee.Configuration do
             load: false,
             # formatters should end up here but known once are still picked up at
             # the top level for now
-            formatter_options: %{
-              console: %{
-                comparison: true,
-                extended_statistics: false
-              }
-            },
+            formatter_options: %{},
             unit_scaling: :best,
             # If you/your plugin/whatever needs it your data can go here
             assigns: %{},
@@ -183,12 +178,7 @@ defmodule Benchee.Configuration do
             inputs: nil,
             save: false,
             load: false,
-            formatters: [
-              {
-                Benchee.Formatters.Console,
-                %{comparison: true, extended_statistics: false}
-              }
-            ],
+            formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
               fast_warning: true,
@@ -216,12 +206,7 @@ defmodule Benchee.Configuration do
             inputs: nil,
             save: false,
             load: false,
-            formatters: [
-              {
-                Benchee.Formatters.Console,
-                %{comparison: true, extended_statistics: false}
-              }
-            ],
+            formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
               fast_warning: true,
@@ -249,12 +234,7 @@ defmodule Benchee.Configuration do
             inputs: nil,
             save: false,
             load: false,
-            formatters: [
-              {
-                Benchee.Formatters.Console,
-                %{comparison: true, extended_statistics: false}
-              }
-            ],
+            formatters: [Benchee.Formatters.Console],
             print: %{
               benchmarking: true,
               fast_warning: true,
@@ -278,9 +258,7 @@ defmodule Benchee.Configuration do
       ...>   warmup: 0.2,
       ...>   formatters: [&IO.puts/1],
       ...>   print: [fast_warning: false],
-      ...>   console: [comparison: false],
       ...>   inputs: %{"Small" => 5, "Big" => 9999},
-      ...>   formatter_options: [some: "option"],
       ...>   unit_scaling: :smallest)
       %Benchee.Suite{
         configuration:
@@ -297,13 +275,7 @@ defmodule Benchee.Configuration do
               fast_warning: false,
               configuration: true
             },
-            formatter_options: %{
-              console: %{
-                comparison: false,
-                extended_statistics: false
-              },
-              some: "option"
-            },
+            formatter_options: %{},
             percentiles: [50, 99],
             unit_scaling: :smallest,
             assigns: %{},
