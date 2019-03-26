@@ -43,34 +43,6 @@ defmodule Benchee.Configuration do
             title: nil
 
   @typedoc """
-  Generated configuration struct from the user supplied configuration options.
-
-  Filled in with a lot of defaults. Also notably every option is already converted to
-  a map or struct at this point for easier handling in benchee.
-  """
-  @type t :: %__MODULE__{
-          parallel: integer,
-          time: number,
-          warmup: number,
-          memory_time: number,
-          pre_check: boolean,
-          formatters: [(Suite.t() -> Suite.t())],
-          print: map,
-          inputs: %{Suite.key() => any} | [{Suite.key(), any}] | nil,
-          save: map | false,
-          load: String.t() | [String.t()] | false,
-          formatter_options: map,
-          unit_scaling: Scale.scaling_strategy(),
-          assigns: map,
-          before_each: fun | nil,
-          after_each: fun | nil,
-          before_scenario: fun | nil,
-          after_scenario: fun | nil,
-          measure_function_call_overhead: boolean,
-          title: String.t() | nil
-        }
-
-  @typedoc """
   The configuration supplied by the user as either a map or a keyword list
 
   Possible options are:
@@ -155,6 +127,35 @@ defmodule Benchee.Configuration do
     * `:measure_function_call_overhead` - Measure how long an empty function call takes and deduct this from each measure run time. Defaults to true.
   """
   @type user_configuration :: map | keyword
+
+  @typedoc """
+  Generated configuration struct from the user supplied configuration options.
+
+  Filled in with a lot of defaults. Also notably every option is already converted to
+  a map or struct at this point for easier handling in benchee.
+  """
+  @type t :: %__MODULE__{
+          parallel: integer,
+          time: number,
+          warmup: number,
+          memory_time: number,
+          pre_check: boolean,
+          formatters: [(Suite.t() -> Suite.t()) | module | {module, map}],
+          print: map,
+          inputs: %{Suite.key() => any} | [{Suite.key(), any}] | nil,
+          save: map | false,
+          load: String.t() | [String.t()] | false,
+          formatter_options: map,
+          unit_scaling: Scale.scaling_strategy(),
+          assigns: map,
+          before_each: fun | nil,
+          after_each: fun | nil,
+          before_scenario: fun | nil,
+          after_scenario: fun | nil,
+          measure_function_call_overhead: boolean,
+          title: String.t() | nil
+        }
+
   @time_keys [:time, :warmup, :memory_time]
 
   @doc """
