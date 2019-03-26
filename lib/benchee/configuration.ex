@@ -426,7 +426,9 @@ defmodule Benchee.Configuration do
 
       Measuring memory consumption is only available on OTP 19 or greater.
       If you would like to benchmark memory consumption, please upgrade to a
-      newer verion of OTP.
+      newer version of OTP.
+      Benchee now also only supports elixir ~> 1.6 which doesn't support OTP 18.
+      Please upgrade :)
 
     """)
   end
