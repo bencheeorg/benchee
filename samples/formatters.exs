@@ -22,13 +22,12 @@ Benchee.run(
   ]
 )
 
-# tobi@speedy:~/github/benchee(formatter-options-closer)$ mix run samples/formatters.exs
-# Operating System: Linux"
+# Operating System: Linux
 # CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
 # Number of Available Cores: 8
 # Available memory: 15.61 GB
-# Elixir 1.7.1
-# Erlang 21.0
+# Elixir 1.8.1
+# Erlang 21.3.2
 
 # Benchmark suite executing with the following configuration:
 # warmup: 2 s
@@ -42,26 +41,26 @@ Benchee.run(
 # Benchmarking map.flatten...
 
 # Name                  ips        average  deviation         median         99th %
-# flat_map           2.27 K      441.13 μs    ±13.46%      428.82 μs      754.50 μs
-# map.flatten        1.17 K      851.99 μs    ±20.39%      786.52 μs     1284.90 μs
+# flat_map           2.41 K      415.64 μs    ±12.00%      406.27 μs      714.89 μs
+# map.flatten        1.28 K      781.62 μs    ±18.60%      743.39 μs     1166.22 μs
 
 # Comparison:
-# flat_map           2.27 K
-# map.flatten        1.17 K - 1.93x slower
+# flat_map           2.41 K
+# map.flatten        1.28 K - 1.88x slower +365.98 μs
 
 # Name                  ips        average  deviation         median         99th %
-# flat_map           2.27 K      441.13 μs    ±13.46%      428.82 μs      754.50 μs
-# map.flatten        1.17 K      851.99 μs    ±20.39%      786.52 μs     1284.90 μs
+# flat_map           2.41 K      415.64 μs    ±12.00%      406.27 μs      714.89 μs
+# map.flatten        1.28 K      781.62 μs    ±18.60%      743.39 μs     1166.22 μs
 
 # Comparison:
-# flat_map           2.27 K
-# map.flatten        1.17 K - 1.93x slower
+# flat_map           2.41 K
+# map.flatten        1.28 K - 1.88x slower +365.98 μs
 
 # Extended statistics:
 
 # Name                minimum        maximum    sample size                     mode
-# flat_map          367.55 μs     1259.94 μs        11.31 K     428.79 μs, 428.54 μs
-# map.flatten       533.85 μs     1786.02 μs         5.86 K777.58 μs, 778.82 μs, 780
+# flat_map          345.15 μs     1169.01 μs        12.00 K406.39 μs, 405.98 μs, 406
+# map.flatten       492.45 μs     1780.14 μs         6.38 K                741.75 μs
 
-# Benchee recorded 11307 run times for flat_map!
-# Benchee recorded 5857 run times for map.flatten!
+# Benchee recorded 12001 run times for flat_map!
+# Benchee recorded 6385 run times for map.flatten!

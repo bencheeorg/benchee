@@ -10,34 +10,34 @@ Benchee.run(
   formatters: [{Benchee.Formatters.Console, extended_statistics: true}]
 )
 
-# tobi@speedy ~/github/benchee $ mix run samples/run_extended_statistics.exs
 # Operating System: Linux
 # CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
 # Number of Available Cores: 8
 # Available memory: 15.61 GB
-# Elixir 1.5.2
-# Erlang 20.0
+# Elixir 1.8.1
+# Erlang 21.3.2
+
 # Benchmark suite executing with the following configuration:
 # warmup: 2 s
 # time: 10 s
+# memory time: 0 ns
 # parallel: 1
 # inputs: none specified
 # Estimated total run time: 24 s
-#
-#
+
 # Benchmarking flat_map...
 # Benchmarking map.flatten...
-#
+
 # Name                  ips        average  deviation         median         99th %
-# flat_map           2.29 K      435.90 μs     ±8.35%         430 μs      624.68 μs
-# map.flatten        1.30 K      766.99 μs    ±24.48%         764 μs        1307 μs
-#
+# flat_map           2.37 K      421.74 μs    ±14.17%      406.44 μs      758.14 μs
+# map.flatten        1.24 K      807.37 μs    ±20.22%      747.94 μs     1311.65 μs
+
 # Comparison:
-# flat_map           2.29 K
-# map.flatten        1.30 K - 1.76x slower
-#
+# flat_map           2.37 K
+# map.flatten        1.24 K - 1.91x slower +385.64 μs
+
 # Extended statistics:
-#
+
 # Name                minimum        maximum    sample size                     mode
-# flat_map             365 μs        1371 μs        22.88 K                   430 μs
-# map.flatten          514 μs        1926 μs        13.01 K                   517 μs
+# flat_map          345.15 μs     1182.74 μs        23.64 K                406.28 μs
+# map.flatten       492.78 μs     1925.29 μs        12.36 K741.79 μs, 739.21 μs, 738

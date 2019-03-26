@@ -11,31 +11,37 @@ Benchee.run(%{
   "Recursion" => fn -> Benchee.Utility.RepeatN.repeat_n(fun, n) end
 })
 
-# tobi@happy ~/github/benchee $ mix run samples/repat_n.exs
-# Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
-# Elixir 1.3.4
+# Operating System: Linux
+# CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
+# Number of Available Cores: 8
+# Available memory: 15.61 GB
+# Elixir 1.8.1
+# Erlang 21.3.2
+
 # Benchmark suite executing with the following configuration:
-# warmup: 2.0s
-# time: 5.0s
+# warmup: 2 s
+# time: 5 s
+# memory time: 0 ns
 # parallel: 1
-# Estimated total run time: 35.0s
-#
+# inputs: none specified
+# Estimated total run time: 35 s
+
 # Benchmarking Enum.each (list)...
 # Benchmarking Enum.each (range)...
 # Benchmarking List comprehension (list)...
 # Benchmarking List comprehension (range)...
 # Benchmarking Recursion...
-#
-# Name                                 ips        average  deviation         median
-# Recursion                        90.60 K       11.04 μs     ±8.72%          11 μs
-# Enum.each (list)                 50.41 K       19.84 μs    ±20.27%          20 μs
-# List comprehension (list)        44.60 K       22.42 μs    ±13.40%          22 μs
-# List comprehension (range)       20.73 K       48.24 μs     ±8.69%          47 μs
-# Enum.each (range)                19.94 K       50.14 μs     ±6.42%          50 μs
-#
+
+# Name                                 ips        average  deviation         median         99th %
+# Recursion                        80.33 K       12.45 μs    ±12.46%       12.37 μs       15.02 μs
+# Enum.each (list)                 45.83 K       21.82 μs    ±19.54%       20.57 μs       34.33 μs
+# List comprehension (list)        43.23 K       23.13 μs    ±12.07%       22.72 μs       33.55 μs
+# List comprehension (range)       35.26 K       28.36 μs    ±10.99%       27.88 μs       36.29 μs
+# Enum.each (range)                30.09 K       33.24 μs    ±11.21%       32.83 μs       48.55 μs
+
 # Comparison:
-# Recursion                        90.60 K
-# Enum.each (list)                 50.41 K - 1.80x slower
-# List comprehension (list)        44.60 K - 2.03x slower
-# List comprehension (range)       20.73 K - 4.37x slower
-# Enum.each (range)                19.94 K - 4.54x slower
+# Recursion                        80.33 K
+# Enum.each (list)                 45.83 K - 1.75x slower +9.37 μs
+# List comprehension (list)        43.23 K - 1.86x slower +10.69 μs
+# List comprehension (range)       35.26 K - 2.28x slower +15.91 μs
+# Enum.each (range)                30.09 K - 2.67x slower +20.79 μs

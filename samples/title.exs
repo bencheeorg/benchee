@@ -10,13 +10,12 @@ Benchee.run(
   title: "Comparing map.flatten and flat_map"
 )
 
-# $ mix run samples/title.exs
-# Operating System: macOS"
-# CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
-# Number of Available Cores: 4
-# Available memory: 8 GB
-# Elixir 1.6.4
-# Erlang 20.3
+# Operating System: Linux
+# CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
+# Number of Available Cores: 8
+# Available memory: 15.61 GB
+# Elixir 1.8.1
+# Erlang 21.3.2
 
 # Benchmark suite executing with the following configuration:
 # warmup: 2 s
@@ -32,9 +31,9 @@ Benchee.run(
 # *** Comparing map.flatten and flat_map ***
 
 # Name                  ips        average  deviation         median         99th %
-# flat_map           1.09 K        0.92 ms    ±34.81%        0.78 ms        1.96 ms
-# map.flatten        0.61 K        1.65 ms    ±26.90%        1.45 ms        2.72 ms
+# flat_map           2.34 K      427.87 μs    ±19.45%      405.68 μs      769.93 μs
+# map.flatten        1.25 K      801.46 μs    ±19.65%      751.36 μs     1202.12 μs
 
 # Comparison:
-# flat_map           1.09 K
-# map.flatten        0.61 K - 1.80x slower
+# flat_map           2.34 K
+# map.flatten        1.25 K - 1.87x slower +373.59 μs

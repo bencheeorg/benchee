@@ -6,25 +6,31 @@ Benchee.run(%{
   "sort_by(-value)" => fn -> Enum.sort_by(list, fn val -> -val end) end
 })
 
-# tobi@airship ~/github/benchee $ mix run samples/descending_sort.exs
-# Erlang/OTP 19 [erts-8.1] [source-4cc2ce3] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false]
-# Elixir 1.3.4
+# Operating System: Linux
+# CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
+# Number of Available Cores: 8
+# Available memory: 15.61 GB
+# Elixir 1.8.1
+# Erlang 21.2.7
+
 # Benchmark suite executing with the following configuration:
-# warmup: 2.0s
-# time: 5.0s
+# warmup: 2 s
+# time: 5 s
+# memory time: 0 ns
 # parallel: 1
-# Estimated total run time: 21.0s
-#
+# inputs: none specified
+# Estimated total run time: 21 s
+
 # Benchmarking sort |> reverse...
 # Benchmarking sort(fun)...
 # Benchmarking sort_by(-value)...
-#
-# Name                      ips        average  deviation         median
-# sort |> reverse        706.70        1.42 ms     ±8.67%        1.41 ms
-# sort(fun)              284.06        3.52 ms     ±5.63%        3.38 ms
-# sort_by(-value)        173.11        5.78 ms     ±3.27%        5.80 ms
-#
+
+# Name                      ips        average  deviation         median         99th %
+# sort |> reverse        719.44        1.39 ms     ±8.83%        1.35 ms        1.94 ms
+# sort(fun)              322.91        3.10 ms     ±6.55%        3.06 ms        4.21 ms
+# sort_by(-value)        184.07        5.43 ms     ±6.81%        5.34 ms        6.49 ms
+
 # Comparison:
-# sort |> reverse        706.70
-# sort(fun)              284.06 - 2.49x slower
-# sort_by(-value)        173.11 - 4.08x slower
+# sort |> reverse        719.44
+# sort(fun)              322.91 - 2.23x slower +1.71 ms
+# sort_by(-value)        184.07 - 3.91x slower +4.04 ms
