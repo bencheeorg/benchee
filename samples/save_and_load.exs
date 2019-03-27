@@ -41,12 +41,12 @@ Benchee.run(
 # Benchmarking map.flatten...
 
 # Name                  ips        average  deviation         median         99th %
-# flat_map           2.39 K      417.60 μs    ±13.45%      405.57 μs      723.41 μs
-# map.flatten        1.26 K      796.12 μs    ±19.81%      742.68 μs     1154.47 μs
+# flat_map           2.40 K      417.31 μs    ±12.98%      406.10 μs      728.39 μs
+# map.flatten        1.27 K      787.55 μs    ±18.48%      743.45 μs     1172.37 μs
 
 # Comparison:
-# flat_map           2.39 K
-# map.flatten        1.26 K - 1.91x slower +378.52 μs
+# flat_map           2.40 K
+# map.flatten        1.27 K - 1.89x slower +370.24 μs
 # Suite saved in external term format at save.benchee
 # ----------------------------------------------
 # Operating System: Linux
@@ -68,20 +68,21 @@ Benchee.run(
 # Benchmarking map.flatten...
 
 # Name                              ips        average  deviation         median         99th %
-# flat_map                       2.41 K      415.72 μs    ±13.10%      405.28 μs      724.05 μs
-# map.flatten                    1.29 K      777.77 μs    ±17.73%      743.63 μs     1163.84 μs
-# flat_map (first-try)           2.39 K      417.60 μs    ±13.45%      405.57 μs      723.41 μs
-# map.flatten (first-try)        1.26 K      796.12 μs    ±19.81%      742.68 μs     1154.47 μs
+# flat_map                       2.42 K      414.01 μs    ±11.90%      406.17 μs      712.99 μs
+# flat_map (first-try)           2.40 K      417.31 μs    ±12.98%      406.10 μs      728.39 μs
+# map.flatten                    1.27 K      784.75 μs    ±18.42%      743.95 μs     1190.36 μs
+# map.flatten (first-try)        1.27 K      787.55 μs    ±18.48%      743.45 μs     1172.37 μs
 
 # Comparison:
-# flat_map                       2.41 K
-# map.flatten                    1.29 K - 1.87x slower +362.05 μs
-# flat_map (first-try)           2.39 K map.flatten (first-try)        1.26 K - 1.91x slower +378.52 μs
+# flat_map                       2.42 K
+# flat_map (first-try)           2.40 K - 1.01x slower +3.30 μs
+# map.flatten                    1.27 K - 1.90x slower +370.74 μs
+# map.flatten (first-try)        1.27 K - 1.90x slower +373.54 μs
 
 # Extended statistics:
 
 # Name                            minimum        maximum    sample size                     mode
-# flat_map                      345.18 μs     1195.24 μs        12.00 K     405.28 μs, 405.28 μs
-# map.flatten                   494.08 μs     1479.42 μs         6.42 K                739.22 μs
-# flat_map (first-try)          345.21 μs     1273.69 μs        11.94 K     405.52 μs, 405.46 μs
-# map.flatten (first-try)       493.44 μs     1614.85 μs         6.27 K                741.30 μs
+# flat_map                      345.33 μs     1180.66 μs        12.05 K                405.29 μs
+# flat_map (first-try)          345.32 μs     1205.74 μs        11.95 K     405.98 μs, 406.09 μs
+# map.flatten                   494.22 μs     1811.82 μs         6.36 K                738.26 μs
+# map.flatten (first-try)       493.95 μs     1882.94 μs         6.34 K                740.59 μs

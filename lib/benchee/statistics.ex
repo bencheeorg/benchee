@@ -6,7 +6,7 @@ defmodule Benchee.Statistics do
   See `statistics/1` for a breakdown of the included statistics.
   """
 
-  alias Benchee.{Conversion.Duration, Scenario, Suite, Utility.Parallel}
+  alias Benchee.{Conversion.Duration, Suite, Utility.Parallel}
 
   alias Benchee.Statistics.Mode
   alias Benchee.Statistics.Percentile
@@ -166,11 +166,7 @@ defmodule Benchee.Statistics do
   def statistics(suite = %Suite{scenarios: scenarios}) do
     config = suite.configuration
 
-    scenarios_with_statistics =
-      scenarios
-      |> calculate_per_scenario_statistics(config)
-      |> sort()
-      |> calculate_relative_statistics(config.inputs)
+    scenarios_with_statistics = calculate_per_scenario_statistics(scenarios, config)
 
     %Suite{suite | scenarios: scenarios_with_statistics}
   end
@@ -245,65 +241,6 @@ defmodule Benchee.Statistics do
         std_dev_ips: standard_dev_ips
     }
   end
-
-  defp calculate_relative_statistics([], _inputs), do: []
-
-  defp calculate_relative_statistics(scenarios, inputs) do
-    scenarios
-    |> scenarios_by_input(inputs)
-    |> Enum.flat_map(fn scenarios_with_same_input ->
-      {reference, others} = split_reference_scenario(scenarios_with_same_input)
-      others_with_relative = statistics_relative_to(others, reference)
-      [reference | others_with_relative]
-    end)
-  end
-
-  defp scenarios_by_input(scenarios, nil), do: [scenarios]
-
-  # we can't just group_by `input_name` because that'd lose the order of inputs which might
-  # be important
-  defp scenarios_by_input(scenarios, inputs) do
-    Enum.map(inputs, fn {input_name, _} ->
-      Enum.filter(scenarios, fn scenario -> scenario.input_name == input_name end)
-    end)
-  end
-
-  # right now we take the first scenario as we sorted them and it is the fastest,
-  # whenever we implement #179 though this becomesd more involved
-  defp split_reference_scenario(scenarios) do
-    [reference | others] = scenarios
-    {reference, others}
-  end
-
-  defp statistics_relative_to(scenarios, reference) do
-    Enum.map(scenarios, fn scenario ->
-      scenario
-      |> update_in([Access.key!(:run_time_data), Access.key!(:statistics)], fn statistics ->
-        add_relative_statistics(statistics, reference.run_time_data.statistics)
-      end)
-      |> update_in([Access.key!(:memory_usage_data), Access.key!(:statistics)], fn statistics ->
-        add_relative_statistics(statistics, reference.memory_usage_data.statistics)
-      end)
-    end)
-  end
-
-  # we might not run time/memory --> we shouldn't crash then ;)
-  defp add_relative_statistics(statistics = %{average: nil}, _reference), do: statistics
-  defp add_relative_statistics(statistics, %{average: nil}), do: statistics
-
-  defp add_relative_statistics(statistics, reference_statistics) do
-    %__MODULE__{
-      statistics
-      | relative_more: zero_safe_division(statistics.average, reference_statistics.average),
-        relative_less: zero_safe_division(reference_statistics.average, statistics.average),
-        absolute_difference: statistics.average - reference_statistics.average
-    }
-  end
-
-  defp zero_safe_division(0.0, 0.0), do: 1.0
-  defp zero_safe_division(_, 0), do: :infinity
-  defp zero_safe_division(_, 0.0), do: :infinity
-  defp zero_safe_division(a, b), do: a / b
 
   @doc """
   Calculate additional percentiles and add them to the
@@ -380,12 +317,5 @@ defmodule Benchee.Statistics do
       end)
 
     %Suite{suite | scenarios: new_scenarios}
-  end
-
-  @spec sort([Scenario.t()]) :: [Scenario.t()]
-  defp sort(scenarios) do
-    Enum.sort_by(scenarios, fn scenario ->
-      {scenario.run_time_data.statistics.average, scenario.memory_usage_data.statistics.average}
-    end)
   end
 end

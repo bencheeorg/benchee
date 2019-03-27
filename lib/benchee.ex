@@ -61,6 +61,7 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
       |> Benchee.collect()
       |> Benchee.statistics()
       |> Benchee.load()
+      |> Benchee.relative_statistics()
       |> Formatter.output()
     end
 
@@ -113,6 +114,11 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     See `Benchee.Statistics.statistics/1`
     """
     defdelegate statistics(suite), to: Benchee.Statistics
+
+    @doc """
+    See `Benchee.RelativeStatistics.relative_statistics/1`
+    """
+    defdelegate relative_statistics(suite), to: Benchee.RelativeStatistics
 
     @doc """
     See `Benchee.ScenarioLoader.load/1`
