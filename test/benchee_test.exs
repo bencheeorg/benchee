@@ -668,13 +668,13 @@ defmodule BencheeTest do
             )
           end)
 
-        assert comparison_output =~ ~r/^too fast\s+\d+\.\d+.*+$/m
+        assert comparison_output =~ ~r/^too fast\s+\d+(\.\d+)?.*+$/m
 
         assert comparison_output =~
-                 ~r/^flat_map \(master\)\s+\d+\.\d+.*- \d+.+x slower \+\d+.+s$/m
+                 ~r/^flat_map \(master\)\s+\d+(\.\d+)?.*- \d+.+x slower \+\d+.+s$/m
 
         assert comparison_output =~
-                 ~r/^map\.flatten \(master\)\s+\d+\.\d+.*- \d+.+x slower \+\d+.+s$/m
+                 ~r/^map\.flatten \(master\)\s+\d+(\.\d+)?.*- \d+.+x slower \+\d+.+s$/m
       after
         if File.exists?(expected_file) do
           File.rm!(expected_file)
