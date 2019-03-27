@@ -668,7 +668,7 @@ defmodule BencheeTest do
             )
           end)
 
-        assert comparison_output =~ ~r/^too fast\s+\d+\.\d+ \S+$/m
+        assert comparison_output =~ ~r/^too fast\s+\d+\.\d+.*+$/m
 
         assert comparison_output =~
                  ~r/^flat_map \(master\)\s+\d+\.\d+.*- \d+.+x slower \+\d+.+s$/m
