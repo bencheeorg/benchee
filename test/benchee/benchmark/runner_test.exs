@@ -185,18 +185,20 @@ defmodule Benchee.Benchmark.RunnerTest do
     end
 
     test "very fast function times are almost 0 with function call overhead elimination" do
-      suite =
-        %{configuration: %{measure_function_call_overhead: true, time: 200_000_000}}
-        |> test_suite()
-        |> Benchmark.benchmark("", fn -> nil end)
-        |> Benchmark.collect(TestPrinter)
-        |> Benchee.statistics()
+      retrying(fn ->
+        suite =
+          %{configuration: %{measure_function_call_overhead: true, time: 200_000_000}}
+          |> test_suite()
+          |> Benchmark.benchmark("", fn -> nil end)
+          |> Benchmark.collect(TestPrinter)
+          |> Benchee.statistics()
 
-      [%{run_time_data: %{statistics: %{median: median}}}] = suite.scenarios
+        [%{run_time_data: %{statistics: %{median: median}}}] = suite.scenarios
 
-      # Should be 0 if it works correctly, give a bit of leeway - especially the appveyor CI
-      # with Windows has a tougher time here as it repeats the function call
-      assert median <= 60
+        # Should be 0 if it works correctly, give a bit of leeway - especially the appveyor CI
+        # with Windows has a tougher time here as it repeats the function call
+        assert median <= 60
+      end)
     end
 
     @tag :performance
