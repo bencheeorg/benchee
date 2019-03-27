@@ -29,15 +29,9 @@ defmodule Benchee.System do
     %Suite{suite | system: system_info}
   end
 
-  @doc """
-  Returns current Elixir version in use.
-  """
-  def elixir, do: System.version()
+  defp elixir, do: System.version()
 
-  @doc """
-  Returns the current erlang/otp version in use.
-  """
-  def erlang do
+  defp erlang do
     otp_release = :erlang.system_info(:otp_release)
     file = Path.join([:code.root_dir(), "releases", otp_release, "OTP_VERSION"])
 
@@ -50,17 +44,11 @@ defmodule Benchee.System do
     end
   end
 
-  @doc """
-  Returns the number of cores available for the currently running VM.
-  """
-  def num_cores do
+  defp num_cores do
     System.schedulers_online()
   end
 
-  @doc """
-  Returns an atom representing the platform the VM is running on.
-  """
-  def os do
+  defp os do
     {_, name} = :os.type()
     os(name)
   end
@@ -70,11 +58,7 @@ defmodule Benchee.System do
   defp os(:freebsd), do: :FreeBSD
   defp os(_), do: :Linux
 
-  @doc """
-  Returns a string with detailed information about the CPU the benchmarks are
-  being performed on.
-  """
-  def cpu_speed, do: cpu_speed(os())
+  defp cpu_speed, do: cpu_speed(os())
 
   defp cpu_speed(:Windows) do
     parse_cpu_for(:Windows, system_cmd("WMIC", ["CPU", "GET", "NAME"]))
@@ -94,6 +78,7 @@ defmodule Benchee.System do
 
   @linux_cpuinfo_regex ~r/model name.*:([\w \(\)\-\@\.]*)/i
 
+  @doc false
   def parse_cpu_for(_, "N/A"), do: "N/A"
 
   def parse_cpu_for(:Windows, raw_output) do
@@ -114,11 +99,7 @@ defmodule Benchee.System do
     end
   end
 
-  @doc """
-  Returns an integer with the total number of available memory on the machine
-  running the benchmarks.
-  """
-  def available_memory, do: available_memory(os())
+  defp available_memory, do: available_memory(os())
 
   defp available_memory(:Windows) do
     parse_memory_for(
@@ -175,6 +156,7 @@ defmodule Benchee.System do
     Memory.format(memory_in_bytes)
   end
 
+  @doc false
   def system_cmd(cmd, args, system_func \\ &System.cmd/2) do
     {output, exit_code} = system_func.(cmd, args)
 

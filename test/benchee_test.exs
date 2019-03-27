@@ -510,10 +510,8 @@ defmodule BencheeTest do
           )
         )
 
-      elixir = Benchee.System.elixir()
-      erlang = Benchee.System.erlang()
-
-      assert %{system: %{elixir: ^elixir, erlang: ^erlang}} = suite
+      assert suite.system.elixir != nil
+      assert suite.system.erlang != nil
     end)
   end
 
