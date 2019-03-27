@@ -70,6 +70,7 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
       end)
     end
 
+    @doc false
     def measure(suite) do
       IO.puts("""
       Benchee.measure/1 is deprecated, please use Benchee.collect/1.
@@ -78,14 +79,44 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
       Benchee.Benchmark.collect(suite)
     end
 
+    @doc """
+    See `Benchee.Configuration.init/1`
+    """
     defdelegate init(), to: Benchee.Configuration
+
+    @doc """
+    See `Benchee.Configuration.init/1`
+    """
     defdelegate init(config), to: Benchee.Configuration
+
+    @doc """
+    See `Benchee.System.system/1`
+    """
     defdelegate system(suite), to: Benchee.System
+
+    @doc """
+    See `Benchee.Benchmark.benchmark/3`
+    """
     defdelegate benchmark(suite, name, function), to: Benchee.Benchmark
+    @doc false
     defdelegate benchmark(suite, name, function, printer), to: Benchee.Benchmark
+
+    @doc """
+    See `Benchee.Benchmark.collect/1`
+    """
     defdelegate collect(suite), to: Benchee.Benchmark
+
+    @doc false
     defdelegate collect(suite, printer), to: Benchee.Benchmark
+
+    @doc """
+    See `Benchee.Statistics.statistics/1`
+    """
     defdelegate statistics(suite), to: Benchee.Statistics
+
+    @doc """
+    See `Benchee.ScenarioLoader.load/1`
+    """
     defdelegate load(suite), to: Benchee.ScenarioLoader
   end
 end
