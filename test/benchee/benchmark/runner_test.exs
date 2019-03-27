@@ -80,15 +80,17 @@ defmodule Benchee.Benchmark.RunnerTest do
     end
 
     test "can run multiple benchmarks in parallel" do
-      suite = test_suite(%Suite{configuration: %{parallel: 4, time: 60_000_000}})
+      suite = test_suite(%Suite{configuration: %{parallel: 3, time: 60_000_000}})
 
       new_suite =
         suite
         |> Benchmark.benchmark("", fn -> :timer.sleep(10) end)
         |> Benchmark.collect(TestPrinter)
 
-      # it does more work when working in parallel than it does alone
-      assert length(run_times_for(new_suite, "")) >= 12
+      # it does more work when working in parallel than it does alone,
+      # alone it should only manage to do ~6 (10ms sleep, 60ms time)
+      # very lenient because... CI.
+      assert length(run_times_for(new_suite, "")) >= 8
     end
 
     test "combines results for parallel benchmarks into a single scenario" do
