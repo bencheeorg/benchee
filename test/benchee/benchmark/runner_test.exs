@@ -107,12 +107,12 @@ defmodule Benchee.Benchmark.RunnerTest do
     @tag :memory_measure
     test "measures the memory usage of a scenario" do
       suite =
-        test_suite(%Suite{configuration: %{time: 60_000, warmup: 10_000, memory_time: 10_000}})
+        test_suite(%Suite{configuration: %{time: 60_000, warmup: 10_000, memory_time: 30_000}})
 
       new_suite =
         suite
         |> Benchmark.benchmark("Name", fn ->
-          Enum.map(0..1000, fn _ -> [12.23, 30.536, 30.632, 7398.3295] end)
+          Enum.map(0..100, fn _ -> [12.23, 30.536, 30.632, 7398.3295] end)
         end)
         |> Benchmark.collect(TestPrinter)
 
