@@ -9,7 +9,7 @@ otp_release:
 matrix:
   include:
     - elixir: 1.6.6
-    - otp_release: 19.3
+      otp_release: 19.3
 before_script:
   - MIX_ENV=test mix compile --warnings-as-errors
   - travis_wait mix dialyzer --plt
