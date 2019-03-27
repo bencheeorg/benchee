@@ -146,6 +146,7 @@ defmodule BencheeTest do
         |> Benchee.benchmark("map.flatten", fn -> list |> Enum.map(map_fun) |> List.flatten() end)
         |> Benchee.collect()
         |> Benchee.statistics()
+        |> Benchee.relative_statistics()
         |> Console.format()
         |> IO.puts()
       end)
@@ -168,6 +169,7 @@ defmodule BencheeTest do
         |> Benchee.benchmark("map.flatten", fn -> list |> Enum.map(map_fun) |> List.flatten() end)
         |> Benchee.collect()
         |> Benchee.statistics()
+        |> Benchee.relative_statistics()
         |> Formatter.output()
       end)
 
@@ -655,6 +657,24 @@ defmodule BencheeTest do
           end)
 
         readme_sample_asserts(loaded_output, " (master)")
+
+        comparison_output =
+          capture_io(fn ->
+            Benchee.run(
+              %{
+                "too fast" => fn -> nil end
+              },
+              Keyword.merge(@test_configuration, load: expected_file)
+            )
+          end)
+
+        assert comparison_output =~ ~r/^too fast\s+\d+\.\d+ \S+$/m
+
+        assert comparison_output =~
+                 ~r/^flat_map \(master\)\s+\d+\.\d+.*- \d+.+x slower \+\d+.+s$/m
+
+        assert comparison_output =~
+                 ~r/^map\.flatten \(master\)\s+\d+\.\d+.*- \d+.+x slower \+\d+.+s$/m
       after
         if File.exists?(expected_file) do
           File.rm!(expected_file)

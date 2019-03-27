@@ -718,6 +718,7 @@ map_fun = fn i -> [i, i * i] end
 )
 |> Benchee.collect()
 |> Benchee.statistics()
+|> Benchee.relative_statistics()
 |> Benchee.Formatter.output(Benchee.Formatters.Console)
 # Instead of the last call you could also just use Benchee.Formatter.output()
 # to just output all configured formatters
@@ -729,8 +730,9 @@ This is a take on the _functional transformation_ of data applied to benchmarks:
 2. Gather System data
 3. Define the functions to be benchmarked
 4. Run benchmarks with the given configuration gathering raw run times per function
-5. Generate statistics based on the raw run times
-6. Format the statistics in a suitable way and print them out
+5. Calculate statistics based on the raw run times
+6. Calculate statistics between the scenarios (faster/slower...)
+7. Format the statistics in a suitable way and print them out
 
 This is also part of the **official API** and allows for more **fine grained control**. (It's also what benchee does internally when you use `Benchee.run/2`).
 

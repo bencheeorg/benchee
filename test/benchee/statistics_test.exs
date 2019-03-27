@@ -210,10 +210,6 @@ defmodule Benchee.StatistcsTest do
 
       assert run_time_stats_1.average == 0.0
       assert run_time_stats_2.sample_size == 5
-
-      assert run_time_stats_2.relative_more == 1.0
-      assert run_time_stats_2.relative_less == 1.0
-      assert run_time_stats_2.absolute_difference == 0.0
     end
 
     @nothing []
@@ -241,56 +237,6 @@ defmodule Benchee.StatistcsTest do
       assert memory_stats.average == nil
     end
 
-    test "sorts them by their average run time fastest to slowest" do
-      fourth = %Scenario{name: "4", run_time_data: %CollectionData{samples: [400.1]}}
-      second = %Scenario{name: "2", run_time_data: %CollectionData{samples: [200.0]}}
-      third = %Scenario{name: "3", run_time_data: %CollectionData{samples: [400.0]}}
-      first = %Scenario{name: "1", run_time_data: %CollectionData{samples: [100.0]}}
-      scenarios = [fourth, third, second, first]
-
-      sorted = Statistics.statistics(%Suite{scenarios: scenarios}).scenarios
-
-      assert Enum.map(sorted, fn scenario -> scenario.name end) == ["1", "2", "3", "4"]
-    end
-
-    test "sorts them by their average memory usage least to most" do
-      fourth = %Scenario{name: "4", memory_usage_data: %CollectionData{samples: [400.1]}}
-      second = %Scenario{name: "2", memory_usage_data: %CollectionData{samples: [200.0]}}
-      third = %Scenario{name: "3", memory_usage_data: %CollectionData{samples: [400.0]}}
-      first = %Scenario{name: "1", memory_usage_data: %CollectionData{samples: [100.0]}}
-      scenarios = [fourth, third, second, first]
-
-      sorted = Statistics.statistics(%Suite{scenarios: scenarios}).scenarios
-
-      assert Enum.map(sorted, fn scenario -> scenario.name end) == ["1", "2", "3", "4"]
-    end
-
-    test "sorts them by their average run time using memory as a tie breaker" do
-      second = %Scenario{
-        name: "2",
-        run_time_data: %CollectionData{samples: [100.0]},
-        memory_usage_data: %CollectionData{samples: [100.0]}
-      }
-
-      third = %Scenario{
-        name: "3",
-        run_time_data: %CollectionData{samples: [100.0]},
-        memory_usage_data: %CollectionData{samples: [100.1]}
-      }
-
-      first = %Scenario{
-        name: "1",
-        run_time_data: %CollectionData{samples: [100.0]},
-        memory_usage_data: %CollectionData{samples: [99.9]}
-      }
-
-      scenarios = [third, second, first]
-
-      sorted = Statistics.statistics(%Suite{scenarios: scenarios}).scenarios
-
-      assert Enum.map(sorted, fn scenario -> scenario.name end) == ["1", "2", "3"]
-    end
-
     defp stats_for(suite, job_name, input_name) do
       %Scenario{run_time_data: %CollectionData{statistics: stats}} =
         Enum.find(suite.scenarios, fn scenario ->
@@ -310,9 +256,6 @@ defmodule Benchee.StatistcsTest do
       assert stats.maximum == 600
       assert stats.sample_size == 5
       assert stats.mode == nil
-      assert_in_delta stats.relative_more, 28.14, 0.01
-      assert_in_delta stats.relative_less, 0.0355, 0.001
-      assert stats.absolute_difference == 380.0
     end
 
     defp sample_2_asserts(stats) do
@@ -325,9 +268,6 @@ defmodule Benchee.StatistcsTest do
       assert stats.maximum == 23
       assert stats.sample_size == 6
       assert stats.mode == nil
-      assert stats.relative_more == nil
-      assert stats.relative_less == nil
-      assert stats.absolute_difference == nil
     end
   end
 end
