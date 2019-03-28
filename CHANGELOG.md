@@ -1,4 +1,40 @@
+## 1.0.0
+
+It's 0.99.0 without the deprecation warnings. Specifically:
+
+* Old way of passing formatters (`:formatter_options`) vs. new `:formatters` with modules, tuples or functions with one arg
+* The configuration needs to be passed as the second argument to `Benchee.run/2`
+* `Benchee.collect/1` replaces `Benchee.measure/1`
+* `unit_scaling` is a top level configuration option, not for the console formatter
+* the warning for memory measurements not working on OTP <= 18 will also be dropped (we already officially dropped OTP 18 support in 0.14.0)
+
+We're aiming to follow Semantic Versioning as we go forward. That means formatters should be safe to use `~> 1.0` (or even `>= 0.99.0`, `< 2.0.0`).
+
+## 0.99.0 (2019-03-28)
+
+The "we're almost 1.0!" release - all the last small features, a bag of polish and deprecation warnings. If you run this release succesfully without deprecation warnings you should be safe to upgrade to 1.0.0, if not - it's a bug :)
+
+### Breaking Changes (User Facing)
+* changed official Elixir compatibility to `~> 1.6`, 1.4+ should still work but aren't guaranteed or tested against.
+
+### Features (User Facing)
+* the console comparison now also displays the absolute difference in the average (like +12 ms) so that you have an idea to how much time that translates to in your applications not just that it's 100x faster
+* Overhaul of README, documentation, update samples etc. - a whole lot of things have also been marked `@doc false` as they're considered internal
+
+### Bugfixes (User Facing)
+* Remove double empty line after configuration display
+* Fix some wrong type specs
+
+### Breaking Changes (Plugins)
+* `Scenario` made it to the big leagues, it's no longer `Benchee.Benchmark.Scenario` but `Benchee.Scenario` - as it is arguably one of our most important data structures.
+* The `Scenario` struct had some keys changed (last time before 2.0 I promise!) - instead of `:run_times`/`:run_time_statistics` you now have one `run_time_data` key that contains `Benchee.CollectionData` which has the keys `:samples` and `:statistics`. Same for `memory_usage`. This was done to be able to handle different kinds of measurements more uniformly as we will add more of them.
+
+### Features (Plugins)
+* `Benchee.Statistics` comes with 3 new values: `:relative_more`, `:relative_less`, `:absolute_difference` so that you don't have to calculate these relative values yourself :)
+
 ## 0.14.0 (2019-02-10)
+
+Highlights of this release are a new way to specify formatter options closer to the formatters themselves as well as maximum precision measurements.
 
 ### Breaking Changes (User Facing)
 * dropped support for Erlang 18.x
