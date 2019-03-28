@@ -14,6 +14,9 @@ defmodule Benchee.Formatters.TaggedSave do
   alias Benchee.Suite
   alias Benchee.Utility.FileCreation
 
+  @doc """
+  Tags all scenario with the desired tag and returns it in term_to_binary along with save path.
+  """
   @impl true
   @spec format(Suite.t(), map) :: {binary, String.t()}
   def format(suite = %Suite{scenarios: scenarios}, formatter_config) do
@@ -71,6 +74,9 @@ defmodule Benchee.Formatters.TaggedSave do
     %Scenario{scenario | name: Scenario.display_name(scenario)}
   end
 
+  @doc """
+  Writes the binary returned by `format/2` to the indicated location, telling you where that is.
+  """
   @spec write({binary, String.t()}, map) :: :ok
   @impl true
   def write({term_binary, filename}, _) do
