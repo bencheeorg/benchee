@@ -291,7 +291,6 @@ defmodule Benchee.Configuration do
       |> standardized_user_configuration
       |> merge_with_defaults
       |> convert_time_to_nano_s
-      |> update_measure_memory
       |> save_option_conversion
 
     %Suite{configuration: config}
@@ -337,29 +336,6 @@ defmodule Benchee.Configuration do
 
       new_config
     end)
-  end
-
-  defp update_measure_memory(config = %{memory_time: memory_time}) do
-    otp_version = List.to_integer(:erlang.system_info(:otp_release))
-
-    if memory_time > 0 and otp_version <= 18 do
-      print_memory_measure_warning()
-      Map.put(config, :memory_time, 0)
-    else
-      config
-    end
-  end
-
-  defp print_memory_measure_warning do
-    IO.puts("""
-
-      Measuring memory consumption is only available on OTP 19 or greater.
-      If you would like to benchmark memory consumption, please upgrade to a
-      newer version of OTP.
-      Benchee now also only supports elixir ~> 1.6 which doesn't support OTP 18.
-      Please upgrade :)
-
-    """)
   end
 
   defp save_option_conversion(config = %{save: false}), do: config
