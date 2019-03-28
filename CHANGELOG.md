@@ -1,4 +1,4 @@
-## 1.0.0
+## 1.0.0 (2019-03-28)
 
 It's 0.99.0 without the deprecation warnings. Specifically:
 

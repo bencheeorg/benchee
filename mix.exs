@@ -1,7 +1,7 @@
 defmodule Benchee.Mixfile do
   use Mix.Project
 
-  @version "0.99.0"
+  @version "1.0.0"
 
   def project do
     [
