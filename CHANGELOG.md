@@ -8,7 +8,7 @@ It's 0.99.0 without the deprecation warnings. Specifically:
 * `unit_scaling` is a top level configuration option, not for the console formatter
 * the warning for memory measurements not working on OTP <= 18 will also be dropped (we already officially dropped OTP 18 support in 0.14.0)
 
-We're aiming to follow Semantic Versioning as we go forward. That means formatters should be safe to use `~> 1.0` (or even `>= 0.99.0`, `< 2.0.0`).
+We're aiming to follow Semantic Versioning as we go forward. That means formatters should be safe to use `~> 1.0` (or even `>= 0.99.0 and < 2.0.0`).
 
 ## 0.99.0 (2019-03-28)
 
