@@ -79,8 +79,6 @@ defmodule Benchee.Formatters.Console do
   @impl true
   @spec format(Suite.t(), map) :: [any]
   def format(%Suite{scenarios: scenarios, configuration: config}, options \\ %{}) do
-    if Map.has_key?(options, :unit_scaling), do: warn_unit_scaling()
-
     config =
       config
       |> Map.take([:unit_scaling, :title])
@@ -116,12 +114,6 @@ defmodule Benchee.Formatters.Console do
     IO.write(output)
   rescue
     _ -> {:error, "Unknown Error"}
-  end
-
-  defp warn_unit_scaling do
-    IO.puts(
-      "unit_scaling is now a top level configuration option, avoid passing it as a formatter option."
-    )
   end
 
   defp generate_output(scenarios, config, input) do
