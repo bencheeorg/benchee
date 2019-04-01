@@ -59,7 +59,7 @@ map.flatten       781.25 KB - 1.25x memory usage +156.28 KB
 **All measurements for memory usage were the same**
 ```
 
-The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/bencheeorg/benchee_html) make it possible to generate nice looking [html reports](http://www.pragtob.info/benchee/flat_map.html), where individual graphs can also be exported as PNG images:
+The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/bencheeorg/benchee_html) make it possible to generate nice looking [html reports](http://www.pragtob.info/benchee/README/results.html), where individual graphs can also be exported as PNG images:
 
 ![report](http://www.pragtob.info/benchee/images/report.png)
 
