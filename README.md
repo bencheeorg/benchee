@@ -80,7 +80,7 @@ Provides you with the following **statistical data**:
 * **average**   - average execution time/memory usage (the lower the better)
 * **ips**       - iterations per second, aka how often can the given function be executed within one second (the higher the better - good for graphing), only for run times
 * **deviation** - standard deviation (how much do the results vary), given as a percentage of the average (raw absolute values also available)
-* **median**    - when all measured values are sorted, this is the middle value. More stable than the average and somewhat more likely to be a typical value you see, for the msot typical value see mode. (the lower the better)
+* **median**    - when all measured values are sorted, this is the middle value. More stable than the average and somewhat more likely to be a typical value you see, for the most typical value see mode. (the lower the better)
 * **99th %**    - 99th percentile, 99% of all measured values are less than this - worst case performance-ish
 
 In addition, you can optionally output an extended set of statistics:
