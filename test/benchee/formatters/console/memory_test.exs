@@ -330,6 +330,44 @@ defmodule Benchee.Formatters.Console.MemoryTest do
       assert result2 =~ "201.20"
     end
 
+    test "doesn't display extended statistics if extended_statistics isn't specified" do
+      scenarios = [
+        %Scenario{
+          name: "First job",
+          memory_usage_data: %CollectionData{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{99 => 300.1},
+              minimum: 111.1,
+              maximum: 333.3,
+              mode: 201.2,
+              sample_size: 50_000
+            }
+          },
+          run_time_data: %CollectionData{statistics: %Statistics{average: 100.0, ips: 1_000.0}}
+        }
+      ]
+
+      params = %{
+        unit_scaling: :best
+      }
+
+      output = scenarios |> Memory.format_scenarios(params) |> Enum.join("")
+
+      refute output =~ "Extended statistics: "
+      refute output =~ "minimum"
+      refute output =~ "maximum"
+      refute output =~ "sample size"
+      refute output =~ "mode"
+      refute output =~ "111.10"
+      refute output =~ "333.30"
+      refute output =~ "50 K"
+      refute output =~ "201.20"
+    end
+
     test "does nothing when there's no statistics to format" do
       scenarios = [
         %Scenario{memory_usage_data: %CollectionData{statistics: %Statistics{sample_size: 0}}}
