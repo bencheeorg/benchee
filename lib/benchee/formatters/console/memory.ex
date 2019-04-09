@@ -254,16 +254,18 @@ defmodule Benchee.Formatters.Console.Memory do
     Memory.format({Memory.scale(memory, unit), unit})
   end
 
-  defp extended_statistics_report(_, _, _, %{extended_statistics: false}, _), do: []
+  defp extended_statistics_report(scenarios, units, label_width, config, hide_statistics)
   defp extended_statistics_report(_, _, _, _, true), do: []
 
-  defp extended_statistics_report(scenarios, units, label_width, _config, _hide_statistics) do
+  defp extended_statistics_report(scenarios, units, label_width, %{extended_statistics: true}, _) do
     [
       Helpers.descriptor("Extended statistics"),
       extended_column_descriptors(label_width)
       | extended_statistics(scenarios, units, label_width)
     ]
   end
+
+  defp extended_statistics_report(_, _, _, _, _), do: []
 
   defp extended_column_descriptors(label_width) do
     "\n~*s~*s~*s~*s~*s\n"
