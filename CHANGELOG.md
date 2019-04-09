@@ -1,3 +1,8 @@
+## 1.0.1 (2019-04-09)
+
+### Bugfixes (User Facing)
+* When memory measurements were actually different extended statistics was displayed although the option was not provided. Now correctly only displayed if the option is provided and values actually had variance.
+
 ## 1.0.0 (2019-03-28)
 
 It's 0.99.0 without the deprecation warnings. Specifically:
