@@ -63,6 +63,36 @@ The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/be
 
 ![report](http://www.pragtob.info/benchee/images/report.png)
 
+## Table of Contents
+
+* [Features](#features)
+* [Installation](#installation)
+* [Usage](#usage)
+    * [Configuration](#configuration)
+    * [Measuring memory consumption](#measuring-memory-consumption)
+    * [Inputs](#inputs)
+    * [Formatters](#formatters)
+      * [Console Formatter options](#console-formatter-options)
+    * [Saving, loading and comparing previous runs](#saving-loading-and-comparing-previous-runs)
+    * [Hooks (Setup, Teardown etc.)](#hooks-setup-teardown-etc)
+      * [Suite hooks](#suite-hooks)
+      * [Scenario hooks](#scenario-hooks)
+          * [What is a scenario?](#what-is-a-scenario)
+          * [before_scenario](#before_scenario)
+          * [after_scenario](#after_scenario)
+      * [Benchmarking function hooks](#benchmarking-function-hooks)
+          * [before_each](#before_each)
+          * [after_each](#after_each)
+      * [Hook arguments and return values](#hook-arguments-and-return-values)
+      * [Hook configuration: global versus local](#hook-configuration-global-versus-local)
+      * [When does a hook happen? (Complete Example)](#when-does-a-hook-happen-complete-example)
+    * [More verbose usage](#more-verbose-usage)
+    * [Usage from Erlang](#usage-from-erlang)
+* [Plugins](#plugins)
+* [Contributing](#contributing-)
+* [Development](#development)
+
+
 ## Features
 
 * first runs the functions for a given warmup time without recording the results, to simulate a _"warm"/running_ system
