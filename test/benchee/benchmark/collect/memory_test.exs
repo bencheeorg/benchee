@@ -15,7 +15,7 @@ defmodule Benchee.Collect.MemoryTest do
       # We need to have some wiggle room here because memory used varies from
       # system to system. It's consistent in an environment, but changes
       # between environments.
-      assert memory_used > 360
+      assert memory_used > 310
       assert memory_used < 400
     end
 
