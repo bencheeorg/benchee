@@ -1,26 +1,7 @@
 defmodule Statistex.Mode do
   @moduledoc false
 
-  @typedoc """
-  Careful with the mode, might be multiple values, one value or nothing.😱
-  """
-  @type mode :: [Statistex.sample()] | Statistex.sample() | nil
-
-  @doc """
-      iex> Statistex.Mode.mode([5, 3, 4, 5, 1, 3, 1, 3])
-      3
-
-      iex> Statistex.Mode.mode([])
-      nil
-
-      iex> Statistex.Mode.mode([1, 2, 3, 4, 5])
-      nil
-
-      iex> mode = Statistex.Mode.mode([5, 3, 4, 5, 1, 3, 1])
-      iex> Enum.sort(mode)
-      [1, 3, 5]
-  """
-  @spec mode(Statistex.samples()) :: mode()
+  @spec mode(Statistex.samples()) :: Statistex.mode()
   def(mode(samples)) do
     samples
     |> Enum.reduce(%{}, fn sample, counts ->

@@ -86,37 +86,6 @@ defmodule Benchee.StatistcsTest do
       sample_2_asserts(stats_2_2)
     end
 
-    @mode_sample [55, 40, 67, 55, 44, 40, 10, 8, 55, 90, 67]
-    test "mode is calculated correctly" do
-      scenarios = [
-        %Scenario{
-          run_time_data: %CollectionData{samples: @mode_sample},
-          memory_usage_data: %CollectionData{samples: @mode_sample}
-        }
-      ]
-
-      suite = Statistics.statistics(%Suite{scenarios: scenarios})
-
-      [%Scenario{run_time_data: %CollectionData{statistics: stats}}] = suite.scenarios
-      assert stats.mode == 55
-    end
-
-    @standard_deviation_sample [600, 470, 170, 430, 300]
-    test "statistical standard deviation is calculated correctly" do
-      scenarios = [
-        %Scenario{
-          run_time_data: %CollectionData{samples: @standard_deviation_sample},
-          memory_usage_data: %CollectionData{samples: @standard_deviation_sample}
-        }
-      ]
-
-      suite = Statistics.statistics(%Suite{scenarios: scenarios})
-
-      [%Scenario{run_time_data: %CollectionData{statistics: stats}}] = suite.scenarios
-      assert_in_delta stats.std_dev, 164.7, 0.1
-      assert_in_delta stats.std_dev_ratio, 0.41, 0.01
-    end
-
     test "preserves all other keys in the suite handed to it" do
       suite = %Suite{
         scenarios: [],
@@ -184,32 +153,6 @@ defmodule Benchee.StatistcsTest do
           }
         ]
       } = Statistics.statistics(suite)
-    end
-
-    @all_zeros [0, 0, 0, 0, 0]
-    test "doesn't blow up when all measurements are zeros (mostly memory measurement)" do
-      scenarios = [
-        %Scenario{
-          run_time_data: %CollectionData{samples: @all_zeros}
-        },
-        %Scenario{
-          run_time_data: %CollectionData{samples: @all_zeros}
-        }
-      ]
-
-      suite = Statistics.statistics(%Suite{scenarios: scenarios})
-
-      [
-        %Scenario{
-          run_time_data: %CollectionData{statistics: run_time_stats_1}
-        },
-        %Scenario{
-          run_time_data: %CollectionData{statistics: run_time_stats_2}
-        }
-      ] = suite.scenarios
-
-      assert run_time_stats_1.average == 0.0
-      assert run_time_stats_2.sample_size == 5
     end
 
     @nothing []

@@ -1,9 +1,12 @@
 defmodule Statistex do
   @moduledoc """
-  Statistics related functionality that is meant to take the raw benchmark data
-  and then compute statistics like the average and the standard deviation etc.
+  Calculate all the statistics for given samples.
 
-  See `statistics/1` for a breakdown of the included statistics.
+  Works all at once with `statistics/1` or has a lot of functions that can be triggered individually.
+
+  To avoid wasting computation, function can be given values they depend on as optional keyword arguments so that these values can be used instead of recalculating them. For an example see `average/2`.
+
+  Some statistics don't really make sense when there are no samples, these then return the error tuple `{:error, :empty_list}`.
   """
 
   alias Statistex.{Mode, Percentile}
@@ -25,27 +28,7 @@ defmodule Statistex do
   @typedoc """
   All the statistics `statistics/1` computes from the samples.
 
-  Overview of all the statistics benchee currently provides:
-
-    * total         - the sum of all the samples
-    * average       - well... the average
-    * std_dev       - standard deviation, a measurement how much samples vary
-      (the higher the more the samples vary)
-    * std_dev_ratio - standard deviation expressed as how much it is relative to
-      the average
-    * median        - when all samples are sorted, this is the middle
-      value (or average of the two middle values when the number of times is
-      even). More stable than the average.
-    * percentiles   - a map of percentile ranks. These are the values below
-      which x% of the samples lie. For example, 99% of samples are less
-      than the 99th percentile (99th %) rank.
-      is a value for which 99% of the run times are shorter.
-    * mode          - the sample(s) that occur the most. Often one value, but
-      can be multiple values if they occur the same amount of times. If no value
-      occurs at least twice, this value will be nil.
-    * minimum       - the smallest sample
-    * maximum       - the biggest sample
-    * sample_size   - the number of run time measurements taken
+  For a description of what a given value means please check out the function here by the same name, it will have an explanation.
   """
   @type t :: %__MODULE__{
           total: number,
@@ -53,28 +36,98 @@ defmodule Statistex do
           standard_deviation: float,
           standard_deviation_ratio: float,
           median: number,
-          percentiles: %{number => float},
-          mode: Statistex.Mode.mode(),
+          percentiles: percentiles,
+          mode: mode,
           minimum: number,
           maximum: number,
           sample_size: non_neg_integer
         }
 
   @typedoc """
-  The samples a `Benchee.Collect` collected to compute statistics from.
+  The samples to compute statistics from.
   """
-  @type samples :: [sample]
+  @type samples :: [sample, ...]
+
+  @typedoc """
+  A single sample/
+  """
   @type sample :: number
 
+  @typedoc """
+  The optional configuration handed to a lot of functions.
+
+  Keys used are function dependent and are documented there.
+  """
   @type configuration :: keyword
+
+  @empty_list_error {:error, :empty_list}
+
+  @typedoc """
+  Error returned when handed an empty list for most functions.
+
+  A lot of statistics don't make sense in the face of an empty input. Hence, this error.
+  """
+  @type empty_list_error :: {:error, :empty_list}
+
+  @typedoc """
+  Careful with the mode, might be multiple values, one value or nothing.😱 See `mode/1`.
+  """
+  @type mode :: [sample()] | sample() | nil
+
+  @typedoc """
+  The percentiles map returned by `percentiles/2`.
+  """
+  @type percentiles :: %{optional(number()) => float}
+
   @doc """
-  WIP
+  Calculate all statistics Statistex offers for a given list of numbers.
+
+  The statistics themselves are described in the individual samples that can be used to calculate individual values.
+
+  `{:error, :empty_list}` is returned if the given list was empty.
+
+  ## Options
+  In a `percentiles` options arguments for the calculation of percentiles (see `percentiles/2`) can be given. The 50th percentile is always calculated as it is the median.
+
+  ## Examples
+
+      iex> Statistex.statistics([200, 400, 400, 400, 500, 500, 500, 700, 900])
+      %Statistex{
+        average:                  500.0,
+        standard_deviation:       200.0,
+        standard_deviation_ratio: 0.4,
+        median:                   500.0,
+        percentiles:              %{50 => 500.0},
+        mode:                     [500, 400],
+        minimum:                  200,
+        maximum:                  900,
+        sample_size:              9,
+        total:                    4500
+      }
+
+      iex> Statistex.statistics([])
+      {:error, :empty_list}
+
+      iex> Statistex.statistics([0, 0, 0, 0])
+      %Statistex{
+        average:                  0.0,
+        standard_deviation:       0.0,
+        standard_deviation_ratio: 0.0,
+        median:                   0.0,
+        percentiles:              %{50 => 0.0},
+        mode:                     0,
+        minimum:                  0,
+        maximum:                  0,
+        sample_size:              4,
+        total:                    0
+      }
+
   """
   @spec statistics(samples, configuration) :: t()
   def statistics(samples, configuration \\ [])
 
   def statistics([], _) do
-    %__MODULE__{sample_size: 0}
+    @empty_list_error
   end
 
   def statistics(samples, configuration) do
@@ -84,7 +137,11 @@ defmodule Statistex do
     standard_deviation = standard_deviation(samples, average: average, sample_size: sample_size)
 
     standard_deviation_ratio =
-      standard_deviation_ratio(samples, average: average, standard_deviation: standard_deviation)
+      standard_deviation_ratio(
+        samples,
+        average: average,
+        standard_deviation: standard_deviation
+      )
 
     percentiles = calculate_percentiles(samples, configuration)
     median = median(samples, percentiles: percentiles)
@@ -103,20 +160,106 @@ defmodule Statistex do
     }
   end
 
-  @spec total(samples) :: number
+  @doc """
+  The total of all samples added together.
+
+  ## Examples
+
+      iex> Statistex.total([])
+      {:error, :empty_list}
+
+      iex> Statistex.total([1, 2, 3, 4, 5])
+      15
+
+      iex> Statistex.total([10, 10.5, 5])
+      25.5
+
+      iex> Statistex.total([-10, 5, 3, 2])
+      0
+  """
+  @spec total(samples) :: number | empty_list_error
+  def total([]), do: @empty_list_error
   def total(samples), do: Enum.sum(samples)
 
+  @doc """
+  Number of samples in the given list.
+
+  Nothing to fancy here, this just calls `length(list)` and is only provided for completeness sake.
+
+  ## Examples
+
+      iex> Statistex.sample_size([])
+      0
+
+      iex> Statistex.sample_size([1, 1, 1, 1, 1])
+      5
+  """
   @spec sample_size(samples) :: non_neg_integer
   def sample_size(samples), do: length(samples)
 
-  @spec average(samples, keyword) :: float
+  @doc """
+  Calculate the average.
+
+  It's.. well the average.
+  When the given samples are empty there is no average.
+
+  ## Options
+  If you already have these values, you can provide both `:total` and `:sample_size`. Should you provide both the provided samples are wholly ignored.
+
+  ## Examples
+
+      iex> Statistex.average([])
+      {:error, :empty_list}
+
+      iex> Statistex.average([5])
+      5.0
+
+      iex> Statistex.average([600, 470, 170, 430, 300])
+      394.0
+
+      iex> Statistex.average([-1, 1])
+      0.0
+
+      iex> Statistex.average([2, 3, 4], sample_size: 3)
+      3.0
+
+      iex> Statistex.average([20, 20, 20, 20, 20], total: 100, sample_size: 5)
+      20.0
+
+      iex> Statistex.average(:ignored, total: 100, sample_size: 5)
+      20.0
+  """
+  @spec average(samples, keyword) :: float | empty_list_error
   def average(samples, options \\ []) do
     total = Keyword.get_lazy(options, :total, fn -> total(samples) end)
     sample_size = Keyword.get_lazy(options, :sample_size, fn -> sample_size(samples) end)
 
-    total / sample_size
+    if sample_size > 0 do
+      total / sample_size
+    else
+      @empty_list_error
+    end
   end
 
+  @doc """
+  Calculate the standard deviation.
+
+  A measurement how much samples vary (the higher the more the samples vary).
+
+  ## Options
+  If already calculated, the `:average` and `:sample_size` options can be provided to avoid recalulating those values.
+
+  ## Examples
+
+      iex> Statistex.standard_deviation([])
+      0.0
+
+      iex> Statistex.standard_deviation([4, 9, 11, 12, 17, 5, 8, 12, 12])
+      4.0
+
+      iex> Statistex.standard_deviation([4, 9, 11, 12, 17, 5, 8, 12, 12], sample_size: 9, average: 10.0)
+      4.0
+  """
   @spec standard_deviation(samples, keyword) :: float
   def standard_deviation(samples, options \\ []) do
     sample_size = Keyword.get_lazy(options, :sample_size, fn -> sample_size(samples) end)
@@ -127,6 +270,7 @@ defmodule Statistex do
     do_standard_deviation(samples, average, sample_size)
   end
 
+  defp do_standard_deviation(_samples, _average, 0), do: 0.0
   defp do_standard_deviation(_samples, _average, 1), do: 0.0
 
   defp do_standard_deviation(samples, average, sample_size) do
@@ -139,8 +283,32 @@ defmodule Statistex do
     :math.sqrt(variance)
   end
 
+  @doc """
+    Calculate the standard deviation relative to the average.
+
+    This helps put the absolute standard deviation value into perspective expressing it relative to the average.
+
+    ## Options
+    If already calculated, the `:average` and `:standard_deviation` options can be provided to avoid recalulating those values.
+
+    If both values are provided, the provided samples will be ignored.
+
+    ## Examples
+
+        iex> Statistex.standard_deviation_ratio([])
+        0.0
+
+        iex> Statistex.standard_deviation_ratio([4, 9, 11, 12, 17, 5, 8, 12, 12])
+        0.4
+
+        iex> Statistex.standard_deviation_ratio([4, 9, 11, 12, 17, 5, 8, 12, 12], average: 10.0, standard_deviation: 4.0)
+        0.4
+
+        iex> Statistex.standard_deviation_ratio(:ignored, average: 10.0, standard_deviation: 4.0)
+        0.4
+  """
   @spec standard_deviation_ratio(samples, keyword) :: float
-  def standard_deviation_ratio(samples, options) do
+  def standard_deviation_ratio(samples, options \\ []) do
     average = Keyword.get_lazy(options, :average, fn -> average(samples) end)
 
     std_dev =
@@ -148,7 +316,7 @@ defmodule Statistex do
         standard_deviation(samples, average: average)
       end)
 
-    if average == 0 do
+    if average == @empty_list_error || average == 0 do
       0.0
     else
       std_dev / average
@@ -159,16 +327,103 @@ defmodule Statistex do
   defp calculate_percentiles(samples, configuration) do
     percentiles_configuration = Keyword.get(configuration, :percentiles, [])
 
-    # 50 is manually added so that it can be used directly by median
+    # median_percentile is manually added so that it can be used directly by median
     percentiles_configuration = Enum.uniq([@median_percentile | percentiles_configuration])
     percentiles(samples, percentiles_configuration)
   end
 
-  defdelegate percentiles(samples, percentiles), to: Percentile
+  @doc """
+  Calculates the value at the `percentile_rank`-th percentile.
+
+  Think of this as the
+  value below which `percentile_rank` percent of the samples lie. For example,
+  if `Statistex.percentile(samples, 99)` == 123.45,
+  99% of samples are less than 123.45.
+
+  Passing a number for `percentile_rank` calculates a single percentile.
+  Passing a list of numbers calculates multiple percentiles, and returns them
+  as a map like %{90 => 45.6, 99 => 78.9}, where the keys are the percentile
+  numbers, and the values are the percentile values.
+
+  Percentiles must be between 0 and 100 (excluding the boundaries).
+
+  ## Examples
+
+      iex> Statistex.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 12.5)
+      %{12.5 => 1.0}
+
+      iex> Statistex.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [50])
+      %{50 => 3.0}
+
+      iex> Statistex.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [75])
+      %{75 => 4.75}
+
+      iex> Statistex.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 99)
+      %{99 => 5.0}
+
+      iex> Statistex.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [50, 75, 99])
+      %{50 => 3.0, 75 => 4.75, 99 => 5.0}
+
+      iex> Statistex.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 100)
+      ** (ArgumentError) percentile must be between 0 and 100, got: 100
+
+      iex> Statistex.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 0)
+      ** (ArgumentError) percentile must be between 0 and 100, got: 0
+  """
+  @spec percentiles(samples, number | [number(), ...]) ::
+          percentiles() | empty_list_error()
+  defdelegate(percentiles(samples, percentiles), to: Percentile)
+
+  @doc """
+  Calculates the mode of the given samples.
+
+
+  Mode is the sample(s) that occur the most. Often one value, but can be multiple values if they occur the same amount of times. If no value occurs at least twice, this value will be nil.
+
+  ## Examples
+
+      iex> Statistex.mode([5, 3, 4, 5, 1, 3, 1, 3])
+      3
+
+      iex> Statistex.mode([])
+      nil
+
+      iex> Statistex.mode([1, 2, 3, 4, 5])
+      nil
+
+      iex> mode = Statistex.mode([5, 3, 4, 5, 1, 3, 1])
+      iex> Enum.sort(mode)
+      [1, 3, 5]
+  """
+  @spec mode(samples) :: mode
   defdelegate mode(samples), to: Mode
 
-  @spec median(samples, keyword) :: number
-  def median(samples, options \\ []) do
+  @doc """
+  Calculates the median of the given samples.
+
+  The median can be thought of separating the higher half from the lower half of the samples.
+  When all samples are sorted, this is the middle value (or average of the two middle values when the number of times is even).
+  More stable than the average.
+
+  ## Examples
+
+      iex> Statistex.median([])
+      {:error, :empty_list}
+
+      iex> Statistex.median([1, 3, 4, 6, 7, 8, 9])
+      6.0
+
+      iex> Statistex.median([1, 2, 3, 4, 5, 6, 8, 9])
+      4.5
+
+      iex> Statistex.median([0])
+      0.0
+  """
+  @spec median(samples, keyword) :: number | empty_list_error
+  def median(samples, options \\ [])
+  def median([], _), do: @empty_list_error
+
+  def median(samples, options) do
     percentiles =
       Keyword.get_lazy(options, :percentiles, fn -> percentiles(samples, @median_percentile) end)
 
@@ -177,8 +432,33 @@ defmodule Statistex do
     end)
   end
 
-  @spec maximum(samples) :: sample
+  @doc """
+  The biggest sample.
+
+  ## Examples
+
+      iex> Statistex.maximum([1, 100, 24])
+      100
+
+      iex> Statistex.maximum([])
+      {:error, :empty_list}
+  """
+  @spec maximum(samples) :: sample | empty_list_error
+  def maximum([]), do: @empty_list_error
   def maximum(samples), do: Enum.max(samples)
-  @spec minimum(samples) :: sample
+
+  @doc """
+  The smallest sample.
+
+  ## Examples
+
+      iex> Statistex.minimum([1, 100, 24])
+      1
+
+      iex> Statistex.minimum([])
+      {:error, :empty_list}
+  """
+  @spec minimum(samples) :: sample | empty_list_error
+  def minimum([]), do: @empty_list_error
   def minimum(samples), do: Enum.min(samples)
 end

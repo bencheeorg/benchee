@@ -192,6 +192,12 @@ defmodule Benchee.Statistics do
     }
   end
 
+  defp calculate_statistics([], _) do
+    %__MODULE__{
+      sample_size: 0
+    }
+  end
+
   defp calculate_statistics(samples, percentiles) do
     samples
     |> Statistex.statistics(percentiles: percentiles)

@@ -1,46 +1,10 @@
 defmodule Statistex.Percentile do
   @moduledoc false
 
-  @type percentile :: float()
-  @type percentiles :: %{optional(number()) => percentile()}
+  @spec percentiles(Statistex.samples(), number | [number, ...]) ::
+          Statistex.percentiles() | Statistex.empty_list_error()
+  def percentiles([], _), do: {:error, :empty_list}
 
-  @doc """
-  Calculates the value at the `percentile_rank`-th percentile.
-
-  Think of this as the
-  value below which `percentile_rank` percent of the samples lie. For example,
-  if `Statistex.Percentile.percentile(samples, 99)` == 123.45,
-  99% of samples are less than 123.45.
-
-  Passing a number for `percentile_rank` calculates a single percentile.
-  Passing a list of numbers calculates multiple percentiles, and returns them
-  as a map like %{90 => 45.6, 99 => 78.9}, where the keys are the percentile
-  numbers, and the values are the percentile values.
-
-  ## Examples
-
-  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 12.5)
-  %{12.5 => 1.0}
-
-  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [50])
-  %{50 => 3.0}
-
-  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [75])
-  %{75 => 4.75}
-
-  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 99)
-  %{99 => 5.0}
-
-  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [50, 75, 99])
-  %{50 => 3.0, 75 => 4.75, 99 => 5.0}
-
-  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 100)
-  ** (ArgumentError) percentile must be between 0 and 100, got: 100
-
-  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 0)
-  ** (ArgumentError) percentile must be between 0 and 100, got: 0
-  """
-  @spec percentiles(Statistex.samples(), number | [number()]) :: percentiles
   def percentiles(samples, percentile_ranks) do
     number_of_samples = length(samples)
     sorted_samples = Enum.sort(samples)
