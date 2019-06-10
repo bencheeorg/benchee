@@ -1,6 +1,8 @@
 defmodule Benchee.Statistics.Mode do
   @moduledoc false
 
+  alias Benchee.Statistics
+
   @doc """
       iex> Benchee.Statistics.Mode.mode([5, 3, 4, 5, 1, 3, 1, 3])
       3
@@ -15,7 +17,8 @@ defmodule Benchee.Statistics.Mode do
       iex> Enum.sort(mode)
       [1, 3, 5]
   """
-  def mode(samples) do
+  @spec mode(Statistics.samples()) :: Statistics.mode()
+  def(mode(samples)) do
     samples
     |> Enum.reduce(%{}, fn sample, counts ->
       Map.update(counts, sample, 1, fn old_value -> old_value + 1 end)

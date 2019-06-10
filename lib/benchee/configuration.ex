@@ -4,6 +4,7 @@ defmodule Benchee.Configuration do
   """
 
   alias Benchee.{
+    Benchmark.Hooks,
     Configuration,
     Conversion.Duration,
     Conversion.Scale,
@@ -142,10 +143,10 @@ defmodule Benchee.Configuration do
           load: String.t() | [String.t()] | false,
           unit_scaling: Scale.scaling_strategy(),
           assigns: map,
-          before_each: fun | nil,
-          after_each: fun | nil,
-          before_scenario: fun | nil,
-          after_scenario: fun | nil,
+          before_each: Hooks.hook_function() | nil,
+          after_each: Hooks.hook_function() | nil,
+          before_scenario: Hooks.hook_function() | nil,
+          after_scenario: Hooks.hook_function() | nil,
           measure_function_call_overhead: boolean,
           title: String.t() | nil
         }

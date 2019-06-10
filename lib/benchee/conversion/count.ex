@@ -41,6 +41,9 @@ defmodule Benchee.Conversion.Count do
     }
   }
 
+  @type unit_atoms :: :one | :thousand | :million | :billion
+  @type units :: unit_atoms | Unit.t()
+
   @doc """
   Scales a value representing a count in ones into a larger unit if appropriate
 

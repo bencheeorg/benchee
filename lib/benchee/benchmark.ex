@@ -23,7 +23,7 @@ defmodule Benchee.Benchmark do
   If there are inputs in the suite's config, a scenario will be added for the given
   function for each input.
   """
-  @spec benchmark(Suite.t(), Suite.key(), fun, module) :: Suite.t()
+  @spec benchmark(Suite.t(), Suite.key(), Scenario.benchmarking_function(), module) :: Suite.t()
   def benchmark(suite = %Suite{scenarios: scenarios}, job_name, function, printer \\ Printer) do
     normalized_name = to_string(job_name)
 

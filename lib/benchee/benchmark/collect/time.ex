@@ -11,6 +11,7 @@ defmodule Benchee.Benchmark.Collect.Time do
 
   @behaviour Benchee.Benchmark.Collect
 
+  @spec collect((() -> any)) :: {non_neg_integer, any}
   def collect(function) do
     start = :erlang.monotonic_time()
     result = function.()

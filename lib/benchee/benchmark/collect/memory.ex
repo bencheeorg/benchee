@@ -15,6 +15,7 @@ defmodule Benchee.Benchmark.Collect.Memory do
 
   @behaviour Benchee.Benchmark.Collect
 
+  @spec collect((() -> any)) :: {nil | non_neg_integer, any}
   def collect(fun) do
     ref = make_ref()
     Process.flag(:trap_exit, true)
