@@ -17,6 +17,7 @@ defmodule Benchee.Configuration do
             time: 5,
             warmup: 2,
             memory_time: 0.0,
+            reduction_time: 0.0,
             pre_check: false,
             formatters: [Console],
             percentiles: [50, 99],
@@ -135,6 +136,7 @@ defmodule Benchee.Configuration do
           time: number,
           warmup: number,
           memory_time: number,
+          reduction_time: number,
           pre_check: boolean,
           formatters: [(Suite.t() -> Suite.t()) | module | {module, map}],
           print: map,
@@ -151,7 +153,7 @@ defmodule Benchee.Configuration do
           title: String.t() | nil
         }
 
-  @time_keys [:time, :warmup, :memory_time]
+  @time_keys [:time, :warmup, :memory_time, :reduction_time]
 
   @doc """
   Returns the initial benchmark configuration for Benchee, composed of defaults

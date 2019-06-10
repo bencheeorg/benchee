@@ -804,6 +804,23 @@ defmodule BencheeTest do
     end
   end
 
+  describe "reduction measurement" do
+    test "measures reduction count when instructed to do so" do
+      output =
+        capture_io(fn ->
+          Benchee.run(
+            %{"To List" => fn -> Enum.to_list(1..100) end},
+            Keyword.merge(
+              @test_configuration,
+              reduction_time: 2
+            )
+          )
+        end)
+
+      assert output =~ ~r/Reduction count statistics:/
+    end
+  end
+
   @slower_regex "\\s+- \\d+\\.\\d+x slower \\+\\d+(\\.\\d+)?.+"
   defp readme_sample_asserts(output, tag_string \\ "") do
     assert output =~ "warmup: 5 ms"

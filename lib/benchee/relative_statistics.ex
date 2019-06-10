@@ -45,7 +45,8 @@ defmodule Benchee.RelativeStatistics do
   @spec sort([Scenario.t()]) :: [Scenario.t()]
   defp sort(scenarios) do
     Enum.sort_by(scenarios, fn scenario ->
-      {scenario.run_time_data.statistics.average, scenario.memory_usage_data.statistics.average}
+      {scenario.run_time_data.statistics.average, scenario.memory_usage_data.statistics.average,
+       scenario.reductions_data.statistics.average}
     end)
   end
 
@@ -74,6 +75,9 @@ defmodule Benchee.RelativeStatistics do
       end)
       |> update_in([Access.key!(:memory_usage_data), Access.key!(:statistics)], fn statistics ->
         add_relative_statistics(statistics, reference.memory_usage_data.statistics)
+      end)
+      |> update_in([Access.key!(:reductions_data), Access.key!(:statistics)], fn statistics ->
+        add_relative_statistics(statistics, reference.reductions_data.statistics)
       end)
     end)
   end

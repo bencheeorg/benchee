@@ -81,6 +81,8 @@ defmodule Benchee.Conversion.Scale do
       iex> Benchee.Conversion.Scale.scale 12345, unit
       12.345
   """
+  def scale(nil, _), do: 0.0
+
   def scale(value, %Unit{magnitude: magnitude}) do
     value / magnitude
   end

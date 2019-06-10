@@ -21,34 +21,46 @@ defmodule Benchee.Conversion do
       iex> statistics = %Benchee.Statistics{average: 1_000_000.0, ips: 1000.0}
       iex> scenario = %Benchee.Scenario{
       ...>   run_time_data: %Benchee.CollectionData{statistics: statistics},
-      ...>   memory_usage_data: %Benchee.CollectionData{statistics: statistics}
+      ...>   memory_usage_data: %Benchee.CollectionData{statistics: statistics},
+      ...>   reductions_data: %Benchee.CollectionData{statistics: statistics}
       ...> }
       iex> Benchee.Conversion.units([scenario], :best)
       %{
-        ips:      %Benchee.Conversion.Unit{
-                    label: "K",
-                    long: "Thousand",
-                    magnitude: 1000,
-                    name: :thousand
-                  },
-        run_time: %Benchee.Conversion.Unit{
-                    label: "ms",
-                    long: "Milliseconds",
-                    magnitude: 1_000_000,
-                    name: :millisecond
-                  },
-        memory:   %Benchee.Conversion.Unit{
-                    label: "KB",
-                    long: "Kilobytes",
-                    magnitude: 1024,
-                    name: :kilobyte
-                  }
+        ips:             %Benchee.Conversion.Unit{
+                           label: "K",
+                           long: "Thousand",
+                           magnitude: 1000,
+                           name: :thousand
+                         },
+        run_time:        %Benchee.Conversion.Unit{
+                           label: "ms",
+                           long: "Milliseconds",
+                           magnitude: 1_000_000,
+                           name: :millisecond
+                         },
+        memory:          %Benchee.Conversion.Unit{
+                           label: "KB",
+                           long: "Kilobytes",
+                           magnitude: 1024,
+                           name: :kilobyte
+                         },
+        reduction_count: %Benchee.Conversion.Unit{
+                           label: "M",
+                           long: "Million",
+                           magnitude: 1000000,
+                           name: :million
+                         }
       }
   """
   def units(scenarios, scaling_strategy) do
     run_time_measurements =
       scenarios
       |> Enum.flat_map(fn scenario -> Map.to_list(scenario.run_time_data.statistics) end)
+      |> Enum.group_by(fn {stat_name, _} -> stat_name end, fn {_, value} -> value end)
+
+    reductions_measurements =
+      scenarios
+      |> Enum.flat_map(fn scenario -> Map.to_list(scenario.reductions_data.statistics) end)
       |> Enum.group_by(fn {stat_name, _} -> stat_name end, fn {_, value} -> value end)
 
     memory_measurements =
@@ -71,7 +83,8 @@ defmodule Benchee.Conversion do
     %{
       run_time: Duration.best(run_time_measurements.average, strategy: scaling_strategy),
       ips: Count.best(run_time_measurements.ips, strategy: scaling_strategy),
-      memory: Memory.best(memory_average, strategy: scaling_strategy)
+      memory: Memory.best(memory_average, strategy: scaling_strategy),
+      reduction_count: Count.best(reductions_measurements.average, strategry: scaling_strategy)
     }
   end
 end

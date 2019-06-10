@@ -1,15 +1,9 @@
-defmodule Benchee.Formatters.Console.Memory do
+defmodule Benchee.Formatters.Console.Reductions do
   @moduledoc false
-
-  # This deals with just the formatting of the run time results. They are similar
-  # to the way the memory results are formatted, but different enough to where the
-  # abstractions start to break down pretty significantly, so I wanted to extract
-  # these two things into separate modules to avoid confusion.
 
   alias Benchee.{
     Conversion,
     Conversion.Count,
-    Conversion.Memory,
     Conversion.Unit,
     Formatters.Console.Helpers,
     Scenario,
@@ -29,23 +23,20 @@ defmodule Benchee.Formatters.Console.Memory do
   @mode_width 25
 
   @doc """
-  Formats the memory statistics to a report suitable for output on the CLI. If
-  all memory measurements are the same and we have a standard deviation of 0.0
-  for each scenario, we don't show the statistics and report just on the single
-  measured memory usage.
+  Formats the reductions statistics to a report suitable for output on the CLI.
   """
   @spec format_scenarios([Scenario.t()], map) :: [String.t(), ...]
   def format_scenarios(scenarios, config) do
-    if memory_measurements_present?(scenarios) do
+    if reductions_measurements_present?(scenarios) do
       render(scenarios, config)
     else
       []
     end
   end
 
-  defp memory_measurements_present?(scenarios) do
+  defp reductions_measurements_present?(scenarios) do
     Enum.any?(scenarios, fn scenario ->
-      scenario.memory_usage_data.statistics.sample_size > 0
+      scenario.reductions_data.statistics.sample_size > 0
     end)
   end
 
@@ -56,7 +47,7 @@ defmodule Benchee.Formatters.Console.Memory do
     hide_statistics = all_have_deviation_of_0?(scenarios)
 
     List.flatten([
-      "\nMemory usage statistics:\n",
+      "\nReduction count statistics:\n",
       column_descriptors(label_width, hide_statistics),
       scenario_reports(scenarios, units, label_width, hide_statistics),
       comparison_report(scenarios, units, label_width, config, hide_statistics),
@@ -66,7 +57,7 @@ defmodule Benchee.Formatters.Console.Memory do
 
   defp all_have_deviation_of_0?(scenarios) do
     Enum.all?(scenarios, fn scenario ->
-      scenario.memory_usage_data.statistics.std_dev == 0.0
+      scenario.reductions_data.statistics.std_dev == 0.0
     end)
   end
 
@@ -95,7 +86,7 @@ defmodule Benchee.Formatters.Console.Memory do
       -label_width,
       "Name",
       @average_width,
-      "Memory usage"
+      "Reduction count"
     ])
     |> to_string
   end
@@ -107,7 +98,7 @@ defmodule Benchee.Formatters.Console.Memory do
     [
       reference_report(scenario, units, label_width),
       comparisons(other_scenarios, units, label_width),
-      "\n**All measurements for memory usage were the same**\n"
+      "\n**All measurements for reduction count were the same**\n"
     ]
   end
 
@@ -123,13 +114,13 @@ defmodule Benchee.Formatters.Console.Memory do
   defp format_scenario(scenario, units, label_width, hide_statistics)
 
   defp format_scenario(
-         scenario = %Scenario{memory_usage_data: %{statistics: %{sample_size: 0}}},
+         scenario = %Scenario{reductions_data: %{statistics: %{sample_size: 0}}},
          _,
          label_width,
          _
        ) do
     warning =
-      "WARNING the scenario \"#{scenario.name}\" has no memory measurements!" <>
+      "WARNING the scenario \"#{scenario.name}\" has no reduction count measurements!" <>
         " This is probably a bug please report it!\n" <>
         "https://github.com/bencheeorg/benchee/issues/new"
 
@@ -146,10 +137,10 @@ defmodule Benchee.Formatters.Console.Memory do
     warning <> "\n" <> data
   end
 
-  defp format_scenario(scenario, %{memory: memory_unit}, label_width, false) do
+  defp format_scenario(scenario, %{reduction_count: reductions_unit}, label_width, false) do
     %Scenario{
       name: name,
-      memory_usage_data: %{
+      reductions_data: %{
         statistics: %Statistics{
           average: average,
           std_dev_ratio: std_dev_ratio,
@@ -164,21 +155,21 @@ defmodule Benchee.Formatters.Console.Memory do
       -label_width,
       name,
       @average_width,
-      memory_output(average, memory_unit),
+      Helpers.count_output(average, reductions_unit),
       @deviation_width,
       Helpers.deviation_output(std_dev_ratio),
       @median_width,
-      memory_output(median, memory_unit),
+      Helpers.count_output(median, reductions_unit),
       @percentile_width,
-      memory_output(percentile_99, memory_unit)
+      Helpers.count_output(percentile_99, reductions_unit)
     ])
     |> to_string
   end
 
-  defp format_scenario(scenario, %{memory: memory_unit}, label_width, true) do
+  defp format_scenario(scenario, %{reduction_count: reductions_unit}, label_width, true) do
     %Scenario{
       name: name,
-      memory_usage_data: %{
+      reductions_data: %{
         statistics: %Statistics{
           average: average
         }
@@ -190,7 +181,7 @@ defmodule Benchee.Formatters.Console.Memory do
       -label_width,
       name,
       @average_width,
-      memory_output(average, memory_unit)
+      Helpers.count_output(average, reductions_unit)
     ])
     |> to_string
   end
@@ -213,16 +204,15 @@ defmodule Benchee.Formatters.Console.Memory do
     ]
   end
 
-  defp reference_report(scenario, %{memory: memory_unit}, label_width) do
-    %Scenario{name: name, memory_usage_data: %{statistics: %Statistics{median: median}}} =
-      scenario
+  defp reference_report(scenario, %{reduction_count: reductions_unit}, label_width) do
+    %Scenario{name: name, reductions_data: %{statistics: %Statistics{median: median}}} = scenario
 
     "~*s~*s\n"
     |> :io_lib.format([
       -label_width,
       name,
       @median_width,
-      memory_output(median, memory_unit)
+      Helpers.count_output(median, reductions_unit)
     ])
     |> to_string
   end
@@ -232,26 +222,20 @@ defmodule Benchee.Formatters.Console.Memory do
     Enum.map(
       scenarios_to_compare,
       fn scenario ->
-        statistics = scenario.memory_usage_data.statistics
-        memory_format = memory_output(statistics.average, units.memory)
+        statistics = scenario.reductions_data.statistics
+        reductions_format = Helpers.count_output(statistics.average, units.reduction_count)
 
         Helpers.format_comparison(
           scenario.name,
           statistics,
-          memory_format,
-          "memory usage",
-          units.memory,
+          reductions_format,
+          "reduction count",
+          units.reduction_count,
           label_width,
           @median_width
         )
       end
     )
-  end
-
-  defp memory_output(nil, _unit), do: "N/A"
-
-  defp memory_output(memory, unit) do
-    Memory.format({Memory.scale(memory, unit), unit})
   end
 
   defp extended_statistics_report(scenarios, units, label_width, config, hide_statistics)
@@ -290,10 +274,10 @@ defmodule Benchee.Formatters.Console.Memory do
     end)
   end
 
-  defp format_scenario_extended(scenario, %{memory: memory_unit}, label_width) do
+  defp format_scenario_extended(scenario, %{reduction_count: reductions_unit}, label_width) do
     %Scenario{
       name: name,
-      memory_usage_data: %{
+      reductions_data: %{
         statistics: %Statistics{
           minimum: minimum,
           maximum: maximum,
@@ -308,13 +292,13 @@ defmodule Benchee.Formatters.Console.Memory do
       -label_width,
       name,
       @minimum_width,
-      Helpers.count_output(minimum, memory_unit),
+      Helpers.count_output(minimum, reductions_unit),
       @maximum_width,
-      Helpers.count_output(maximum, memory_unit),
+      Helpers.count_output(maximum, reductions_unit),
       @sample_size_width,
       Count.format(sample_size),
       @mode_width,
-      Helpers.mode_out(mode, memory_unit)
+      Helpers.mode_out(mode, reductions_unit)
     ])
     |> to_string
   end

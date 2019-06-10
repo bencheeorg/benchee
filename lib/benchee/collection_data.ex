@@ -5,7 +5,9 @@ defmodule Benchee.CollectionData do
   Consists of the recorded `samples` and the statistics computed from them.
   """
 
-  defstruct [:statistics, samples: []]
+  alias Benchee.Statistics
+
+  defstruct statistics: %Statistics{}, samples: []
 
   @typedoc """
   Samples and statistics.
@@ -14,6 +16,6 @@ defmodule Benchee.CollectionData do
   """
   @type t :: %__MODULE__{
           samples: [float | non_neg_integer],
-          statistics: Benchee.Statistics.t() | nil
+          statistics: Statistics.t()
         }
 end
