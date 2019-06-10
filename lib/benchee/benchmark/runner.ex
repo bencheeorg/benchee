@@ -66,7 +66,7 @@ defmodule Benchee.Benchmark.Runner do
     }
 
     {run_times, []} = measure_scenario(scenario, scenario_context)
-    %{50 => median} = Statistics.Percentile.percentiles(run_times, 50)
+    %{50 => median} = Statistex.percentiles(run_times, [50])
 
     median
   end

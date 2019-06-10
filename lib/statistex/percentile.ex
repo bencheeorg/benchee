@@ -1,13 +1,15 @@
-defmodule Benchee.Statistics.Percentile do
+defmodule Statistex.Percentile do
   @moduledoc false
 
   @type percentile :: float()
   @type percentiles :: %{optional(number()) => percentile()}
 
   @doc """
-  Calculates the value at the `percentile_rank`-th percentile. Think of this as the
+  Calculates the value at the `percentile_rank`-th percentile.
+
+  Think of this as the
   value below which `percentile_rank` percent of the samples lie. For example,
-  if `Benchee.Statistics.Percentile.percentile(samples, 99)` == 123.45,
+  if `Statistex.Percentile.percentile(samples, 99)` == 123.45,
   99% of samples are less than 123.45.
 
   Passing a number for `percentile_rank` calculates a single percentile.
@@ -17,28 +19,28 @@ defmodule Benchee.Statistics.Percentile do
 
   ## Examples
 
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 12.5)
+  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 12.5)
   %{12.5 => 1.0}
 
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [50])
+  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [50])
   %{50 => 3.0}
 
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [75])
+  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [75])
   %{75 => 4.75}
 
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 99)
+  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 99)
   %{99 => 5.0}
 
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [50, 75, 99])
+  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [50, 75, 99])
   %{50 => 3.0, 75 => 4.75, 99 => 5.0}
 
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 100)
+  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 100)
   ** (ArgumentError) percentile must be between 0 and 100, got: 100
 
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 0)
+  iex> Statistex.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 0)
   ** (ArgumentError) percentile must be between 0 and 100, got: 0
   """
-  @spec percentiles([number()], number | [number()]) :: percentiles
+  @spec percentiles(Statistex.samples(), number | [number()]) :: percentiles
   def percentiles(samples, percentile_ranks) do
     number_of_samples = length(samples)
     sorted_samples = Enum.sort(samples)

@@ -1,6 +1,6 @@
-defmodule Benchee.Statistics.PercentileTest do
+defmodule Statistex.PercentileTest do
   use ExUnit.Case, async: true
-  alias Benchee.Statistics.Percentile
+  alias Statistex.Percentile
   doctest Percentile
 
   @nist_sample_data [
