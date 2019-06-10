@@ -47,7 +47,8 @@ defmodule Benchee.Formatters.Console do
   ...>         percentiles: %{99 => 300.1},
   ...>         sample_size: 200
   ...>       }
-  ...>     }
+  ...>     },
+  ...>     memory_usage_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{}}
   ...>   },
   ...>   %Benchee.Scenario{
   ...>     name: "Job 2", input_name: "My input", run_time_data: %Benchee.CollectionData{
@@ -59,7 +60,8 @@ defmodule Benchee.Formatters.Console do
   ...>         percentiles: %{99 => 500.1},
   ...>         sample_size: 200
   ...>       }
-  ...>     }
+  ...>     },
+  ...>     memory_usage_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{}}
   ...>   }
   ...> ]
   iex> suite = %Benchee.Suite{
