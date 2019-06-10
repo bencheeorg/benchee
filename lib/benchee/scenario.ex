@@ -16,8 +16,8 @@ defmodule Benchee.Scenario do
   saved before. See `display_name/1`.
   """
 
-  alias Benchee.CollectionData
   alias Benchee.Benchmark.Hooks
+  alias Benchee.CollectionData
 
   defstruct [
     :name,

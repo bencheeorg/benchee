@@ -3,8 +3,8 @@ defmodule Benchee.Benchmark.Hooks do
   # Non benchee code should not rely on this module.
 
   alias Benchee.Benchmark.ScenarioContext
-  alias Benchee.Scenario
   alias Benchee.Configuration
+  alias Benchee.Scenario
 
   @type hook_function :: (any -> any)
 
