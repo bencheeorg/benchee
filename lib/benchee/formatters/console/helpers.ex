@@ -5,6 +5,7 @@ defmodule Benchee.Formatters.Console.Helpers do
   # memory usage statistics.
 
   alias Benchee.Conversion.{Count, DeviationPercent, Format, Scale, Unit}
+  alias Benchee.Scenario
   alias Benchee.Statistics
 
   @type unit_per_statistic :: %{atom => Unit.t()}
@@ -29,6 +30,7 @@ defmodule Benchee.Formatters.Console.Helpers do
     Format.format({Scale.scale(value, unit), unit})
   end
 
+  @spec label_width([Scenario.t()]) :: number
   def label_width(scenarios) do
     max_label_width =
       scenarios
@@ -39,10 +41,12 @@ defmodule Benchee.Formatters.Console.Helpers do
     max_label_width + 1
   end
 
+  @spec count_output(number, Count.units()) :: binary
   def count_output(count, unit) do
     Count.format({Count.scale(count, unit), unit})
   end
 
+  @spec deviation_output(number) :: binary
   def deviation_output(std_dev_ratio) do
     DeviationPercent.format(std_dev_ratio)
   end

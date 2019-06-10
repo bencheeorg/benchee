@@ -5,7 +5,7 @@ defmodule Benchee.CollectionData do
   Consists of the recorded `samples` and the statistics computed from them.
   """
 
-  defstruct statistics: %Benchee.Statistics{}, samples: []
+  defstruct [:statistics, samples: []]
 
   @typedoc """
   Samples and statistics.

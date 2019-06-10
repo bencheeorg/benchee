@@ -9,7 +9,7 @@ defmodule Benchee.Benchmark.ScenarioContext do
     :current_time,
     :end_time,
     # before_scenario can alter the original input
-    scenario_input: nil,
+    :scenario_input,
     num_iterations: 1,
     function_call_overhead: 0
   ]

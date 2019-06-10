@@ -27,6 +27,8 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
 
   @minimum_execution_time 10
   @times_multiplier 10
+  @spec determine_n_times(Scenario.t(), ScenarioContext.t(), bool, module) ::
+          {pos_integer, any}
   def determine_n_times(
         scenario,
         scenario_context = %ScenarioContext{
@@ -63,6 +65,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
   defp adjust_for_iterations(measurement, 1), do: measurement
   defp adjust_for_iterations(measurement, num_iterations), do: measurement / num_iterations
 
+  @spec collect(Scenario.t(), ScenarioContext.t(), module) :: number
   def collect(
         scenario,
         scenario_context = %ScenarioContext{

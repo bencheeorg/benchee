@@ -17,6 +17,7 @@ defmodule Benchee.Scenario do
   """
 
   alias Benchee.CollectionData
+  alias Benchee.Benchmark.Hooks
 
   defstruct [
     :name,
@@ -24,14 +25,21 @@ defmodule Benchee.Scenario do
     :function,
     :input_name,
     :input,
+    :before_each,
+    :after_each,
+    :before_scenario,
+    :after_scenario,
+    :tag,
     run_time_data: %CollectionData{},
-    memory_usage_data: %CollectionData{},
-    before_each: nil,
-    after_each: nil,
-    before_scenario: nil,
-    after_scenario: nil,
-    tag: nil
+    memory_usage_data: %CollectionData{}
   ]
+
+  @typedoc """
+  The main function executed while benchmarking.
+
+  No arguments if no inputs are used, one argument if inputs are used.
+  """
+  @type benchmarking_function :: (() -> any) | (any -> any)
 
   @typedoc """
   All the data collected for a scenario (combination of function and input)
@@ -43,15 +51,15 @@ defmodule Benchee.Scenario do
   @type t :: %__MODULE__{
           name: String.t(),
           job_name: String.t(),
-          function: fun,
+          function: benchmarking_function,
           input_name: String.t() | nil,
           input: any | nil,
           run_time_data: CollectionData.t(),
           memory_usage_data: CollectionData.t(),
-          before_each: fun | nil,
-          after_each: fun | nil,
-          before_scenario: fun | nil,
-          after_scenario: fun | nil,
+          before_each: Hooks.hook_function() | nil,
+          after_each: Hooks.hook_function() | nil,
+          before_scenario: Hooks.hook_function() | nil,
+          after_scenario: Hooks.hook_function() | nil,
           tag: String.t() | nil
         }
 
