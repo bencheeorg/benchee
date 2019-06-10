@@ -201,8 +201,8 @@ defmodule Benchee.Statistics do
   defp convert_from_statistex(statistex_statistics) do
     %__MODULE__{
       average: statistex_statistics.average,
-      std_dev: statistex_statistics.std_dev,
-      std_dev_ratio: statistex_statistics.std_dev_ratio,
+      std_dev: statistex_statistics.standard_deviation,
+      std_dev_ratio: statistex_statistics.standard_deviation_ratio,
       median: statistex_statistics.median,
       percentiles: statistex_statistics.percentiles,
       mode: statistex_statistics.mode,

@@ -4,7 +4,7 @@ defmodule Statistex.Mode do
   @typedoc """
   Careful with the mode, might be multiple values, one value or nothing.😱
   """
-  @type mode :: [number] | number | nil
+  @type mode :: [Statistex.sample()] | Statistex.sample() | nil
 
   @doc """
       iex> Statistex.Mode.mode([5, 3, 4, 5, 1, 3, 1, 3])

@@ -10,17 +10,15 @@ defmodule Statistex do
   require Integer
 
   defstruct [
+    :total,
     :average,
-    :std_dev,
-    :std_dev_ratio,
+    :standard_deviation,
+    :standard_deviation_ratio,
     :median,
     :percentiles,
     :mode,
     :minimum,
     :maximum,
-    :relative_more,
-    :relative_less,
-    :absolute_difference,
     sample_size: 0
   ]
 
@@ -29,58 +27,44 @@ defmodule Statistex do
 
   Overview of all the statistics benchee currently provides:
 
-    * average       - average run time of the job in μs (the lower the better)
-    * ips           - iterations per second, how often can the given function be
-      executed within one second (the higher the better)
-    * std_dev       - standard deviation, a measurement how much results vary
-      (the higher the more the results vary)
+    * total         - the sum of all the samples
+    * average       - well... the average
+    * std_dev       - standard deviation, a measurement how much samples vary
+      (the higher the more the samples vary)
     * std_dev_ratio - standard deviation expressed as how much it is relative to
       the average
-    * std_dev_ips   - the absolute standard deviation of iterations per second
-      (= ips * std_dev_ratio)
-    * median        - when all measured times are sorted, this is the middle
+    * median        - when all samples are sorted, this is the middle
       value (or average of the two middle values when the number of times is
-      even). More stable than the average and somewhat more likely to be a
-      typical value you see.
+      even). More stable than the average.
     * percentiles   - a map of percentile ranks. These are the values below
-      which x% of the run times lie. For example, 99% of run times are shorter
+      which x% of the samples lie. For example, 99% of samples are less
       than the 99th percentile (99th %) rank.
       is a value for which 99% of the run times are shorter.
-    * mode          - the run time(s) that occur the most. Often one value, but
+    * mode          - the sample(s) that occur the most. Often one value, but
       can be multiple values if they occur the same amount of times. If no value
       occurs at least twice, this value will be nil.
-    * minimum       - the smallest sample measured for the scenario
-    * maximum       - the biggest sample measured for the scenario
-    * relative_more - relative to the reference (usually the fastest scenario) how much more
-      was the average of this scenario. E.g. for reference at 100, this scenario 200 then it
-      is 2.0.
-    * relative_less - relative to the reference (usually the fastest scenario) how much less
-      was the average of this scenario. E.g. for reference at 100, this scenario 200 then it
-      is 0.5.
-    * absolute_difference - relative to the reference (usually the fastest scenario) what is
-      the difference of the averages of the scenarios. e.g. for reference at 100, this
-      scenario 200 then it is 100.
+    * minimum       - the smallest sample
+    * maximum       - the biggest sample
     * sample_size   - the number of run time measurements taken
   """
   @type t :: %__MODULE__{
+          total: number,
           average: float,
-          std_dev: float,
-          std_dev_ratio: float,
+          standard_deviation: float,
+          standard_deviation_ratio: float,
           median: number,
           percentiles: %{number => float},
           mode: Statistex.Mode.mode(),
           minimum: number,
           maximum: number,
-          relative_more: float | nil | :infinity,
-          relative_less: float | nil | :infinity,
-          absolute_difference: float | nil,
           sample_size: non_neg_integer
         }
 
   @typedoc """
   The samples a `Benchee.Collect` collected to compute statistics from.
   """
-  @type samples :: [number]
+  @type samples :: [sample]
+  @type sample :: number
 
   @type configuration :: keyword
   @doc """
@@ -94,39 +78,58 @@ defmodule Statistex do
   end
 
   def statistics(samples, configuration) do
-    total = Enum.sum(samples)
-    num_iterations = length(samples)
-    average = total / num_iterations
-    deviation = standard_deviation(samples, average, num_iterations)
-    standard_dev_ratio = if average == 0, do: 0, else: deviation / average
+    total = total(samples)
+    sample_size = length(samples)
+    average = average(samples, total: total, sample_size: sample_size)
+    standard_deviation = standard_deviation(samples, average: average, sample_size: sample_size)
 
-    percentiles = Keyword.get(configuration, :percentiles, [])
-    percentiles = Enum.uniq([50 | percentiles])
+    standard_deviation_ratio =
+      standard_deviation_ratio(samples, average: average, standard_deviation: standard_deviation)
 
-    percentiles = Percentile.percentiles(samples, percentiles)
-    median = Map.fetch!(percentiles, 50)
-    mode = Mode.mode(samples)
-    minimum = Enum.min(samples)
-    maximum = Enum.max(samples)
+    percentiles = calculate_percentiles(samples, configuration)
+    median = median(samples, percentiles: percentiles)
 
     %__MODULE__{
+      total: total,
       average: average,
-      std_dev: deviation,
-      std_dev_ratio: standard_dev_ratio,
+      standard_deviation: standard_deviation,
+      standard_deviation_ratio: standard_deviation_ratio,
       median: median,
       percentiles: percentiles,
-      mode: mode,
-      minimum: minimum,
-      maximum: maximum,
-      sample_size: num_iterations
+      mode: mode(samples),
+      minimum: minimum(samples),
+      maximum: maximum(samples),
+      sample_size: sample_size
     }
   end
 
-  defdelegate percentiles(samples, percentiles), to: Percentile
+  @spec total(samples) :: number
+  def total(samples), do: Enum.sum(samples)
 
-  defp standard_deviation(_samples, _average, 1), do: 0
+  @spec sample_size(samples) :: non_neg_integer
+  def sample_size(samples), do: length(samples)
 
-  defp standard_deviation(samples, average, sample_size) do
+  @spec average(samples, keyword) :: float
+  def average(samples, options \\ []) do
+    total = Keyword.get_lazy(options, :total, fn -> total(samples) end)
+    sample_size = Keyword.get_lazy(options, :sample_size, fn -> sample_size(samples) end)
+
+    total / sample_size
+  end
+
+  @spec standard_deviation(samples, keyword) :: float
+  def standard_deviation(samples, options \\ []) do
+    sample_size = Keyword.get_lazy(options, :sample_size, fn -> sample_size(samples) end)
+
+    average =
+      Keyword.get_lazy(options, :average, fn -> average(samples, sample_size: sample_size) end)
+
+    do_standard_deviation(samples, average, sample_size)
+  end
+
+  defp do_standard_deviation(_samples, _average, 1), do: 0.0
+
+  defp do_standard_deviation(samples, average, sample_size) do
     total_variance =
       Enum.reduce(samples, 0, fn sample, total ->
         total + :math.pow(sample - average, 2)
@@ -135,4 +138,47 @@ defmodule Statistex do
     variance = total_variance / (sample_size - 1)
     :math.sqrt(variance)
   end
+
+  @spec standard_deviation_ratio(samples, keyword) :: float
+  def standard_deviation_ratio(samples, options) do
+    average = Keyword.get_lazy(options, :average, fn -> average(samples) end)
+
+    std_dev =
+      Keyword.get_lazy(options, :standard_deviation, fn ->
+        standard_deviation(samples, average: average)
+      end)
+
+    if average == 0 do
+      0.0
+    else
+      std_dev / average
+    end
+  end
+
+  @median_percentile 50
+  defp calculate_percentiles(samples, configuration) do
+    percentiles_configuration = Keyword.get(configuration, :percentiles, [])
+
+    # 50 is manually added so that it can be used directly by median
+    percentiles_configuration = Enum.uniq([@median_percentile | percentiles_configuration])
+    percentiles(samples, percentiles_configuration)
+  end
+
+  defdelegate percentiles(samples, percentiles), to: Percentile
+  defdelegate mode(samples), to: Mode
+
+  @spec median(samples, keyword) :: number
+  def median(samples, options \\ []) do
+    percentiles =
+      Keyword.get_lazy(options, :percentiles, fn -> percentiles(samples, @median_percentile) end)
+
+    Map.get_lazy(percentiles, @median_percentile, fn ->
+      samples |> percentiles(@median_percentile) |> Map.fetch!(@median_percentile)
+    end)
+  end
+
+  @spec maximum(samples) :: sample
+  def maximum(samples), do: Enum.max(samples)
+  @spec minimum(samples) :: sample
+  def minimum(samples), do: Enum.min(samples)
 end
