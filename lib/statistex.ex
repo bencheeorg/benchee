@@ -46,7 +46,7 @@ defmodule Statistex do
   @typedoc """
   The samples to compute statistics from.
   """
-  @type samples :: [sample, ...]
+  @type samples :: [sample]
 
   @typedoc """
   A single sample/
@@ -77,7 +77,7 @@ defmodule Statistex do
   @typedoc """
   The percentiles map returned by `percentiles/2`.
   """
-  @type percentiles :: %{optional(number()) => float}
+  @type percentiles :: %{number() => float}
 
   @doc """
   Calculate all statistics Statistex offers for a given list of numbers.
