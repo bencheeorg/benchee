@@ -21,6 +21,6 @@ defmodule Benchee.Benchmark.ScenarioContext do
           end_time: pos_integer | nil,
           scenario_input: any,
           num_iterations: pos_integer,
-          function_call_overhead: pos_integer
+          function_call_overhead: non_neg_integer
         }
 end

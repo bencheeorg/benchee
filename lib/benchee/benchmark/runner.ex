@@ -4,8 +4,8 @@ defmodule Benchee.Benchmark.Runner do
   # This module actually runs our benchmark scenarios, adding information about
   # run time and memory usage to each scenario.
 
-  alias Benchee.{Benchmark, Configuration, Conversion, Scenario, Utility.Parallel}
-  alias Benchmark.{Collect, Hooks, RepeatedMeasurement, ScenarioContext}
+  alias Benchee.{Benchmark, Configuration, Scenario, Utility.Parallel}
+  alias Benchmark.{Collect, FunctionCallOverhead, Hooks, RepeatedMeasurement, ScenarioContext}
 
   @doc """
   Executes the benchmarks defined before by first running the defined functions
@@ -29,7 +29,7 @@ defmodule Benchee.Benchmark.Runner do
 
     function_call_overhead =
       if scenario_context.config.measure_function_call_overhead do
-        determine_function_call_overhead()
+        FunctionCallOverhead.measure()
       else
         0
       end
@@ -51,36 +51,6 @@ defmodule Benchee.Benchmark.Runner do
     _ = Hooks.run_after_scenario(scenario, scenario_context)
     nil
   end
-
-  @no_input Benchmark.no_input()
-  @overhead_determination_time Conversion.Duration.convert_value({0.01, :second}, :nanosecond)
-  defp determine_function_call_overhead do
-    overhead_times = run_scenario_to_measure_function_call_overhead()
-
-    compute_median(overhead_times)
-  end
-
-  @spec run_scenario_to_measure_function_call_overhead() :: [number]
-  defp run_scenario_to_measure_function_call_overhead do
-    scenario = %Scenario{function: fn -> nil end, input: @no_input}
-
-    scenario_context = %ScenarioContext{
-      config: %Configuration{
-        time: @overhead_determination_time,
-        warmup: @overhead_determination_time,
-        print: %{fast_warning: false}
-      }
-    }
-
-    {run_times, []} = measure_scenario(scenario, scenario_context)
-    run_times
-  end
-
-  @spec compute_median([number]) :: number
-  # this case should never occur in real life but it's here to be totally
-  # sure and hopefully make dialyzer happy
-  defp compute_median([]), do: 0
-  defp compute_median(samples), do: Statistex.median(samples)
 
   defp parallel_benchmark(
          scenario = %Scenario{job_name: job_name, input_name: input_name},
@@ -112,7 +82,7 @@ defmodule Benchee.Benchmark.Runner do
     }
   end
 
-  @spec measure_scenario(any, any) :: {[number], [number]}
+  @spec measure_scenario(Scenario.t(), ScenarioContext.t()) :: {[number], [number]}
   defp measure_scenario(scenario, scenario_context) do
     scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
@@ -183,7 +153,7 @@ defmodule Benchee.Benchmark.Runner do
     do_benchmark(scenario, new_context, Collect.Memory, [])
   end
 
-  @spec measure_runtimes(any, any, number, boolean) :: [number]
+  @spec measure_runtimes(Scenario.t(), ScenarioContext.t(), number, boolean) :: [number]
   defp measure_runtimes(scenario, context, run_time, fast_warning)
   defp measure_runtimes(_, _, 0.0, _), do: []
 
@@ -274,6 +244,7 @@ defmodule Benchee.Benchmark.Runner do
     RepeatedMeasurement.collect(scenario, scenario_context, collector)
   end
 
+  @no_input Benchmark.no_input()
   def main_function(function, @no_input), do: function
   def main_function(function, input), do: fn -> function.(input) end
 end
