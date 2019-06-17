@@ -2,7 +2,14 @@ defmodule Statistex.Mode do
   @moduledoc false
 
   @spec mode(Statistex.samples()) :: Statistex.mode()
-  def(mode(samples)) do
+  def mode([]) do
+    raise(
+      ArgumentError,
+      "Passed an empty list ([]) to calculate statistics from, please pass a list containing at least on number."
+    )
+  end
+
+  def mode(samples) do
     samples
     |> Enum.reduce(%{}, fn sample, counts ->
       Map.update(counts, sample, 1, fn old_value -> old_value + 1 end)

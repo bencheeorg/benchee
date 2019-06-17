@@ -2,8 +2,13 @@ defmodule Statistex.Percentile do
   @moduledoc false
 
   @spec percentiles(Statistex.samples(), number | [number, ...]) ::
-          Statistex.percentiles() | Statistex.empty_list_error()
-  def percentiles([], _), do: {:error, :empty_list}
+          Statistex.percentiles()
+  def percentiles([], _) do
+    raise(
+      ArgumentError,
+      "Passed an empty list ([]) to calculate statistics from, please pass a list containing at least on number."
+    )
+  end
 
   def percentiles(samples, percentile_ranks) do
     number_of_samples = length(samples)

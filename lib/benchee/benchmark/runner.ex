@@ -55,6 +55,13 @@ defmodule Benchee.Benchmark.Runner do
   @no_input Benchmark.no_input()
   @overhead_determination_time Conversion.Duration.convert_value({0.01, :second}, :nanosecond)
   defp determine_function_call_overhead do
+    overhead_times = run_scenario_to_measure_function_call_overhead()
+
+    compute_median(overhead_times)
+  end
+
+  @spec run_scenario_to_measure_function_call_overhead() :: [number]
+  defp run_scenario_to_measure_function_call_overhead do
     scenario = %Scenario{function: fn -> nil end, input: @no_input}
 
     scenario_context = %ScenarioContext{
@@ -66,10 +73,14 @@ defmodule Benchee.Benchmark.Runner do
     }
 
     {run_times, []} = measure_scenario(scenario, scenario_context)
-    %{50 => median} = Statistex.percentiles(run_times, 50)
-
-    median
+    run_times
   end
+
+  @spec compute_median([number]) :: number
+  # this case should never occur in real life but it's here to be totally
+  # sure and hopefully make dialyzer happy
+  defp compute_median([]), do: 0
+  defp compute_median(samples), do: Statistex.median(samples)
 
   defp parallel_benchmark(
          scenario = %Scenario{job_name: job_name, input_name: input_name},
@@ -101,6 +112,7 @@ defmodule Benchee.Benchmark.Runner do
     }
   end
 
+  @spec measure_scenario(any, any) :: {[number], [number]}
   defp measure_scenario(scenario, scenario_context) do
     scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
@@ -171,6 +183,7 @@ defmodule Benchee.Benchmark.Runner do
     do_benchmark(scenario, new_context, Collect.Memory, [])
   end
 
+  @spec measure_runtimes(any, any, number, boolean) :: [number]
   defp measure_runtimes(scenario, context, run_time, fast_warning)
   defp measure_runtimes(_, _, 0.0, _), do: []
 
@@ -225,6 +238,7 @@ defmodule Benchee.Benchmark.Runner do
   end
 
   # We return `nil` if memory measurement failed so keep it empty
+  @spec updated_measurements(number | nil, [number]) :: [number]
   defp updated_measurements(nil, measurements), do: measurements
   defp updated_measurements(measurement, measurements), do: [measurement | measurements]
 

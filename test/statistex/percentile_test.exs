@@ -27,7 +27,7 @@ defmodule Statistex.PercentileTest do
   end
 
   test "an empty list raises an argument error" do
-    assert percentiles([], [1]) == {:error, :empty_list}
+    assert_raise ArgumentError, fn -> percentiles([], [1]) end
   end
 
   describe "a list of one element" do
