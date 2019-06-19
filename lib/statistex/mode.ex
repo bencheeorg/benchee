@@ -1,24 +1,15 @@
-defmodule Benchee.Statistics.Mode do
+defmodule Statistex.Mode do
   @moduledoc false
 
-  alias Benchee.Statistics
+  @spec mode(Statistex.samples()) :: Statistex.mode()
+  def mode([]) do
+    raise(
+      ArgumentError,
+      "Passed an empty list ([]) to calculate statistics from, please pass a list containing at least on number."
+    )
+  end
 
-  @doc """
-      iex> Benchee.Statistics.Mode.mode([5, 3, 4, 5, 1, 3, 1, 3])
-      3
-
-      iex> Benchee.Statistics.Mode.mode([])
-      nil
-
-      iex> Benchee.Statistics.Mode.mode([1, 2, 3, 4, 5])
-      nil
-
-      iex> mode = Benchee.Statistics.Mode.mode([5, 3, 4, 5, 1, 3, 1])
-      iex> Enum.sort(mode)
-      [1, 3, 5]
-  """
-  @spec mode(Statistics.samples()) :: Statistics.mode()
-  def(mode(samples)) do
+  def mode(samples) do
     samples
     |> Enum.reduce(%{}, fn sample, counts ->
       Map.update(counts, sample, 1, fn old_value -> old_value + 1 end)

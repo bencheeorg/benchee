@@ -20,7 +20,7 @@ before_script:
   - travis_wait mix dialyzer --plt
 script:
   - mix credo --strict
-  - mix format --check-formatted
+  - if [[ "$TRAVIS_ELIXIR_VERSION" == "1.8"* ]]; then mix format --check-formatted; fi
   - mix dialyzer --halt-exit-status
   - mix coveralls.travis
 after_script:

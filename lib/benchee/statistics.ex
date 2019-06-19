@@ -6,10 +6,8 @@ defmodule Benchee.Statistics do
   See `statistics/1` for a breakdown of the included statistics.
   """
 
-  alias Benchee.{Conversion.Duration, Suite, Utility.Parallel}
+  alias Benchee.{CollectionData, Conversion.Duration, Scenario, Suite, Utility.Parallel}
 
-  alias Benchee.Statistics.Mode
-  alias Benchee.Statistics.Percentile
   require Integer
 
   defstruct [
@@ -163,69 +161,61 @@ defmodule Benchee.Statistics do
 
   """
   @spec statistics(Suite.t()) :: Suite.t()
-  def statistics(suite = %Suite{scenarios: scenarios}) do
-    config = suite.configuration
+  def statistics(suite) do
+    percentiles = suite.configuration.percentiles
 
-    scenarios_with_statistics = calculate_per_scenario_statistics(scenarios, config)
-
-    %Suite{suite | scenarios: scenarios_with_statistics}
-  end
-
-  defp calculate_per_scenario_statistics(scenarios, config) do
-    percentiles = Enum.uniq([50 | config.percentiles])
-
-    Parallel.map(scenarios, fn scenario ->
-      run_time_stats = scenario.run_time_data.samples |> job_statistics(percentiles) |> add_ips
-      memory_stats = job_statistics(scenario.memory_usage_data.samples, percentiles)
-
-      %{
-        scenario
-        | run_time_data: %{scenario.run_time_data | statistics: run_time_stats},
-          memory_usage_data: %{scenario.memory_usage_data | statistics: memory_stats}
-      }
+    update_in(suite.scenarios, fn scenarios ->
+      Parallel.map(scenarios, fn scenario ->
+        calculate_scenario_statistics(scenario, percentiles)
+      end)
     end)
   end
 
-  @spec job_statistics(samples, list) :: __MODULE__.t()
-  defp job_statistics([], _) do
-    %__MODULE__{sample_size: 0}
-  end
+  defp calculate_scenario_statistics(scenario, percentiles) do
+    run_time_stats =
+      scenario.run_time_data.samples
+      |> calculate_statistics(percentiles)
+      |> add_ips
 
-  defp job_statistics(samples, percentiles) do
-    total = Enum.sum(samples)
-    num_iterations = length(samples)
-    average = total / num_iterations
-    deviation = standard_deviation(samples, average, num_iterations)
-    standard_dev_ratio = if average == 0, do: 0, else: deviation / average
-    percentiles = Percentile.percentiles(samples, percentiles)
-    median = Map.fetch!(percentiles, 50)
-    mode = Mode.mode(samples)
-    minimum = Enum.min(samples)
-    maximum = Enum.max(samples)
+    memory_stats = calculate_statistics(scenario.memory_usage_data.samples, percentiles)
 
-    %__MODULE__{
-      average: average,
-      std_dev: deviation,
-      std_dev_ratio: standard_dev_ratio,
-      median: median,
-      percentiles: percentiles,
-      mode: mode,
-      minimum: minimum,
-      maximum: maximum,
-      sample_size: num_iterations
+    %Scenario{
+      scenario
+      | run_time_data: %CollectionData{
+          scenario.run_time_data
+          | statistics: run_time_stats
+        },
+        memory_usage_data: %CollectionData{
+          scenario.memory_usage_data
+          | statistics: memory_stats
+        }
     }
   end
 
-  defp standard_deviation(_samples, _average, 1), do: 0
+  defp calculate_statistics([], _) do
+    %__MODULE__{
+      sample_size: 0
+    }
+  end
 
-  defp standard_deviation(samples, average, sample_size) do
-    total_variance =
-      Enum.reduce(samples, 0, fn sample, total ->
-        total + :math.pow(sample - average, 2)
-      end)
+  defp calculate_statistics(samples, percentiles) do
+    samples
+    |> Statistex.statistics(percentiles: percentiles)
+    |> convert_from_statistex
+  end
 
-    variance = total_variance / (sample_size - 1)
-    :math.sqrt(variance)
+  defp convert_from_statistex(statistex_statistics) do
+    %__MODULE__{
+      average: statistex_statistics.average,
+      std_dev: statistex_statistics.standard_deviation,
+      std_dev_ratio: statistex_statistics.standard_deviation_ratio,
+      median: statistex_statistics.median,
+      percentiles: statistex_statistics.percentiles,
+      mode: statistex_statistics.mode,
+      minimum: statistex_statistics.minimum,
+      maximum: statistex_statistics.maximum,
+      sample_size: statistex_statistics.sample_size
+    }
   end
 
   defp add_ips(statistics = %__MODULE__{sample_size: 0}), do: statistics

@@ -1,7 +1,8 @@
-defmodule Benchee.Statistics.PercentileTest do
+defmodule Statistex.PercentileTest do
   use ExUnit.Case, async: true
-  alias Benchee.Statistics.Percentile
-  doctest Percentile
+  import Statistex.Percentile
+
+  doctest Statistex.Percentile
 
   @nist_sample_data [
     95.1772,
@@ -21,12 +22,12 @@ defmodule Benchee.Statistics.PercentileTest do
   # Test data from:
   #   http://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm
   test "90th percentile" do
-    %{90 => result} = Percentile.percentiles(@nist_sample_data, 90)
+    %{90 => result} = percentiles(@nist_sample_data, 90)
     assert Float.round(result, 4) == 95.1981
   end
 
   test "an empty list raises an argument error" do
-    assert_raise ArgumentError, fn -> Percentile.percentiles([], [1]) end
+    assert_raise ArgumentError, fn -> percentiles([], [1]) end
   end
 
   describe "a list of one element" do
@@ -35,17 +36,17 @@ defmodule Benchee.Statistics.PercentileTest do
     end
 
     test "1st percentile", %{samples: samples} do
-      %{1 => result} = Percentile.percentiles(samples, [1])
+      %{1 => result} = percentiles(samples, [1])
       assert result == 300.0
     end
 
     test "50th percentile", %{samples: samples} do
-      %{50 => result} = Percentile.percentiles(samples, [50])
+      %{50 => result} = percentiles(samples, [50])
       assert result == 300.0
     end
 
     test "99th percentile", %{samples: samples} do
-      %{99 => result} = Percentile.percentiles(samples, [99])
+      %{99 => result} = percentiles(samples, [99])
       assert result == 300.0
     end
   end
@@ -56,17 +57,17 @@ defmodule Benchee.Statistics.PercentileTest do
     end
 
     test "1st percentile", %{samples: samples} do
-      %{1 => result} = Percentile.percentiles(samples, [1])
+      %{1 => result} = percentiles(samples, [1])
       assert result == 203.0
     end
 
     test "50th percentile", %{samples: samples} do
-      %{50 => result} = Percentile.percentiles(samples, [50])
+      %{50 => result} = percentiles(samples, [50])
       assert result == 250.0
     end
 
     test "99th percentile", %{samples: samples} do
-      %{99 => result} = Percentile.percentiles(samples, [99])
+      %{99 => result} = percentiles(samples, [99])
       assert result == 300.0
     end
   end
@@ -77,17 +78,17 @@ defmodule Benchee.Statistics.PercentileTest do
     end
 
     test "1st percentile", %{samples: samples} do
-      %{1 => result} = Percentile.percentiles(samples, [1])
+      %{1 => result} = percentiles(samples, [1])
       assert result == 104.0
     end
 
     test "50th percentile", %{samples: samples} do
-      %{50 => result} = Percentile.percentiles(samples, [50])
+      %{50 => result} = percentiles(samples, [50])
       assert result == 200.0
     end
 
     test "99th percentile", %{samples: samples} do
-      %{99 => result} = Percentile.percentiles(samples, [99])
+      %{99 => result} = percentiles(samples, [99])
       assert result == 300.0
     end
   end

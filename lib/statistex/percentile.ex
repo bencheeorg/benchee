@@ -1,44 +1,15 @@
-defmodule Benchee.Statistics.Percentile do
+defmodule Statistex.Percentile do
   @moduledoc false
 
-  @type percentile :: float()
-  @type percentiles :: %{optional(number()) => percentile()}
+  @spec percentiles(Statistex.samples(), number | [number, ...]) ::
+          Statistex.percentiles()
+  def percentiles([], _) do
+    raise(
+      ArgumentError,
+      "Passed an empty list ([]) to calculate statistics from, please pass a list containing at least on number."
+    )
+  end
 
-  @doc """
-  Calculates the value at the `percentile_rank`-th percentile. Think of this as the
-  value below which `percentile_rank` percent of the samples lie. For example,
-  if `Benchee.Statistics.Percentile.percentile(samples, 99)` == 123.45,
-  99% of samples are less than 123.45.
-
-  Passing a number for `percentile_rank` calculates a single percentile.
-  Passing a list of numbers calculates multiple percentiles, and returns them
-  as a map like %{90 => 45.6, 99 => 78.9}, where the keys are the percentile
-  numbers, and the values are the percentile values.
-
-  ## Examples
-
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 12.5)
-  %{12.5 => 1.0}
-
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [50])
-  %{50 => 3.0}
-
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [75])
-  %{75 => 4.75}
-
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 99)
-  %{99 => 5.0}
-
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], [50, 75, 99])
-  %{50 => 3.0, 75 => 4.75, 99 => 5.0}
-
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 100)
-  ** (ArgumentError) percentile must be between 0 and 100, got: 100
-
-  iex> Benchee.Statistics.Percentile.percentiles([5, 3, 4, 5, 1, 3, 1, 3], 0)
-  ** (ArgumentError) percentile must be between 0 and 100, got: 0
-  """
-  @spec percentiles([number()], number | [number()]) :: percentiles
   def percentiles(samples, percentile_ranks) do
     number_of_samples = length(samples)
     sorted_samples = Enum.sort(samples)
