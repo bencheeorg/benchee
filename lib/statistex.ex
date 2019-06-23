@@ -278,7 +278,6 @@ defmodule Statistex do
     do_standard_deviation(samples, average, sample_size)
   end
 
-  defp do_standard_deviation(_samples, _average, 0), do: 0.0
   defp do_standard_deviation(_samples, _average, 1), do: 0.0
 
   defp do_standard_deviation(samples, average, sample_size) do
@@ -294,7 +293,7 @@ defmodule Statistex do
   @doc """
     Calculate the standard deviation relative to the average.
 
-    This helps put the absolute standard deviation value into perspective expressing it relative to the average.
+    This helps put the absolute standard deviation value into perspective expressing it relative to the average. It's what percentage of the absolute value of the average the variance takes.
 
     ## Options
     If already calculated, the `:average` and `:standard_deviation` options can be provided to avoid recalulating those values.
@@ -306,6 +305,9 @@ defmodule Statistex do
     ## Examples
 
         iex> Statistex.standard_deviation_ratio([4, 9, 11, 12, 17, 5, 8, 12, 12])
+        0.4
+
+        iex> Statistex.standard_deviation_ratio([-4, -9, -11, -12, -17, -5, -8, -12, -12])
         0.4
 
         iex> Statistex.standard_deviation_ratio([4, 9, 11, 12, 17, 5, 8, 12, 12], average: 10.0, standard_deviation: 4.0)
@@ -332,7 +334,7 @@ defmodule Statistex do
     if average == 0 do
       0.0
     else
-      std_dev / average
+      abs(std_dev / average)
     end
   end
 
