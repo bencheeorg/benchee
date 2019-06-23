@@ -262,6 +262,12 @@ defmodule Statistex do
       iex> Statistex.standard_deviation([4, 9, 11, 12, 17, 5, 8, 12, 12], sample_size: 9, average: 10.0)
       4.0
 
+      iex> Statistex.standard_deviation([42])
+      0.0
+
+      iex> Statistex.standard_deviation([1, 1, 1, 1, 1, 1, 1])
+      0.0
+
       iex> Statistex.standard_deviation([])
       ** (ArgumentError) Passed an empty list ([]) to calculate statistics from, please pass a list containing at least on number.
   """
