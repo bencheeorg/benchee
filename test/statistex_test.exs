@@ -42,14 +42,13 @@ defmodule Statistex.StatistexTest do
       end
     end
 
+    @tag skip: """
+         seems like for 2 element lists the 50th percentiles ends up
+         smaller than the 25th percentile which definitely isn't cool.
+
+         I have no Internet atm to research what the correct behaviour should be.
+         """
     property "percentiles are correctly related to each other" do
-      pending("""
-      seems like for 2 element lists the 50th percentiles ends up
-      smaller than the 25th percentile which definitely isn't cool.
-
-      I have no Internet atm to research what the correct behaviour should be.
-      """)
-
       check all samples <- list_of(float(), min_length: 1) do
         percies = percentiles(samples, [25, 50, 75, 90, 99])
 
