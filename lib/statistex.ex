@@ -368,6 +368,8 @@ defmodule Statistex do
 
   Percentiles must be between 0 and 100 (excluding the boundaries).
 
+  The method used for interpolation is [described here and recommended by NIST](https://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm).
+
   `Argumenterror` is raised if the given list is empty.
 
   ## Examples

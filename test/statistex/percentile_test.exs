@@ -31,64 +31,76 @@ defmodule Statistex.PercentileTest do
   end
 
   describe "a list of one element" do
-    setup do
-      {:ok, samples: [300]}
-    end
-
-    test "1st percentile", %{samples: samples} do
-      %{1 => result} = percentiles(samples, [1])
+    @samples [300]
+    test "1st percentile" do
+      %{1 => result} = percentiles(@samples, [1])
       assert result == 300.0
     end
 
-    test "50th percentile", %{samples: samples} do
-      %{50 => result} = percentiles(samples, [50])
+    test "50th percentile" do
+      %{50 => result} = percentiles(@samples, [50])
       assert result == 300.0
     end
 
-    test "99th percentile", %{samples: samples} do
-      %{99 => result} = percentiles(samples, [99])
+    test "99th percentile" do
+      %{99 => result} = percentiles(@samples, [99])
       assert result == 300.0
     end
   end
 
   describe "a list of two elements" do
-    setup do
-      {:ok, samples: [300, 200]}
+    @samples [300, 200]
+    test "1st percentile (small sample size simply picks first element)" do
+      %{1 => result} = percentiles(@samples, [1])
+      assert result == 200.0
     end
 
-    test "1st percentile", %{samples: samples} do
-      %{1 => result} = percentiles(samples, [1])
-      assert result == 203.0
-    end
-
-    test "50th percentile", %{samples: samples} do
-      %{50 => result} = percentiles(samples, [50])
+    test "50th percentile" do
+      %{50 => result} = percentiles(@samples, [50])
       assert result == 250.0
     end
 
-    test "99th percentile", %{samples: samples} do
-      %{99 => result} = percentiles(samples, [99])
+    test "99th percentile" do
+      %{99 => result} = percentiles(@samples, [99])
       assert result == 300.0
     end
   end
 
+  describe "seemingly problematic 2 element list [9, 1]" do
+    @samples [9, 1]
+
+    percentiles = %{
+      25 => 1,
+      50 => 5,
+      75 => 9.0,
+      90 => 9.0,
+      99 => 9.0
+    }
+
+    for {percentile, expected} <- percentiles do
+      @percentile percentile
+      @expected expected
+      test "#{percentile}th percentile" do
+        %{@percentile => result} = percentiles(@samples, [@percentile])
+        assert result == @expected
+      end
+    end
+  end
+
   describe "a list of three elements" do
-    setup do
-      {:ok, samples: [100, 300, 200]}
+    @samples [100, 300, 200]
+    test "1st percentile (small sample size simply picks first element)" do
+      %{1 => result} = percentiles(@samples, [1])
+      assert result == 100.0
     end
 
-    test "1st percentile", %{samples: samples} do
-      %{1 => result} = percentiles(samples, [1])
-      assert result == 104.0
-    end
-
-    test "50th percentile", %{samples: samples} do
-      %{50 => result} = percentiles(samples, [50])
+    test "50th percentile" do
+      %{50 => result} = percentiles(@samples, [50])
       assert result == 200.0
     end
 
-    test "99th percentile", %{samples: samples} do
-      %{99 => result} = percentiles(samples, [99])
+    test "99th percentile" do
+      %{99 => result} = percentiles(@samples, [99])
       assert result == 300.0
     end
   end
