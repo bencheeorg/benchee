@@ -262,6 +262,12 @@ defmodule Statistex do
       iex> Statistex.standard_deviation([4, 9, 11, 12, 17, 5, 8, 12, 12], sample_size: 9, average: 10.0)
       4.0
 
+      iex> Statistex.standard_deviation([42])
+      0.0
+
+      iex> Statistex.standard_deviation([1, 1, 1, 1, 1, 1, 1])
+      0.0
+
       iex> Statistex.standard_deviation([])
       ** (ArgumentError) Passed an empty list ([]) to calculate statistics from, please pass a list containing at least on number.
   """
@@ -278,7 +284,6 @@ defmodule Statistex do
     do_standard_deviation(samples, average, sample_size)
   end
 
-  defp do_standard_deviation(_samples, _average, 0), do: 0.0
   defp do_standard_deviation(_samples, _average, 1), do: 0.0
 
   defp do_standard_deviation(samples, average, sample_size) do
@@ -294,7 +299,7 @@ defmodule Statistex do
   @doc """
     Calculate the standard deviation relative to the average.
 
-    This helps put the absolute standard deviation value into perspective expressing it relative to the average.
+    This helps put the absolute standard deviation value into perspective expressing it relative to the average. It's what percentage of the absolute value of the average the variance takes.
 
     ## Options
     If already calculated, the `:average` and `:standard_deviation` options can be provided to avoid recalulating those values.
@@ -306,6 +311,9 @@ defmodule Statistex do
     ## Examples
 
         iex> Statistex.standard_deviation_ratio([4, 9, 11, 12, 17, 5, 8, 12, 12])
+        0.4
+
+        iex> Statistex.standard_deviation_ratio([-4, -9, -11, -12, -17, -5, -8, -12, -12])
         0.4
 
         iex> Statistex.standard_deviation_ratio([4, 9, 11, 12, 17, 5, 8, 12, 12], average: 10.0, standard_deviation: 4.0)
@@ -332,7 +340,7 @@ defmodule Statistex do
     if average == 0 do
       0.0
     else
-      std_dev / average
+      abs(std_dev / average)
     end
   end
 
@@ -359,6 +367,8 @@ defmodule Statistex do
   numbers, and the values are the percentile values.
 
   Percentiles must be between 0 and 100 (excluding the boundaries).
+
+  The method used for interpolation is [described here and recommended by NIST](https://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm).
 
   `Argumenterror` is raised if the given list is empty.
 
