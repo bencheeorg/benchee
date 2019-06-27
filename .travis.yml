@@ -25,7 +25,7 @@ script:
   - mix coveralls.travis
 after_script:
   - if [[ "$TRAVIS_ELIXIR_VERSION" == "1.8"* ]]; then mix deps.get --only docs && MIX_ENV=docs mix inch.report; fi
-dist: bionic
+dist: xenial
 cache:
   directories:
     - _build
