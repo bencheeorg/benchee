@@ -762,30 +762,6 @@ defmodule Benchee.Benchmark.RunnerTest do
       ])
     end
 
-    test "after_each hooks with super fast functions" do
-      me = self()
-
-      %Suite{
-        configuration: %{
-          warmup: 100,
-          time: 100,
-          after_each: fn out -> send(me, {:global, out}) end
-        }
-      }
-      |> test_suite
-      |> Benchmark.benchmark("job", {fn ->
-         # still keep to make sure we only get one iteration and not too fast
-         :timer.sleep(1)
-         :value
-       end, after_each: fn out -> send(me, {:local, out}) end})
-      |> Benchmark.collect(TestPrinter)
-
-      assert_received {:global, :value}
-      assert_received {:local, :value}
-      assert_received {:global, :value}
-      assert_received {:local, :value}
-    end
-
     test "hooks dealing with inputs can adapt it and pass it on" do
       me = self()
 
