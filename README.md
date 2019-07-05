@@ -874,6 +874,8 @@ If you're on the [elixir-lang slack](https://elixir-lang.slack.com) also feel fr
 
 ## Development
 
+Note that if the change includes adding new statistics you might need to introduce them to our statistics library [Statistex](https://github.com/bencheeorg/statistex) first!
+
 * `mix deps.get` to install dependencies
 * `mix test` to run tests
 * `mix dialyzer` to run dialyzer for type checking, might take a while on the first invocation (try building plts first with `mix dialyzer --plt`)
