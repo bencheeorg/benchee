@@ -22,8 +22,9 @@ defmodule Benchee.Configuration do
             percentiles: [50, 99],
             print: %{
               benchmarking: true,
+              fast_warning: true,
               configuration: true,
-              fast_warning: true
+              system: true,
             },
             inputs: nil,
             save: false,
@@ -178,7 +179,8 @@ defmodule Benchee.Configuration do
             print: %{
               benchmarking: true,
               fast_warning: true,
-              configuration: true
+              configuration: true,
+              system: true
             },
             percentiles: [50, 99],
             unit_scaling: :best,
@@ -206,7 +208,8 @@ defmodule Benchee.Configuration do
             print: %{
               benchmarking: true,
               fast_warning: true,
-              configuration: true
+              configuration: true,
+              system: true
             },
             percentiles: [50, 99],
             unit_scaling: :best,
@@ -234,7 +237,8 @@ defmodule Benchee.Configuration do
             print: %{
               benchmarking: true,
               fast_warning: true,
-              configuration: true
+              configuration: true,
+              system: true
             },
             percentiles: [50, 99],
             unit_scaling: :best,
@@ -269,7 +273,8 @@ defmodule Benchee.Configuration do
             print: %{
               benchmarking: true,
               fast_warning: false,
-              configuration: true
+              configuration: true,
+              system: true
             },
             percentiles: [50, 99],
             unit_scaling: :smallest,
