@@ -1,10 +1,23 @@
+defmodule Mix.Tasks.Benchmark.Helper do
+  @moduledoc false
+  defmacro compile_file(file) do
+    case Version.compare(System.version, "1.7.0") do
+      :gt -> quote do Code.compile_file(unquote(file)) end
+      _ -> quote do Code.load_file(unquote(file)) end
+    end
+  end
+end
+
 defmodule Mix.Tasks.Benchmark do
   use Mix.Task
   require Logger
+  alias Mix.Tasks.Benchmark.Helper
+  require Mix.Tasks.Benchmark.Helper
 
   @moduledoc """
   Runs project benchmarks
   """
+  @dialyzer [no_match: [find_benchmark_files: 2]]
 
   @switches []
 
@@ -23,7 +36,7 @@ defmodule Mix.Tasks.Benchmark do
   end
 
   defp compile_project(args, _opts) do
-    Logger.debug("Compiling project")
+    :ok = Logger.debug("Compiling project")
     Mix.Task.run("loadpaths", args)
     Mix.Project.compile(args)
   end
@@ -36,7 +49,7 @@ defmodule Mix.Tasks.Benchmark do
 
   defp find_benchmark_files(:stop, _opts), do: :stop
   defp find_benchmark_files(files, _opts) do
-    Logger.debug("Locating benchmarks")
+    :ok = Logger.debug("Locating benchmarks")
     files =
       case files do
         [] ->
@@ -55,7 +68,7 @@ defmodule Mix.Tasks.Benchmark do
       end)
     case files do
       [] ->
-        Logger.debug("No benchmark files found")
+        :ok = Logger.debug("No benchmark files found")
         :stop
       files ->
         files
@@ -64,27 +77,26 @@ defmodule Mix.Tasks.Benchmark do
 
   defp compile_benchmark_files(:stop, _opts), do: :stop
   defp compile_benchmark_files(files, _opts) do
-    Logger.debug("Compiling benchmarks")
+    :ok = Logger.debug("Compiling benchmarks")
     modules =
       files
       |> Enum.flat_map(fn f ->
            f
-           |> Code.compile_file()
+           |> Helper.compile_file()
            |> Enum.map(fn {mod, _bin} -> mod
          end)
     end)
       case modules do
         [] ->
-          Logger.debug("No benchmarks found")
+          :ok = Logger.debug("No benchmarks found")
           :stop
         modules -> modules
       end
-      modules
   end
 
   defp run_benchmarks(:stop, _opts), do: :stop
   defp run_benchmarks(modules, _opts) do
-    Logger.debug("Running benchmarks")
+    :ok = Logger.debug("Running benchmarks")
 
     modules
     |> get_benchmarks()
@@ -106,19 +118,17 @@ defmodule Mix.Tasks.Benchmark do
             fn funname, state ->
               apply(mod, funname, [state, opts])
             end)
-        apply_if_exists(mod, :teardown, [state])
+        try_apply_if_exists(mod, :teardown, [state])
       other ->
-        Logger.error("Global setup of \"#{inspect mod}\" "<>
+        :ok = Logger.error("Global setup of \"#{inspect mod}\" "<>
           "returned #{inspect other}")
     end
     run_all_benchmarks(rest, false)
   end
 
-  defp apply_if_exists(mod, fun, args) do
-    arity = length(args)
-    case mod.module_info(:exports)[fun] do
-      ^arity -> {:ok, apply(mod, fun, args)}
-      nil -> {:error, :not_exists}
+  defp try_apply_if_exists(mod, name, args) do
+    case apply_if_exists(mod, name, args) do
+      _ -> :ok
     end
   end
 
@@ -126,6 +136,14 @@ defmodule Mix.Tasks.Benchmark do
     case apply_if_exists(mod, name, args) do
       {:ok, result} -> result
       {:error, :not_exists} -> default
+    end
+  end
+
+  defp apply_if_exists(mod, fun, args) do
+    arity = length(args)
+    case mod.module_info(:exports)[fun] do
+      ^arity -> {:ok, apply(mod, fun, args)}
+      nil -> {:error, :not_exists}
     end
   end
 

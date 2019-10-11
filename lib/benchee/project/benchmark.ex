@@ -1,8 +1,10 @@
 defmodule Benchee.Project.Benchmark do
+
   @moduledoc """
   Module with macro for defining project-wide benchmarks.
   """
   require Logger
+
   def benchee_scenario_attr, do: :benchee_cases
 
   @doc """
@@ -31,6 +33,7 @@ defmodule Benchee.Project.Benchmark do
     end
   end
 
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defmacro benchmark(name, opts \\ [], [do: {:__block__, [], exprs}]) do
     mod = __CALLER__.module
     state_var = atom_to_var(:state)
@@ -63,7 +66,7 @@ defmodule Benchee.Project.Benchmark do
       local_setup = block_to_fun(setup_doblock, [:state])
 
     if length(rest) > 1 do
-      Logger.warn("#{inspect mod}: Only the first setup is used")
+      :ok = Logger.warn("#{inspect mod}: Only the first setup is used")
     end
 
     [teardown_doblock | rest] =
@@ -74,7 +77,7 @@ defmodule Benchee.Project.Benchmark do
     local_teardown = block_to_fun(teardown_doblock, [:state])
 
     if length(rest) > 1 do
-      Logger.warn("#{inspect mod}: Only the first teardown is used")
+      :ok = Logger.warn("#{inspect mod}: Only the first teardown is used")
     end
 
     opts =
@@ -99,7 +102,7 @@ defmodule Benchee.Project.Benchmark do
             Benchee.run(unquote({:%{}, [], scenarios}), opts)
             unquote(local_teardown).(unquote(state_var))
           other ->
-            Logger.error("Local setup of \"#{unquote(name)}\" in "<>
+            :ok = Logger.error("Local setup of \"#{unquote(name)}\" in "<>
               "#{inspect __MODULE__} returned #{inspect other}")
         end
       end
