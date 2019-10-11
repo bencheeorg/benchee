@@ -24,7 +24,7 @@ defmodule Benchee.Configuration do
               benchmarking: true,
               fast_warning: true,
               configuration: true,
-              system: true,
+              system: true
             },
             inputs: nil,
             save: false,

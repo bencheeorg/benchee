@@ -26,13 +26,13 @@ defmodule Benchee.Output.BenchmarkPrinter do
   end
 
   defp print_system_information(%{
-        erlang: erlang_version,
-        elixir: elixir_version,
-        os: os,
-        num_cores: num_cores,
-        cpu_speed: cpu_speed,
-        available_memory: available_memory
-                          }) do
+         erlang: erlang_version,
+         elixir: elixir_version,
+         os: os,
+         num_cores: num_cores,
+         cpu_speed: cpu_speed,
+         available_memory: available_memory
+       }) do
     IO.puts("""
     Operating System: #{os}
     CPU Information: #{cpu_speed}
@@ -50,8 +50,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
     nil
   end
 
-  def configuration_information(%{scenarios: scenarios,
-                                  configuration: config}) do
+  def configuration_information(%{scenarios: scenarios, configuration: config}) do
     print_suite_information(scenarios, config)
   end
 

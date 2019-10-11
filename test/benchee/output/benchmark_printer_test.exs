@@ -30,12 +30,15 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       capture_io(fn ->
         %{
           configuration: %Configuration{
-            parallel: 2, time: 10_000, warmup: 0, inputs: nil
+            parallel: 2,
+            time: 10_000,
+            warmup: 0,
+            inputs: nil
           },
           # scenarios: [%Scenario{job_name: "one"}, %Scenario{job_name: "two"}],
           system: @system_info
-    }
-    |> system_information
+        }
+        |> system_information
       end)
 
     assert output =~ "Erlang 19.2"
