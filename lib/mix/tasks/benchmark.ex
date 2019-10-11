@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Benchmark.Helper do
   @moduledoc false
   defmacro compile_file(file) do
-    case Version.compare(System.version(), "1.7.0") do
+    case compare_versions(System.version(), "1.7.0") do
       :gt ->
         quote do
           Code.compile_file(unquote(file))
@@ -12,6 +12,10 @@ defmodule Mix.Tasks.Benchmark.Helper do
           Code.load_file(unquote(file))
         end
     end
+  end
+
+  defp compare_versions(v1, v2) do
+    Version.compare(Version.parse!(v1), Version.parse!(v2))
   end
 end
 
