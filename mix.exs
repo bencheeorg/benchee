@@ -55,7 +55,7 @@ defmodule Benchee.Mixfile do
       {:credo, "~> 1.0", only: :dev},
       {:ex_doc, "~> 0.20.0", only: :dev},
       {:earmark, "~> 1.0", only: :dev},
-      {:excoveralls, "~> 0.7", only: :test},
+      {:excoveralls, "~> 0.12", only: :test},
       {:inch_ex, "~> 2.0", only: :docs},
       {:dialyxir, "~> 1.0.0-rc.4", only: :dev, runtime: false}
     ]
