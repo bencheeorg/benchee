@@ -3,6 +3,9 @@ map_fun = fn i -> [i, i * i] end
 Benchee.run(
   %{
     "flat_map" => fn input ->
+      # We need randomness here so we have differing reduction sizes. Otherwise,
+      # we only get the output when all measurements are the same, which isn't
+      # very helpful for testing.
       if rem(Enum.random(1..5), 2) == 0 do
         _ = Enum.random(1..10) + Enum.random(1..10)
         Enum.flat_map(input, map_fun)

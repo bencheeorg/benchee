@@ -812,7 +812,7 @@ defmodule BencheeTest do
             %{"To List" => fn -> Enum.to_list(1..100) end},
             Keyword.merge(
               @test_configuration,
-              reduction_time: 2
+              reduction_time: 0.1
             )
           )
         end)
