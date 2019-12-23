@@ -12,7 +12,7 @@ defmodule Clickhouse.Benchmark.Performance do
   # Called before any benchmark in the module.
   #
   # If defined, must return {:ok, state} for benchmarks to run
-  setup do
+  before_all do
     {:ok, nil}
   end
 
@@ -22,7 +22,7 @@ defmodule Clickhouse.Benchmark.Performance do
   # (and their possible local teardowns had been called).
   #
   # Can return anything.
-  teardown do
+  after_all do
     :anything
   end
 
@@ -37,7 +37,7 @@ defmodule Clickhouse.Benchmark.Performance do
     # implicit variable "state" is bound to it's result
     #
     # If defined, must return {:ok, state} for benchmarks to run
-    setup do
+    before_benchmark do
       {:ok, fn x -> [x] end}
     end
 
@@ -47,7 +47,7 @@ defmodule Clickhouse.Benchmark.Performance do
     # (or from global setup, if no local setup is defined)
     #
     # Can return anything
-    teardown do
+    after_benchmark do
       :anything
     end
 
@@ -69,17 +69,19 @@ defmodule Clickhouse.Benchmark.Performance do
     # And if any input is passed (either with option or as input directive):
     # - input: data for benchmark
     scenario "Enum.flat_map", # Name. Mandatory
-    before_scenario: fn i ->
-      IO.inspect(length(i), label: "Input length");
-      i end                 # Scenario options, e.g. local hooks. Optional.
+      before_scenario:
+        fn i ->               # Scenario options, e.g. local hooks. Optional.
+          IO.inspect(length(i), label: "Input length");
+          i
+        end
       do                      # Do block. Mandatory
-      map_fun = state
-      Enum.flat_map(input, map_fun)
-    end
-
-      scenario "Enum.map |> List.flatten" do
         map_fun = state
-        input |> Enum.map(map_fun) |> List.flatten()
+        Enum.flat_map(input, map_fun)
       end
+
+    scenario "Enum.map |> List.flatten" do
+      map_fun = state
+      input |> Enum.map(map_fun) |> List.flatten()
+    end
   end
 end

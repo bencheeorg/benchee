@@ -1,5 +1,6 @@
 defmodule Mix.Tasks.Benchmark.Helper do
   @moduledoc false
+
   defmacro compile_file(file) do
     case compare_versions(System.version(), "1.7.0") do
       :gt ->
@@ -30,6 +31,8 @@ defmodule Mix.Tasks.Benchmark do
   """
   @dialyzer [no_match: [find_benchmark_files: 2]]
 
+  defp default_benchmark_path, do: "./benchmarks"
+
   @switches []
 
   @shortdoc "Runs project benchmarks"
@@ -39,26 +42,34 @@ defmodule Mix.Tasks.Benchmark do
   def run(args) do
     {opts, files} = OptionParser.parse!(args, strict: @switches)
 
-    compile_project(args, opts)
-
-    files
-    |> compile_benchmarks(opts)
-    |> run_benchmarks(opts)
+    with :ok <- compile_project(args, opts),
+         {:ok, modules} <- compile_benchmarks(files, opts),
+         :ok <- run_benchmarks(modules, opts)
+    do
+      :ok
+    else
+      {:error, reason} = e ->
+        :ok = Logger.error("Benchmark task failed with reason: #{inspect reason}")
+      e
+    end
   end
 
   defp compile_project(args, _opts) do
     :ok = Logger.debug("Compiling project")
     Mix.Task.run("loadpaths", args)
     Mix.Project.compile(args)
+    :ok
   end
 
   defp compile_benchmarks(files, opts) do
-    files
-    |> find_benchmark_files(opts)
-    |> compile_benchmark_files(opts)
+    with {:ok, files} <- find_benchmark_files(files, opts),
+         {:ok, modules} <- compile_benchmark_files(files, opts)
+    do
+      {:ok, modules}
+    else
+      {:error, _} = e -> e
+    end
   end
-
-  defp find_benchmark_files(:stop, _opts), do: :stop
 
   defp find_benchmark_files(files, _opts) do
     :ok = Logger.debug("Locating benchmarks")
@@ -68,8 +79,8 @@ defmodule Mix.Tasks.Benchmark do
         [] ->
           [default_benchmark_path()]
 
-        o ->
-          o
+        already_defined ->
+          already_defined
       end
 
     files =
@@ -86,14 +97,12 @@ defmodule Mix.Tasks.Benchmark do
     case files do
       [] ->
         :ok = Logger.debug("No benchmark files found")
-        :stop
+        {:error, :no_benchmark_files}
 
       files ->
-        files
+        {:ok, files}
     end
   end
-
-  defp compile_benchmark_files(:stop, _opts), do: :stop
 
   defp compile_benchmark_files(files, _opts) do
     :ok = Logger.debug("Compiling benchmarks")
@@ -109,14 +118,12 @@ defmodule Mix.Tasks.Benchmark do
     case modules do
       [] ->
         :ok = Logger.debug("No benchmarks found")
-        :stop
+        {:error, :no_benchmarks}
 
       modules ->
-        modules
+        {:ok, modules}
     end
   end
-
-  defp run_benchmarks(:stop, _opts), do: :stop
 
   defp run_benchmarks(modules, _opts) do
     :ok = Logger.debug("Running benchmarks")
@@ -124,6 +131,20 @@ defmodule Mix.Tasks.Benchmark do
     modules
     |> get_benchmarks()
     |> run_all_benchmarks()
+  end
+
+  defp get_benchmarks(modules) do
+    case_attr = Benchee.Project.Benchmark.benchee_scenario_attr()
+
+    modules
+    |> Enum.filter(fn mod ->
+      Keyword.has_key?(mod.module_info(:attributes), case_attr)
+    end)
+    |> Enum.map(fn mod ->
+      attrs = mod.module_info(:attributes)
+      run_funs = Keyword.get(attrs, case_attr)
+      {mod, run_funs}
+    end)
   end
 
   defp run_all_benchmarks(benchmarks, print_system? \\ true)
@@ -136,14 +157,14 @@ defmodule Mix.Tasks.Benchmark do
         false -> [print: [system: false]]
       end
 
-    case apply_if_exists(mod, :setup, [], {:ok, nil}) do
+    case apply_if_exists(mod, :before_benchmark, [], {:ok, nil}) do
       {:ok, state} ->
         state =
           Enum.reduce(run_funs, state, fn funname, state ->
             apply(mod, funname, [state, opts])
           end)
 
-        try_apply_if_exists(mod, :teardown, [state])
+        try_apply_if_exists(mod, :after_benchmark, [state])
 
       other ->
         :ok =
@@ -172,28 +193,9 @@ defmodule Mix.Tasks.Benchmark do
   defp apply_if_exists(mod, fun, args) do
     arity = length(args)
 
-    case mod.module_info(:exports)[fun] do
-      ^arity -> {:ok, apply(mod, fun, args)}
-      nil -> {:error, :not_exists}
+    case function_exported?(mod, fun, arity) do
+      true -> {:ok, apply(mod, fun, args)}
+      false -> {:error, :not_exists}
     end
-  end
-
-  defp get_benchmarks(modules) do
-    case_attr = Benchee.Project.Benchmark.benchee_scenario_attr()
-
-    modules
-    |> Stream.filter(fn mod ->
-      Keyword.has_key?(mod.module_info(:attributes), case_attr)
-    end)
-    |> Stream.map(fn mod ->
-      attrs = mod.module_info(:attributes)
-      run_funs = Keyword.get(attrs, case_attr)
-      {mod, run_funs}
-    end)
-    |> Enum.to_list()
-  end
-
-  def default_benchmark_path do
-    "./benchmarks"
   end
 end

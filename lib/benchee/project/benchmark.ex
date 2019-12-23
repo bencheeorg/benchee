@@ -4,16 +4,16 @@ defmodule Benchee.Project.Benchmark do
   """
   require Logger
 
-  def benchee_scenario_attr, do: :benchee_cases
+  def benchee_scenario_attr, do: :benchee_benchmarks
 
   @doc """
   Module-scope setup. Optional.
 
   Must return {:ok, state} for actual benchmark to start.
   """
-  defmacro setup(_opts \\ [], do: doblock) do
+  defmacro before_all(_opts \\ [], do: doblock) do
     quote do
-      def setup do
+      def before_all do
         unquote(doblock)
       end
     end
@@ -24,9 +24,9 @@ defmodule Benchee.Project.Benchmark do
 
   Can return anything.
   """
-  defmacro teardown(_opts \\ [], do: doblock) do
+  defmacro after_all(_opts \\ [], do: doblock) do
     quote do
-      def teardown(state) do
+      def after_all(state) do
         unquote(doblock)
       end
     end
@@ -34,66 +34,15 @@ defmodule Benchee.Project.Benchmark do
 
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defmacro benchmark(name, opts \\ [], do: {:__block__, [], exprs}) do
-    mod = __CALLER__.module
     state_var = atom_to_var(:state)
 
-    inputs =
-      Keyword.get(opts, :inputs, []) ++
-        for {:input, _, [name, expr]} <- exprs,
-            do:
-              {name,
-               quote do
-                 unquote(block_to_fun(expr)).()
-               end}
+    run_fun_name = make_fun_name(name)
 
-    case_args =
-      case length(inputs) do
-        0 -> []
-        _ -> [:input]
-      end
+    inputs = make_inputs(exprs, opts)
+    scenarios = make_scenarios(exprs, inputs)
 
-    scenarios =
-      for {:scenario, _, args} <- exprs do
-        case args do
-          [name, block] ->
-            {name, block_to_fun(block, case_args)}
-
-          [name, opts, block] ->
-            {name, {block_to_fun(block, case_args), opts}}
-        end
-      end
-
-    [setup_doblock | rest] =
-      (exprs
-       |> Enum.filter(fn t -> elem(t, 0) == :setup end)
-       |> Enum.map(fn {:setup, _, [[do: doblock]]} -> doblock end)) ++
-        [
-          quote generated: true do
-            {:ok, unquote(state_var)}
-          end
-        ]
-
-    local_setup = block_to_fun(setup_doblock, [:state])
-
-    if length(rest) > 1 do
-      :ok = Logger.warn("#{inspect(mod)}: Only the first setup is used")
-    end
-
-    [teardown_doblock | rest] =
-      (exprs
-       |> Enum.filter(fn t -> elem(t, 0) == :teardown end)
-       |> Enum.map(fn {:teardown, _, [[do: doblock]]} -> doblock end)) ++
-        [
-          quote do
-            {:ok, unquote(state_var)}
-          end
-        ]
-
-    local_teardown = block_to_fun(teardown_doblock, [:state])
-
-    if length(rest) > 1 do
-      :ok = Logger.warn("#{inspect(mod)}: Only the first teardown is used")
-    end
+    before_benchmark = make_before_benchmark(exprs, state_var)
+    after_benchmark = make_after_benchmark(exprs, state_var)
 
     opts =
       case inputs do
@@ -101,20 +50,15 @@ defmodule Benchee.Project.Benchmark do
         [_ | _] -> Keyword.put(opts, :inputs, inputs)
       end
 
-    run_fun_name =
-      ["run", :erlang.unique_integer() |> Integer.to_string(), name]
-      |> Enum.join("_")
-      |> String.to_atom()
-
     quote generated: true do
       @unquote(benchee_scenario_attr())(unquote(run_fun_name))
       def unquote(run_fun_name)(unquote(state_var), opts \\ []) do
         opts = DeepMerge.deep_merge(opts, unquote(opts))
 
-        case unquote(local_setup).(unquote(state_var)) do
+        case unquote(before_benchmark).(unquote(state_var)) do
           {:ok, unquote(state_var)} ->
             Benchee.run(unquote({:%{}, [], scenarios}), opts)
-            unquote(local_teardown).(unquote(state_var))
+            unquote(after_benchmark).(unquote(state_var))
 
           other ->
             :ok =
@@ -127,6 +71,75 @@ defmodule Benchee.Project.Benchmark do
     end
   end
 
+  defp make_fun_name(name) do
+    ["run", :erlang.unique_integer() |> Integer.to_string(), name]
+    |> Enum.join("_")
+    |> String.to_atom()
+  end
+
+  defp make_inputs(exprs, opts) do
+    inputs_dsl =
+    for {:input, _, [name, expr]} <- exprs do
+      {name,
+       quote do
+         unquote(block_to_fun(expr)).()
+       end}
+    end
+    Keyword.get(opts, :inputs, []) ++ inputs_dsl
+  end
+
+  defp make_scenarios(exprs, inputs) do
+    case_args =
+      case length(inputs) do
+        0 -> []
+        _ -> [:input]
+      end
+
+    for {:scenario, _, args} <- exprs do
+      case args do
+        [name, block] ->
+          {name, block_to_fun(block, case_args)}
+
+        [name, opts, block] ->
+          {name, {block_to_fun(block, case_args), opts}}
+      end
+    end
+  end
+
+  defp make_before_benchmark(exprs, state_var) do
+    [before_doblock | rest] =
+      (exprs
+       |> Enum.filter(fn t -> elem(t, 0) == :before_benchmark end)
+       |> Enum.map(fn {:before_benchmark, _, [[do: doblock]]} -> doblock end)
+      ) ++
+      [quote generated: true do {:ok, unquote(state_var)} end]
+
+    before_benchmark = block_to_fun(before_doblock, [:state])
+
+    if length(rest) > 1 do
+      raise "Multiple before_benchmark found: only one is required"
+    end
+
+    before_benchmark
+  end
+
+  defp make_after_benchmark(exprs, state_var) do
+    [after_doblock | rest] =
+      (exprs
+       |> Enum.filter(fn t -> elem(t, 0) == :after_benchmark end)
+       |> Enum.map(fn {:after_benchmark, _, [[do: doblock]]} -> doblock end)
+      ) ++
+      [quote do {:ok, unquote(state_var)} end]
+
+    after_benchmark = block_to_fun(after_doblock, [:state])
+
+    if length(rest) > 1 do
+      raise "Multiple after_benchmark found: only one is required"
+    end
+
+    after_benchmark
+  end
+
   defmacro __using__(_) do
     quote do
       require Logger
@@ -137,7 +150,11 @@ defmodule Benchee.Project.Benchmark do
       )
 
       import Benchee.Project.Benchmark,
-        only: [setup: 1, teardown: 1, benchmark: 2, benchmark: 3]
+        only: [
+          before_all: 1,
+          after_all: 1,
+          benchmark: 2, benchmark: 3
+        ]
     end
   end
 
@@ -151,8 +168,6 @@ defmodule Benchee.Project.Benchmark do
     |> Macro.var(module)
     |> quote_put_attrs(generated: true)
   end
-
-  %{configuration: %{print: %{system: false}}}
 
   defp block_to_fun(doblock, args \\ [])
 
