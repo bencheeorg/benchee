@@ -1,5 +1,6 @@
 defmodule Benchee.Benchmark.Hooks do
   @moduledoc false
+
   # Non benchee code should not rely on this module.
 
   alias Benchee.Benchmark.ScenarioContext

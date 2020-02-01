@@ -20,11 +20,11 @@ before_script:
   - travis_wait mix dialyzer --plt
 script:
   - mix credo --strict
-  - if [[ "$TRAVIS_ELIXIR_VERSION" == "1.8"* ]]; then mix format --check-formatted; fi
+  - if [[ "$TRAVIS_ELIXIR_VERSION" == "1.10"* ]]; then mix format --check-formatted; fi
   - mix dialyzer --halt-exit-status
   - mix coveralls.travis
 after_script:
-  - if [[ "$TRAVIS_ELIXIR_VERSION" == "1.8"* ]]; then mix deps.get --only docs && MIX_ENV=docs mix inch.report; fi
+  - if [[ "$TRAVIS_ELIXIR_VERSION" == "1.10"* ]]; then mix deps.get --only docs && MIX_ENV=docs mix inch.report; fi
 sudo: required
 dist: trusty
 cache:
