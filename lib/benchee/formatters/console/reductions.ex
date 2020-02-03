@@ -207,12 +207,19 @@ defmodule Benchee.Formatters.Console.Reductions do
   defp reference_report(scenario, %{reduction_count: reductions_unit}, label_width) do
     %Scenario{name: name, reductions_data: %{statistics: %Statistics{median: median}}} = scenario
 
+    count =
+      if is_nil(median) do
+        @na
+      else
+        Helpers.count_output(median, reductions_unit)
+      end
+
     "~*s~*s\n"
     |> :io_lib.format([
       -label_width,
       name,
       @median_width,
-      Helpers.count_output(median, reductions_unit)
+      count
     ])
     |> to_string
   end
@@ -223,7 +230,13 @@ defmodule Benchee.Formatters.Console.Reductions do
       scenarios_to_compare,
       fn scenario ->
         statistics = scenario.reductions_data.statistics
-        reductions_format = Helpers.count_output(statistics.average, units.reduction_count)
+
+        reductions_format =
+          if is_nil(statistics.average) do
+            @na
+          else
+            Helpers.count_output(statistics.average, units.reduction_count)
+          end
 
         Helpers.format_comparison(
           scenario.name,
