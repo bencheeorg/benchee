@@ -67,22 +67,23 @@ defmodule Benchee.Benchmark.Runner do
   end
 
   defp measure_scenario_parallel(config, scenario, scenario_context) do
-    1..config.parallel
-    |> Parallel.map(fn _ -> measure_scenario(scenario, scenario_context) end)
+    Parallel.map(1..config.parallel, fn _ -> measure_scenario(scenario, scenario_context) end)
   end
 
   defp add_measurements_to_scenario(measurements, scenario) do
-    run_times = Enum.flat_map(measurements, fn {run_times, _} -> run_times end)
-    memory_usages = Enum.flat_map(measurements, fn {_, memory_usages} -> memory_usages end)
+    run_times = Enum.flat_map(measurements, fn {run_times, _, _} -> run_times end)
+    memory_usages = Enum.flat_map(measurements, fn {_, memory_usages, _} -> memory_usages end)
+    reductions = Enum.flat_map(measurements, fn {_, _, reductions} -> reductions end)
 
     %{
       scenario
       | run_time_data: %{scenario.run_time_data | samples: run_times},
-        memory_usage_data: %{scenario.memory_usage_data | samples: memory_usages}
+        memory_usage_data: %{scenario.memory_usage_data | samples: memory_usages},
+        reductions_data: %{scenario.reductions_data | samples: reductions}
     }
   end
 
-  @spec measure_scenario(Scenario.t(), ScenarioContext.t()) :: {[number], [number]}
+  @spec measure_scenario(Scenario.t(), ScenarioContext.t()) :: {[number], [number], [number]}
   defp measure_scenario(scenario, scenario_context) do
     scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
@@ -94,9 +95,15 @@ defmodule Benchee.Benchmark.Runner do
       |> deduct_function_call_overhead(scenario_context.function_call_overhead)
 
     memory_usages = run_memory_benchmark(scenario, scenario_context)
+
+    reductions =
+      scenario
+      |> run_reductions_benchmark(scenario_context)
+      |> deduct_reduction_overhead()
+
     Hooks.run_after_scenario(scenario, scenario_context)
 
-    {run_times, memory_usages}
+    {run_times, memory_usages, reductions}
   end
 
   defp run_warmup(
@@ -128,6 +135,48 @@ defmodule Benchee.Benchmark.Runner do
     Enum.map(run_times, fn time ->
       max(time - overhead, 0)
     end)
+  end
+
+  defp deduct_reduction_overhead([]), do: []
+
+  defp deduct_reduction_overhead(reductions) do
+    me = self()
+    ref = make_ref()
+
+    spawn(fn ->
+      {offset, _} = Collect.Reductions.collect(fn -> nil end)
+      send(me, {ref, offset})
+    end)
+
+    offset =
+      receive do
+        {^ref, offset} -> offset
+      end
+
+    Enum.map(reductions, &(&1 - offset))
+  end
+
+  defp run_reductions_benchmark(_, %ScenarioContext{config: %{reduction_time: 0.0}}) do
+    []
+  end
+
+  defp run_reductions_benchmark(
+         scenario,
+         scenario_context = %ScenarioContext{
+           config: %Configuration{
+             reduction_time: reduction_time
+           }
+         }
+       ) do
+    end_time = current_time() + reduction_time
+
+    new_context = %ScenarioContext{
+      scenario_context
+      | current_time: current_time(),
+        end_time: end_time
+    }
+
+    do_benchmark(scenario, new_context, Collect.Reductions, [])
   end
 
   defp run_memory_benchmark(_, %ScenarioContext{config: %{memory_time: 0.0}}) do
@@ -190,7 +239,7 @@ defmodule Benchee.Benchmark.Runner do
          _collector,
          measurements
        )
-       when current_time > end_time do
+       when current_time > end_time and measurements != [] do
     # restore correct order - important for graphing
     Enum.reverse(measurements)
   end

@@ -29,8 +29,6 @@ defmodule Benchee.System do
     %Suite{suite | system: system_info}
   end
 
-  defp elixir, do: System.version()
-
   defp erlang do
     otp_release = :erlang.system_info(:otp_release)
     file = Path.join([:code.root_dir(), "releases", otp_release, "OTP_VERSION"])
@@ -43,6 +41,8 @@ defmodule Benchee.System do
         IO.puts("Error trying to dermine erlang version #{reason}")
     end
   end
+
+  defp elixir, do: System.version()
 
   defp num_cores do
     System.schedulers_online()

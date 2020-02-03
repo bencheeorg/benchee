@@ -178,6 +178,7 @@ defmodule Benchee.Statistics do
       |> add_ips
 
     memory_stats = calculate_statistics(scenario.memory_usage_data.samples, percentiles)
+    reductions_stats = calculate_statistics(scenario.reductions_data.samples, percentiles)
 
     %Scenario{
       scenario
@@ -188,6 +189,10 @@ defmodule Benchee.Statistics do
         memory_usage_data: %CollectionData{
           scenario.memory_usage_data
           | statistics: memory_stats
+        },
+        reductions_data: %CollectionData{
+          scenario.reductions_data
+          | statistics: reductions_stats
         }
     }
   end

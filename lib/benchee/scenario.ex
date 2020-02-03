@@ -31,7 +31,8 @@ defmodule Benchee.Scenario do
     :after_scenario,
     :tag,
     run_time_data: %CollectionData{},
-    memory_usage_data: %CollectionData{}
+    memory_usage_data: %CollectionData{},
+    reductions_data: %CollectionData{}
   ]
 
   @typedoc """
@@ -56,6 +57,7 @@ defmodule Benchee.Scenario do
           input: any | nil,
           run_time_data: CollectionData.t(),
           memory_usage_data: CollectionData.t(),
+          reductions_data: CollectionData.t(),
           before_each: Hooks.hook_function() | nil,
           after_each: Hooks.hook_function() | nil,
           before_scenario: Hooks.hook_function() | nil,

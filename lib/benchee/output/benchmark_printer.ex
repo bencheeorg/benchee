@@ -50,10 +50,11 @@ defmodule Benchee.Output.BenchmarkPrinter do
          time: time,
          warmup: warmup,
          inputs: inputs,
-         memory_time: memory_time
+         memory_time: memory_time,
+         reduction_time: reduction_time
        }) do
     scenario_count = length(scenarios)
-    exec_time = warmup + time + memory_time
+    exec_time = warmup + time + memory_time + reduction_time
     total_time = scenario_count * exec_time
 
     IO.puts("""
@@ -61,6 +62,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
     warmup: #{Duration.format(warmup)}
     time: #{Duration.format(time)}
     memory time: #{Duration.format(memory_time)}
+    reduction time: #{Duration.format(reduction_time)}
     parallel: #{parallel}
     inputs: #{inputs_out(inputs)}
     Estimated total run time: #{Duration.format(total_time)}
@@ -79,7 +81,9 @@ defmodule Benchee.Output.BenchmarkPrinter do
   Prints a notice which job is currently being benchmarked.
   """
   def benchmarking(_, _, %{print: %{benchmarking: false}}), do: nil
-  def benchmarking(_, _, %{time: 0.0, warmup: 0.0, memory_time: 0.0}), do: nil
+
+  def benchmarking(_, _, %{time: 0.0, warmup: 0.0, memory_time: 0.0, reduction_time: 0.0}),
+    do: nil
 
   def benchmarking(name, input_name, _config) do
     IO.puts("Benchmarking #{name}#{input_information(input_name)}...")

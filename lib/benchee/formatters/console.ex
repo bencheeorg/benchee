@@ -19,12 +19,22 @@ defmodule Benchee.Formatters.Console do
       map.flatten       781.25 KB - 1.25x memory usage
 
       **All measurements for memory usage were the same**
+
+      Reduction count statistics:
+
+      Name              average  deviation      median      99th %
+      flat_map           417.00      ±9.40      411.45      715.21
+      map.flatten        806.89     ±16.62      768.02     1170.67
+
+      Comparison:
+      flat_map           417.00
+      map.flatten        806.89 - 1.93x more reductions
   """
 
   @behaviour Benchee.Formatter
 
   alias Benchee.Suite
-  alias Benchee.Formatters.Console.{Memory, RunTime}
+  alias Benchee.Formatters.Console.{Memory, Reductions, RunTime}
 
   @doc """
   Formats the benchmark statistics to a report suitable for output on the CLI.
@@ -121,7 +131,9 @@ defmodule Benchee.Formatters.Console do
   defp generate_output(scenarios, config, input) do
     [
       suite_header(input, config)
-      | RunTime.format_scenarios(scenarios, config) ++ Memory.format_scenarios(scenarios, config)
+      | RunTime.format_scenarios(scenarios, config) ++
+          Memory.format_scenarios(scenarios, config) ++
+          Reductions.format_scenarios(scenarios, config)
     ]
   end
 

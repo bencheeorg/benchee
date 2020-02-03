@@ -85,6 +85,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
               time: 10_000,
               warmup: 0,
               memory_time: 1_000,
+              reduction_time: 0,
               inputs: @inputs
             },
             scenarios: [
@@ -100,6 +101,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
 
       assert output =~ "time: 10 μs"
       assert output =~ "memory time: 1 μs"
+      assert output =~ "reduction time: 0 ns"
       assert output =~ "parallel: 2"
       assert output =~ "inputs: Arg 1, Arg 2"
       assert output =~ "Estimated total run time: 44 μs"
