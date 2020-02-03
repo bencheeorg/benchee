@@ -9,11 +9,11 @@ defmodule Benchee.Benchmark.Collect.Reductions do
     spawn_link(fn ->
       start = get_reductions()
       output = fun.()
-      send(parent, {get_reductions() - start, output})
+      send(parent, {:reductions, get_reductions() - start, output})
     end)
 
     receive do
-      result -> result
+      {:reductions, reductions, output} -> {reductions, output}
     end
   end
 

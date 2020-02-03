@@ -29,9 +29,7 @@ defmodule Benchee.System do
     %Suite{suite | system: system_info}
   end
 
-  @doc false
-  @spec erlang() :: String.t()
-  def erlang do
+  defp erlang do
     otp_release = :erlang.system_info(:otp_release)
     file = Path.join([:code.root_dir(), "releases", otp_release, "OTP_VERSION"])
 
