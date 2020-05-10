@@ -50,6 +50,7 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
       |> Benchee.load()
       |> Benchee.relative_statistics()
       |> Formatter.output()
+      |> Benchee.profile()
     end
 
     defp add_benchmarking_jobs(suite, jobs) do
@@ -70,5 +71,10 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     defdelegate statistics(suite), to: Benchee.Statistics
     defdelegate relative_statistics(suite), to: Benchee.RelativeStatistics
     defdelegate load(suite), to: Benchee.ScenarioLoader
+
+    @doc """
+    See `Benchee.Profile.profile/1`
+    """
+    defdelegate profile(suite), to: Benchee.Profile
   end
 end
