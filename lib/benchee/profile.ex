@@ -20,10 +20,15 @@ defmodule Benchee.Profile do
   @spec profile(Suite.t()) :: Suite.t()
   def profile(suite = %{configuration: %{profile: %{profile_after: false}}}), do: suite
 
-  def profile(suite = %{configuration: %{profile: %{profiler: profiler, profiler_opts: profiler_opts}}, scenarios: scenarios}) do
+  def profile(
+        suite = %{
+          configuration: %{profile: %{profiler: profiler, profiler_opts: profiler_opts}},
+          scenarios: scenarios
+        }
+      ) do
     profiler_module = profiler_to_module(profiler)
 
-    Enum.each(scenarios, & run(&1, {profiler, profiler_module, profiler_opts}))
+    Enum.each(scenarios, &run(&1, {profiler, profiler_module, profiler_opts}))
 
     suite
   end
@@ -42,10 +47,12 @@ defmodule Benchee.Profile do
         profiler =
           profiler
           |> Atom.to_string()
-          |> String.capitalize
+          |> String.capitalize()
 
         Module.concat(Mix.Tasks.Profile, profiler)
-      false -> nil # not supported yet
+
+      false ->
+        nil
     end
   end
 
