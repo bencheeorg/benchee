@@ -2,7 +2,7 @@ version: build{build}
 
 install:
   # current elixir install breaks see https://ci.appveyor.com/project/PragTob/benchee-8e4gw/builds/32804950
-  - cinst elixir --version 1.9.4
+  - cinst elixir --version 1.10.3
   - refreshenv
 
 shallow_clone: true
