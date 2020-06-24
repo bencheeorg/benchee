@@ -1,0 +1,103 @@
+name: CI
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+on:
+  pull_request:
+    branches:
+      - 'master'
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  linux:
+    name: Test on Ubuntu (Elixir ${{ matrix.elixir_version }}, OTP ${{ matrix.otp_version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        elixir_version: ['1.6.6', '1.7.4', '1.8.2', '1.9.4', '1.10.3']
+        otp_version: ['20.3', '21.3', '22.3']
+        include:
+          - elixir_version: '1.6.6'
+            otp_version: '19.3'
+        exclude:
+          - elixir_version: '1.6.6'
+            otp_version: '22.3'
+          - elixir_version: '1.10.3'
+            otp_version: '20.3'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Elixir
+        uses: actions/setup-elixir@v1
+        with:
+          elixir-version: ${{ matrix.elixir_version }}
+          otp-version: ${{ matrix.otp_version }}
+      - name: Restore deps and _build
+        uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{ matrix.elixir_version }}-${{ matrix.otp_version }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+      - name: Restore plts
+        uses: actions/cache@v2
+        with:
+          path: priv/plts
+          key: ${{ runner.os }}-dialyzer-${{ matrix.elixir_version }}-${{ matrix.otp_version }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+      - run: mix deps.get
+      - run: MIX_ENV=test mix compile --warnings-as-errors
+      - run: mix credo --strict
+      - name: Check if formatted
+        if: ${{ contains(matrix.elixir_version, '1.10') }}
+        run: mix format --check-formatted
+      - name: Dialyzer
+        run: mix dialyzer --halt-exit-status
+      - run: MIX_ENV=test mix coveralls.github
+      - name: After script
+        if: ${{ contains(matrix.elixir_version, '1.10') }}
+        run: mix deps.get --only docs && MIX_ENV=docs mix inch.report
+
+  macos:
+    name: Test on MacOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Elixir
+        run: brew install elixir
+      - name: Restore deps and _build
+        uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+      - run: mix local.hex --force
+      - run: mix deps.get
+      - run: mix local.rebar --force
+      - run: MIX_ENV=test mix compile --warnings-as-errors
+      - run: mix test
+
+  windows:
+    name: Test on Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Install Elixir
+        run: |
+          cinst elixir --version 1.9.4
+          refreshenv
+      - name: Build
+        run: |
+          C:\ProgramData\chocolatey\lib\Elixir\bin\mix local.hex --force
+          C:\ProgramData\chocolatey\lib\Elixir\bin\mix deps.get
+          C:\ProgramData\chocolatey\lib\Elixir\bin\mix local.rebar --force
+          C:\ProgramData\chocolatey\lib\Elixir\bin\mix compile --warnings-as-errors
+      - name: Test
+        run: C:\ProgramData\chocolatey\lib\Elixir\bin\mix test
