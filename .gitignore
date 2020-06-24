@@ -8,3 +8,5 @@ doc
 docs
 /test/tmp
 save.benchee
+/priv/plts/benchee.plt
+/priv/plts/benchee.plt.hash
