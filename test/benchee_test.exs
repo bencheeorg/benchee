@@ -799,7 +799,12 @@ defmodule BencheeTest do
       # Byte
       assert output =~ "B"
 
-      assert output =~ "1.00x memory"
+      if mac_os?() do
+        assert output =~ "1.04x memory"
+      else
+        assert output =~ "1.00x memory"
+      end
+
       assert output =~ "∞ x memo"
     end
   end
@@ -848,5 +853,10 @@ defmodule BencheeTest do
   defp windows? do
     {_, os} = :os.type()
     os == :nt
+  end
+
+  defp mac_os? do
+    {_, os} = :os.type()
+    os == :darwin
   end
 end
