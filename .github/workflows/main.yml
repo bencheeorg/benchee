@@ -3,13 +3,7 @@ name: CI
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-on:
-  pull_request:
-    branches:
-      - 'master'
-  push:
-    branches:
-      - 'master'
+on: [pull_request, push]
 
 jobs:
   linux:
@@ -89,15 +83,19 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Install Elixir
         run: |
-          cinst elixir --version 1.9.4
+          cinst elixir
+          set MIX_ENV=test
+          echo "::add-path::C:\ProgramData\chocolatey\lib\Elixir\bin;C:\ProgramData\chocolatey\bin"
           refreshenv
       - name: Build
         run: |
-          C:\ProgramData\chocolatey\lib\Elixir\bin\mix local.hex --force
-          C:\ProgramData\chocolatey\lib\Elixir\bin\mix deps.get
-          C:\ProgramData\chocolatey\lib\Elixir\bin\mix local.rebar --force
-          C:\ProgramData\chocolatey\lib\Elixir\bin\mix compile --warnings-as-errors
+          mix local.hex --force
+          mix deps.get
+          mix local.rebar --force
+          mix compile --warnings-as-errors
       - name: Test
-        run: C:\ProgramData\chocolatey\lib\Elixir\bin\mix test
+        run: mix test
