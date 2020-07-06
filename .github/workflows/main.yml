@@ -85,9 +85,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Restore chocolatey
+        uses: actions/cache@v2
+        with:
+          path: C:\Users\runneradmin\AppData\Local\Temp\chocolatey
+          key: ${{ runner.os }}-chocolatey-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-chocolatey-
       - name: Install Elixir
         run: |
-          cinst elixir
+          cinst elixir --no-progress
           set MIX_ENV=test
           echo "::add-path::C:\ProgramData\chocolatey\lib\Elixir\bin;C:\ProgramData\chocolatey\bin"
           refreshenv
