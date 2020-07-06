@@ -80,17 +80,19 @@ defmodule Benchee.Benchmark.RunnerTest do
     end
 
     test "can run multiple benchmarks in parallel" do
-      suite = test_suite(%Suite{configuration: %{parallel: 3, time: 60_000_000}})
+      retrying(fn ->
+        suite = test_suite(%Suite{configuration: %{parallel: 2, time: 60_000_000}})
 
-      new_suite =
-        suite
-        |> Benchmark.benchmark("", fn -> :timer.sleep(10) end)
-        |> Benchmark.collect(TestPrinter)
+        new_suite =
+          suite
+          |> Benchmark.benchmark("", fn -> :timer.sleep(10) end)
+          |> Benchmark.collect(TestPrinter)
 
-      # it does more work when working in parallel than it does alone,
-      # alone it should only manage to do ~6 (10ms sleep, 60ms time)
-      # very lenient because... CI.
-      assert length(run_times_for(new_suite, "")) >= 8
+        # it does more work when working in parallel than it does alone,
+        # alone it should only manage to do ~6 (10ms sleep, 60ms time)
+        # very lenient because... CI.
+        assert length(run_times_for(new_suite, "")) >= 7
+      end)
     end
 
     test "combines results for parallel benchmarks into a single scenario" do
@@ -628,79 +630,82 @@ defmodule Benchee.Benchmark.RunnerTest do
 
     @tag :performance
     test "each triggers for every invocation, scenario once" do
-      me = self()
+      # and the CI goes slowwwwww
+      retrying(fn ->
+        me = self()
 
-      suite = %Suite{
-        configuration: %{
-          warmup: 0.0,
-          time: 10_000_000,
-          before_each: fn input ->
-            send(me, :global_before)
-            input
-          end,
-          after_each: fn _ -> send(me, :global_after) end,
-          before_scenario: fn input ->
-            send(me, :global_before_scenario)
-            input
-          end,
-          after_scenario: fn _ -> send(me, :global_after_scenario) end
+        suite = %Suite{
+          configuration: %{
+            warmup: 0.0,
+            time: 10_000_000,
+            before_each: fn input ->
+              send(me, :global_before)
+              input
+            end,
+            after_each: fn _ -> send(me, :global_after) end,
+            before_scenario: fn input ->
+              send(me, :global_before_scenario)
+              input
+            end,
+            after_scenario: fn _ -> send(me, :global_after_scenario) end
+          }
         }
-      }
 
-      result =
-        suite
-        |> test_suite
-        |> Benchmark.benchmark(
-          "job",
-          {fn -> :timer.sleep(1) end,
-           before_each: fn input ->
-             send(me, :local_before)
-             input
-           end,
-           after_each: fn _ -> send(me, :local_after) end,
-           before_scenario: fn input ->
-             send(me, :local_before_scenario)
-             input
-           end,
-           after_scenario: fn _ -> send(me, :local_after_scenario) end}
-        )
-        |> Benchmark.collect(TestPrinter)
+        result =
+          suite
+          |> test_suite
+          |> Benchmark.benchmark(
+            "job",
+            {fn -> :timer.sleep(1) end,
+             before_each: fn input ->
+               send(me, :local_before)
+               input
+             end,
+             after_each: fn _ -> send(me, :local_after) end,
+             before_scenario: fn input ->
+               send(me, :local_before_scenario)
+               input
+             end,
+             after_scenario: fn _ -> send(me, :local_after_scenario) end}
+          )
+          |> Benchmark.collect(TestPrinter)
 
-      {:messages, messages} = Process.info(self(), :messages)
+        {:messages, messages} = Process.info(self(), :messages)
 
-      global_before_sceneario_count =
-        Enum.count(messages, fn msg -> msg == :global_before_scenario end)
+        global_before_sceneario_count =
+          Enum.count(messages, fn msg -> msg == :global_before_scenario end)
 
-      local_before_sceneario_count =
-        Enum.count(messages, fn msg -> msg == :local_before_scenario end)
+        local_before_sceneario_count =
+          Enum.count(messages, fn msg -> msg == :local_before_scenario end)
 
-      local_after_sceneario_count =
-        Enum.count(messages, fn msg -> msg == :local_after_scenario end)
+        local_after_sceneario_count =
+          Enum.count(messages, fn msg -> msg == :local_after_scenario end)
 
-      global_after_sceneario_count =
-        Enum.count(messages, fn msg -> msg == :global_after_scenario end)
+        global_after_sceneario_count =
+          Enum.count(messages, fn msg -> msg == :global_after_scenario end)
 
-      assert global_before_sceneario_count == 1
-      assert local_before_sceneario_count == 1
-      assert local_after_sceneario_count == 1
-      assert global_after_sceneario_count == 1
+        assert global_before_sceneario_count == 1
+        assert local_before_sceneario_count == 1
+        assert local_after_sceneario_count == 1
+        assert global_after_sceneario_count == 1
 
-      global_before_count = Enum.count(messages, fn message -> message == :global_before end)
-      local_before_count = Enum.count(messages, fn message -> message == :local_before end)
-      local_after_count = Enum.count(messages, fn message -> message == :local_after end)
-      global_after_count = Enum.count(messages, fn message -> message == :global_after end)
+        global_before_count = Enum.count(messages, fn message -> message == :global_before end)
+        local_before_count = Enum.count(messages, fn message -> message == :local_before end)
+        local_after_count = Enum.count(messages, fn message -> message == :local_after end)
+        global_after_count = Enum.count(messages, fn message -> message == :global_after end)
 
-      assert local_before_count == global_before_count
-      assert local_after_count == global_after_count
-      assert local_before_count == local_after_count
-      hook_call_count = local_before_count
+        assert local_before_count == global_before_count
+        assert local_after_count == global_after_count
+        assert local_before_count == local_after_count
+        hook_call_count = local_before_count
 
-      # should be closer to 10 by you know slow CI systems...
-      assert hook_call_count >= 2
-      # for every sample that we have, we should have run a hook
-      [%{run_time_data: %Benchee.CollectionData{samples: run_times}}] = result.scenarios
-      sample_size = length(run_times)
-      assert sample_size == hook_call_count
+        # should be closer to 10 by you know slow CI systems...
+        assert hook_call_count >= 2
+        # for every sample that we have, we should have run a hook
+        [%{run_time_data: %Benchee.CollectionData{samples: run_times}}] = result.scenarios
+        sample_size = length(run_times)
+        assert sample_size == hook_call_count
+      end)
     end
 
     @tag :needs_fast_function_repetition

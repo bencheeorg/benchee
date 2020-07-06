@@ -7,12 +7,17 @@ exclusions = if otp_release > 18, do: [], else: [memory_measure: true]
 {_, os} = :os.type()
 
 exclusions =
-  if os == :nt do
-    [{:performance, true} | exclusions]
-  else
-    # with our new nanosecond accuracy we can't trigger our super fast function code
-    # anymore on Linux/MacOS
-    [{:needs_fast_function_repetition, true} | exclusions]
+  case os do
+    :nt ->
+      [{:performance, true} | exclusions]
+
+    :darwin ->
+      [{:performance, true}, {:needs_fast_function_repetition, true}] ++ exclusions
+
+    _ ->
+      # with our new nanosecond accuracy we can't trigger our super fast function code
+      # anymore on Linux and MacOS (see above)
+      [{:needs_fast_function_repetition, true} | exclusions]
   end
 
 ExUnit.start(exclude: exclusions)

@@ -340,11 +340,11 @@ defmodule BencheeTest do
         capture_io(fn ->
           Benchee.run(
             %{"Sleeps" => fn -> :timer.sleep(10) end},
-            Keyword.merge(
-              @test_configuration,
-              assigns: %{custom: "Custom value"},
-              formatters: [formatter_one, formatter_two, formatter_three]
-            )
+            time: 0.08,
+            warmup: 0.03,
+            measure_function_call_overhead: false,
+            assigns: %{custom: "Custom value"},
+            formatters: [formatter_one, formatter_two, formatter_three]
           )
         end)
 
