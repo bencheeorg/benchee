@@ -229,10 +229,9 @@ The available options are the following (also documented in [hexdocs](https://he
     * `:smallest` - the smallest best fit unit will be used
     * `:none`     - no unit scaling will occur.
 * `:before_scenario`/`after_scenario`/`before_each`/`after_each` - read up on them in the [hooks section](#hooks-setup-teardown-etc)
-* `profile` - a map of options to enable profiling after each benchmark containing the following keys:
-    * `profiler_after`  - either `true` or `false` to enable/disable the profiler, defaults to `false`.
-    * `profiler`        - one of the built-in profilers to use (either `:cprof`, `:eprof` or `:fprof`), defaults to `:cprof`.
-    * `profiler_opts`   - the option list to pass to the `profile/2` function of the profiler (for more information read the documentation of each profiler).
+* `profile_after` - accepts any of the following options:
+      * a boolean   - `true` will enable profiling with the default profiler (`:cprof`) and `false` will disable profiling. Defaults to `false`.
+      * a profiler  - either as a tuple of `{profiler, opts}` (e.g., `{:fprof, [sort: :own]}`) or just the profiler, which is equivalent to `{profiler, []}`.
 
 ### Measuring memory consumption
 

@@ -5,6 +5,7 @@ defmodule BencheeTest do
     Conversion.Duration,
     Formatter,
     Formatters.Console,
+    Profile.Benchee.UnknownProfilerError,
     Statistics,
     Suite,
     Test.FakeFormatter
@@ -223,6 +224,73 @@ defmodule BencheeTest do
       end)
 
     refute output =~ ~r/compar/i
+  end
+
+  test "integration profiling can be deactivated" do
+    output =
+      capture_io(fn ->
+        Benchee.run(
+          %{"Sleeps" => fn -> :timer.sleep(10) end},
+          Keyword.merge(
+            @test_configuration,
+            profile_after: false
+          )
+        )
+      end)
+
+    refute output =~ ~r/Profiling.+with/
+    refute output =~ ~r/Profile done/
+  end
+
+  @default_profiler :cprof
+  test "integration profiling `profile_after: true` runs default profiler" do
+    output =
+      capture_io(fn ->
+        Benchee.run(
+          %{"Sleeps" => fn -> :timer.sleep(10) end},
+          Keyword.merge(
+            @test_configuration,
+            profile_after: true
+          )
+        )
+      end)
+
+    assert output =~ profiling_regex("Sleeps", @default_profiler)
+    assert output =~ end_of_profiling_regex(@default_profiler)
+  end
+
+  @profilers [:cprof, :eprof, :fprof]
+  for profiler <- @profilers do
+    @profiler profiler
+    test "integration profiling runs #{inspect(@profiler)} profiler" do
+      output =
+        capture_io(fn ->
+          Benchee.run(
+            %{"Sleeps" => fn -> :timer.sleep(10) end},
+            Keyword.merge(
+              @test_configuration,
+              profile_after: @profiler
+            )
+          )
+        end)
+
+      assert output =~ profiling_regex("Sleeps", @profiler)
+      assert output =~ end_of_profiling_regex(@profiler)
+    end
+  end
+
+  test "integration profiling a wrong profiler raises exception" do
+    assert_raise UnknownProfilerError, fn ->
+      capture_io(fn ->
+        Benchee.run(
+          %{"Sleeps" => fn -> :timer.sleep(10) end},
+          Keyword.merge(
+            @test_configuration,
+            profile_after: :cproff
+          )
+        )
+      end)
+    end
   end
 
   test "multiple formatters can be configured and are all called" do
@@ -848,6 +916,20 @@ defmodule BencheeTest do
 
   defp body_regex(benchmark_name, tag_regex \\ "") do
     ~r/^#{benchmark_name}#{tag_regex}\s+\d+.+\s+\d+\.?\d*.+\s+.+\d+\.?\d*.+\s+\d+\.?\d*.+/m
+  end
+
+  defp profiling_regex(benchmark_name, profiler) do
+    ~r/Profiling #{benchmark_name} with #{profiler}/
+  end
+
+  # :fprof is the only profiler who doesn't have at the end of its output:
+  # "Profile done over X matching functions"
+  defp end_of_profiling_regex(:fprof) do
+    ~r/CNT.+ACC \(ms\).+OWN \(ms\)/
+  end
+
+  defp end_of_profiling_regex(_profiler) do
+    ~r/Profile done/
   end
 
   defp windows? do

@@ -9,9 +9,7 @@ Benchee.run(
   warmup: 0.1,
   time: 0.3,
   memory_time: 0.3,
-  profile: [
-    profile_after: true
-  ]
+  profile_after: true
 )
 
 # Operating System: Linux
