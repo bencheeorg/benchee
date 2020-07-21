@@ -230,8 +230,12 @@ The available options are the following (also documented in [hexdocs](https://he
     * `:none`     - no unit scaling will occur.
 * `:before_scenario`/`after_scenario`/`before_each`/`after_each` - read up on them in the [hooks section](#hooks-setup-teardown-etc)
 * `profile_after` - accepts any of the following options:
-      * a boolean   - `true` will enable profiling with the default profiler (`:cprof`) and `false` will disable profiling. Defaults to `false`.
-      * a profiler  - either as a tuple of `{profiler, opts}` (e.g., `{:fprof, [sort: :own]}`) or just the profiler, which is equivalent to `{profiler, []}`.
+    * a boolean   - `true` will enable profiling with the default profiler (`:eprof`) and `false` will disable profiling. Defaults to `false`.
+    * a profiler  - either as a tuple of `{profiler, opts}` (e.g., `{:fprof, [sort: :own]}`) or just the profiler (e.g., `:fprof`),
+    which is equivalent to `{profiler, []}`. The accepted built-in profilers are
+    [`:cprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Cprof.html),
+    [`:eprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Eprof.html) and
+    [`:fprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Fprof.html).
 
 ### Measuring memory consumption
 

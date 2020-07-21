@@ -125,9 +125,12 @@ defmodule Benchee.Configuration do
     * `:measure_function_call_overhead` - Measure how long an empty function call takes and deduct this from each measure run time. Defaults to true.
     * `profile_after` - accepts any of the following options:
       * a boolean   - `true` will enable profiling with the default profiler
-      (`:cprof`) and `false` will disable profiling. Defaults to `false`.
+      (`:eprof`) and `false` will disable profiling. Defaults to `false`.
       * a profiler  - either as a tuple of `{profiler, opts}` (e.g., `{:fprof, [sort: :own]}`)
-      or just the profiler, which is equivalent to `{profiler, []}`.
+      or just the profiler (e.g., `:fprof`), which is equivalent to `{profiler, []}`. The accepted built-in profilers are
+      [`:cprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Cprof.html),
+      [`:eprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Eprof.html) and
+      [`:fprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Fprof.html).
   """
   @type user_configuration :: map | keyword
 

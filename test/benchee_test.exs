@@ -5,6 +5,7 @@ defmodule BencheeTest do
     Conversion.Duration,
     Formatter,
     Formatters.Console,
+    Profile,
     Profile.Benchee.UnknownProfilerError,
     Statistics,
     Suite,
@@ -226,23 +227,16 @@ defmodule BencheeTest do
     refute output =~ ~r/compar/i
   end
 
-  test "integration profiling can be deactivated" do
+  test "integration profiling defaults to no profile" do
     output =
       capture_io(fn ->
-        Benchee.run(
-          %{"Sleeps" => fn -> :timer.sleep(10) end},
-          Keyword.merge(
-            @test_configuration,
-            profile_after: false
-          )
-        )
+        Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end})
       end)
 
-    refute output =~ ~r/Profiling.+with/
-    refute output =~ ~r/Profile done/
+    refute output =~ ~r/Profiling.+with/i
+    refute output =~ ~r/Profile done/i
   end
 
-  @default_profiler :cprof
   test "integration profiling `profile_after: true` runs default profiler" do
     output =
       capture_io(fn ->
@@ -255,8 +249,8 @@ defmodule BencheeTest do
         )
       end)
 
-    assert output =~ profiling_regex("Sleeps", @default_profiler)
-    assert output =~ end_of_profiling_regex(@default_profiler)
+    assert output =~ profiling_regex("Sleeps", Profile.default_profiler())
+    assert output =~ end_of_profiling_regex(Profile.default_profiler())
   end
 
   @profilers [:cprof, :eprof, :fprof]
