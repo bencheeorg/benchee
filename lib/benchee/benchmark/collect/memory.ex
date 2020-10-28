@@ -57,7 +57,7 @@ defmodule Benchee.Benchmark.Collect.Memory do
           # would love to have this in a separate function, but elixir 1.7 complains
           send(tracer, :done)
           send(parent, {ref, :shutdown})
-          stacktrace = System.stacktrace()
+          stacktrace = __STACKTRACE__
           IO.puts(Exception.format(kind, reason, stacktrace))
           exit(:normal)
       after
