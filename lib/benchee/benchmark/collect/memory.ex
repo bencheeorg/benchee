@@ -15,7 +15,7 @@ defmodule Benchee.Benchmark.Collect.Memory do
 
   @behaviour Benchee.Benchmark.Collect
 
-  defmacro compatible_stacktrace do
+  defmacrop compatible_stacktrace do
     if Version.match?(Version.parse!(System.version()), "~> 1.7") do
       quote do
         __STACKTRACE__
