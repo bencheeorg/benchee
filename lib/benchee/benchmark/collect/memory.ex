@@ -15,6 +15,18 @@ defmodule Benchee.Benchmark.Collect.Memory do
 
   @behaviour Benchee.Benchmark.Collect
 
+  defmacro compatible_stacktrace do
+    if Version.compare(Version.parse!(System.version()), Version.parse!("1.7.0")) == :gt do
+      quote do
+        __STACKTRACE__
+      end
+    else
+      quote do
+        System.stacktrace()
+      end
+    end
+  end
+
   @spec collect((() -> any)) :: {nil | non_neg_integer, any}
   def collect(fun) do
     ref = make_ref()
@@ -54,15 +66,9 @@ defmodule Benchee.Benchmark.Collect.Memory do
         send(parent, {ref, memory_used * word_size})
       catch
         kind, reason ->
-          # would love to have this in a separate function, but elixir 1.7 complains
           send(tracer, :done)
           send(parent, {ref, :shutdown})
-
-          stacktrace =
-            if Version.compare(System.version(), "1.7.0") == :gt,
-              do: __STACKTRACE__,
-              else: System.stacktrace()
-
+          stacktrace = compatible_stacktrace()
           IO.puts(Exception.format(kind, reason, stacktrace))
           exit(:normal)
       after
