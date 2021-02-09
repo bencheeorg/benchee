@@ -96,10 +96,10 @@ jobs:
         run: |
           cinst elixir --no-progress
           set MIX_ENV=test
-          echo "::add-path::C:\ProgramData\chocolatey\lib\Elixir\bin;C:\ProgramData\chocolatey\bin"
-          refreshenv
+          echo "C:\ProgramData\chocolatey\lib\Elixir\bin;C:\ProgramData\chocolatey\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Build
         run: |
+          echo "$PATH"
           mix local.hex --force
           mix deps.get
           mix local.rebar --force
