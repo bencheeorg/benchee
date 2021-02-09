@@ -96,7 +96,7 @@ jobs:
         run: |
           cinst elixir --no-progress
           set MIX_ENV=test
-          echo "::add-path::C:\ProgramData\chocolatey\lib\Elixir\bin;C:\ProgramData\chocolatey\bin"
+          echo "C:\ProgramData\chocolatey\lib\Elixir\bin;C:\ProgramData\chocolatey\bin" >> $GITHUB_PATH
           refreshenv
       - name: Build
         run: |
