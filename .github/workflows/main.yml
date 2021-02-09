@@ -97,9 +97,9 @@ jobs:
           cinst elixir --no-progress
           set MIX_ENV=test
           echo "C:\ProgramData\chocolatey\lib\Elixir\bin;C:\ProgramData\chocolatey\bin" >> $GITHUB_PATH
-          refreshenv
       - name: Build
         run: |
+          echo "$PATH"
           mix local.hex --force
           mix deps.get
           mix local.rebar --force
