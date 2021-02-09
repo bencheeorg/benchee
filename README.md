@@ -1,4 +1,4 @@
-# Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee) [![docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/) ![CI](https://github.com/bencheeorg/benchee/workflows/CI/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/bencheeorg/benchee/badge.svg?branch=master)](https://coveralls.io/github/bencheeorg/benchee?branch=master)
+# Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee) [![docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/) [![CI](https://github.com/bencheeorg/benchee/workflows/CI/badge.svg)](https://github.com/bencheeorg/benchee/actions?query=branch%3Amain) [![Coverage Status](https://coveralls.io/repos/github/bencheeorg/benchee/badge.svg?branch=master)](https://coveralls.io/github/bencheeorg/benchee?branch=master)
 
 **There is a [known issue regarding measurement accuracy for nanoseconds on MacOS](https://github.com/bencheeorg/benchee/issues/313)**
 
