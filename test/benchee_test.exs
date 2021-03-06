@@ -464,8 +464,8 @@ defmodule BencheeTest do
       end)
 
     assert String.contains?(output, ["small list", "medium list", "bigger list"])
-    occurences = Regex.scan(body_regex("flat_map"), output)
-    assert length(occurences) == 3
+    occurrences = Regex.scan(body_regex("flat_map"), output)
+    assert length(occurrences) == 3
   end
 
   test "inputs can also be a list of 2-tuples and it then keeps the order" do
@@ -493,8 +493,8 @@ defmodule BencheeTest do
       end)
 
     assert output =~ ~r/With input small list .*With input medium list.*With input bigger list/s
-    occurences = Regex.scan(body_regex("flat_map"), output)
-    assert length(occurences) == 3
+    occurrences = Regex.scan(body_regex("flat_map"), output)
+    assert length(occurrences) == 3
   end
 
   test "multiple inputs with very fast functions" do
@@ -521,8 +521,8 @@ defmodule BencheeTest do
     end
 
     assert String.contains?(output, ["number_one", "symbol_one"])
-    occurences = Regex.scan(body_regex("identity"), output)
-    assert length(occurences) == 2
+    occurrences = Regex.scan(body_regex("identity"), output)
+    assert length(occurrences) == 2
   end
 
   test ".run returns the suite intact" do
@@ -604,8 +604,8 @@ defmodule BencheeTest do
       end)
 
     assert String.contains?(output, ["small list", "mediumList"])
-    occurences = Regex.scan(body_regex("flat_map"), output)
-    assert length(occurences) == 2
+    occurrences = Regex.scan(body_regex("flat_map"), output)
+    assert length(occurrences) == 2
   end
 
   defmodule MacroTest do

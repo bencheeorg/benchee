@@ -52,7 +52,7 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       assert result2 =~ ~r/201.20/
     end
 
-    test "displays extended statistics with multiple mode ouput" do
+    test "displays extended statistics with multiple mode output" do
       scenarios = [
         %Scenario{
           name: "First job",

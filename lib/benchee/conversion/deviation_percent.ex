@@ -1,9 +1,9 @@
 defmodule Benchee.Conversion.DeviationPercent do
   @moduledoc """
-  Helps with formattiong for the standard deviation ratio converting it into the
+  Helps with formatting for the standard deviation ratio converting it into the
   more common percent form.
 
-  Only benchee plugins should use this code.
+  Only Benchee plugins should use this code.
   """
 
   alias Benchee.Conversion.Format
@@ -11,7 +11,7 @@ defmodule Benchee.Conversion.DeviationPercent do
   @behaviour Format
 
   @doc """
-  Formates the standard deviation ratio to an equivalent percent number
+  Formats the standard deviation ratio to an equivalent percent number
   including special signs. The ± is an important part of it as it shows that
   the deviation might be up but also might be down.
 

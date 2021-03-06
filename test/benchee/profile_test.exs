@@ -16,7 +16,7 @@ defmodule Benchee.ProfileTest do
   @config_with_profiler %Configuration{profile_after: true}
 
   describe ".profile" do
-    test "`profile_after` defaults to false, which doesnt profile" do
+    test "`profile_after` defaults to false, which doesn't profile" do
       %{configuration: %{profile_after: profile_after}} = suite = %Suite{}
 
       output =

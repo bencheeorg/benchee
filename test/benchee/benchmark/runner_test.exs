@@ -186,8 +186,8 @@ defmodule Benchee.Benchmark.RunnerTest do
           |> Benchmark.collect()
         end)
 
-      # need to asser on IO here as our message sending trick doesn't work
-      # as we spawn new processes to do our benchmarking work therfore the
+      # need to assert on IO here as our message sending trick doesn't work
+      # as we spawn new processes to do our benchmarking work therefore the
       # message never arrives here...
       assert output =~ ~r/Warning.+fast.+unreliable/i
     end
@@ -243,7 +243,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         assert_in_delta projected,
                         time,
                         leeway,
-                        "excution took too long #{time} vs. #{projected} +- #{leeway}"
+                        "execution took too long #{time} vs. #{projected} +- #{leeway}"
       end)
     end
 
