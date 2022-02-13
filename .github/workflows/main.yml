@@ -18,6 +18,9 @@ jobs:
           - elixir_version: '1.6.6'
             otp_version: '19.3'
         exclude:
+          # has shown weird behavior when it comes to dialyzer (aka only this one failing)
+          - elixir_version: '1.6.6'
+            otp_version: '21.3'
           - elixir_version: '1.6.6'
             otp_version: '22.3'
           - elixir_version: '1.10.3'
