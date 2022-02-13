@@ -61,7 +61,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
       # If the resolution is 1_000_000 that means microsecond, while 1_000_000_000 is nanosecond.
       # we then need to adjust our measured time by that value. I.e. if we measured "5000" here we
       # do not want to let it pass as it is essentially just "5" for our measurement purposes.
-      resolution = Access.fetch!(clock_info, :resolution)
+      {:ok, resolution} = Access.fetch(clock_info, :resolution)
 
       @nanosecond_resolution / resolution
     else
