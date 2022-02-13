@@ -94,12 +94,12 @@ defmodule Benchee.Benchmark do
   """
   @spec collect(Suite.t(), module, module) :: Suite.t()
   def collect(
-        suite = %Suite{scenarios: scenarios, configuration: config},
+        suite = %Suite{scenarios: scenarios, configuration: config, system: system},
         printer \\ Printer,
         runner \\ Runner
       ) do
     printer.configuration_information(suite)
-    scenario_context = %ScenarioContext{config: config, printer: printer}
+    scenario_context = %ScenarioContext{config: config, printer: printer, system: system}
     scenarios = runner.run_scenarios(scenarios, scenario_context)
     %Suite{suite | scenarios: scenarios}
   end

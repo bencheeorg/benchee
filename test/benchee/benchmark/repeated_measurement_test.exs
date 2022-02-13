@@ -21,12 +21,17 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
   alias Benchee.Test.FakeBenchmarkPrinter
   alias Bencheee.Benchmark.RepeatedMeasurementTest.FakeCollector
 
+  @good_system_info %{erlang: "24.0.2"}
+  @macos_fixed_system_info %{os: :macOS, erlang: "22.2"}
+  @macos_broken_system_info %{os: :macOS, erlang: "22.1.34"}
+
   @no_input Benchee.Benchmark.no_input()
   @scenario_context %ScenarioContext{
     num_iterations: 1,
     printer: FakeBenchmarkPrinter,
     config: %Benchee.Configuration{},
-    scenario_input: @no_input
+    scenario_input: @no_input,
+    system: @good_system_info
   }
 
   # Linux (mostly)
@@ -51,8 +56,8 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
           scenario,
           @scenario_context,
           false,
-          FakeCollector,
-          @nano_second_accuracy_clock
+          @nano_second_accuracy_clock,
+          FakeCollector
         )
 
       assert num_iterations == 10
@@ -77,8 +82,8 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
           scenario,
           @scenario_context,
           false,
-          FakeCollector,
-          @micro_second_accuracy_clock
+          @micro_second_accuracy_clock,
+          FakeCollector
         )
 
       assert num_iterations == 10
@@ -101,8 +106,8 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
           scenario,
           @scenario_context,
           false,
-          FakeCollector,
-          @micro_second_accuracy_clock
+          @micro_second_accuracy_clock,
+          FakeCollector
         )
 
       assert num_iterations == 1000
@@ -116,25 +121,104 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
     test "doesn't do repetitions if the time is small enough from the get go" do
       function = fn -> send(self(), :called) end
       scenario = %Scenario{function: function}
-      Process.put(:test_measurement_time, 10)
+      function_time = 10
+      Process.put(:test_measurement_time, function_time)
 
       {num_iterations, time} =
         determine_n_times(
           scenario,
           @scenario_context,
           false,
-          FakeCollector,
-          @nano_second_accuracy_clock
+          @nano_second_accuracy_clock,
+          FakeCollector
         )
 
       assert num_iterations == 1
 
-      # Why erlang time conversion? See test above.
-      expected_time = :erlang.convert_time_unit(10, :native, :nanosecond)
-      assert_in_delta time, expected_time, 1
+      assert_in_delta time, function_time, 1
 
       # 1 initial + 10 more after repeat
       assert_received_exactly_n_times(:called, 1)
+    end
+
+    test "trusts the clock if no system information is present" do
+      function = fn -> send(self(), :called) end
+      scenario = %Scenario{function: function}
+      function_run_time = 100
+      Process.put(:test_measurement_time, function_run_time)
+
+      {num_iterations, time} =
+        determine_n_times(
+          scenario,
+          %{@scenario_context | system: nil},
+          false,
+          @nano_second_accuracy_clock,
+          FakeCollector
+        )
+
+      assert num_iterations == 1
+      assert_in_delta time, function_run_time, 1
+      assert_received_exactly_n_times(:called, 1)
+    end
+
+    test "trusts the clock on a good system" do
+      function = fn -> send(self(), :called) end
+      scenario = %Scenario{function: function}
+      function_run_time = 100
+      Process.put(:test_measurement_time, function_run_time)
+
+      {num_iterations, time} =
+        determine_n_times(
+          scenario,
+          %{@scenario_context | system: @good_system_info},
+          false,
+          @nano_second_accuracy_clock,
+          FakeCollector
+        )
+
+      assert num_iterations == 1
+      assert_in_delta time, function_run_time, 1
+      assert_received_exactly_n_times(:called, 1)
+    end
+
+    test "trusts the clock on macOS but with a fixed OTP version" do
+      function = fn -> send(self(), :called) end
+      scenario = %Scenario{function: function}
+      function_run_time = 100
+      Process.put(:test_measurement_time, function_run_time)
+
+      {num_iterations, time} =
+        determine_n_times(
+          scenario,
+          %{@scenario_context | system: @macos_fixed_system_info},
+          false,
+          @nano_second_accuracy_clock,
+          FakeCollector
+        )
+
+      assert num_iterations == 1
+      assert_in_delta time, function_run_time, 1
+      assert_received_exactly_n_times(:called, 1)
+    end
+
+    test "does not trust the macOS clock on a broken OTP version, repeating the calls assuming milliseconds" do
+      function = fn -> send(self(), :called) end
+      scenario = %Scenario{function: function}
+      function_run_time = 100
+      Process.put(:test_measurement_time, function_run_time)
+
+      {num_iterations, time} =
+        determine_n_times(
+          scenario,
+          %{@scenario_context | system: @macos_broken_system_info},
+          false,
+          @nano_second_accuracy_clock,
+          FakeCollector
+        )
+
+      assert num_iterations == 100
+      assert_in_delta time, function_run_time, 1
+      assert_received_exactly_n_times(:called, 111)
     end
   end
 

@@ -6,6 +6,7 @@ defmodule Benchee.Benchmark.ScenarioContext do
   defstruct [
     :config,
     :printer,
+    :system,
     :current_time,
     :end_time,
     # before_scenario can alter the original input

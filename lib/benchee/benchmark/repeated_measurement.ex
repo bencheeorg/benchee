@@ -23,6 +23,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
 
   alias Benchee.Benchmark.{Collect, Hooks, Runner, ScenarioContext}
   alias Benchee.Scenario
+  alias Benchee.Utility.ErlangVersion
   alias Benchee.Utility.RepeatN
 
   @minimum_execution_time 10
@@ -33,30 +34,49 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
           {pos_integer, number}
   def determine_n_times(
         scenario,
-        scenario_context,
+        scenario_context = %ScenarioContext{system: system_info},
         print_fast_warning,
-        collector \\ Collect.Time,
-        clock_info \\ :erlang.system_info(:os_monotonic_time_source)
+        clock_info \\ :erlang.system_info(:os_monotonic_time_source),
+        collector \\ Collect.Time
       ) do
-    resolution_adjustment = determine_resolution_adjustment(clock_info)
+    resolution_adjustment = determine_resolution_adjustment(system_info, clock_info)
 
     do_determine_n_times(
       scenario,
       scenario_context,
       print_fast_warning,
-      collector,
-      resolution_adjustment
+      resolution_adjustment,
+      collector
     )
   end
 
-  defp determine_resolution_adjustment(clock_info) do
-    # If the resolution is 1_000_000 that means microsecond, while 1_000_000_000 is nanosecond.
-    # we then need to adjust our measured time by that value. I.e. if we measured "5000" here we
-    # do not want to let it pass as it is essentially just "5" for our measurement purposes.
-    resolution = Access.fetch!(clock_info, :resolution)
+  # See ERL-1067 aka which was fixed here
+  # https://erlang.org/download/otp_src_22.2.readme
+  @fixed_erlang_vesion "22.2.0"
+  # MacOS usually measures in micro seconds so that's the best default to return when not given
+  @old_macos_value 1_000
 
-    @nanosecond_resolution / resolution
+  defp determine_resolution_adjustment(system_info, clock_info) do
+    if trust_clock?(system_info) do
+      # If the resolution is 1_000_000 that means microsecond, while 1_000_000_000 is nanosecond.
+      # we then need to adjust our measured time by that value. I.e. if we measured "5000" here we
+      # do not want to let it pass as it is essentially just "5" for our measurement purposes.
+      resolution = Access.fetch!(clock_info, :resolution)
+
+      @nanosecond_resolution / resolution
+    else
+      @old_macos_value
+    end
   end
+
+  # Can't really trust the macOS clock on OTP before mentioned version, see tickets linked above
+  defp trust_clock?(%{os: :macOS, erlang: erlang_version}) do
+    ErlangVersion.includes_fixes_from?(erlang_version, @fixed_erlang_vesion)
+  end
+
+  # If `suite.system` wasn't populated then we'll not mistrust it as well as all others
+  # (can happen if people call parts of benchee themselves without calling system first)
+  defp trust_clock?(_), do: true
 
   defp do_determine_n_times(
          scenario,
@@ -65,8 +85,8 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
            printer: printer
          },
          print_fast_warning,
-         collector,
-         resolution_adjustment
+         resolution_adjustment,
+         collector
        ) do
     run_time = measure_iteration(scenario, scenario_context, collector)
     resolution_adjusted_run_time = run_time / resolution_adjustment
@@ -81,7 +101,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
         | num_iterations: num_iterations * @times_multiplier
       }
 
-      do_determine_n_times(scenario, new_context, false, collector, resolution_adjustment)
+      do_determine_n_times(scenario, new_context, false, resolution_adjustment, collector)
     end
   end
 
