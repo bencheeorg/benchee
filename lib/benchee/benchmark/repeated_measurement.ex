@@ -33,22 +33,43 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
           {pos_integer, number}
   def determine_n_times(
         scenario,
-        scenario_context = %ScenarioContext{
-          num_iterations: num_iterations,
-          printer: printer
-        },
+        scenario_context,
         print_fast_warning,
         collector \\ Collect.Time,
         clock_info \\ :erlang.system_info(:os_monotonic_time_source)
       ) do
-    run_time = measure_iteration(scenario, scenario_context, collector)
-    resolution = Access.fetch!(clock_info, :resolution)
+    resolution_adjustment = determine_resolution_adjustment(clock_info)
+
+    do_determine_n_times(
+      scenario,
+      scenario_context,
+      print_fast_warning,
+      collector,
+      resolution_adjustment
+    )
+  end
+
+  defp determine_resolution_adjustment(clock_info) do
     # If the resolution is 1_000_000 that means microsecond, while 1_000_000_000 is nanosecond.
     # we then need to adjust our measured time by that value. I.e. if we measured "5000" here we
     # do not want to let it pass as it is essentially just "5" for our measurement purposes.
-    resolution_nanoscond_adjustment = @nanosecond_resolution / resolution
+    resolution = Access.fetch!(clock_info, :resolution)
 
-    resolution_adjusted_run_time = run_time / resolution_nanoscond_adjustment
+    @nanosecond_resolution / resolution
+  end
+
+  defp do_determine_n_times(
+         scenario,
+         scenario_context = %ScenarioContext{
+           num_iterations: num_iterations,
+           printer: printer
+         },
+         print_fast_warning,
+         collector,
+         resolution_adjustment
+       ) do
+    run_time = measure_iteration(scenario, scenario_context, collector)
+    resolution_adjusted_run_time = run_time / resolution_adjustment
 
     if resolution_adjusted_run_time >= @minimum_execution_time do
       {num_iterations, report_time(run_time, num_iterations)}
@@ -60,7 +81,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
         | num_iterations: num_iterations * @times_multiplier
       }
 
-      determine_n_times(scenario, new_context, false, collector, clock_info)
+      do_determine_n_times(scenario, new_context, false, collector, resolution_adjustment)
     end
   end
 
