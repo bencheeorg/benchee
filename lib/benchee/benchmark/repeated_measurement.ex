@@ -10,8 +10,8 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
   # Instead we repeat the function call n times until we measure at least ~10 (time unit) so
   # that the difference between measurements can at least be ~10%.
   #
-  # Today this is mostly only relevant on Windows as we have nanosecond precision on Linux and
-  # Mac OS and we've failed to produce a measurable function call that takes less than 10 nano
+  # Today this is mostly only relevant on Windows & Mac OS as we have nanosecond precision on
+  # Linux and we've failed to produce a measurable function call that takes less than 10 nano
   # seconds.
   #
   # That's also why this code lives in a separate module and not `Runner` - as it's rarely used
@@ -27,6 +27,8 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
 
   @minimum_execution_time 10
   @times_multiplier 10
+  @nanosecond_resolution Benchee.Conversion.Duration.convert_value({1, :second}, :nanosecond)
+
   @spec determine_n_times(Scenario.t(), ScenarioContext.t(), boolean, module) ::
           {pos_integer, number}
   def determine_n_times(
@@ -35,22 +37,30 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
           num_iterations: num_iterations,
           printer: printer
         },
-        fast_warning,
-        collector \\ Collect.NativeTime
+        print_fast_warning,
+        collector \\ Collect.Time,
+        clock_info \\ :erlang.system_info(:os_monotonic_time_source)
       ) do
     run_time = measure_iteration(scenario, scenario_context, collector)
+    resolution = Access.fetch!(clock_info, :resolution)
+    # If the resolution is 1_000_000 that means microsecond, while 1_000_000_000 is nanosecond.
+    # we then need to adjust our measured time by that value. I.e. if we measured "5000" here we
+    # do not want to let it pass as it is essentially just "5" for our measurement purposes.
+    resolution_nanoscond_adjustment = @nanosecond_resolution / resolution
 
-    if run_time >= @minimum_execution_time do
+    resolution_adjusted_run_time = run_time / resolution_nanoscond_adjustment
+
+    if resolution_adjusted_run_time >= @minimum_execution_time do
       {num_iterations, report_time(run_time, num_iterations)}
     else
-      if fast_warning, do: printer.fast_warning()
+      if print_fast_warning, do: printer.fast_warning()
 
       new_context = %ScenarioContext{
         scenario_context
         | num_iterations: num_iterations * @times_multiplier
       }
 
-      determine_n_times(scenario, new_context, false, collector)
+      determine_n_times(scenario, new_context, false, collector, clock_info)
     end
   end
 

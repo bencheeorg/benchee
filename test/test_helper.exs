@@ -12,7 +12,7 @@ exclusions =
       [{:performance, true} | exclusions]
 
     :darwin ->
-      [{:performance, true}, {:needs_fast_function_repetition, true}] ++ exclusions
+      [{:performance, true} | exclusions]
 
     _ ->
       # with our new nanosecond accuracy we can't trigger our super fast function code
