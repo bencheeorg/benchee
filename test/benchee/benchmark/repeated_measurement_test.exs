@@ -3,7 +3,7 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest.FakeCollector do
 
   def collect(function) do
     value = function.()
-    time = Process.get(:test_measurement_time, 5)
+    time = Process.get(:test_measurement_time)
     next_value = time * 10
 
     Process.put(:test_measurement_time, next_value)
@@ -13,7 +13,7 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest.FakeCollector do
 end
 
 defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import Benchee.Benchmark.RepeatedMeasurement
   alias Benchee.Benchmark.ScenarioContext
@@ -29,24 +29,88 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
     scenario_input: @no_input
   }
 
+  # Linux (mostly)
+  @nano_second_accuracy_clock [
+    resolution: Benchee.Conversion.Duration.convert_value({1, :second}, :nanosecond)
+  ]
+
+  # MacOS (mostly, it seems)
+  @micro_second_accuracy_clock [
+    resolution: Benchee.Conversion.Duration.convert_value({1, :second}, :microsecond)
+  ]
+
   describe ".determine_n_times/4" do
     test "it repeats the function calls until a suitable time is reached" do
       function = fn -> send(self(), :called) end
       scenario = %Scenario{function: function}
+      function_run_time = 5
+      Process.put(:test_measurement_time, function_run_time)
 
       {num_iterations, time} =
-        determine_n_times(scenario, @scenario_context, false, FakeCollector)
+        determine_n_times(
+          scenario,
+          @scenario_context,
+          false,
+          FakeCollector,
+          @nano_second_accuracy_clock
+        )
 
       assert num_iterations == 10
 
       # 50 adjusted by the 10 iteration factor
-      # we need to use convert_time_unit cos windows is funny, see:
-      # https://twitter.com/PragTob/status/1108024728734838784
-      expected_time = :erlang.convert_time_unit(5, :native, :nanosecond)
-      assert_in_delta time, expected_time, 1
+      assert_in_delta time, function_run_time, 1
 
       # 1 initial + 10 more after repeat
       assert_received_exactly_n_times(:called, 11)
+    end
+
+    # https://github.com/bencheeorg/benchee/issues/313
+    test "it repeats the function calls until a suitable time is reached even with micro second clocks" do
+      function = fn -> send(self(), :called) end
+      scenario = %Scenario{function: function}
+
+      function_run_time = 1000
+      Process.put(:test_measurement_time, function_run_time)
+
+      {num_iterations, time} =
+        determine_n_times(
+          scenario,
+          @scenario_context,
+          false,
+          FakeCollector,
+          @micro_second_accuracy_clock
+        )
+
+      assert num_iterations == 10
+
+      assert_in_delta time, function_run_time, 1
+
+      # 1 initial + 10 more after repeat
+      assert_received_exactly_n_times(:called, 11)
+    end
+
+    test "it repeats the function calls even more times to reach a doable time" do
+      function = fn -> send(self(), :called) end
+      scenario = %Scenario{function: function}
+
+      function_run_time = 10
+      Process.put(:test_measurement_time, function_run_time)
+
+      {num_iterations, time} =
+        determine_n_times(
+          scenario,
+          @scenario_context,
+          false,
+          FakeCollector,
+          @micro_second_accuracy_clock
+        )
+
+      assert num_iterations == 1000
+
+      assert_in_delta time, function_run_time, 1
+
+      # 1 initial + 10 + 100 + 1000
+      assert_received_exactly_n_times(:called, 1111)
     end
 
     test "doesn't do repetitions if the time is small enough from the get go" do
@@ -55,7 +119,13 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
       Process.put(:test_measurement_time, 10)
 
       {num_iterations, time} =
-        determine_n_times(scenario, @scenario_context, false, FakeCollector)
+        determine_n_times(
+          scenario,
+          @scenario_context,
+          false,
+          FakeCollector,
+          @nano_second_accuracy_clock
+        )
 
       assert num_iterations == 1
 
