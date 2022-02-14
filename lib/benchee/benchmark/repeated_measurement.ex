@@ -108,9 +108,7 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
   # we need to convert the time here since we measure native time to see when we have enough
   # repetitions but the first time is used in the actual samples
   defp report_time(measurement, num_iterations) do
-    measurement
-    |> :erlang.convert_time_unit(:native, :nanosecond)
-    |> adjust_for_iterations(num_iterations)
+    adjust_for_iterations(measurement, num_iterations)
   end
 
   defp adjust_for_iterations(measurement, 1), do: measurement
