@@ -44,6 +44,10 @@ defmodule Bencheee.Benchmark.RepeatedMeasurementTest do
     resolution: Benchee.Conversion.Duration.convert_value({1, :second}, :microsecond)
   ]
 
+  # We need a nano second resolution clock here as we are converting from/with native time
+  # which on Windows does not exist and loses us time
+  @moduletag :nanosecond_resolution_clock
+
   describe ".determine_n_times/4" do
     test "it repeats the function calls until a suitable time is reached" do
       function_run_time = 5

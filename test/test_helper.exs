@@ -9,7 +9,7 @@ exclusions = if otp_release > 18, do: [], else: [memory_measure: true]
 exclusions =
   case os do
     :nt ->
-      [{:performance, true} | exclusions]
+      [{:performance, true}, {:nanosecond_resolution_clock, true}] ++ exclusions
 
     :darwin ->
       [{:performance, true} | exclusions]
