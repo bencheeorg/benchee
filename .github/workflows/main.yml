@@ -56,6 +56,8 @@ jobs:
       - run: mix deps.get
       - run: MIX_ENV=test mix compile --warnings-as-errors
       - run: mix credo --strict
+        # credo does not support elixir 1.6 any more
+        if: ${{ !contains(matrix.elixir_version, '1.6') }}
       - name: Check if formatted
         if: ${{ contains(matrix.elixir_version, '1.13') }}
         run: mix format --check-formatted
