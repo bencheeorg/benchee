@@ -57,18 +57,18 @@ jobs:
       - run: MIX_ENV=test mix compile --warnings-as-errors
       - run: mix credo --strict
       - name: Check if formatted
-        if: ${{ contains(matrix.elixir_version, '1.10') }}
+        if: ${{ contains(matrix.elixir_version, '1.13') }}
         run: mix format --check-formatted
       - name: Actual Tests
         run: MIX_ENV=test mix coveralls.github
-        if: !contains(matrix.elixir_version, '1.13')
+        if: ${{ !contains(matrix.elixir_version, '1.13') }}
       - name: Actual Tests WITH warnings as errors
         run: MIX_ENV=test mix coveralls.github --warnings-as-errors
         if: contains(matrix.elixir_version, '1.13')
       - name: Dialyzer
         run: mix dialyzer --halt-exit-status
       - name: After script
-        if: ${{ contains(matrix.elixir_version, '1.10') }}
+        if: ${{ contains(matrix.elixir_version, '1.13') }}
         run: mix deps.get --only docs && MIX_ENV=docs mix inch.report
 
   macos:
