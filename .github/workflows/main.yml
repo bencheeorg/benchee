@@ -31,7 +31,7 @@ jobs:
             otp_version: '21.3'
         exclude:
           - elixir_version: '1.10.4'
-            otp_version: '24.3'
+            otp_version: '24.2'
 
     steps:
       - name: Checkout
@@ -63,12 +63,15 @@ jobs:
         run: mix format --check-formatted
       - name: Actual Tests
         run: MIX_ENV=test mix coveralls.github
+        # Apparently the one with `!` can't go without the fancy expression syntax
         if: ${{ !contains(matrix.elixir_version, '1.13') }}
       - name: Actual Tests WITH warnings as errors
         run: MIX_ENV=test mix coveralls.github --warnings-as-errors
         if: contains(matrix.elixir_version, '1.13')
       - name: Dialyzer
         run: mix dialyzer --halt-exit-status
+        # credo does not support elixir 1.6 any more and it's compiled here.. not sure why
+        if: ${{ !contains(matrix.elixir_version, '1.6') }}
       - name: After script
         if: ${{ contains(matrix.elixir_version, '1.13') }}
         run: mix deps.get --only docs && MIX_ENV=docs mix inch.report
