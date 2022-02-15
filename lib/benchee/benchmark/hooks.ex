@@ -4,15 +4,11 @@ defmodule Benchee.Benchmark.Hooks do
   # Non Benchee code should not rely on this module.
 
   alias Benchee.Benchmark.ScenarioContext
-  alias Benchee.Configuration
   alias Benchee.Scenario
 
   @type hook_function :: (any -> any)
 
-  @spec run_before_scenario(
-          %Scenario{before_scenario: hook_function | nil, input: any},
-          %ScenarioContext{config: %Configuration{before_scenario: hook_function | nil}}
-        ) :: any
+  @spec run_before_scenario(Scenario.t(), ScenarioContext.t()) :: any
   def run_before_scenario(
         %Scenario{
           before_scenario: local_before_scenario,
@@ -30,10 +26,7 @@ defmodule Benchee.Benchmark.Hooks do
   defp run_before_function(input, nil), do: input
   defp run_before_function(input, function), do: function.(input)
 
-  @spec run_before_each(%Scenario{before_each: nil | hook_function}, %ScenarioContext{
-          config: %Configuration{before_each: nil | hook_function},
-          scenario_input: any
-        }) :: any
+  @spec run_before_each(Scenario.t(), ScenarioContext.t()) :: any
   def run_before_each(
         %{
           before_each: local_before_each
@@ -48,9 +41,7 @@ defmodule Benchee.Benchmark.Hooks do
     |> run_before_function(local_before_each)
   end
 
-  @spec run_after_each(any, %Scenario{after_each: nil | hook_function}, %ScenarioContext{
-          config: %Configuration{after_each: nil | hook_function}
-        }) :: any
+  @spec run_after_each(any, Scenario.t(), ScenarioContext.t()) :: any
   def run_after_each(
         return_value,
         %{
@@ -64,11 +55,7 @@ defmodule Benchee.Benchmark.Hooks do
     if global_after_each, do: global_after_each.(return_value)
   end
 
-  @spec run_after_scenario(%Scenario{after_scenario: hook_function | nil}, %ScenarioContext{
-          config: %Configuration{after_scenario: nil | hook_function},
-          scenario_input: any
-        }) :: any
-  # @spec run_after_scenario(Scenario.t(), ScenarioContext.t()) :: any
+  @spec run_after_scenario(Scenario.t(), ScenarioContext.t()) :: any
   def run_after_scenario(
         %{
           after_scenario: local_after_scenario

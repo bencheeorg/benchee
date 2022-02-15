@@ -377,19 +377,20 @@ defmodule BencheeTest do
   test "formatters have full access to the suite data, values in assigns" do
     retrying(fn ->
       formatter_one = fn suite ->
+        [scenario] = suite.scenarios
+
         run_time =
-          suite.scenarios
-          |> (fn [scenario | _] -> List.last(scenario.run_time_data.samples) end).()
+          scenario.run_time_data.samples
+          |> List.last(scenario.run_time_data.samples)
           |> Duration.format()
 
         IO.puts("Run time: #{run_time}")
       end
 
       formatter_two = fn suite ->
-        average =
-          suite.scenarios
-          |> (fn [scenario | _] -> scenario.run_time_data.statistics.average end).()
-          |> Duration.format()
+        [scenario] = suite.scenarios
+
+        average = Duration.format(scenario.run_time_data.statistics.average)
 
         IO.puts("Average: #{average}")
       end

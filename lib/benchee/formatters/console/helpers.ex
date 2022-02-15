@@ -77,9 +77,7 @@ defmodule Benchee.Formatters.Console.Helpers do
   defp comparison_display(%Statistics{relative_more: nil, absolute_difference: nil}, _, _), do: ""
 
   defp comparison_display(statistics, comparison_name, unit) do
-    "- #{comparison_text(statistics, comparison_name)} #{
-      absolute_difference_text(statistics, unit)
-    }\n"
+    "- #{comparison_text(statistics, comparison_name)} #{absolute_difference_text(statistics, unit)}\n"
   end
 
   defp comparison_text(%Statistics{relative_more: :infinity}, name), do: "∞ x #{name}"

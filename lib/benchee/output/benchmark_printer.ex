@@ -72,9 +72,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
   defp inputs_out(nil), do: "none specified"
 
   defp inputs_out(inputs) do
-    inputs
-    |> Enum.map(fn {name, _} -> name end)
-    |> Enum.join(", ")
+    Enum.map_join(inputs, ", ", fn {name, _} -> name end)
   end
 
   @doc """

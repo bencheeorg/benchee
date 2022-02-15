@@ -89,7 +89,7 @@ defmodule Benchee.Profile do
          printer
        ) do
     printer.profiling(name, profiler)
-    apply(profiler_module, :profile, [fun_to_profile, profiler_opts])
+    profiler_module.profile(fun_to_profile, profiler_opts)
   end
 
   # If given a builtin profiler the function will return its proper module.
