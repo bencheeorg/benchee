@@ -53,7 +53,7 @@ defmodule Benchee.Mixfile do
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:excoveralls, "~> 0.13", only: :test},
       {:inch_ex, "~> 2.0", only: :docs, runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.4", only: :dev, runtime: false}
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false}
     ]
   end
 
