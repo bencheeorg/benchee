@@ -381,7 +381,7 @@ defmodule BencheeTest do
 
         run_time =
           scenario.run_time_data.samples
-          |> List.last(scenario.run_time_data.samples)
+          |> List.last()
           |> Duration.format()
 
         IO.puts("Run time: #{run_time}")
