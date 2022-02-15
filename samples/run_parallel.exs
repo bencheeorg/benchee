@@ -14,7 +14,7 @@ Benchee.run(
 # work load (music, browser, editor, gui etc.) which is not the ideal
 # benchmarking environment ;)
 #
-# The slight performance degredation with parallel: 2 is expected (like most CPUs
+# The slight performance degradation with parallel: 2 is expected (like most CPUs
 # mine has a speed boost when only one CPU is occupied). As parallel processes
 # grow then performance degrades because they have to contend with everything
 # that is running. Therefore, be aware of the impact running benchmarks in

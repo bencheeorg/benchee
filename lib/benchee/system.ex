@@ -38,7 +38,7 @@ defmodule Benchee.System do
         String.trim(version)
 
       {:error, reason} ->
-        IO.puts("Error trying to dermine erlang version #{reason}")
+        IO.puts("Error trying to determine erlang version #{reason}")
     end
   end
 
