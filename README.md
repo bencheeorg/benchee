@@ -1,7 +1,5 @@
 # Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee) [![Hex Docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/) [![CI](https://github.com/bencheeorg/benchee/workflows/CI/badge.svg)](https://github.com/bencheeorg/benchee/actions?query=branch%3Amain) [![Coverage Status](https://coveralls.io/repos/github/bencheeorg/benchee/badge.svg?branch=master)](https://coveralls.io/github/bencheeorg/benchee?branch=master) [![Total Download](https://img.shields.io/hexpm/dt/benchee.svg)](https://hex.pm/packages/benchee) [![License](https://img.shields.io/hexpm/l/benchee.svg)](https://github.com/bencheeorg/benchee/blob/master/LICENSE)
 
-**There is a [known issue regarding measurement accuracy for nanoseconds on MacOS](https://github.com/bencheeorg/benchee/issues/313)**
-
 Library for easy and nice (micro) benchmarking in Elixir. Benchee allows you to compare the performance of different pieces of code at a glance. It is also versatile and extensible, relying only on functions. There are also a bunch of [plugins](#plugins) to draw pretty graphs and more!
 
 Benchee runs each of your functions for a given amount of time after an initial warmup, it then measures their run time and optionally memory consumption. It then shows different statistical values like average, standard deviation etc. See [features](#features).
