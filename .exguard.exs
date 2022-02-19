@@ -10,7 +10,7 @@ guard("compile and warn", run_on_start: true)
 |> notification(:auto)
 
 guard("credo", run_on_start: true)
-|> command("mix credo --strict")
+|> command("mix credo")
 |> watch(project_files)
 |> ignore(deps)
 |> notification(:auto)
