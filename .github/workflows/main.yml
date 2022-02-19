@@ -59,7 +59,7 @@ jobs:
         # credo does not support elixir 1.6 any more
         if: ${{ !contains(matrix.elixir_version, '1.6') }}
       - name: Check if formatted
-        if: ${{ contains(matrix.elixir_version, '1.13') }}
+        if: contains(matrix.elixir_version, '1.13')
         run: mix format --check-formatted
       - name: Actual Tests
         run: MIX_ENV=test mix coveralls.github
@@ -73,7 +73,7 @@ jobs:
         # credo does not support elixir 1.6 any more and it's compiled here.. not sure why
         if: ${{ !contains(matrix.elixir_version, '1.6') }}
       - name: After script
-        if: ${{ contains(matrix.elixir_version, '1.13') }}
+        if: contains(matrix.elixir_version, '1.13')
         run: mix deps.get --only docs && MIX_ENV=docs mix inch.report
 
   macos:
