@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.1.0 (2022-02-??)
+
+Long time, huh? I'm sorry, combination of priorities, difficult to fix bugs, stress and arm problems kept me away too long.
+This release brings features long developped and finally into released hands, along with a critical bugfix around measurement accuracy for very fast functions (nanoseconds).
+
+
+
+### Bugfixes (User Facing)
+* Benchee now correctly looks for the time resolution as reported by `:erlang.system_info(:os_monotonic_time_source)`, also working around an erlang bug we discovered present in erlang <= 22.2. [Issue for reference](https://github.com/bencheeorg/benchee/issues/313)
+* The annoying stacktrace warning has been removed - thanks [@mad42](https://github.com/mad42)
+
+### Features (User Facing)
+* Reduction counting/measurements was implemented. Basically, it's a rather stable unit of execution implemented by the BEAM that measures in more abstract manner how much work it has to do. It's helpful, as it shouldn't be affected by load on the system. Check out [the issue](https://github.com/bencheeorg/benchee/issues/156).
+* You can now dive straight into profiling from your benchmarks by using the profiling feature. See [the issue](https://github.com/bencheeorg/benchee/issues/250) - thanks [@pablocostass](https://github.com/pablocostass)
+
+### Noteworthy
+* a new dependency `statistex` will show up - it's a part of continued efforts to extract reusable libraries from Benchee
+
 ## 1.0.1 (2019-04-09)
 
 ### Bugfixes (User Facing)
