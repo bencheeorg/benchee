@@ -50,9 +50,7 @@ defmodule Benchee.TestHelpers do
   Specifically this used on Windows CI, which for whatever reason that I do not understand
   seems to have a resolution of 100 which is... 10 milliseconds. Which is... way too litle.
   """
-  # credo:disable-for-this-file
   @clock_resolution Access.get(:erlang.system_info(:os_monotonic_time_source), :resolution)
-                    |> IO.inspect()
   @milliseconds Benchee.Conversion.Duration.convert_value({1, :second}, :millisecond)
   @minimum_measured_time 10
   @min_sleep_time 1
@@ -60,7 +58,7 @@ defmodule Benchee.TestHelpers do
                                 @minimum_measured_time / (@clock_resolution / @milliseconds),
                                 @min_sleep_time
                               )
-  @safe_test_sleep_time trunc(@safe_test_sleep_time_float) |> IO.inspect()
+  @safe_test_sleep_time trunc(@safe_test_sleep_time_float)
   def sleep_safe_time do
     :timer.sleep(@safe_test_sleep_time)
   end

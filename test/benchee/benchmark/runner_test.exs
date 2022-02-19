@@ -79,7 +79,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       end)
     end
 
-    # wat
+    @tag :millisecond_resolution_clock
     test "can run multiple benchmarks in parallel" do
       retrying(fn ->
         suite = test_suite(%Suite{configuration: %{parallel: 2, time: 60_000_000}})
@@ -339,7 +339,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert length(run_times_for(new_suite, "Sleeps")) == 1
     end
 
-    # wat 2
+    @tag :millisecond_resolution_clock
     test "stores run times in the right order" do
       retrying(fn ->
         {:ok, agent} = Agent.start(fn -> 10 end)

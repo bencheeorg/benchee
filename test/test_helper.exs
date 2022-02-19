@@ -20,4 +20,17 @@ exclusions =
       [{:needs_fast_function_repetition, true} | exclusions]
   end
 
+# Somehow at some point the resolution on the Windows CI got very bad to 100 (which is 10ms)
+# and so we gotta get some level in here not to work around them too much.
+clock_resolution = Access.get(:erlang.system_info(:os_monotonic_time_source), :resolution)
+
+minimum_millisecond_resolution = 1000
+
+exclusions =
+  if clock_resolution < minimum_millisecond_resolution do
+    [{:millisecond_resolution_clock, true} | exclusions]
+  else
+    exclusions
+  end
+
 ExUnit.start(exclude: exclusions)
