@@ -79,6 +79,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       end)
     end
 
+    # wat
     test "can run multiple benchmarks in parallel" do
       retrying(fn ->
         suite = test_suite(%Suite{configuration: %{parallel: 2, time: 60_000_000}})
@@ -232,7 +233,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         suite =
           %Suite{configuration: %{time: time, warmup: warmup}}
           |> test_suite()
-          |> Benchmark.benchmark("", fn -> :timer.sleep(1) end)
+          |> Benchmark.benchmark("", fn -> sleep_safe_time() end)
 
         {time, _} =
           Benchmark.Collect.Time.collect(fn -> Benchmark.collect(suite, TestPrinter) end)
@@ -338,6 +339,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert length(run_times_for(new_suite, "Sleeps")) == 1
     end
 
+    # wat 2
     test "stores run times in the right order" do
       retrying(fn ->
         {:ok, agent} = Agent.start(fn -> 10 end)
@@ -403,7 +405,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         }
       }
       |> test_suite
-      |> Benchmark.benchmark("job", fn -> :timer.sleep(1) end)
+      |> Benchmark.benchmark("job", fn -> sleep_safe_time() end)
       |> Benchmark.collect(TestPrinter)
 
       assert_received_exactly([:before, :after])
@@ -421,7 +423,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> test_suite
       |> Benchmark.benchmark(
         "job",
-        {fn -> :timer.sleep(1) end,
+        {fn -> sleep_safe_time() end,
          before_each: fn input ->
            send(me, :before)
            input
@@ -450,7 +452,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> test_suite
       |> Benchmark.benchmark(
         "job",
-        {fn -> :timer.sleep(1) end,
+        {fn -> sleep_safe_time() end,
          before_each: fn input ->
            send(me, :before)
            input
@@ -497,7 +499,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> test_suite
       |> Benchmark.benchmark(
         "job",
-        {fn _ -> :timer.sleep(1) end,
+        {fn _ -> sleep_safe_time() end,
          before_each: fn input ->
            send(me, :local_before)
            input
@@ -549,7 +551,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> test_suite
       |> Benchmark.benchmark(
         "job",
-        {fn -> :timer.sleep(1) end,
+        {fn -> sleep_safe_time() end,
          before_each: fn input ->
            send(me, :local_1_before)
            input
@@ -559,7 +561,7 @@ defmodule Benchee.Benchmark.RunnerTest do
            input
          end}
       )
-      |> Benchmark.benchmark("job 2", fn -> :timer.sleep(1) end)
+      |> Benchmark.benchmark("job 2", fn -> sleep_safe_time() end)
       |> Benchmark.collect(TestPrinter)
 
       assert_received_exactly([
@@ -591,7 +593,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> test_suite
       |> Benchmark.benchmark(
         "job",
-        {fn -> :timer.sleep(1) end,
+        {fn -> sleep_safe_time() end,
          before_each: fn input ->
            send(me, :local_before)
            input
@@ -604,7 +606,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       )
       |> Benchmark.benchmark(
         "job 2",
-        {fn -> :timer.sleep(1) end,
+        {fn -> sleep_safe_time() end,
          before_each: fn input ->
            send(me, :local_2_before)
            input
@@ -656,7 +658,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           |> test_suite
           |> Benchmark.benchmark(
             "job",
-            {fn -> :timer.sleep(1) end,
+            {fn -> sleep_safe_time() end,
              before_each: fn input ->
                send(me, :local_before)
                input
@@ -773,7 +775,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> test_suite
       |> Benchmark.benchmark("job", {fn ->
          # still keep to make sure we only get one iteration and not too fast
-         :timer.sleep(1)
+         sleep_safe_time()
          :value
        end, after_each: fn out -> send(me, {:local, out}) end})
       |> Benchmark.collect(TestPrinter)
@@ -810,7 +812,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> test_suite
       |> Benchmark.benchmark("job", {fn input ->
          # still keep to make sure we only get one iteration and not too fast
-         :timer.sleep(1)
+         sleep_safe_time()
          send(me, {:runner, input})
        end,
        before_scenario: fn input ->
@@ -863,7 +865,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> test_suite
       |> Benchmark.benchmark("job", {fn ->
          # still keep to make sure we only get one iteration and not too fast
-         :timer.sleep(1)
+         sleep_safe_time()
        end,
        before_scenario: fn input ->
          send(me, {:local_scenario, input})

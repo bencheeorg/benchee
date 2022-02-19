@@ -737,7 +737,7 @@ defmodule BencheeTest do
         Benchee.run(
           %{
             "sleeper" =>
-              {fn -> :timer.sleep(1) end,
+              {fn -> sleep_safe_time() end,
                before_each: fn input ->
                  send(myself, :local_before)
                  input
@@ -748,7 +748,7 @@ defmodule BencheeTest do
                  input
                end,
                after_scenario: fn _ -> send(myself, :local_after_scenario) end},
-            "sleeper 2" => fn -> :timer.sleep(1) end
+            "sleeper 2" => fn -> sleep_safe_time() end
           },
           Keyword.merge(
             @test_configuration,
