@@ -62,4 +62,8 @@ defmodule Benchee.TestHelpers do
   def sleep_safe_time do
     :timer.sleep(@safe_test_sleep_time)
   end
+
+  def safe_sleep_time do
+    @safe_test_sleep_time
+  end
 end
