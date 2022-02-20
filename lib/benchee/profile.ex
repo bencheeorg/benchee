@@ -1,4 +1,7 @@
 defmodule Benchee.Profile do
+  alias Benchee.Benchmark.Collect
+  alias Benchee.Benchmark.RunOnce
+  alias Benchee.Benchmark.ScenarioContext
   alias Benchee.Output.ProfilePrinter, as: Printer
   alias Benchee.Suite
 
@@ -42,11 +45,11 @@ defmodule Benchee.Profile do
   def profile(
         suite = %{
           scenarios: scenarios,
-          configuration: %{profile_after: true}
+          configuration: config = %{profile_after: true}
         },
         printer
       ) do
-    do_profile(scenarios, {@default_profiler, []}, printer)
+    do_profile(scenarios, {@default_profiler, []}, config, printer)
 
     suite
   end
@@ -54,11 +57,11 @@ defmodule Benchee.Profile do
   def profile(
         suite = %{
           scenarios: scenarios,
-          configuration: %{profile_after: {profiler, profiler_opts}}
+          configuration: config = %{profile_after: {profiler, profiler_opts}}
         },
         printer
       ) do
-    do_profile(scenarios, {profiler, profiler_opts}, printer)
+    do_profile(scenarios, {profiler, profiler_opts}, config, printer)
 
     suite
   end
@@ -66,30 +69,36 @@ defmodule Benchee.Profile do
   def profile(
         suite = %{
           scenarios: scenarios,
-          configuration: %{profile_after: profiler}
+          configuration: config = %{profile_after: profiler}
         },
         printer
       ) do
-    do_profile(scenarios, {profiler, []}, printer)
+    do_profile(scenarios, {profiler, []}, config, printer)
 
     suite
   end
 
-  defp do_profile(scenarios, {profiler, profiler_opts}, printer) do
+  defp do_profile(scenarios, {profiler, profiler_opts}, config, printer) do
     profiler_module = profiler_to_module(profiler)
 
     Enum.each(scenarios, fn scenario ->
-      run(scenario, {profiler, profiler_module, profiler_opts}, printer)
+      run(scenario, {profiler, profiler_module, profiler_opts}, config, printer)
     end)
   end
 
   defp run(
-         %{name: name, function: fun_to_profile},
+         scenario,
          {profiler, profiler_module, profiler_opts},
+         config,
          printer
        ) do
-    printer.profiling(name, profiler)
-    profiler_module.profile(fun_to_profile, profiler_opts)
+    printer.profiling(scenario.name, profiler)
+
+    RunOnce.run(
+      scenario,
+      %ScenarioContext{config: config},
+      {Collect.Profile, [profiler_module: profiler_module, profiler_opts: profiler_opts]}
+    )
   end
 
   # If given a builtin profiler the function will return its proper module.

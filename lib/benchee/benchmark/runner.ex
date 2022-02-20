@@ -5,7 +5,15 @@ defmodule Benchee.Benchmark.Runner do
   # run time and memory usage to each scenario.
 
   alias Benchee.{Benchmark, Configuration, Scenario, Utility.Parallel}
-  alias Benchmark.{Collect, FunctionCallOverhead, Hooks, RepeatedMeasurement, ScenarioContext}
+
+  alias Benchmark.{
+    Collect,
+    FunctionCallOverhead,
+    Hooks,
+    RepeatedMeasurement,
+    RunOnce,
+    ScenarioContext
+  }
 
   @doc """
   Executes the benchmarks defined before by first running the defined functions
@@ -45,11 +53,7 @@ defmodule Benchee.Benchmark.Runner do
   # This will run the given scenario exactly once, including the before and
   # after hooks, to ensure the function can execute without raising an error.
   defp pre_check(scenario, scenario_context) do
-    scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
-    scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
-    _ = collect(scenario, scenario_context, Collect.Time)
-    _ = Hooks.run_after_scenario(scenario, scenario_context)
-    nil
+    RunOnce.run(scenario, scenario_context, Collect.Time)
   end
 
   defp parallel_benchmark(
@@ -276,7 +280,7 @@ defmodule Benchee.Benchmark.Runner do
     new_input = Hooks.run_before_each(scenario, scenario_context)
     function = main_function(function, new_input)
 
-    {measurement, return_value} = collector.collect(function)
+    {measurement, return_value} = invoke_collector(collector, function)
 
     Hooks.run_after_each(return_value, scenario, scenario_context)
     measurement
@@ -296,4 +300,9 @@ defmodule Benchee.Benchmark.Runner do
   @no_input Benchmark.no_input()
   def main_function(function, @no_input), do: function
   def main_function(function, input), do: fn -> function.(input) end
+
+  defp invoke_collector({collector, collector_opts}, function),
+    do: collector.collect(function, collector_opts)
+
+  defp invoke_collector(collector, function), do: collector.collect(function)
 end
