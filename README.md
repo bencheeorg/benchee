@@ -388,6 +388,63 @@ map.flatten       522.99 μs     2105.56 μs        12.03 K     767.83 μs, 768.
 
 (Btw. notice how the modes of both are much closer and for `map.flatten` much less than the average of `766.99`, see `samples/run_extended_statistics`)
 
+### Profiling after a run
+
+Often time when benchmarking, you want to improve performance but benchee only tells you how fast something is, it doesn't tell you what part of your code is slow. This is where profiling comes in.
+
+Benchee offers you the `profile_after` option to run a profiler of your choice after a benchmarking run to see what's slow. This will run every scenario once.
+
+By default it will run the `:eprof` profiler, different profilers with different options can be used - see the [documentation of the configuration](#configuration).
+
+```elixir
+list = Enum.to_list(1..10_000)
+map_fun = fn i -> [i, i * i] end
+
+Benchee.run(
+  %{
+    "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
+    "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
+  },
+  profile_after: true
+)
+```
+
+After the normal benchmarking results prints profiles like:
+
+```
+Profiling flat_map with eprof...
+Warmup...
+
+
+Profile results of #PID<0.1885.0>
+#                                               CALLS     % TIME µS/CALL
+Total                                           30004 100.0 5665    0.19
+Enum.flat_map/2                                     1  0.00    0    0.00
+anonymous fn/2 in :elixir_compiler_1.__FILE__/1     1  0.00    0    0.00
+:erlang.apply/2                                     1  0.04    2    2.00
+:erlang.++/2                                    10000 18.38 1041    0.10
+anonymous fn/1 in :elixir_compiler_1.__FILE__/1 10000 28.12 1593    0.16
+Enum.flat_map_list/2                            10001 53.47 3029    0.30
+
+Profile done over 6 matching functions
+
+Profiling map.flatten with eprof...
+Warmup...
+
+
+Profile results of #PID<0.1887.0>
+#                                               CALLS     % TIME µS/CALL
+Total                                           60007 100.0 8649    0.14
+Enum.map/2                                          1  0.00    0    0.00
+anonymous fn/2 in :elixir_compiler_1.__FILE__/1     1  0.00    0    0.00
+List.flatten/1                                      1  0.00    0    0.00
+:lists.flatten/1                                    1  0.00    0    0.00
+:erlang.apply/2                                     1  0.02    2    2.00
+anonymous fn/1 in :elixir_compiler_1.__FILE__/1 10000 16.35 1414    0.14
+Enum."-map/2-lists^map/1-0-"/2                  10001 26.38 2282    0.23
+:lists.do_flatten/2                             40001 57.24 4951    0.12
+```
+
 ### Saving, loading and comparing previous runs
 
 Benchee can store the results of previous runs in a file and then load them again to compare them. For example this is useful to compare what was recorded on the master branch against a branch with performance improvements.
