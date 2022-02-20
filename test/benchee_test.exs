@@ -886,6 +886,44 @@ defmodule BencheeTest do
       end
     end
 
+    test "profiling and hooks work together" do
+      output =
+        capture_io(fn ->
+          Benchee.run(
+            %{"Sleeps" => fn _arg -> :timer.sleep(10) end},
+            Keyword.merge(
+              @test_configuration,
+              profile_after: true,
+              # the value here isn't too important, it just forces the function to take
+              # an argument which is what can make it break
+              before_each: fn _ -> nil end
+            )
+          )
+        end)
+
+      assert output =~ profiling_regex("Sleeps", Profile.default_profiler())
+      assert output =~ end_of_profiling_regex(Profile.default_profiler())
+    end
+
+    test "profiling and inputs work together" do
+      output =
+        capture_io(fn ->
+          Benchee.run(
+            %{"Sleeps" => fn sleep_time -> :timer.sleep(sleep_time) end},
+            Keyword.merge(
+              @test_configuration,
+              profile_after: true,
+              # the value here isn't too important, it just forces the function to take
+              # an argument which is what can make it break
+              inputs: %{"sleep time" => safe_sleep_time()}
+            )
+          )
+        end)
+
+      assert output =~ profiling_regex("Sleeps", Profile.default_profiler())
+      assert output =~ end_of_profiling_regex(Profile.default_profiler())
+    end
+
     defp profiling_regex(benchmark_name, profiler) do
       ~r/Profiling #{benchmark_name} with #{profiler}/
     end
