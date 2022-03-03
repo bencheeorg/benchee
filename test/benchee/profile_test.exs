@@ -16,70 +16,71 @@ defmodule Benchee.ProfileTest do
 
   @config_with_profiler %Configuration{profile_after: true}
 
-  describe ".profile" do
-    test "`profile_after` defaults to false, which doesn't profile" do
-      %{configuration: %{profile_after: profile_after}} = suite = %Suite{}
+  test "`profile_after` defaults to false, which doesn't profile" do
+    %{configuration: %{profile_after: profile_after}} = suite = %Suite{}
 
-      output =
-        capture_io(fn ->
-          suite
-          |> Benchmark.benchmark("one job", fn -> 1 end)
-          |> Profile.profile()
-        end)
-
-      refute output =~ "Profiling"
-      refute profile_after
-    end
-
-    test "can profile a benchmark" do
-      output =
-        capture_io(fn ->
-          %Suite{configuration: @config_with_profiler}
-          |> Benchmark.benchmark("one job", fn -> 1 end)
-          |> Profile.profile()
-        end)
-
-      assert output =~ "Profiling"
-    end
-
-    test "will not profile if no benchmark is found" do
-      output =
-        capture_io(fn ->
-          %Suite{configuration: @config_with_profiler}
-          |> Profile.profile()
-        end)
-
-      assert output =~ ""
-    end
-
-    test "accepts profiler options" do
-      configuration = %Configuration{profile_after: profiler_with_opts()}
-
-      output =
-        capture_io(fn ->
-          %Suite{configuration: configuration}
-          |> Benchmark.benchmark("one job", fn -> 1 end)
-          |> Profile.profile()
-        end)
-
-      assert output =~ ~r/Profiling one job with fprof/
-      assert output =~ ~r/CNT.+ACC \(ms\).+OWN \(ms\)/
-    end
-
-    test "sends the correct data to the profile printer" do
-      name = "one job"
-      profiler = :cprof
-      configuration = %Configuration{profile_after: profiler}
-
+    output =
       capture_io(fn ->
-        %Suite{configuration: configuration}
-        |> Benchmark.benchmark(name, fn -> 1 end)
-        |> Profile.profile(TestPrinter)
+        suite
+        |> Benchmark.benchmark("one job", fn -> 1 end)
+        |> Profile.profile()
       end)
 
-      assert_receive {:profiling, ^name, ^profiler}
-    end
+    refute output =~ "Profiling"
+    refute profile_after
+  end
 
+  test "can profile a benchmark" do
+    output =
+      capture_io(fn ->
+        %Suite{configuration: @config_with_profiler}
+        |> Benchmark.benchmark("one job", fn -> 1 end)
+        |> Profile.profile()
+      end)
+
+    assert output =~ "Profiling"
+  end
+
+  test "will not profile if no benchmark is found" do
+    output =
+      capture_io(fn ->
+        %Suite{configuration: @config_with_profiler}
+        |> Profile.profile()
+      end)
+
+    assert output =~ ""
+  end
+
+  test "accepts profiler options" do
+    configuration = %Configuration{profile_after: profiler_with_opts()}
+
+    output =
+      capture_io(fn ->
+        %Suite{configuration: configuration}
+        |> Benchmark.benchmark("one job", fn -> 1 end)
+        |> Profile.profile()
+      end)
+
+    assert output =~ ~r/Profiling one job with fprof/
+    assert output =~ ~r/CNT.+ACC \(ms\).+OWN \(ms\)/
+  end
+
+  test "sends the correct data to the profile printer" do
+    name = "one job"
+    profiler = :cprof
+    configuration = %Configuration{profile_after: profiler}
+
+    capture_io(fn ->
+      %Suite{configuration: configuration}
+      |> Benchmark.benchmark(name, fn -> 1 end)
+      |> Profile.profile(TestPrinter)
+    end)
+
+    assert_receive {:profiling, ^name, ^profiler}
+  end
+
+  # can't say warmup as some profilers will have it in the profile messing with the test
+  describe "warming up behavior" do
     @profilers Profile.builtin_profilers()
 
     for profiler <- @profilers do
