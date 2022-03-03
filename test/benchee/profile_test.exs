@@ -2,6 +2,9 @@ defmodule Benchee.ProfileTest do
   # async is set to false because otherwise testing the profilers might lead to failures
   use ExUnit.Case, async: false
 
+  import Benchee.TestHelpers
+  import ExUnit.CaptureIO
+
   alias Benchee.{
     Benchmark,
     Configuration,
@@ -10,8 +13,6 @@ defmodule Benchee.ProfileTest do
   }
 
   alias Benchee.Test.FakeProfilePrinter, as: TestPrinter
-
-  import ExUnit.CaptureIO
 
   @config_with_profiler %Configuration{profile_after: true}
 
@@ -77,6 +78,54 @@ defmodule Benchee.ProfileTest do
       end)
 
       assert_receive {:profiling, ^name, ^profiler}
+    end
+
+    @profilers Profile.builtin_profilers()
+
+    for profiler <- @profilers do
+      @profiler profiler
+      # can't say warmup in the test description as eprof picks it up and then it matches
+      test "the function will be called exactly once by default for profiling with #{@profiler}" do
+        output =
+          capture_io(fn ->
+            test_process = self()
+
+            %Suite{configuration: %Configuration{profile_after: @profiler}}
+            |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
+            |> Profile.profile()
+          end)
+
+        assert_received_exactly([:ran])
+        refute output =~ ~r/warmup/i
+      end
+    end
+
+    test "You can still specify you really want to do warmup" do
+      output =
+        capture_io(fn ->
+          test_process = self()
+
+          %Suite{configuration: %Configuration{profile_after: {:cprof, warmup: true}}}
+          |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
+          |> Profile.profile()
+        end)
+
+      assert_received_exactly([:ran, :ran])
+      assert output =~ ~r/warmup/i
+    end
+
+    test "specifying other options doesn't break the no warmup behavior" do
+      output =
+        capture_io(fn ->
+          test_process = self()
+
+          %Suite{configuration: %Configuration{profile_after: {:cprof, something: true}}}
+          |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
+          |> Profile.profile()
+        end)
+
+      assert_received_exactly([:ran])
+      refute output =~ ~r/warmup/i
     end
   end
 
