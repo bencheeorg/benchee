@@ -13,7 +13,7 @@ defmodule Benchee.Benchmark.Collect.Profile do
     profiler_opts = Access.get(opts, :profiler_opts, [])
 
     # note, I already put this here but it doesn't work yet
-    # see elixir core discussion: https://groups.google.com/g/elixir-lang-core/c/f0gP0It-yuU
+    # needs the release of this PR: https://github.com/elixir-lang/elixir/pull/11657
     return_value = profiler_module.profile(function, profiler_opts)
 
     {nil, return_value}
