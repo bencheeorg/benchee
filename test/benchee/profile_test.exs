@@ -130,6 +130,24 @@ defmodule Benchee.ProfileTest do
     end
   end
 
+  describe "hooks" do
+    test "before each hook works" do
+      output =
+        capture_io(fn ->
+          test_process = self()
+
+          %Suite{configuration: %Configuration{profile_after: true}}
+          |> Benchmark.benchmark(
+            "job",
+            {fn -> 42 end, before_each: fn _ -> send(test_process, :before_each) end}
+          )
+          |> Profile.profile()
+        end)
+
+      assert_received_exactly([:before_each])
+    end
+  end
+
   # The example of {:fprof, [sort: :own]} crashes in Elixir version
   # prior to 1.7 because back then they didn't use the atom `:own`
   # but rather its string counterpart.
