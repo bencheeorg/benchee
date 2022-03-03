@@ -7,6 +7,8 @@ defmodule Benchee.Profile do
 
   @default_profiler :eprof
   @builtin_profilers [:cprof, :eprof, :fprof]
+  # we run the function a bunch already, no need for further warmup
+  @default_profiler_opts [warmup: false]
 
   defmodule Benchee.UnknownProfilerError do
     defexception message: "error"
@@ -36,6 +38,11 @@ defmodule Benchee.Profile do
   def default_profiler, do: @default_profiler
 
   @doc """
+  List of supported builtin profilers as atoms.
+  """
+  def builtin_profilers, do: @builtin_profilers
+
+  @doc """
   Runs for each scenario found in the suite the `profile/2` function from the given profiler.
   """
   @spec profile(Suite.t(), module) :: Suite.t()
@@ -49,7 +56,7 @@ defmodule Benchee.Profile do
         },
         printer
       ) do
-    do_profile(scenarios, {@default_profiler, []}, config, printer)
+    do_profile(scenarios, {@default_profiler, @default_profiler_opts}, config, printer)
 
     suite
   end
@@ -61,6 +68,7 @@ defmodule Benchee.Profile do
         },
         printer
       ) do
+    profiler_opts = Keyword.merge(@default_profiler_opts, profiler_opts)
     do_profile(scenarios, {profiler, profiler_opts}, config, printer)
 
     suite
@@ -73,7 +81,7 @@ defmodule Benchee.Profile do
         },
         printer
       ) do
-    do_profile(scenarios, {profiler, []}, config, printer)
+    do_profile(scenarios, {profiler, @default_profiler_opts}, config, printer)
 
     suite
   end
