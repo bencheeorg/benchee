@@ -140,7 +140,7 @@ against. Also fixes a bug for running benchmarks in parallel.
 
 ### Features (User Facing)
 * new `save` option specifying a path and a tag to save the results and tag them
-(for instance with `"master"`) and a `load` option to load those results again
+(for instance with `"main"`) and a `load` option to load those results again
 and compare them against your current results.
 * runs warning free with elixir 1.6
 
@@ -254,7 +254,7 @@ The biggest feature apart from that is the possibility to use multiple inputs - 
 
 ### Features (User Facing)
 
-* New `:inputs` configuration key that allows you to specify a map from input name to input value so that each defined benchmarking job is then executed with this input. For this to work the benchmarking function is called with the appropriate `input` as an argument. See [`samples/multiple_inputs.exs`](https://github.com/bencheeorg/benchee/blob/master/samples/multiple_inputs.exs) for an example. [#21]( https://github.com/bencheeorg/benchee/issues/21)
+* New `:inputs` configuration key that allows you to specify a map from input name to input value so that each defined benchmarking job is then executed with this input. For this to work the benchmarking function is called with the appropriate `input` as an argument. See [`samples/multiple_inputs.exs`](https://github.com/bencheeorg/benchee/blob/main/samples/multiple_inputs.exs) for an example. [#21]( https://github.com/bencheeorg/benchee/issues/21)
 * The highlevel `Benchee.run/2` is now more idiomatic elixir and takes the map of jobs as the first argument and a keyword list of options as the second (and last) argument. The old way of passing config as a map as the first argument and the jobs as the second argument still works, **but might be deprecated later on** [#47](https://github.com/bencheeorg/benchee/issues/47)
 * Along with that `Benchee.init/1` now also accepts keyword lists of course
 

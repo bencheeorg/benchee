@@ -76,8 +76,8 @@ defmodule Benchee.Scenario do
       iex> alias Benchee.Scenario
       iex> Scenario.display_name(%Scenario{job_name: "flat_map"})
       "flat_map"
-      iex> Scenario.display_name(%Scenario{job_name: "flat_map", tag: "master"})
-      "flat_map (master)"
+      iex> Scenario.display_name(%Scenario{job_name: "flat_map", tag: "main"})
+      "flat_map (main)"
       iex> Scenario.display_name(%{job_name: "flat_map"})
       "flat_map"
   """

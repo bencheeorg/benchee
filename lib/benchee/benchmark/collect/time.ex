@@ -7,7 +7,7 @@ defmodule Benchee.Benchmark.Collect.Time do
   # seconds. This helps us avoid losing precision as both Linux and MacOSX seem to be able to
   # measure in nano seconds. `:timer.tc/n`
   # [forfeits this precision](
-  # https://github.com/erlang/otp/blob/master/lib/stdlib/src/timer.erl#L164-L169).
+  # https://github.com/erlang/otp/blob/main/lib/stdlib/src/timer.erl#L164-L169).
 
   @behaviour Benchee.Benchmark.Collect
 

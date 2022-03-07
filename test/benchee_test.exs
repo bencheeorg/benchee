@@ -609,7 +609,7 @@ defmodule BencheeTest do
 
   describe "save & load" do
     test "saving the suite to disk and restoring it" do
-      save = [save: [path: "save.benchee", tag: "master"]]
+      save = [save: [path: "save.benchee", tag: "main"]]
       expected_file = "save.benchee"
 
       try do
@@ -642,7 +642,7 @@ defmodule BencheeTest do
             Benchee.run(%{}, Keyword.merge(@test_configuration, load: expected_file))
           end)
 
-        readme_sample_asserts(loaded_output, " (master)")
+        readme_sample_asserts(loaded_output, " (main)")
 
         comparison_output =
           capture_io(fn ->
@@ -657,10 +657,10 @@ defmodule BencheeTest do
         assert comparison_output =~ ~r/^too fast\s+\d+(\.\d+)?.*+$/m
 
         assert comparison_output =~
-                 ~r/^flat_map \(master\)\s+\d+(\.\d+)?.*- \d+.+x slower \+\d+.+s$/m
+                 ~r/^flat_map \(main\)\s+\d+(\.\d+)?.*- \d+.+x slower \+\d+.+s$/m
 
         assert comparison_output =~
-                 ~r/^map\.flatten \(master\)\s+\d+(\.\d+)?.*- \d+.+x slower \+\d+.+s$/m
+                 ~r/^map\.flatten \(main\)\s+\d+(\.\d+)?.*- \d+.+x slower \+\d+.+s$/m
       after
         if File.exists?(expected_file) do
           File.rm!(expected_file)

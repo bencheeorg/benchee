@@ -1,4 +1,4 @@
-# Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee) [![Hex Docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/) [![CI](https://github.com/bencheeorg/benchee/workflows/CI/badge.svg)](https://github.com/bencheeorg/benchee/actions?query=branch%3Amain) [![Coverage Status](https://coveralls.io/repos/github/bencheeorg/benchee/badge.svg?branch=master)](https://coveralls.io/github/bencheeorg/benchee?branch=master) [![Total Download](https://img.shields.io/hexpm/dt/benchee.svg)](https://hex.pm/packages/benchee) [![License](https://img.shields.io/hexpm/l/benchee.svg)](https://github.com/bencheeorg/benchee/blob/master/LICENSE)
+# Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee) [![Hex Docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/) [![CI](https://github.com/bencheeorg/benchee/workflows/CI/badge.svg)](https://github.com/bencheeorg/benchee/actions?query=branch%3Amain) [![Coverage Status](https://coveralls.io/repos/github/bencheeorg/benchee/badge.svg?branch=main)](https://coveralls.io/github/bencheeorg/benchee?branch=main) [![Total Download](https://img.shields.io/hexpm/dt/benchee.svg)](https://hex.pm/packages/benchee) [![License](https://img.shields.io/hexpm/l/benchee.svg)](https://github.com/bencheeorg/benchee/blob/main/LICENSE)
 
 Library for easy and nice (micro) benchmarking in Elixir. Benchee allows you to compare the performance of different pieces of code at a glance. It is also versatile and extensible, relying only on functions. There are also a bunch of [plugins](#plugins) to draw pretty graphs and more!
 
@@ -199,7 +199,7 @@ map.flatten        1.22 K - 1.92x slower +393.09 μs
 
 See [Features](#features) for a description of the different statistical values and what they mean.
 
-If you're looking to see how to make something specific work, please refer to the [samples](https://github.com/bencheeorg/benchee/tree/master/samples) directory. Also, especially when wanting to extend Benchee, check out the [hexdocs](https://hexdocs.pm/benchee/api-reference.html).
+If you're looking to see how to make something specific work, please refer to the [samples](https://github.com/bencheeorg/benchee/tree/main/samples) directory. Also, especially when wanting to extend Benchee, check out the [hexdocs](https://hexdocs.pm/benchee/api-reference.html).
 
 ### Configuration
 
@@ -348,7 +348,7 @@ Also like memory measurements, reduction measurements will often be constant unl
 
 `:inputs` is a very useful configuration that allows you to run the same benchmarking jobs with different inputs. We call this combination a _"scenario"_. You specify the inputs as either a map from name (String or atom) to the actual input value or a list of tuples where the first element in each tuple is the name and the second element in the tuple is the value.
 
-Why do this? Functions can have different performance characteristics on differently shaped inputs - be that structure or input size. One of such cases is comparing tail-recursive and body-recursive implementations of `map`. More information in the [repository with the benchmark](https://github.com/PragTob/elixir_playground/blob/master/bench/tco_blog_post_focussed_inputs.exs) and the [blog post](https://pragtob.wordpress.com/2016/06/16/tail-call-optimization-in-elixir-erlang-not-as-efficient-and-important-as-you-probably-think/).
+Why do this? Functions can have different performance characteristics on differently shaped inputs - be that structure or input size. One of such cases is comparing tail-recursive and body-recursive implementations of `map`. More information in the [repository with the benchmark](https://github.com/PragTob/elixir_playground/blob/main/bench/tco_blog_post_focussed_inputs.exs) and the [blog post](https://pragtob.wordpress.com/2016/06/16/tail-call-optimization-in-elixir-erlang-not-as-efficient-and-important-as-you-probably-think/).
 
 As a little sample:
 
@@ -528,12 +528,12 @@ Enum."-map/2-lists^map/1-0-"/2                  10001 26.38 2282    0.23
 
 ### Saving, loading and comparing previous runs
 
-Benchee can store the results of previous runs in a file and then load them again to compare them. For example this is useful to compare what was recorded on the master branch against a branch with performance improvements.
+Benchee can store the results of previous runs in a file and then load them again to compare them. For example this is useful to compare what was recorded on the main branch against a branch with performance improvements.
 
 **Saving** is done through the `save` configuration option. You can specify a `path` where results are saved, or you can use the default option of`"benchmark.benchee"` if you don't pass a `path`. You can also pass a `tag` option which annotates these results (for instance with a branch name). The default option for the `tag` is a timestamp of when the benchmark was run.
 
 **Loading** is done through the `load` option specifying a path to the file to
-load (for instance `"benchmark.benchee"`). You can also specify multiple files to load through a list of paths (`["my.benchee", "master_save.benchee"]`) - each one of those can also be a glob expression to match even more files glob (`"save_number*.benchee"`).
+load (for instance `"benchmark.benchee"`). You can also specify multiple files to load through a list of paths (`["my.benchee", "main_save.benchee"]`) - each one of those can also be a glob expression to match even more files glob (`"save_number*.benchee"`).
 
 ```elixir
 Benchee.run(
@@ -933,7 +933,7 @@ deps, [
 ]}.
 
 {plugins, [
-    { rebar3_elixir_compile, ".*", {git, "https://github.com/barrel-db/rebar3_elixir_compile.git", {branch, "master"}}}
+    { rebar3_elixir_compile, ".*", {git, "https://github.com/barrel-db/rebar3_elixir_compile.git", {branch, "main"}}}
 ]}.
 
 {provider_hooks, [
@@ -1004,7 +1004,7 @@ Contributions to Benchee are **very welcome**! Bug reports, documentation, spell
 
 Keep in mind that the [plugins](#plugins) live in their own repositories with their own issue tracker and they also like to get contributions :)
 
-Please respect the [Code of Conduct](//github.com/bencheeorg/benchee/blob/master/CODE_OF_CONDUCT.md).
+Please respect the [Code of Conduct](//github.com/bencheeorg/benchee/blob/main/CODE_OF_CONDUCT.md).
 
 In addition to contributing code, you can help to triage issues. This can include reproducing bug reports, or asking for vital information such as version numbers or reproduction instructions. If you would like to start triaging issues, one easy way to get started is to [subscribe to pragtob/benchee on CodeTriage](https://www.codetriage.com/pragtob/benchee).
 
