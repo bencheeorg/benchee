@@ -22,7 +22,7 @@ defmodule Benchee.Benchmark.FunctionCallOverhead do
 
     warmup(overhead_function)
     run_times = run(overhead_function)
-    Statistex.median(run_times)
+    Statistex.minimum(run_times)
   end
 
   defp warmup(function) do
