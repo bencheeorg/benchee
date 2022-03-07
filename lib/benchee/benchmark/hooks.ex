@@ -1,5 +1,7 @@
 defmodule Benchee.Benchmark.Hooks do
-  @moduledoc false
+  @moduledoc """
+  Internal module to support hooks functionality.
+  """
 
   # Non Benchee code should not rely on this module.
 
