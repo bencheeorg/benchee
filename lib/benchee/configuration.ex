@@ -36,7 +36,7 @@ defmodule Benchee.Configuration do
             after_each: nil,
             before_scenario: nil,
             after_scenario: nil,
-            measure_function_call_overhead: true,
+            measure_function_call_overhead: false,
             title: nil,
             profile_after: false
 
@@ -122,7 +122,7 @@ defmodule Benchee.Configuration do
       in microseconds, and counts will be displayed in ones (this is
       equivalent to the behaviour Benchee had pre 0.5.0)
     * `:before_scenario`/`after_scenario`/`before_each`/`after_each` - read up on them in the hooks section in the README
-    * `:measure_function_call_overhead` - Measure how long an empty function call takes and deduct this from each measure run time. Defaults to true.
+    * `:measure_function_call_overhead` - Measure how long an empty function call takes and deduct this from each measure run time. This overhead should be negligible for all but the most micro benchmarks. Defaults to false.
     * `profile_after` - accepts any of the following options:
       * a boolean   - `true` will enable profiling with the default profiler
       (`:eprof`) and `false` will disable profiling. Defaults to `false`.

@@ -20,7 +20,7 @@ defmodule Benchee.Benchmark.FunctionCallOverhead do
     # just the fastest function one can think of...
     overhead_function = fn -> nil end
 
-    _ = warmup(overhead_function)
+    warmup(overhead_function)
     run_times = run(overhead_function)
     Statistex.median(run_times)
   end
