@@ -1,6 +1,6 @@
 # Idea from this:
 # credo:disable-for-next-line
-# https://github.com/PragTob/benchee/commit/b3ddbc132e641cdf1eec0928b322ced1dab8553f#commitcomment-23381474
+# https://github.com/bencheeorg/benchee/commit/b3ddbc132e641cdf1eec0928b322ced1dab8553f#commitcomment-23381474
 
 elixir_doc = """
 Top level module providing convenience access to needed functions as well

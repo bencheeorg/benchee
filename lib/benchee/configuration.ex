@@ -81,7 +81,7 @@ defmodule Benchee.Configuration do
     job/function. This gives you more data in the same time, but also puts a
     load on the system interfering with benchmark results. For more on the pros
     and cons of parallel benchmarking [check the
-    wiki](https://github.com/PragTob/benchee/wiki/Parallel-Benchmarking).
+    wiki](https://github.com/bencheeorg/benchee/wiki/Parallel-Benchmarking).
     Defaults to 1 (no parallel execution).
     * `save` - specify a `path` where to store the results of the current
     benchmarking suite, tagged with the specified `tag`.

@@ -105,7 +105,7 @@ Mostly fixing memory measurement bugs and delivering them to you asap ;)
 Mostly fixing memory measurement bugs and related issues :) Enjoy a better memory measurement experience from now on!
 
 ### Bugfixes (User Facing)
-* Memory measurements now correctly take the old generation on the heap into account. In reality that means sometimes bigger results and no missing measurements. See [#216](https://github.com/PragTob/benchee/pull/216) for details. Thanks to @michalmuskala for providing an interesting sample.
+* Memory measurements now correctly take the old generation on the heap into account. In reality that means sometimes bigger results and no missing measurements. See [#216](https://github.com/bencheeorg/benchee/pull/216) for details. Thanks to @michalmuskala for providing an interesting sample.
 * Formatters are now more robust (aka not crashing) when dealing with partially missing memory measurements. Although it shouldn't happen anymore with the item before fixed, Benchee shouldn't crash on you so we want to be on the safe side.
 * It's now possible to run just memory measurements (i.e. `time: 0, warmup: 0, memory_time: 1`)
 * even when you already have scenarios tagged with `-2` etc. it still correctly produces `-3`, `-4` etc. when saving again with the same "base tagged name"
@@ -115,7 +115,7 @@ Mostly fixing memory measurement bugs and related issues :) Enjoy a better memor
 Memory Measurements are finally here! Please report problems if you experience them.
 
 ### Features (User Facing)
-* Memory measurements obviously ;) Memory measurement are currently limited to process your function will be run in - memory consumption of other processes will **not** be measured. More information can be found in the [README](https://github.com/PragTob/benchee#measuring-memory-consumption). Only usable on OTP 19+. Special thanks go to @devonestes and @michalmuskala
+* Memory measurements obviously ;) Memory measurement are currently limited to process your function will be run in - memory consumption of other processes will **not** be measured. More information can be found in the [README](https://github.com/bencheeorg/benchee#measuring-memory-consumption). Only usable on OTP 19+. Special thanks go to @devonestes and @michalmuskala
 * new `pre_check` configuration option which allows users to add a dry run of all
 benchmarks with each input before running the actual suite. This should save
 time while actually writing the code for your benchmarks.
@@ -172,7 +172,7 @@ A tiny little release with a bugfix and MOARE statistics for the console formatt
 This release focuses on 2 main things: the internal restructuring to use _scenarios_ and the new _hooks_ system. Other than that we also have some nice convenience features and formatters can be generated in parallel now.
 
 ### Features (User Facing)
-* Hooks system - basically you can now do something before/after a benchmarking scenario or the benchmarking function, too much to explain it in a Changelog, check the [README](https://github.com/PragTob/benchee#hooks-setup-teardown-etc)
+* Hooks system - basically you can now do something before/after a benchmarking scenario or the benchmarking function, too much to explain it in a Changelog, check the [README](https://github.com/bencheeorg/benchee#hooks-setup-teardown-etc)
 * Don't show more precision than we have - i.e. 234.00 microseconds (measurements are in microseconds and .00 doesn't gain you anything)
 * Limit precision of available memory displayed, you don't need to know 7.45678932 GB. Thanks to `@elpikel`.
 * Display the 99th percentile runtime. Thanks to `@wasnotrice`.
@@ -193,7 +193,7 @@ This release focuses on 2 main things: the internal restructuring to use _scenar
 
 ## 0.9.0 (2017-06-08)
 
-This release focuses on adding more system specific information like CPU etc. and for better Erlang compatibility if you wanna use Benchee from Erlang. There is an [example project](https://github.com/PragTob/benchee_erlang_try) but calling Elixir from Erlang hasn't been as easy as I hoped :)
+This release focuses on adding more system specific information like CPU etc. and for better Erlang compatibility if you wanna use Benchee from Erlang. There is an [example project](https://github.com/bencheeorg/benchee_erlang_try) but calling Elixir from Erlang hasn't been as easy as I hoped :)
 
 ### Features (User Facing)
 * Gather more system data like number of cores, Operating System, memory, cpu speed - thanks @devonestes and @OvermindDL1
@@ -211,7 +211,7 @@ Another smaller release that focuses on adding type specs and structs in appropr
 * Major functions are type specced for your viewing pleasure in the docs and your dialyzer pleasure at type check time.
 
 ### Bugfixes (User Facing)
-* In 0.7.0 statistics generation might time out if Millions of run times were captured so that it takes longer than 5 seconds, this is fixed by waiting infinitely - thanks @devonestes for the [report](https://github.com/PragTob/benchee/issues/71).
+* In 0.7.0 statistics generation might time out if Millions of run times were captured so that it takes longer than 5 seconds, this is fixed by waiting infinitely - thanks @devonestes for the [report](https://github.com/bencheeorg/benchee/issues/71).
 * Unintended line break in the fast function warning removed
 * All necessary dependencies added to `:applications` (deep_merge was missing)
 
@@ -229,7 +229,7 @@ Another smaller release that focuses on adding type specs and structs in appropr
 
 ## 0.7.0 (April 23, 2017)
 
-Smaller convenience features in here - the biggest part of work went into breaking reports in [benchee_html](https://github.com/PragTob/benchee_html) apart :)
+Smaller convenience features in here - the biggest part of work went into breaking reports in [benchee_html](https://github.com/bencheeorg/benchee_html) apart :)
 
 ### Features (User Facing)
 * the print out of the Erlang version now is less verbose (just major/minor)
@@ -250,12 +250,12 @@ Smaller convenience features in here - the biggest part of work went into breaki
 
 One of the biggest releases yet. Great stuff in here - more elixir like API for `Benchee.run/2` with the jobs as the primary argument and the optional options as the second argument and now also as the more idiomatic keyword list!
 
-The biggest feature apart from that is the possibility to use multiple inputs - which you all should do now as quite many functions behave differently with bigger, smaller or differently shaped inputs. Apart from that a bulk of work has gone into making and supporting [benchee_html](https://github.com/PragTob/benchee_html)!
+The biggest feature apart from that is the possibility to use multiple inputs - which you all should do now as quite many functions behave differently with bigger, smaller or differently shaped inputs. Apart from that a bulk of work has gone into making and supporting [benchee_html](https://github.com/bencheeorg/benchee_html)!
 
 ### Features (User Facing)
 
-* New `:inputs` configuration key that allows you to specify a map from input name to input value so that each defined benchmarking job is then executed with this input. For this to work the benchmarking function is called with the appropriate `input` as an argument. See [`samples/multiple_inputs.exs`](https://github.com/PragTob/benchee/blob/master/samples/multiple_inputs.exs) for an example. [#21]( https://github.com/PragTob/benchee/issues/21)
-* The highlevel `Benchee.run/2` is now more idiomatic elixir and takes the map of jobs as the first argument and a keyword list of options as the second (and last) argument. The old way of passing config as a map as the first argument and the jobs as the second argument still works, **but might be deprecated later on** [#47](https://github.com/PragTob/benchee/issues/47)
+* New `:inputs` configuration key that allows you to specify a map from input name to input value so that each defined benchmarking job is then executed with this input. For this to work the benchmarking function is called with the appropriate `input` as an argument. See [`samples/multiple_inputs.exs`](https://github.com/bencheeorg/benchee/blob/master/samples/multiple_inputs.exs) for an example. [#21]( https://github.com/bencheeorg/benchee/issues/21)
+* The highlevel `Benchee.run/2` is now more idiomatic elixir and takes the map of jobs as the first argument and a keyword list of options as the second (and last) argument. The old way of passing config as a map as the first argument and the jobs as the second argument still works, **but might be deprecated later on** [#47](https://github.com/bencheeorg/benchee/issues/47)
 * Along with that `Benchee.init/1` now also accepts keyword lists of course
 
 ### Breaking Changes (User Facing)
@@ -275,7 +275,7 @@ also already added to the suite during `Benchee.run/2`
 ### Bugfixes
 
 * prewarming (discarding the first result due to some timer issues) during run time was removed, as it should already happen during the warmup period and would discard actual useful results especially for longer running macro benchmarks.
-* when the execution time of the benchmarking job exceeds the given `:time` it will now execute exactly once (used to be 2) [#49](https://github.com/PragTob/benchee/issues/49)
+* when the execution time of the benchmarking job exceeds the given `:time` it will now execute exactly once (used to be 2) [#49](https://github.com/bencheeorg/benchee/issues/49)
 * `run_times` are now in the order as recorded (used to be reverse) - important when wants to graph them/look at them to see if there are any anomalies during benchmarking
 * Remove elixir 1.4.0-rc.0 warnings
 
@@ -290,7 +290,7 @@ This release focuses on scaling units to more appropriate sizes. Instead of alwa
     * instead of "44556.77 μs" run time, you would see "44.56 ms"
 * Console output for standard deviation omits the parentheses
 * Scaling of console output can be configured with the 4 different strategies `:best`, `:largest`, `:smallest` and `:none`. Refer to the documentation for their different properties.
-* Shortened the fast function warning and instead [linked to the wiki](https://github.com/PragTob/benchee/wiki/Benchee-Warnings#fast-execution-warning)
+* Shortened the fast function warning and instead [linked to the wiki](https://github.com/bencheeorg/benchee/wiki/Benchee-Warnings#fast-execution-warning)
 
 ### Features (Plugins)
 
