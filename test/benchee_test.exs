@@ -18,7 +18,7 @@ defmodule BencheeTest do
   doctest Benchee
 
   @header_regex ~r/^Name.+ips.+average.+deviation.+median.+99th %$/m
-  @test_configuration [time: 0.01, warmup: 0.005, measure_function_call_overhead: false]
+  @test_configuration [time: 0.01, warmup: 0.005]
 
   test "integration high level README example" do
     output =
@@ -936,6 +936,29 @@ defmodule BencheeTest do
 
     defp end_of_profiling_regex(_profiler) do
       ~r/Profile done/
+    end
+  end
+
+  describe "function call overhead measurement" do
+    @overhead_output_regex ~r/function call overhead.*\d+/i
+    test "by default it is off" do
+      output =
+        capture_io(fn ->
+          Benchee.run(%{"sleeps" => fn -> sleep_safe_time() end})
+        end)
+
+      refute output =~ @overhead_output_regex
+    end
+
+    test "can be turned on" do
+      output =
+        capture_io(fn ->
+          Benchee.run(%{"sleeps" => fn -> sleep_safe_time() end},
+            measure_function_call_overhead: true
+          )
+        end)
+
+      assert output =~ @overhead_output_regex
     end
   end
 

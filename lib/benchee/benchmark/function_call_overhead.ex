@@ -15,13 +15,14 @@ defmodule Benchee.Benchmark.FunctionCallOverhead do
   # `determine_n_times` code that we should rather not go through as it changes
   # what this function does.
   # This also gives us a way to make sure we definitely take at least one measurement.
-  @spec measure() :: number
+  @spec measure() :: non_neg_integer()
   def measure do
     # just the fastest function one can think of...
     overhead_function = fn -> nil end
 
-    warmup(overhead_function)
+    _ = warmup(overhead_function)
     run_times = run(overhead_function)
+
     Statistex.minimum(run_times)
   end
 

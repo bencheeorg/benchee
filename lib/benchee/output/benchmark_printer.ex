@@ -104,4 +104,14 @@ defmodule Benchee.Output.BenchmarkPrinter do
     You may disable this warning by passing print: [fast_warning: false] as configuration options.
     """)
   end
+
+  @doc """
+  Print the measured function call overhead.
+  """
+  @spec function_call_overhead(non_neg_integer()) :: :ok
+  def function_call_overhead(overhead) do
+    scaled_overhead = Duration.scale(overhead)
+
+    IO.puts("Measured function call overhead as: #{Duration.format(scaled_overhead)}")
+  end
 end
