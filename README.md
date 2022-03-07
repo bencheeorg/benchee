@@ -275,6 +275,13 @@ Generally speaking we have seen accuracies down to 1 nanosecond on Linux and ~1 
 These numbers are not a limitation of Benchee, but of the Operating System (or at the very least how erlang makes it available).
 
 If your benchmark takes 100s of microseconds this likely has no/little impact, but **if you want to do extremely nano benchmarks we recommend doing them on Linux**.
+
+So, what happens if a function executes too fast for Benchee to measure? If Benchee recognizes this (not always possible) it will automatically take the function and repeat it multiple times. This way a function that takes 2 microseconds will take ~20 microseconds and differences can be measured even with microsecond accuracy. Naturally, this comes at several disadvantages:
+
+* The looping/repetition code is now measured alongside the function
+* essentially every single measurement is now an average across 10 runs making lots of statistics less meaningful
+
+Benchee will print a big warning when this happens.
 #### Measuring Memory Consumption
 
 Starting with version 0.13, users can now get measurements of how much memory their benchmarked scenarios use. The measurement is **limited to the process that Benchee executes your provided code in** - i.e. other processes (like worker pools)/the whole BEAM isn't taken into account.
@@ -457,11 +464,11 @@ map.flatten       522.99 μs     2105.56 μs        12.03 K     767.83 μs, 768.
 
 ### Profiling after a run
 
-Often time when benchmarking, you want to improve performance but benchee only tells you how fast something is, it doesn't tell you what part of your code is slow. This is where profiling comes in.
+Often time when benchmarking, you want to improve performance. However, Benchee only tells you how fast something is, it doesn't tell you what part of your code is slow. This is where profiling comes in.
 
 Benchee offers you the `profile_after` option to run a profiler of your choice after a benchmarking run to see what's slow. This will run every scenario once.
 
-By default it will run the `:eprof` profiler, different profilers with different options can be used - see the [documentation of the configuration](#configuration).
+By default it will run the `:eprof` profiler, different profilers with different options can be used - see [configuration](#configuration).
 
 ```elixir
 list = Enum.to_list(1..10_000)
@@ -476,7 +483,7 @@ Benchee.run(
 )
 ```
 
-After the normal benchmarking results prints profiles like:
+After the normal benchmarking, this results prints profiles like:
 
 ```
 Profiling flat_map with eprof...
@@ -545,7 +552,7 @@ Benchee has three types of hooks:
 * [Benchmarking function hooks](#benchmarking-function-hooks)
 
 
-Of course, **hooks are not included in the measurements**. So they are there especially if you want to do something and want it to **not be included in the measurements**. Sadly there is the notable exception of _too_fast_functions_ (the ones that execute faster than we can measure in _native_ resolution). As we need to measure their repeated invocations to get halfway good measurements `before_each` and `after_each` hooks are included there. However, to the best of our knowledge this should only ever happen on Windows (because of the bad run time measurement accuracy).
+Of course, **hooks are not included in the measurements**. So they are there especially if you want to do something and want it to **not be included in the measurements**. Sadly there is the notable exception of _too_fast_functions_ (the ones that execute faster than we can measure in [_native_ resolution](#a-note-on-time-measurement-accuracy)). As we need to measure their repeated invocations to get halfway good measurements `before_each` and `after_each` hooks are included there. However, to the best of our knowledge this should only ever happen on Windows (because of the bad run time measurement accuracy).
 
 #### Suite hooks
 
