@@ -98,13 +98,17 @@ The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/be
 
 * first runs the functions for a given warmup time without recording the results, to simulate a _"warm"/running_ system
 * [measures memory usage](#measuring-memory-consumption)
-* provides you with lots of statistics - check the next list
+* provides you with lots of [statistics](#statitics)
 * plugin/extensible friendly architecture so you can use different formatters to display benchmarking results as [HTML, markdown, JSON and more](#plugins)
+* measure not only [time](#measuring-time), but also measure [memory](#measuring-memory-consumption) and [reductions](#measuring-reductions)
+* as precise as it can get, measure with up to nanosecond precision (Operating System dependent)
 * nicely formatted console output with units scaled to appropriately (nanoseconds to minutes)
 * (optionally) measures the overhead of function calls so that the measured/reported times really are the execution time of _your_code_ without that overhead.
-* [hooks](#hooks-setup-teardown-etc) to execute something before/after a benchmarking invocation
+* [hooks](#hooks-setup-teardown-etc) to execute something before/after a benchmarking invocation, without it impacting the measured time
 * execute benchmark jobs in parallel to gather more results in the same time, or simulate a system under load
 * well documented & well tested
+
+### Statitics
 
 Provides you with the following **statistical data**:
 
@@ -119,7 +123,7 @@ In addition, you can optionally output an extended set of statistics:
 * **minimum**     - the smallest value measured for the job (fastest/least consumption)
 * **maximum**     - the biggest run time measured for the job (slowest/most consumption)
 * **sample size** - the number of measurements taken
-* **mode**        - the measured values that occur the most. Often one value, but can be multiple values if they occur the same amount of times. If no value occurs at least twice, this value will be nil.
+* **mode**        - the measured values that occur the most. Often one value, but can be multiple values if they occur exactly as often. If no value occurs at least twice, this value will be `nil`.
 
 ## Installation
 
@@ -205,6 +209,7 @@ The available options are the following (also documented in [hexdocs](https://he
 * `warmup` - the time in seconds for which a benchmarking job should be run without measuring anything before "real" measurements start. This simulates a _"warm"/running_ system. Defaults to 2.
 * `time` - the time in seconds for how long each individual scenario (benchmarking job x input) should be run for measuring the execution times (run time performance). Defaults to 5.
 * `memory_time` - the time in seconds for how long [memory measurements](#measuring-memory-consumption) should be conducted. Defaults to 0 (turned off).
+* `reduction_time` - the time in seconds for how long [reductions are measured](#measuring-memory-reductions) should be conducted. Defaults to 0 (turned off).
 * `inputs` - a map or list of two element tuples. If a map, the keys are descriptive input names and values are the actual input values. If a list of tuples, the first element in each tuple is the input name, and the second element in each tuple is the actual input value. Your benchmarking jobs will then be run with each of these inputs. For this to work your benchmarking function gets the current input passed in as an argument into the function. Defaults to `nil`, aka no input specified and functions are called without an argument. See [Inputs](#inputs).
 * `formatters` - list of formatters either as a module implementing the formatter behaviour, a tuple of said module and options it should take or formatter functions. They are run when using `Benchee.run/2` or you can invoke them through `Benchee.Formatter.output/1`. Functions need to accept one argument (which is the benchmarking suite with all data) and then use that to produce output. Used for plugins & configuration. Also allows the configuration of the console formatter to print extended statistics. Defaults to the builtin console formatter `Benchee.Formatters.Console`. See [Formatters](#formatters).
 * `measure_function_call_overhead` - Measure how long an empty function call takes and deduct this from each measured run time. This overhead should be negligible for all but the most micro benchmarks. Defaults to false.
@@ -238,7 +243,39 @@ The available options are the following (also documented in [hexdocs](https://he
     [`:eprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Eprof.html) and
     [`:fprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Fprof.html).
 
-### Measuring memory consumption
+### Metrics to measure
+
+Benchee can't only measure [execution time](#measuring-time), but also [memory consumption](#measuring-memory-consumption) and [reductions](#measuring-reductions)!
+
+You can measure one of these metrics, or all at the same time. The choice is up to you. Warmup will only occur once though, the time for measuring the metrics are governed by `time`, `memory_time` and `reduction_time` configuration values respectively.
+
+By default only execution time is measured, memory and reductions need to be opted in by specifying a non 0 time amount.
+
+#### Measuring time
+
+This is the default, which you'll most likely want to use as you want to measure how fast your system processes something or responds to a request. Benchee does its best to measure time as accurately and as scoped to your function as possible.
+
+```elixir
+Benchee.run(
+  %{
+    "something_great" => fn -> cool_stuff end
+  },
+  warmup: 1,
+  time: 5,
+  memory_time: 2,
+  reduction_time: 2
+)
+```
+
+##### A note on time measurement accuracy
+
+From system to system the resolution of the clock [can vary](https://www.erlang.org/doc/apps/erts/time_correction.html).
+
+Generally speaking we have seen accuracies down to 1 nanosecond on Linux and ~1 microsecond onb both OSX and Windows. We have also seen accuracy as low as 10ms on Windows in a CI environment.
+These numbers are not a limitation of Benchee, but of the Operating System (or at the very least how erlang makes it available).
+
+If your benchmark takes 100s of microseconds this likely has no/little impact, but **if you want to do extremely nano benchmarks we recommend doing them on Linux**.
+#### Measuring Memory Consumption
 
 Starting with version 0.13, users can now get measurements of how much memory their benchmarked scenarios use. The measurement is **limited to the process that Benchee executes your provided code in** - i.e. other processes (like worker pools)/the whole BEAM isn't taken into account.
 
@@ -248,7 +285,7 @@ This measurement of memory does not affect the measurement of run times.
 
 In cases where all measurements of memory consumption are identical, which happens very frequently, the full statistics will be omitted from the standard console formatter. If your function is deterministic, this should always be the case. Only in functions with some amount of randomness will there be variation in memory usage.
 
-Memory measurement is disabled by default, and you can choose to enable it by passing `memory_time: your_seconds` option to `Benchee.run/2`:
+Memory measurement is disabled by default, you can choose to enable it by passing `memory_time: your_seconds` option to `Benchee.run/2`:
 
 ```elixir
 Benchee.run(
@@ -263,6 +300,35 @@ Memory time can be specified separately as it will often be constant - so it mig
 
 A full example, including an example of the console output, can be found
 [here](samples/measure_memory.exs).
+
+#### Measuring Reductions
+
+Starting in versions 1.1.0 Benchee can measure reductions - but what are reductions?
+
+In short, it's not very well defined but a "unit of work". The BEAM uses them to keep track of how long a process has run. As [the Beam Book puts it as follows](https://blog.stenmans.org/theBeamBook/#_scheduling_non_preemptive_reduction_counting):
+
+>BEAM solves this by keeping track of how long a process has been running. This is done by counting reductions. The term originally comes from the mathematical term beta-reduction used in lambda calculus.
+>
+>The definition of a reduction in BEAM is not very specific, but we can see it as a small piece of work, which shouldn’t take too long. Each function call is counted as a reduction. BEAM does a test upon entry to each function to check whether the process has used up all its reductions or not. If there are reductions left the function is executed otherwise the process is suspended.
+
+Now, why would you want to measure this? Well, apart from BIFs & NIFs, which are not accurately tracked through this, it gives an impression of how much work the BEAM is doing. And the great thing is, this is independent of the load the system is under as well as the hardware. Hence, it gives you a way to check performance that is less volatile so suitable for CI for instance.
+
+It can slightly differ between elixir & erlang versions, though.
+
+**Like memory measurements, this only tracks reductions directly in the function given to benchee, not processes spawned by it or other processes it uses.**
+
+Reduction measurement is disabled by default, you can choose to enable it by passing `reduction_time: your_seconds` option to `Benchee.run/2`:
+
+```elixir
+Benchee.run(
+  %{
+    "something_great" => fn -> cool_stuff end
+  },
+  memory_time: 2
+)
+```
+
+Also like memory measurements, reduction measurements will often be constant unless something changes about the execution of the benchmarking function.
 
 ### Inputs
 
