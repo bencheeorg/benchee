@@ -225,7 +225,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           |> Benchmark.collect(TestPrinter)
           |> Benchee.statistics()
 
-        [%{run_time_data: %{statistics: %{median: median}}}] = suite.scenarios
+        [%{run_time_data: %{statistics: %{minimum: minimum}}}] = suite.scenarios
 
         assert_received {:function_call_overhead, overhead}
         # in Windows/Mac CI this measured overhead might legitimately be 0
@@ -233,7 +233,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
         # Should be 0 if it works correctly, give a bit of leeway - especially the appveyor CI
         # with Windows has a tougher time here as it repeats the function call
-        assert median <= 60
+        assert minimum <= 60
       end)
     end
 
