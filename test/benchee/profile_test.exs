@@ -1,5 +1,11 @@
 defmodule Benchee.ProfileTest do
   # async is set to false because otherwise testing the profilers might lead to failures
+  # Also a good amount of tests (probably should be all) is set to retrying, due to seemingly
+  # random failures (the mix task should take care of this, not us):
+  # (exit) exited in: :gen_server.call(:eprof, {:profile_start, [], {:_, :_, :_}, {:erlang, :apply,
+  # [#Function<16.26155113/0 in Benchee.ProfileTest."..."/1>, []]}, [set_on_spawn: true]},
+  # :infinity)** (EXIT) no process: the process is not alive or there's no process currently
+  # associated with the given name, possibly because its application isn't started
   use ExUnit.Case, async: false
 
   import Benchee.TestHelpers
@@ -87,17 +93,19 @@ defmodule Benchee.ProfileTest do
       @profiler profiler
       # can't say warmup in the test description as eprof picks it up and then it matches
       test "the function will be called exactly once by default for profiling with #{@profiler}" do
-        output =
-          capture_io(fn ->
-            test_process = self()
+        retrying(fn ->
+          output =
+            capture_io(fn ->
+              test_process = self()
 
-            %Suite{configuration: %Configuration{profile_after: @profiler}}
-            |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
-            |> Profile.profile()
-          end)
+              %Suite{configuration: %Configuration{profile_after: @profiler}}
+              |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
+              |> Profile.profile()
+            end)
 
-        assert_received_exactly([:ran])
-        refute output =~ ~r/warmup/i
+          assert_received_exactly([:ran])
+          refute output =~ ~r/warmup/i
+        end)
       end
     end
 
