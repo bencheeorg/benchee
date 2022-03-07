@@ -132,18 +132,21 @@ defmodule Benchee.ProfileTest do
 
   describe "hooks" do
     test "before each hook works" do
-      capture_io(fn ->
-        test_process = self()
+      # random flaky failures:      ** (exit) exited in: :gen_server.call(:eprof, {:profile_start, [], {:_, :_, :_}, {:erlang, :apply, [#Function<6.54153602/0 in Benchee.Benchmark.Runner.main_function/2>, []]}, [set_on_spawn: true]}, :infinity)
+      retrying(fn ->
+        capture_io(fn ->
+          test_process = self()
 
-        %Suite{configuration: %Configuration{profile_after: true}}
-        |> Benchmark.benchmark(
-          "job",
-          {fn _ -> 42 end, before_each: fn _ -> send(test_process, :before_each) end}
-        )
-        |> Profile.profile()
+          %Suite{configuration: %Configuration{profile_after: true}}
+          |> Benchmark.benchmark(
+            "job",
+            {fn _ -> 42 end, before_each: fn _ -> send(test_process, :before_each) end}
+          )
+          |> Profile.profile()
+        end)
+
+        assert_received_exactly([:before_each])
       end)
-
-      assert_received_exactly([:before_each])
     end
 
     test "all kinds of hooks with inputs work" do
