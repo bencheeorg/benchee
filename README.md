@@ -23,38 +23,39 @@ Benchee.run(
 Produces the following output on the console:
 
 ```
-tobi@speedy:$ mix run samples/run.exs
+tobi@qiqi:~/github/benchee$ mix run samples/run.exs
 Operating System: Linux
-CPU Information: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
-Number of Available Cores: 8
-Available memory: 15.61 GB
-Elixir 1.8.1
-Erlang 21.2.7
+CPU Information: AMD Ryzen 9 5900X 12-Core Processor
+Number of Available Cores: 24
+Available memory: 31.27 GB
+Elixir 1.13.3
+Erlang 24.2.1
 
 Benchmark suite executing with the following configuration:
 warmup: 2 s
 time: 10 s
 memory time: 2 s
+reduction time: 0 ns
 parallel: 1
 inputs: none specified
 Estimated total run time: 28 s
 
-Benchmarking flat_map...
-Benchmarking map.flatten...
+Benchmarking flat_map ...
+Benchmarking map.flatten ...
 
 Name                  ips        average  deviation         median         99th %
-flat_map           2.34 K      426.84 μs     ±9.88%      418.72 μs      720.20 μs
-map.flatten        1.18 K      844.08 μs    ±19.73%      778.10 μs     1314.87 μs
+flat_map           3.71 K      269.48 μs     ±8.10%      267.14 μs      333.89 μs
+map.flatten        2.13 K      469.18 μs    ±36.34%      410.03 μs      904.42 μs
 
 Comparison:
-flat_map           2.34 K
-map.flatten        1.18 K - 1.98x slower +417.24 μs
+flat_map           3.71 K
+map.flatten        2.13 K - 1.74x slower +199.71 μs
 
 Memory usage statistics:
 
 Name           Memory usage
-flat_map          624.97 KB
-map.flatten       781.25 KB - 1.25x memory usage +156.28 KB
+flat_map             625 KB
+map.flatten       781.25 KB - 1.25x memory usage +156.25 KB
 
 **All measurements for memory usage were the same**
 ```
