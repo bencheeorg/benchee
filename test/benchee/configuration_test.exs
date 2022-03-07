@@ -34,10 +34,10 @@ defmodule Benchee.ConfigurationTest do
                configuration: %{
                  formatters: [
                    Benchee.Formatters.Console,
-                   {Benchee.Formatters.TaggedSave, %{path: "save_one.benchee", tag: "master"}}
+                   {Benchee.Formatters.TaggedSave, %{path: "save_one.benchee", tag: "main"}}
                  ]
                }
-             } = init(save: [path: "save_one.benchee", tag: "master"])
+             } = init(save: [path: "save_one.benchee", tag: "main"])
     end
 
     test ":save tag defaults to date" do
