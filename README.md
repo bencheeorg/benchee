@@ -101,6 +101,7 @@ The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/be
 * provides you with lots of [statistics](#statitics)
 * plugin/extensible friendly architecture so you can use different formatters to display benchmarking results as [HTML, markdown, JSON and more](#plugins)
 * measure not only [time](#measuring-time), but also measure [memory](#measuring-memory-consumption) and [reductions](#measuring-reductions)
+* [profile](#profiling-after-a-run) right after benchmarking
 * as precise as it can get, measure with up to nanosecond precision (Operating System dependent)
 * nicely formatted console output with units scaled to appropriately (nanoseconds to minutes)
 * (optionally) measures the overhead of function calls so that the measured/reported times really are the execution time of _your_code_ without that overhead.
