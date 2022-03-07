@@ -37,7 +37,7 @@ defmodule Benchee.Benchmark.Runner do
 
     function_call_overhead =
       if scenario_context.config.measure_function_call_overhead do
-        FunctionCallOverhead.measure()
+        measure_and_report_function_call_overhead(scenario_context.printer)
       else
         0
       end
@@ -54,6 +54,12 @@ defmodule Benchee.Benchmark.Runner do
   # after hooks, to ensure the function can execute without raising an error.
   defp pre_check(scenario, scenario_context) do
     RunOnce.run(scenario, scenario_context, Collect.Time)
+  end
+
+  def measure_and_report_function_call_overhead(prtiner) do
+    overhead = FunctionCallOverhead.measure()
+    prtiner.function_call_overhead(overhead)
+    overhead
   end
 
   defp parallel_benchmark(

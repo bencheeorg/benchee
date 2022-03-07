@@ -206,7 +206,17 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert median < 1500
     end
 
-    test "very fast function times are almost 0 with function call overhead elimination" do
+    test "function call overhead isn't measured/reported when it is off" do
+      %{configuration: %{measure_function_call_overhead: false}}
+      |> test_suite()
+      |> Benchmark.benchmark("", fn -> nil end)
+      |> Benchmark.collect(TestPrinter)
+      |> Benchee.statistics()
+
+      refute_received {:function_call_overhead, _}
+    end
+
+    test "very fast function times are almost 0 with function call overhead elimination & prints overhead" do
       retrying(fn ->
         suite =
           %{configuration: %{measure_function_call_overhead: true, time: 200_000_000}}
@@ -216,6 +226,10 @@ defmodule Benchee.Benchmark.RunnerTest do
           |> Benchee.statistics()
 
         [%{run_time_data: %{statistics: %{median: median}}}] = suite.scenarios
+
+        assert_received {:function_call_overhead, overhead}
+        # in Windows/Mac CI this measured overhead might legitimately be 0
+        assert overhead >= 0
 
         # Should be 0 if it works correctly, give a bit of leeway - especially the appveyor CI
         # with Windows has a tougher time here as it repeats the function call

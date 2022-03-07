@@ -16,4 +16,8 @@ defmodule Benchee.Test.FakeBenchmarkPrinter do
   def fast_warning do
     send(self(), :fast_warning)
   end
+
+  def function_call_overhead(overhead) do
+    send(self(), {:function_call_overhead, overhead})
+  end
 end
