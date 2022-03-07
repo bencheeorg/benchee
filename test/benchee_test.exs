@@ -829,7 +829,7 @@ defmodule BencheeTest do
     test "integration profiling defaults to no profile" do
       output =
         capture_io(fn ->
-          Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end})
+          Benchee.run(%{"Sleeps" => fn -> :timer.sleep(10) end}, @test_configuration)
         end)
 
       refute output =~ ~r/Profiling.+with/i
@@ -944,7 +944,10 @@ defmodule BencheeTest do
     test "by default it is off" do
       output =
         capture_io(fn ->
-          Benchee.run(%{"sleeps" => fn -> sleep_safe_time() end})
+          Benchee.run(
+            %{"sleeps" => fn -> sleep_safe_time() end},
+            @test_configuration
+          )
         end)
 
       refute output =~ @overhead_output_regex
@@ -953,8 +956,9 @@ defmodule BencheeTest do
     test "can be turned on" do
       output =
         capture_io(fn ->
-          Benchee.run(%{"sleeps" => fn -> sleep_safe_time() end},
-            measure_function_call_overhead: true
+          Benchee.run(
+            %{"sleeps" => fn -> sleep_safe_time() end},
+            Keyword.merge(@test_configuration, measure_function_call_overhead: true)
           )
         end)
 
