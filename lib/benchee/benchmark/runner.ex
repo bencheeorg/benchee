@@ -1,5 +1,7 @@
 defmodule Benchee.Benchmark.Runner do
-  @moduledoc false
+  @moduledoc """
+  Internal module "running" a scenario, measuring all defined measurements.
+  """
 
   # This module actually runs our benchmark scenarios, adding information about
   # run time and memory usage to each scenario.

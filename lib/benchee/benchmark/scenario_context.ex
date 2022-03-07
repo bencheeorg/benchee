@@ -1,5 +1,11 @@
 defmodule Benchee.Benchmark.ScenarioContext do
-  @moduledoc false
+  @moduledoc """
+  Internal struct the runner & related modules deal with to run a scenario.
+
+  Practically bundles information the runner needs to be aware of while running
+  a scenario such as the current_time, end_time, printer, input, function call
+  overhead etc.
+  """
 
   # This struct holds the context in which any scenario is run.
 
