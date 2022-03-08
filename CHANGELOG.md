@@ -5,21 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 1.1.0 (2022-03-??)
+## 1.1.0 (2022-03-08)
 
 Long time, huh? I'm sorry, combination of priorities, difficult to fix bugs, stress and arm problems kept me away too long.
-This release brings features long developed and finally into released hands, along with a critical bugfix around measurement accuracy for very fast functions (nanoseconds).
+This release brings major features long developed and now finally released (reduction measurements + profiler after run), along with a critical bugfix around measurement accuracy for very fast functions (nanoseconds).
 
 ### Features (User Facing)
-* Reduction counting/measurements was implemented. Basically, it's a rather stable unit of execution implemented by the BEAM that measures in more abstract manner how much work it has to do. It's helpful, as it shouldn't be affected by load on the system. Check out [the docs](https://github.com/bencheeorg/benchee#measuring-reductions).
+* Reduction counting/measurements was implemented. Basically, it's a rather stable unit of execution implemented by the BEAM that measures in more abstract manner how much work was done. It's helpful, as it shouldn't be affected by load on the system. Check out [the docs](https://github.com/bencheeorg/benchee#measuring-reductions).
 * You can now dive straight into profiling from your benchmarks by using the profiling feature. See [the docs](https://github.com/bencheeorg/benchee#profiling-after-a-run) - thanks [@pablocostass](https://github.com/pablocostass)
 
 ### Bugfixes (User Facing)
-* Benchee now correctly looks for the time resolution as reported by `:erlang.system_info(:os_monotonic_time_source)`, also working around an erlang bug we discovered present in erlang <= 22.2. [Issue for reference](https://github.com/bencheeorg/benchee/issues/313)
+* Benchee now correctly looks for the time resolution as reported by `:erlang.system_info(:os_monotonic_time_source)` to accomodate when determining if a measurement is "precise" enough. Benche also works around an erlang bug we discovered present in erlang <= 22.2. [Issue for reference](https://github.com/bencheeorg/benchee/issues/313).
 * The annoying stacktrace warning has been removed - thanks [@mad42](https://github.com/mad42)
 
 ### Noteworthy
-* a new dependency `statistex` will show up - it's a part of continued efforts to extract reusable libraries from Benchee
+* a new dependency `statistex` will show up - it's a part of continued efforts to extract reusable libraries from Benchee.
 
 ## 1.0.1 (2019-04-09)
 
