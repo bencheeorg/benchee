@@ -14,6 +14,9 @@ This release brings major features long developed and now finally released (redu
 * Reduction counting/measurements was implemented. Basically, it's a rather stable unit of execution implemented by the BEAM that measures in more abstract manner how much work was done. It's helpful, as it shouldn't be affected by load on the system. Check out [the docs](https://github.com/bencheeorg/benchee#measuring-reductions).
 * You can now dive straight into profiling from your benchmarks by using the profiling feature. See [the docs](https://github.com/bencheeorg/benchee#profiling-after-a-run) - thanks [@pablocostass](https://github.com/pablocostass)
 
+### Default Behavior Changes (User Facing)
+* measuring function call overhead is now turned off by default, as it only helps with extreme nano benchmarks and has some potential for causing wrong results, so it should only be opt in. We now also print out the measured overhead for vsibility.
+
 ### Bugfixes (User Facing)
 * Benchee now correctly looks for the time resolution as reported by `:erlang.system_info(:os_monotonic_time_source)` to accomodate when determining if a measurement is "precise" enough. Benche also works around an erlang bug we discovered present in erlang <= 22.2. [Issue for reference](https://github.com/bencheeorg/benchee/issues/313).
 * The annoying stacktrace warning has been removed - thanks [@mad42](https://github.com/mad42)
