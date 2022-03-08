@@ -51,7 +51,7 @@ jobs:
       - name: Restore plts
         uses: actions/cache@v2
         with:
-          path: priv/plts
+          path: tools/plts
           key: ${{ runner.os }}-dialyzer-${{ matrix.elixir_version }}-${{ matrix.otp_version }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
       - run: mix deps.get
       - run: MIX_ENV=test mix compile --warnings-as-errors

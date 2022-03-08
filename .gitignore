@@ -28,5 +28,5 @@ benchee-*.tar
 # Misc.
 save.benchee
 /test/tmp/
-/priv/plts/benchee.plt
-/priv/plts/benchee.plt.hash
+/tools/plts/benchee.plt
+/tools/plts/benchee.plt.hash
