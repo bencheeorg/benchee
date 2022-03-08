@@ -526,6 +526,8 @@ Enum."-map/2-lists^map/1-0-"/2                  10001 26.38 2282    0.23
 :lists.do_flatten/2                             40001 57.24 4951    0.12
 ```
 
+**Note about after_each hooks:** `after_each` hooks currently don't work when profiling a function, as they are not passed the return value of the function after the profiling run. It's already fixed on the elixir side and is waiting for release, likely in 1.14. It should then just work.
+
 ### Saving, loading and comparing previous runs
 
 Benchee can store the results of previous runs in a file and then load them again to compare them. For example this is useful to compare what was recorded on the main branch against a branch with performance improvements.
