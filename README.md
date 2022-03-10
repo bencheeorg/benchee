@@ -338,7 +338,7 @@ Benchee.run(
   %{
     "something_great" => fn -> cool_stuff end
   },
-  memory_time: 2
+  reduction_time: 2
 )
 ```
 
