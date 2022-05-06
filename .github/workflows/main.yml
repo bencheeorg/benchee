@@ -40,7 +40,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup Elixir
-        uses: actions/setup-elixir@v1
+        uses: erlef/setup-beam@v1
         with:
           elixir-version: ${{ matrix.elixir_version }}
           otp-version: ${{ matrix.otp_version }}
