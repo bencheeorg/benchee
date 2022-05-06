@@ -8,7 +8,7 @@ defmodule Benchee.Utility.ErlangVersion do
 
   Used to check if a bugfix has already landed.
 
-  Applies some manual massaging, as erlang likes to report versios number not compatible with
+  Applies some manual massaging, as erlang likes to report versions number not compatible with
   SemVer. If we can't parse the version, to minimize false positives, we assume it's newer.
 
   Only the `version_to_check` is treated loosely. `version_to_check` must be SemVer compatible,

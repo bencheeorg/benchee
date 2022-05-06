@@ -48,7 +48,7 @@ defmodule Benchee.TestHelpers do
   We can do this at compile time, as the system clock should not change.
 
   Specifically this used on Windows CI, which for whatever reason that I do not understand
-  seems to have a resolution of 100 which is... 10 milliseconds. Which is... way too litle.
+  seems to have a resolution of 100 which is... 10 milliseconds. Which is... way too little.
   """
   @clock_resolution Access.get(:erlang.system_info(:os_monotonic_time_source), :resolution)
   @milliseconds Benchee.Conversion.Duration.convert_value({1, :second}, :millisecond)
