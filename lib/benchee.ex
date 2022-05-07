@@ -40,6 +40,7 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
         )
     """
     @spec run(map, keyword) :: any
+
     def run(jobs, config \\ []) when is_list(config) do
       config
       |> Benchee.init()
@@ -55,6 +56,11 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
 
     defp add_benchmarking_jobs(suite, jobs) do
       Enum.reduce(jobs, suite, fn {key, function}, suite_acc ->
+        if :erlang.fun_info(function, :module) == {:module, :erl_eval} do
+          "warning: the benchmark #{key} is using an evaluated function. Evaluated functions perform slower than compiled functions. Consider moving all of the Benchee caller to a function in a module and invoking the `Mod.fun()` instead."
+          |> IO.puts()
+        end
+
         Benchee.benchmark(suite_acc, key, function)
       end)
     end
