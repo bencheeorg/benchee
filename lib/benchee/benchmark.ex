@@ -24,14 +24,33 @@ defmodule Benchee.Benchmark do
   function for each input.
   """
   @spec benchmark(Suite.t(), Suite.key(), Scenario.to_benchmark(), module) :: Suite.t()
-  def benchmark(suite = %Suite{scenarios: scenarios}, job_name, function, printer \\ Printer) do
+  def benchmark(
+        suite = %Suite{scenarios: scenarios},
+        job_name,
+        to_be_benchmark,
+        printer \\ Printer
+      ) do
+    warn_if_evaluated(to_be_benchmark, job_name, printer)
+
     normalized_name = to_string(job_name)
 
     if duplicate?(scenarios, normalized_name) do
       printer.duplicate_benchmark_warning(normalized_name)
       suite
     else
-      add_scenario(suite, normalized_name, function)
+      add_scenario(suite, normalized_name, to_be_benchmark)
+    end
+  end
+
+  defp warn_if_evaluated(to_be_benchmark, job_name, printer) do
+    function =
+      case to_be_benchmark do
+        {function, _} -> function
+        function -> function
+      end
+
+    if :erlang.fun_info(function, :module) == {:module, :erl_eval} do
+      printer.evaluated_function_warning(job_name)
     end
   end
 
