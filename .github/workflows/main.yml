@@ -14,7 +14,7 @@ jobs:
       matrix:
         # Thoroughly check the most recent versions
         elixir_version: ['1.10.4', '1.11.4', '1.12.3', '1.13.4']
-        otp_version: ['22.3', '23.3', '24.3', '25.0']
+        otp_version: ['22.3', '23.3', '24.3']
         # Spot check older versions
         include:
           - elixir_version: '1.6.6'
