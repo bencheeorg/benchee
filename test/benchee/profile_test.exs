@@ -39,14 +39,16 @@ defmodule Benchee.ProfileTest do
   end
 
   test "can profile a benchmark" do
-    output =
-      capture_io(fn ->
-        %Suite{configuration: @config_with_profiler}
-        |> Benchmark.benchmark("one job", fn -> 1 end)
-        |> Profile.profile()
-      end)
+    retrying(fn ->
+      output =
+        capture_io(fn ->
+          %Suite{configuration: @config_with_profiler}
+          |> Benchmark.benchmark("one job", fn -> 1 end)
+          |> Profile.profile()
+        end)
 
-    assert output =~ "Profiling"
+      assert output =~ "Profiling"
+    end)
   end
 
   test "will not profile if no benchmark is found" do
