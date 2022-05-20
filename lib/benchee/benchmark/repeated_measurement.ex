@@ -40,6 +40,8 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
         collector \\ Collect.Time
       ) do
     resolution_adjustment = determine_resolution_adjustment(system_info, clock_info)
+    IO.inspect(clock_info)
+    IO.inspect(resolution_adjustment)
 
     do_determine_n_times(
       scenario,
