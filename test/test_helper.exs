@@ -6,18 +6,17 @@ exclusions = if otp_release > 18, do: [], else: [memory_measure: true]
 # see: https://github.com/bencheeorg/benchee/pull/195#issuecomment-377010006
 {_, os} = :os.type()
 
+# mac and windows just aren't as fast
 exclusions =
   case os do
     :nt ->
-      [{:performance, true}, {:nanosecond_resolution_clock, true}] ++ exclusions
+      [{:performance, true} | exclusions]
 
     :darwin ->
       [{:performance, true} | exclusions]
 
     _ ->
-      # with our new nanosecond accuracy we can't trigger our super fast function code
-      # anymore on Linux and MacOS (see above)
-      [{:needs_fast_function_repetition, true} | exclusions]
+      exclusions
   end
 
 # Somehow at some point the resolution on the Windows CI got very bad to 100 (which is 10ms)
@@ -29,6 +28,28 @@ minimum_millisecond_resolution = 1000
 exclusions =
   if clock_resolution < minimum_millisecond_resolution do
     [{:millisecond_resolution_clock, true} | exclusions]
+  else
+    exclusions
+  end
+
+# to trigger fast function repetition we'd need to have a clock with a at most a resolution of
+# ~100ns
+ns_100_resolution = 10_000_000
+
+exclusions =
+  if clock_resolution > ns_100_resolution do
+    [{:needs_fast_function_repetition, true} | exclusions]
+  else
+    exclusions
+  end
+
+# to trigger fast function repetition we'd need to have a clock with a at most a resolution of
+# ~100ns
+ns_resolution = 1_000_000_000
+
+exclusions =
+  if clock_resolution < ns_resolution do
+    [{:nanosecond_resolution_clock, true} | exclusions]
   else
     exclusions
   end
