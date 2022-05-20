@@ -43,4 +43,15 @@ exclusions =
     exclusions
   end
 
+# to trigger fast function repetition we'd need to have a clock with a at most a resolution of
+# ~100ns
+ns_resolution = 1000_000_000
+
+exclusions =
+  if clock_resolution < ns_resolution do
+    [{:nanosecond_resolution_clock, true} | exclusions]
+  else
+    exclusions
+  end
+
 ExUnit.start(exclude: exclusions)
