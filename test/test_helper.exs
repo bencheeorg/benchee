@@ -32,7 +32,8 @@ exclusions =
     exclusions
   end
 
-# to trigger fast function repetition we'd need to have a clock with a at most a resolution of ~100ns
+# to trigger fast function repetition we'd need to have a clock with a at most a resolution of
+# ~100ns
 ns_100_resolution = 10_000_000
 
 exclusions =
