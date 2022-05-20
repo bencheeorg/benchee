@@ -879,7 +879,7 @@ defmodule BencheeTest do
             %{"Sleeps" => fn -> :timer.sleep(10) end},
             Keyword.merge(
               @test_configuration,
-              profile_after: :cproff
+              profile_after: :unknown_profiler
             )
           )
         end)

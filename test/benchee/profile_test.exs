@@ -1,5 +1,7 @@
 defmodule Benchee.ProfileTest do
   # async is set to false because otherwise testing the profilers might lead to failures
+  # - the profilers are more or less global so running them in parallel can cause problems.
+  #
   # Also a good amount of tests (probably should be all) is set to retrying, due to seemingly
   # random failures (the mix task should take care of this, not us):
   # (exit) exited in: :gen_server.call(:eprof, {:profile_start, [], {:_, :_, :_}, {:erlang, :apply,
