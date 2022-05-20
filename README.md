@@ -67,7 +67,7 @@ The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/be
 ## Table of Contents
 
 - [Features](#features)
-  - [Statitics](#statitics)
+  - [Statistics](#statistics)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Configuration](#configuration)
@@ -104,7 +104,7 @@ The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/be
 
 * first runs the functions for a given warmup time without recording the results, to simulate a _"warm"/running_ system
 * [measures memory usage](#measuring-memory-consumption)
-* provides you with lots of [statistics](#statitics)
+* provides you with lots of [statistics](#statistics)
 * plugin/extensible friendly architecture so you can use different formatters to display benchmarking results as [HTML, markdown, JSON and more](#plugins)
 * measure not only [time](#measuring-time), but also measure [memory](#measuring-memory-consumption) and [reductions](#measuring-reductions)
 * [profile](#profiling-after-a-run) right after benchmarking
@@ -115,7 +115,7 @@ The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/be
 * execute benchmark jobs in parallel to gather more results in the same time, or simulate a system under load
 * well documented & well tested
 
-### Statitics
+### Statistics
 
 Provides you with the following **statistical data**:
 
