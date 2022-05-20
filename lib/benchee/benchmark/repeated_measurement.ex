@@ -40,8 +40,6 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
         collector \\ Collect.Time
       ) do
     resolution_adjustment = determine_resolution_adjustment(system_info, clock_info)
-    IO.inspect(clock_info)
-    IO.inspect(resolution_adjustment)
 
     do_determine_n_times(
       scenario,
@@ -92,9 +90,6 @@ defmodule Benchee.Benchmark.RepeatedMeasurement do
        ) do
     run_time = measure_iteration(scenario, scenario_context, collector)
     resolution_adjusted_run_time = run_time / resolution_adjustment
-
-    IO.inspect(run_time, label: "run time")
-    IO.inspect(resolution_adjusted_run_time, label: "res run time")
 
     if resolution_adjusted_run_time >= @minimum_execution_time do
       {num_iterations, report_time(run_time, num_iterations)}
