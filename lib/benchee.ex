@@ -55,14 +55,6 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
 
     defp add_benchmarking_jobs(suite, jobs) do
       Enum.reduce(jobs, suite, fn {key, function}, suite_acc ->
-        if is_function(function) && :erlang.fun_info(function, :module) == {:module, :erl_eval} do
-          IO.puts("""
-          Warning: the benchmark #{key} is using an evaluated function.
-            Evaluated functions perform slower than compiled functions.
-            Consider moving all of the Benchee caller to a function in a module and invoking the `Mod.fun()` instead.
-          """)
-        end
-
         Benchee.benchmark(suite_acc, key, function)
       end)
     end

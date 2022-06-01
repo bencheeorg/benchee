@@ -4,6 +4,20 @@ defmodule Benchee.Output.BenchmarkPrinter do
   alias Benchee.{Benchmark, Conversion.Duration}
 
   @doc """
+  Shown when you try benchmark an evaluated function.
+
+  Compiled functions should be preferred as they are less likely to introduce additional overhead to your benchmark timing.
+  """
+  def evaluated_function_warning(job_name) do
+    IO.puts("""
+    Warning: the benchmark #{job_name} is using an evaluated function.
+      Evaluated functions perform slower than compiled functions.
+      You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+      Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+    """)
+  end
+
+  @doc """
   Shown when you try to define a benchmark with the same name twice.
 
   How would you want to discern those anyhow?
