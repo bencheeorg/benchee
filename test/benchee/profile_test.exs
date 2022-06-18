@@ -197,35 +197,39 @@ defmodule Benchee.ProfileTest do
     end
 
     test "after_each is called in principle" do
-      capture_io(fn ->
-        test_process = self()
+      retrying(fn ->
+        capture_io(fn ->
+          test_process = self()
 
-        %Suite{configuration: %Configuration{profile_after: true}}
-        |> Benchmark.benchmark(
-          "job",
-          {fn -> 42 end, after_each: fn _ -> send(test_process, :after_each) end}
-        )
-        |> Profile.profile()
+          %Suite{configuration: %Configuration{profile_after: true}}
+          |> Benchmark.benchmark(
+            "job",
+            {fn -> 42 end, after_each: fn _ -> send(test_process, :after_each) end}
+          )
+          |> Profile.profile()
+        end)
+
+        assert_received_exactly([:after_each])
       end)
-
-      assert_received_exactly([:after_each])
     end
 
     # waiting for release of https://github.com/elixir-lang/elixir/pull/11657
     @tag :skip
     test "after_each doesn't get the function value yet" do
-      capture_io(fn ->
-        test_process = self()
+      retrying(fn ->
+        capture_io(fn ->
+          test_process = self()
 
-        %Suite{configuration: %Configuration{profile_after: true}}
-        |> Benchmark.benchmark(
-          "job",
-          {fn -> 42 end, after_each: fn input -> send(test_process, {:after_each, input}) end}
-        )
-        |> Profile.profile()
+          %Suite{configuration: %Configuration{profile_after: true}}
+          |> Benchmark.benchmark(
+            "job",
+            {fn -> 42 end, after_each: fn input -> send(test_process, {:after_each, input}) end}
+          )
+          |> Profile.profile()
+        end)
+
+        assert_received_exactly([{:after_each, 42}])
       end)
-
-      assert_received_exactly([{:after_each, 42}])
     end
   end
 
