@@ -162,38 +162,40 @@ defmodule Benchee.ProfileTest do
     end
 
     test "all kinds of hooks with inputs work" do
-      capture_io(fn ->
-        test_process = self()
+      retrying(fn ->
+        capture_io(fn ->
+          test_process = self()
 
-        %Suite{
-          configuration: %Configuration{
-            profile_after: true,
-            inputs: %{"input 1" => 1},
-            before_scenario: fn input ->
-              send(test_process, {:before_scenario, input})
-              input + 1
-            end,
-            before_each: fn input ->
-              send(test_process, {:before_each, input})
-              input + 1
-            end,
-            after_scenario: fn input ->
-              send(test_process, {:after_scenario, input})
-            end
+          %Suite{
+            configuration: %Configuration{
+              profile_after: true,
+              inputs: %{"input 1" => 1},
+              before_scenario: fn input ->
+                send(test_process, {:before_scenario, input})
+                input + 1
+              end,
+              before_each: fn input ->
+                send(test_process, {:before_each, input})
+                input + 1
+              end,
+              after_scenario: fn input ->
+                send(test_process, {:after_scenario, input})
+              end
+            }
           }
-        }
-        |> Benchmark.benchmark("job", fn input ->
-          send(test_process, input)
-          input + 1
+          |> Benchmark.benchmark("job", fn input ->
+            send(test_process, input)
+            input + 1
+          end)
+          |> Profile.profile()
         end)
-        |> Profile.profile()
-      end)
 
-      assert_received_exactly([
-        {:before_scenario, 1},
-        {:before_each, 2},
-        {:after_scenario, 2}
-      ])
+        assert_received_exactly([
+          {:before_scenario, 1},
+          {:before_each, 2},
+          {:after_scenario, 2}
+        ])
+      end)
     end
 
     test "after_each is called in principle" do
