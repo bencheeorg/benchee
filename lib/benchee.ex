@@ -39,7 +39,7 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
           time: 3
         )
     """
-    @spec run(map, keyword) :: any
+    @spec run(map, keyword) :: Benchee.Suite.t()
     def run(jobs, config \\ []) when is_list(config) do
       config
       |> Benchee.init()
