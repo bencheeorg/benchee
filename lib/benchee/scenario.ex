@@ -43,6 +43,13 @@ defmodule Benchee.Scenario do
   @type benchmarking_function :: (() -> any) | (any -> any)
 
   @typedoc """
+  What shall be benchmarked, mostly a function but can contain options.
+
+  Options are there for hooks (`after_each`, `before_each` etc.)
+  """
+  @type to_benchmark :: benchmarking_function() | {benchmarking_function(), keyword()}
+
+  @typedoc """
   All the data collected for a scenario (combination of function and input)
 
   Among all the data required to execute the scenario (function, input, all the hooks aka
