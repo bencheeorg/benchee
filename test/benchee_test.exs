@@ -966,6 +966,23 @@ defmodule BencheeTest do
     end
   end
 
+  describe "warn when functions are evaluated" do
+    test "warns when run in iex" do
+      # test env to avoid repeated compilation on CI
+      port = Port.open({:spawn, "iex -S mix"}, [:binary, env: [{'MIX_ENV', 'test'}]])
+
+      send(
+        port,
+        {self(), {:command, "Benchee.run(%{\"test\" => fn -> 1 end}, time: 0.001, warmup: 0)\n"}}
+      )
+
+      # timeout huge because of CI
+      assert_receive {^port, {:data, "Warning: " <> message}}, 20_000
+
+      assert message =~ ~r/test.+evaluated.+slower.+compiled.+module.+/is
+    end
+  end
+
   @slower_regex "\\s+- \\d+\\.\\d+x slower \\+\\d+(\\.\\d+)?.+"
   defp readme_sample_asserts(output, tag_string \\ "") do
     assert output =~ "warmup: 5 ms"
