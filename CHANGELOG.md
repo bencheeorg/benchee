@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## unreleased
+
+### Features (User Facing)
+* Trying to benchmark evaluated functions will now result in a warning. Thanks [@BrooklinJazz](https://github.com/BrooklinJazz), [@czrpb](https://github.com/czrpb), [@aar2dee2](https://github.com/aar2dee2),[@ReecesPeanutButterCodes](https://github.com/ReecesPeanutButterCodes).
+
 ## 1.1.0 (2022-03-08)
 
 Long time, huh? I'm sorry, combination of priorities, difficult to fix bugs, stress and arm problems kept me away too long.
