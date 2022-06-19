@@ -16,7 +16,10 @@ defmodule Benchee.TestHelpers do
   def retrying(asserting_function, n) do
     asserting_function.()
   rescue
-    ExUnit.AssertionError ->
+    # The profile tests have been too flakey due to process not being started
+    some_error ->
+      # credo:disable-for-next-line Credo.Check.Warning.IoInspect
+      IO.inspect(some_error, label: "Error being retried:")
       retrying(asserting_function, n - 1)
   end
 
