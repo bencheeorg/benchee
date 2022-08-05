@@ -48,6 +48,7 @@ defmodule Benchee.Mixfile do
     [
       {:deep_merge, "~> 1.0"},
       {:statistex, "~> 1.0"},
+      {:table, "~> 0.1.0", optional: true},
       {:ex_guard, "~> 1.3", only: :dev},
       {:credo, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
