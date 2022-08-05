@@ -47,3 +47,95 @@ defimpl DeepMerge.Resolver, for: Benchee.Suite do
     Map.merge(original, override, resolver)
   end
 end
+
+if Code.ensure_loaded?(Table.Reader) do
+  defimpl Table.Reader, for: Benchee.Suite do
+    alias Benchee.CollectionData
+    alias Benchee.Scenario
+
+    def init(suite_results) do
+      summarized_results = extract_rows_from_suite(suite_results)
+
+      {:rows, %{columns: summarized_results.columns, count: summarized_results.num_rows},
+       summarized_results.rows}
+    end
+
+    defp extract_rows_from_suite(suite_results) do
+      config_percentiles = suite_results.configuration.percentiles
+
+      percentile_labels =
+        Enum.map(config_percentiles, fn percentile ->
+          "p_#{percentile}"
+        end)
+
+      fields_per_type =
+        List.flatten([
+          "samples",
+          "ips",
+          "average",
+          "maximum",
+          "median",
+          "minimum",
+          "mode",
+          percentile_labels,
+          "sample_size",
+          "std_dev"
+        ])
+
+      memory_fields = Enum.map(fields_per_type, fn field -> "memory_#{field}" end)
+      reductions_fields = Enum.map(fields_per_type, fn field -> "reductions_#{field}" end)
+      run_time_fields = Enum.map(fields_per_type, fn field -> "run_time_#{field}" end)
+
+      columns =
+        List.flatten([
+          "job_name",
+          memory_fields,
+          reductions_fields,
+          run_time_fields
+        ])
+
+      Enum.reduce(
+        suite_results.scenarios,
+        %{columns: columns, num_rows: 0, rows: []},
+        fn %Scenario{} = scenario, acc ->
+          mem_stats = get_stats_from_scenario(scenario.memory_usage_data, config_percentiles)
+          reduction_stats = get_stats_from_scenario(scenario.reductions_data, config_percentiles)
+          runtime_stats = get_stats_from_scenario(scenario.run_time_data, config_percentiles)
+          new_row = [scenario.job_name] ++ mem_stats ++ reduction_stats ++ runtime_stats
+
+          acc
+          |> Map.update!(:num_rows, &(&1 + 1))
+          |> Map.update!(:rows, &[new_row | &1])
+        end
+      )
+      |> Map.update!(:rows, &Enum.reverse/1)
+    end
+
+    defp get_stats_from_scenario(
+           %CollectionData{statistics: statistics} = collection_data,
+           percentiles
+         ) do
+      percentile_data =
+        Enum.map(percentiles, fn percentile ->
+          if statistics.percentiles do
+            Map.get(statistics.percentiles, percentile)
+          else
+            nil
+          end
+        end)
+
+      [collection_data.samples] ++
+        List.flatten([
+          statistics.ips,
+          statistics.average,
+          statistics.maximum,
+          statistics.median,
+          statistics.minimum,
+          statistics.mode,
+          percentile_data,
+          statistics.sample_size,
+          statistics.std_dev
+        ])
+    end
+  end
+end
