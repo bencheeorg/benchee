@@ -77,9 +77,9 @@ if Code.ensure_loaded?(Table.Reader) do
           "median",
           "minimum",
           "mode",
-          percentile_labels,
           "sample_size",
-          "std_dev"
+          "std_dev",
+          percentile_labels
         ])
 
       memory_fields = Enum.map(fields_per_type, fn field -> "memory_#{field}" end)
@@ -94,14 +94,21 @@ if Code.ensure_loaded?(Table.Reader) do
           run_time_fields
         ])
 
-      Enum.reduce(
-        suite_results.scenarios,
+      suite_results.scenarios
+      |> Enum.reduce(
         %{columns: columns, num_rows: 0, rows: []},
         fn %Scenario{} = scenario, acc ->
           mem_stats = get_stats_from_scenario(scenario.memory_usage_data, config_percentiles)
           reduction_stats = get_stats_from_scenario(scenario.reductions_data, config_percentiles)
           runtime_stats = get_stats_from_scenario(scenario.run_time_data, config_percentiles)
-          new_row = [scenario.job_name] ++ mem_stats ++ reduction_stats ++ runtime_stats
+
+          new_row =
+            Enum.concat([
+              [scenario.job_name],
+              mem_stats,
+              reduction_stats,
+              runtime_stats
+            ])
 
           acc
           |> Map.update!(:num_rows, &(&1 + 1))
@@ -124,18 +131,20 @@ if Code.ensure_loaded?(Table.Reader) do
           end
         end)
 
-      [collection_data.samples] ++
-        List.flatten([
+      Enum.concat([
+        [
+          collection_data.samples,
           statistics.ips,
           statistics.average,
           statistics.maximum,
           statistics.median,
           statistics.minimum,
           statistics.mode,
-          percentile_data,
           statistics.sample_size,
           statistics.std_dev
-        ])
+        ],
+        percentile_data
+      ])
     end
   end
 end
