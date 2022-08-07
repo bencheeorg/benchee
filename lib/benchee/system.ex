@@ -37,8 +37,8 @@ defmodule Benchee.System do
       {:ok, version} ->
         String.trim(version)
 
-      {:error, reason} ->
-        IO.puts("Error trying to determine erlang version #{reason}")
+      {:error, _reason} ->
+        to_string(otp_release)
     end
   end
 
