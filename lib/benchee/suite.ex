@@ -123,13 +123,7 @@ if Code.ensure_loaded?(Table.Reader) do
            percentiles
          ) do
       percentile_data =
-        Enum.map(percentiles, fn percentile ->
-          if statistics.percentiles do
-            Map.get(statistics.percentiles, percentile)
-          else
-            nil
-          end
-        end)
+        Enum.map(percentiles, fn percentile -> statistics.percentiles[percentile] end)
 
       Enum.concat([
         [
