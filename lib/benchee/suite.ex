@@ -69,7 +69,7 @@ if Code.ensure_loaded?(Table.Reader) do
         end)
 
       fields_per_type =
-        List.flatten([
+        [
           "samples",
           "ips",
           "average",
@@ -78,9 +78,8 @@ if Code.ensure_loaded?(Table.Reader) do
           "minimum",
           "mode",
           "sample_size",
-          "std_dev",
-          percentile_labels
-        ])
+          "std_dev"
+        ] ++ percentile_labels
 
       memory_fields = Enum.map(fields_per_type, fn field -> "memory_#{field}" end)
       reductions_fields = Enum.map(fields_per_type, fn field -> "reductions_#{field}" end)
