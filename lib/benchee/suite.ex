@@ -54,13 +54,13 @@ if Code.ensure_loaded?(Table.Reader) do
     alias Benchee.Scenario
 
     def init(suite_results) do
-      summarized_results = extract_rows_from_suite(suite_results)
+      columns = get_columns_from_suite(suite_results)
+      {rows, count} = extract_rows_from_suite(suite_results)
 
-      {:rows, %{columns: summarized_results.columns, count: summarized_results.num_rows},
-       summarized_results.rows}
+      {:rows, %{columns: columns, count: count}, rows}
     end
 
-    defp extract_rows_from_suite(suite_results) do
+    defp get_columns_from_suite(suite_results) do
       config_percentiles = suite_results.configuration.percentiles
 
       percentile_labels =
@@ -85,36 +85,32 @@ if Code.ensure_loaded?(Table.Reader) do
       reductions_fields = Enum.map(fields_per_type, fn field -> "reductions_#{field}" end)
       run_time_fields = Enum.map(fields_per_type, fn field -> "run_time_#{field}" end)
 
-      columns =
-        List.flatten([
-          "job_name",
-          memory_fields,
-          reductions_fields,
-          run_time_fields
-        ])
+      List.flatten([
+        "job_name",
+        memory_fields,
+        reductions_fields,
+        run_time_fields
+      ])
+    end
 
-      suite_results.scenarios
-      |> Enum.reduce(
-        %{columns: columns, num_rows: 0, rows: []},
-        fn %Scenario{} = scenario, acc ->
-          mem_stats = get_stats_from_scenario(scenario.memory_usage_data, config_percentiles)
-          reduction_stats = get_stats_from_scenario(scenario.reductions_data, config_percentiles)
-          runtime_stats = get_stats_from_scenario(scenario.run_time_data, config_percentiles)
+    defp extract_rows_from_suite(suite_results) do
+      config_percentiles = suite_results.configuration.percentiles
 
-          new_row =
-            Enum.concat([
-              [scenario.job_name],
-              mem_stats,
-              reduction_stats,
-              runtime_stats
-            ])
+      Enum.map_reduce(suite_results.scenarios, 0, fn %Scenario{} = scenario, count ->
+        mem_stats = get_stats_from_scenario(scenario.memory_usage_data, config_percentiles)
+        reduction_stats = get_stats_from_scenario(scenario.reductions_data, config_percentiles)
+        runtime_stats = get_stats_from_scenario(scenario.run_time_data, config_percentiles)
 
-          acc
-          |> Map.update!(:num_rows, &(&1 + 1))
-          |> Map.update!(:rows, &[new_row | &1])
-        end
-      )
-      |> Map.update!(:rows, &Enum.reverse/1)
+        row =
+          Enum.concat([
+            [scenario.job_name],
+            mem_stats,
+            reduction_stats,
+            runtime_stats
+          ])
+
+        {row, count + 1}
+      end)
     end
 
     defp get_stats_from_scenario(
