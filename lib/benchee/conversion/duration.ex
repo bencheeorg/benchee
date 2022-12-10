@@ -239,7 +239,7 @@ defmodule Benchee.Conversion.Duration do
 
   @doc """
   Formats a number as a string, with a unit label. To specify the unit, pass
-  a tuple of `{value, unit_atom}` like `{1_234, :second}`
+  a tuple of `{value, unit_atom}` like `{1_234, :second}`.
 
   ## Examples
 
@@ -261,5 +261,59 @@ defmodule Benchee.Conversion.Duration do
   """
   def format(duration) do
     Format.format(duration, __MODULE__)
+  end
+
+  @doc """
+  Formats a number as a string.
+  The output is a sequence of values and unit labels separated by a space.
+  Only units whose value is non-zero are included in the output.
+  The passed number is duration in the base unit - nanoseconds.
+
+      iex> Benchee.Conversion.Duration.format_verbose(5_400_000_000_000)
+      "1 h 30 min"
+
+      iex> Benchee.Conversion.Duration.format_verbose(12.5)
+      "12.50 ns"
+
+      iex> Benchee.Conversion.Duration.format_verbose(3_660_001_001_000)
+      "1 h 1 min 1 ms 1 μs"
+  """
+  def format_verbose(number) when is_number(number) do
+    number
+    |> place_values()
+    |> Enum.map_join(" ", &format(&1))
+  end
+
+  # Returns a list of place vaules with corresponding units for the `number`.
+  # The output is sorted descending by magnitude of units and excludes tuples with place value 0.
+  # Place values are `non_neg_integer` for non-base units,
+  # however base unit may also be `float` becuase the decimals can't be split further.
+  @spec place_values(number) :: [{number, Scale.unit()}]
+  defp place_values(number) do
+    desc_units =
+      @units
+      |> Map.values()
+      |> Enum.sort(&(&1.magnitude >= &2.magnitude))
+
+    case place_values(number, desc_units) do
+      [] -> [{0, base_unit()}]
+      res -> res
+    end
+  end
+
+  @spec place_values(number, [Scale.unit()]) :: [{number, Scale.unit()}]
+  defp place_values(0, _units), do: []
+
+  defp place_values(number, [base_unit]), do: [{number, base_unit}]
+
+  defp place_values(number, [unit | units]) do
+    place_value = floor(number)
+    decimal_carry = number - place_value
+    int_carry = rem(place_value, unit.magnitude)
+
+    case div(place_value, unit.magnitude) do
+      0 -> place_values(int_carry + decimal_carry, units)
+      place_value -> [{place_value, unit} | place_values(int_carry + decimal_carry, units)]
+    end
   end
 end

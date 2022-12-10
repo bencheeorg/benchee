@@ -17,14 +17,14 @@ defmodule Benchee.Conversion.Scale do
   @doc """
   Scales a number in a domain's base unit to an equivalent value in the best
   fit unit. Results are a `{number, unit}` tuple. See `Benchee.Conversion.Count` and
-  `Benchee.Conversion.Duration` for examples
+  `Benchee.Conversion.Duration` for examples.
   """
   @callback scale(number) :: scaled_number
 
   @doc """
   Scales a number in a domain's base unit to an equivalent value in the
-  specified unit. Results are a `{number, unit}` tuple. See
-  `Benchee.Conversion.Count` and `Benchee.Conversion.Duration` for examples
+  specified unit.
+  See `Benchee.Conversion.Count` and `Benchee.Conversion.Duration` for examples.
   """
   @callback scale(number, any_unit) :: number
 
