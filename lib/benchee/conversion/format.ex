@@ -24,10 +24,14 @@ defmodule Benchee.Conversion.Format do
     "#{number_format(count)}#{separator}#{label}"
   end
 
-  defp number_format(count) do
+  defp number_format(count) when is_float(count) do
     count
     |> :erlang.float_to_list(decimals: float_precision(count))
     |> to_string
+  end
+
+  defp number_format(count) when is_integer(count) do
+    to_string(count)
   end
 
   @doc """
@@ -57,7 +61,7 @@ defmodule Benchee.Conversion.Format do
     format({count, module.unit_for(unit_atom)})
   end
 
-  def format(number, module) do
+  def format(number, module) when is_number(number) do
     number
     |> module.scale()
     |> format

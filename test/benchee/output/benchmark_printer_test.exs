@@ -72,7 +72,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       assert output =~ "time: 1 min"
       assert output =~ "memory time: 5 s"
       assert output =~ "parallel: 1"
-      assert output =~ "Estimated total run time: 2.50 min"
+      assert output =~ "Estimated total run time: 2 min 30 s"
     end
 
     @inputs %{"Arg 1" => 1, "Arg 2" => 2}
