@@ -72,6 +72,14 @@ defmodule Benchee.Utility.ErlangVersion do
       iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("23.0-rc0", "22.0.0")
       true
 
+      # since we are falling back to general OTP versions now, test those as well
+      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("21", "22.0.0")
+      false
+      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22", "22.0.0")
+      true
+      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("23.0", "22.0.0")
+      true
+
       # completely broken versions are assumed to be good to avoid false positives
       # as this is not a main functionality but code to potentially work around an older erlang
       # bug.
@@ -104,6 +112,7 @@ defmodule Benchee.Utility.ErlangVersion do
       case dot_count do
         3 -> Regex.replace(@last_version_segment, erlang_version, "")
         1 -> deal_with_major_minor(erlang_version)
+        0 -> "#{erlang_version}.0.0"
         _ -> erlang_version
       end
 
