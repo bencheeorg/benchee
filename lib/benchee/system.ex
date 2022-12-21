@@ -37,7 +37,13 @@ defmodule Benchee.System do
       {:ok, version} ->
         String.trim(version)
 
-      {:error, _reason} ->
+      # Livebook seemingly doesn't have the file where we expect it to be:
+      # https://github.com/bencheeorg/benchee/issues/367
+      {:error, reason} ->
+        IO.puts(
+          "Error trying to determine erlang version #{reason}, falling back to overall OTP version"
+        )
+
         to_string(otp_release)
     end
   end
