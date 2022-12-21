@@ -1,7 +1,7 @@
 defmodule Benchee.Conversion.MemoryTest do
   use ExUnit.Case, async: true
   import Benchee.Conversion.Memory
-  doctest Benchee.Conversion.Memory
+  doctest Benchee.Conversion.Memory, import: true
 
   describe ".format" do
     test ".format(1_023)" do

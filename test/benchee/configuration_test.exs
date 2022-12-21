@@ -1,6 +1,6 @@
 defmodule Benchee.ConfigurationTest do
   use ExUnit.Case, async: true
-  doctest Benchee.Configuration
+  doctest Benchee.Configuration, import: true
 
   alias Benchee.{Configuration, Suite}
 

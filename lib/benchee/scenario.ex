@@ -80,12 +80,13 @@ defmodule Benchee.Scenario do
 
   ## Examples
 
-      iex> alias Benchee.Scenario
-      iex> Scenario.display_name(%Scenario{job_name: "flat_map"})
+      iex> display_name(%Benchee.Scenario{job_name: "flat_map"})
       "flat_map"
-      iex> Scenario.display_name(%Scenario{job_name: "flat_map", tag: "main"})
+
+      iex> display_name(%Benchee.Scenario{job_name: "flat_map", tag: "main"})
       "flat_map (main)"
-      iex> Scenario.display_name(%{job_name: "flat_map"})
+
+      iex> display_name(%{job_name: "flat_map"})
       "flat_map"
   """
   @spec display_name(t) :: String.t()
@@ -104,16 +105,16 @@ defmodule Benchee.Scenario do
 
   ## Examples
 
-      iex> alias Benchee.Scenario
-      iex> alias Benchee.Statistics
-      iex> scenario = %Scenario{run_time_data: %Benchee.CollectionData{statistics: %Statistics{sample_size: 100}}}
-      iex> Scenario.data_processed?(scenario, :run_time)
+      iex> scenario = %Benchee.Scenario{run_time_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 100}}}
+      iex> data_processed?(scenario, :run_time)
       true
-      iex> scenario = %Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Statistics{sample_size: 1}}}
-      iex> Scenario.data_processed?(scenario, :memory)
+
+      iex> scenario = %Benchee.Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}}
+      iex> data_processed?(scenario, :memory)
       true
-      iex> scenario = %Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Statistics{sample_size: 0}}}
-      iex> Scenario.data_processed?(scenario, :memory)
+
+      iex> scenario = %Benchee.Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 0}}}
+      iex> data_processed?(scenario, :memory)
       false
   """
   @spec data_processed?(t, :run_time | :memory) :: boolean

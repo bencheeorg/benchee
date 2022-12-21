@@ -1,7 +1,7 @@
 defmodule Benchee.Conversion.DurationTest do
   use ExUnit.Case, async: true
   import Benchee.Conversion.Duration
-  doctest Benchee.Conversion.Duration
+  doctest Benchee.Conversion.Duration, import: true
 
   describe ".format" do
     test ".format(98.7654321)" do

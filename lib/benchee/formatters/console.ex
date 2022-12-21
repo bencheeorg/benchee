@@ -80,7 +80,7 @@ defmodule Benchee.Formatters.Console do
   ...>     unit_scaling: :best,
   ...>   }
   ...> }
-  iex> Benchee.Formatters.Console.format(suite, %{comparison: false, extended_statistics: false})
+  iex> format(suite, %{comparison: false, extended_statistics: false})
   [["\n##### With input My input #####", "\nName             ips        average  deviation         median         99th %\n",
   "My Job           5 K         200 ns    ±10.00%         190 ns      300.10 ns\n",
   "Job 2         2.50 K         400 ns    ±20.00%         390 ns      500.10 ns\n"]]

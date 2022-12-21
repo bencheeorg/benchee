@@ -176,7 +176,7 @@ defmodule Benchee.Configuration do
 
   ## Examples
 
-      iex> Benchee.init
+      iex> init()
       %Benchee.Suite{
         configuration:
           %Benchee.Configuration{
@@ -204,7 +204,7 @@ defmodule Benchee.Configuration do
         scenarios: []
       }
 
-      iex> Benchee.init time: 1, warmup: 0.2
+      iex> init(time: 1, warmup: 0.2)
       %Benchee.Suite{
         configuration:
           %Benchee.Configuration{
@@ -232,7 +232,7 @@ defmodule Benchee.Configuration do
         scenarios: []
       }
 
-      iex> Benchee.init %{time: 1, warmup: 0.2}
+      iex> init(%{time: 1, warmup: 0.2})
       %Benchee.Suite{
         configuration:
           %Benchee.Configuration{
@@ -260,7 +260,7 @@ defmodule Benchee.Configuration do
         scenarios: []
       }
 
-      iex> Benchee.init(
+      iex> init(
       ...>   parallel: 2,
       ...>   time: 1,
       ...>   warmup: 0.2,

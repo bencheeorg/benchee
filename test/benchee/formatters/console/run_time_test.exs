@@ -1,6 +1,6 @@
 defmodule Benchee.Formatters.Console.RunTimeTest do
   use ExUnit.Case, async: true
-  doctest Benchee.Formatters.Console.RunTime
+  doctest Benchee.Formatters.Console.RunTime, import: true
 
   alias Benchee.{CollectionData, Formatters.Console.RunTime, Scenario, Statistics}
 

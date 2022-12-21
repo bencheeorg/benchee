@@ -17,10 +17,10 @@ defmodule Benchee.Conversion.DeviationPercent do
 
   ## Examples
 
-      iex> Benchee.Conversion.DeviationPercent.format(0.12345)
+      iex> format(0.12345)
       "±12.35%"
 
-      iex> Benchee.Conversion.DeviationPercent.format(1)
+      iex> format(1)
       "±100.00%"
   """
   def format(std_dev_ratio) do
