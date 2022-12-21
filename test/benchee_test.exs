@@ -15,8 +15,6 @@ defmodule BencheeTest do
   import ExUnit.CaptureIO
   import Benchee.TestHelpers
 
-  doctest Benchee
-
   @header_regex ~r/^Name.+ips.+average.+deviation.+median.+99th %$/m
   @test_configuration [time: 0.01, warmup: 0.005]
 

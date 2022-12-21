@@ -56,14 +56,14 @@ defmodule Benchee.Conversion.Memory do
 
   ## Examples
 
-    iex> {value, unit} = Benchee.Conversion.Memory.convert({1024, :kilobyte}, :megabyte)
+    iex> {value, unit} = convert({1024, :kilobyte}, :megabyte)
     iex> value
     1.0
     iex> unit.name
     :megabyte
 
-    iex> current_unit = Benchee.Conversion.Memory.unit_for :kilobyte
-    iex> {value, unit} = Benchee.Conversion.Memory.convert({1024, current_unit}, :megabyte)
+    iex> current_unit = unit_for :kilobyte
+    iex> {value, unit} = convert({1024, current_unit}, :megabyte)
     iex> value
     1.0
     iex> unit.name
@@ -81,25 +81,25 @@ defmodule Benchee.Conversion.Memory do
 
   ## Examples
 
-    iex> {value, unit} = Benchee.Conversion.Memory.scale(1)
+    iex> {value, unit} = scale(1)
     iex> value
     1.0
     iex> unit.name
     :byte
 
-    iex> {value, unit} = Benchee.Conversion.Memory.scale(1_234)
+    iex> {value, unit} = scale(1_234)
     iex> value
     1.205078125
     iex> unit.name
     :kilobyte
 
-    iex> {value, unit} = Benchee.Conversion.Memory.scale(11_234_567_890.123)
+    iex> {value, unit} = scale(11_234_567_890.123)
     iex> value
     10.463006692121736
     iex> unit.name
     :gigabyte
 
-    iex> {value, unit} = Benchee.Conversion.Memory.scale(1_111_234_567_890.123)
+    iex> {value, unit} = scale(1_111_234_567_890.123)
     iex> value
     1.0106619519229962
     iex> unit.name
@@ -140,7 +140,7 @@ defmodule Benchee.Conversion.Memory do
 
   ## Examples
 
-      iex> Benchee.Conversion.Memory.unit_for :gigabyte
+      iex> unit_for :gigabyte
       %Benchee.Conversion.Unit{
           name:      :gigabyte,
           magnitude: 1_073_741_824,
@@ -148,7 +148,7 @@ defmodule Benchee.Conversion.Memory do
           long:      "Gigabytes"
       }
 
-      iex> Benchee.Conversion.Memory.unit_for(%Benchee.Conversion.Unit{
+      iex> unit_for(%Benchee.Conversion.Unit{
       ...>   name:      :gigabyte,
       ...>   magnitude: 1_073_741_824,
       ...>   label:     "GB",
@@ -170,13 +170,13 @@ defmodule Benchee.Conversion.Memory do
 
   ## Examples
 
-      iex> Benchee.Conversion.Memory.scale(12345, :kilobyte)
+      iex> scale(12345, :kilobyte)
       12.0556640625
 
-      iex> Benchee.Conversion.Memory.scale(12345, :megabyte)
+      iex> scale(12345, :megabyte)
       0.011773109436035156
 
-      iex> Benchee.Conversion.Memory.scale(123_456_789, :gigabyte)
+      iex> scale(123_456_789, :gigabyte)
       0.11497809458523989
 
   """
@@ -195,16 +195,16 @@ defmodule Benchee.Conversion.Memory do
 
   ## Examples
 
-      iex> Benchee.Conversion.Memory.best([23, 23_000, 34_000, 2_340_000]).name
+      iex> best([23, 23_000, 34_000, 2_340_000]).name
       :kilobyte
 
-      iex> Benchee.Conversion.Memory.best([23, 23_000, 34_000, 2_340_000, 3_450_000]).name
+      iex> best([23, 23_000, 34_000, 2_340_000, 3_450_000]).name
       :megabyte
 
-      iex> Benchee.Conversion.Memory.best([23, 23_000, 34_000, 2_340_000], strategy: :smallest).name
+      iex> best([23, 23_000, 34_000, 2_340_000], strategy: :smallest).name
       :byte
 
-      iex> Benchee.Conversion.Memory.best([23, 23_000, 34_000, 2_340_000], strategy: :largest).name
+      iex> best([23, 23_000, 34_000, 2_340_000], strategy: :largest).name
       :megabyte
   """
   def best(list, opts \\ [strategy: :best])
@@ -218,7 +218,7 @@ defmodule Benchee.Conversion.Memory do
 
   ## Examples
 
-      iex> Benchee.Conversion.Memory.base_unit.name
+      iex> base_unit().name
       :byte
 
   """
@@ -230,16 +230,16 @@ defmodule Benchee.Conversion.Memory do
 
   ## Examples
 
-      iex> Benchee.Conversion.Memory.format(45_678.9)
+      iex> format(45_678.9)
       "44.61 KB"
 
-      iex> Benchee.Conversion.Memory.format(45.6789)
+      iex> format(45.6789)
       "45.68 B"
 
-      iex> Benchee.Conversion.Memory.format({45.6789, :kilobyte})
+      iex> format({45.6789, :kilobyte})
       "45.68 KB"
 
-      iex> Benchee.Conversion.Memory.format {45.6789,
+      iex> format {45.6789,
       ...>   %Benchee.Conversion.Unit{
       ...>     long: "Kilobytes", magnitude: 1024, label: "KB"}
       ...>   }

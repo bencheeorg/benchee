@@ -115,7 +115,7 @@ defmodule Benchee.Statistics do
       ...>   }
       ...> ]
       iex> suite = %Benchee.Suite{scenarios: scenarios}
-      iex> Benchee.Statistics.statistics(suite)
+      iex> statistics(suite)
       %Benchee.Suite{
         scenarios: [
           %Benchee.Scenario{

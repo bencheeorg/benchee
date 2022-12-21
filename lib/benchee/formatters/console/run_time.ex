@@ -58,7 +58,7 @@ defmodule Benchee.Formatters.Console.RunTime do
   ...>   }
   ...> ]
   iex> configuration = %{comparison: false, unit_scaling: :best, extended_statistics: true}
-  iex> Benchee.Formatters.Console.RunTime.format_scenarios(scenarios, configuration)
+  iex> format_scenarios(scenarios, configuration)
   ["\nName             ips        average  deviation         median         99th %\n",
   "My Job           5 K         200 ns    ±10.00%         190 ns      300.10 ns\n",
   "Job 2         2.50 K         400 ns    ±20.00%         390 ns      500.10 ns\n",

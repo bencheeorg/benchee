@@ -1,6 +1,5 @@
 defmodule Benchee.Formatters.Console.ReductionsTest do
   use ExUnit.Case, async: true
-  doctest Benchee.Formatters.Console.Reductions
 
   alias Benchee.{CollectionData, Formatters.Console.Reductions, Scenario, Statistics}
 

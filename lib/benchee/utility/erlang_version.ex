@@ -16,76 +16,76 @@ defmodule Benchee.Utility.ErlangVersion do
 
   ## Examples
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22.0.0", "22.0.0")
+      iex> includes_fixes_from?("22.0.0", "22.0.0")
       true
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22.0.1", "22.0.0")
+      iex> includes_fixes_from?("22.0.1", "22.0.0")
       true
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22.0.0", "22.0.1")
+      iex> includes_fixes_from?("22.0.0", "22.0.1")
       false
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22.0.4", "22.0.5")
+      iex> includes_fixes_from?("22.0.4", "22.0.5")
       false
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22.0.4", "22.0.4")
+      iex> includes_fixes_from?("22.0.4", "22.0.4")
       true
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22.0.5", "22.0.4")
+      iex> includes_fixes_from?("22.0.5", "22.0.4")
       true
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("21.999.9999", "22.0.0")
+      iex> includes_fixes_from?("21.999.9999", "22.0.0")
       false
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("23.0.0", "22.0.0")
+      iex> includes_fixes_from?("23.0.0", "22.0.0")
       true
 
       # weird longer version numbers work
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22.0.0.0", "22.0.0")
+      iex> includes_fixes_from?("22.0.0.0", "22.0.0")
       true
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22.0.0.14", "22.0.0")
+      iex> includes_fixes_from?("22.0.0.14", "22.0.0")
       true
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("23.3.5.14", "22.0.0")
+      iex> includes_fixes_from?("23.3.5.14", "22.0.0")
       true
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("21.3.5.14", "22.0.0")
+      iex> includes_fixes_from?("21.3.5.14", "22.0.0")
       false
 
       # weird shorter version numbers work
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22.0", "22.0.0")
+      iex> includes_fixes_from?("22.0", "22.0.0")
       true
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22.0", "22.0.1")
+      iex> includes_fixes_from?("22.0", "22.0.1")
       false
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22.1", "22.0.0")
+      iex> includes_fixes_from?("22.1", "22.0.0")
       true
 
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("21.3", "22.0.0")
+      iex> includes_fixes_from?("21.3", "22.0.0")
       false
 
       # rc version numbers work
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22.0-rc3", "22.0.0")
+      iex> includes_fixes_from?("22.0-rc3", "22.0.0")
       false
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("23.0-rc0", "22.0.0")
+      iex> includes_fixes_from?("23.0-rc0", "22.0.0")
       true
 
       # since we are falling back to general OTP versions now, test those as well
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("21", "22.0.0")
+      iex> includes_fixes_from?("21", "22.0.0")
       false
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("22", "22.0.0")
+      iex> includes_fixes_from?("22", "22.0.0")
       true
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("23.0", "22.0.0")
+      iex> includes_fixes_from?("23.0", "22.0.0")
       true
 
       # completely broken versions are assumed to be good to avoid false positives
       # as this is not a main functionality but code to potentially work around an older erlang
       # bug.
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("super erlang", "22.0.0")
+      iex> includes_fixes_from?("super erlang", "22.0.0")
       true
-      iex> Benchee.Utility.ErlangVersion.includes_fixes_from?("", "22.0.0")
+      iex> includes_fixes_from?("", "22.0.0")
       true
   """
   def includes_fixes_from?(version_to_check, reference_version) do

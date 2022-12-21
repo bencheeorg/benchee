@@ -1,7 +1,7 @@
 defmodule Benchee.Conversion.CountTest do
   use ExUnit.Case, async: true
   import Benchee.Conversion.Count
-  doctest Benchee.Conversion.Count
+  doctest Benchee.Conversion.Count, import: true
 
   describe ".scale" do
     test "123_456_789_012 scales to :billion" do

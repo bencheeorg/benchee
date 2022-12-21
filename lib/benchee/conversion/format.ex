@@ -41,7 +41,7 @@ defmodule Benchee.Conversion.Format do
   formatted output. If no `separator/0` function exists, the default separator
   (a single space) will be used.
 
-      iex> Benchee.Conversion.Format.format({1.0, :kilobyte}, Benchee.Conversion.Memory)
+      iex> format({1.0, :kilobyte}, Benchee.Conversion.Memory)
       "1 KB"
 
   """

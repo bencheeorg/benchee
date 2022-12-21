@@ -65,46 +65,46 @@ defmodule Benchee.Utility.FileCreation do
 
   ## Examples
 
-      iex> Benchee.Utility.FileCreation.interleave("abc.csv", "hello")
+      iex> interleave("abc.csv", "hello")
       "abc_hello.csv"
 
-      iex> Benchee.Utility.FileCreation.interleave("abc.csv", "Big Input")
+      iex> interleave("abc.csv", "Big Input")
       "abc_big_input.csv"
 
-      iex> Benchee.Utility.FileCreation.interleave("abc.csv", "String.length/1")
+      iex> interleave("abc.csv", "String.length/1")
       "abc_string_length_1.csv"
 
-      iex> Benchee.Utility.FileCreation.interleave("bench/abc.csv", "Big Input")
+      iex> interleave("bench/abc.csv", "Big Input")
       "bench/abc_big_input.csv"
 
-      iex> Benchee.Utility.FileCreation.interleave("bench/abc.csv",
+      iex> interleave("bench/abc.csv",
       ...>   ["Big Input"])
       "bench/abc_big_input.csv"
 
-      iex> Benchee.Utility.FileCreation.interleave("abc.csv", [])
+      iex> interleave("abc.csv", [])
       "abc.csv"
 
-      iex> Benchee.Utility.FileCreation.interleave("bench/abc.csv",
+      iex> interleave("bench/abc.csv",
       ...>   ["Big Input", "Comparison"])
       "bench/abc_big_input_comparison.csv"
 
-      iex> Benchee.Utility.FileCreation.interleave("bench/A B C.csv",
+      iex> interleave("bench/A B C.csv",
       ...>   ["Big Input", "Comparison"])
       "bench/A B C_big_input_comparison.csv"
 
-      iex> Benchee.Utility.FileCreation.interleave("bench/abc.csv",
+      iex> interleave("bench/abc.csv",
       ...>   ["Big Input", "Comparison", "great Stuff"])
       "bench/abc_big_input_comparison_great_stuff.csv"
 
       iex> marker = Benchee.Benchmark.no_input
-      iex> Benchee.Utility.FileCreation.interleave("abc.csv", marker)
+      iex> interleave("abc.csv", marker)
       "abc.csv"
-      iex> Benchee.Utility.FileCreation.interleave("abc.csv", [marker])
+      iex> interleave("abc.csv", [marker])
       "abc.csv"
-      iex> Benchee.Utility.FileCreation.interleave("abc.csv",
+      iex> interleave("abc.csv",
       ...>   [marker, "Comparison"])
       "abc_comparison.csv"
-      iex> Benchee.Utility.FileCreation.interleave("abc.csv",
+      iex> interleave("abc.csv",
       ...>   ["Something cool", marker, "Comparison"])
       "abc_something_cool_comparison.csv"
   """

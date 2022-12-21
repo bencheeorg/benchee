@@ -1,7 +1,7 @@
 defmodule Benchee.StatistcsTest do
   use ExUnit.Case, async: true
   alias Benchee.{CollectionData, Configuration, Scenario, Statistics, Suite}
-  doctest Benchee.Statistics
+  doctest Benchee.Statistics, import: true
 
   @sample_1 [600, 470, 170, 430, 300]
   @sample_2 [17, 15, 23, 7, 9, 13]
