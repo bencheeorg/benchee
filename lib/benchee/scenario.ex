@@ -95,6 +95,53 @@ defmodule Benchee.Scenario do
   def display_name(%{job_name: job_name}), do: job_name
 
   @doc """
+  Returns the different measurement types supported.
+
+
+  ## Examples
+
+      iex> measurement_types()
+      [:run_time, :memory, :reductions]
+  """
+  @spec measurement_types :: [:memory | :reductions | :run_time, ...]
+  def measurement_types, do: [:run_time, :memory, :reductions]
+
+  @doc """
+  Given the measurement type name given by `measurement_types/0`, get the associated data.
+
+  Raises if no correct measurement type was specified.
+
+  ## Examples
+
+      iex> scenario = %Benchee.Scenario{run_time_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}}
+      iex> measurement_data(scenario, :run_time)
+      %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}
+
+      iex> scenario = %Benchee.Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 2}}}
+      iex> measurement_data(scenario, :memory)
+      %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 2}}
+
+      iex> scenario = %Benchee.Scenario{reductions_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 3}}}
+      iex> measurement_data(scenario, :reductions)
+      %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 3}}
+
+      iex> measurement_data(%Benchee.Scenario{}, :memory)
+      %Benchee.CollectionData{}
+
+      iex> measurement_data(%Benchee.Scenario{}, :invalid)
+      ** (FunctionClauseError) no function clause matching in Benchee.Scenario.measurement_data/2
+  """
+  @spec measurement_data(t, :memory | :reductions | :run_time) :: CollectionData.t()
+  # Arguably this access is OO-ish/not great. However, with the incosistency we have in naming
+  # between the scenario struct fields and the measurement types this should be good/covnenient.
+  # Technically, we could/should move to a map structure from "measurement_type" to collection
+  # data but it's probably not worth breaking compatibility for right now.
+  def measurement_data(scenario, measurement_type)
+  def measurement_data(scenario, :run_time), do: scenario.run_time_data
+  def measurement_data(scenario, :memory), do: scenario.memory_usage_data
+  def measurement_data(scenario, :reductions), do: scenario.reductions_data
+
+  @doc """
   Returns `true` if data of the provided type has been fully procsessed, `false` otherwise.
 
   Current available types are `run_time` and `memory`. Reasons they might not have been processed
@@ -113,6 +160,10 @@ defmodule Benchee.Scenario do
       iex> data_processed?(scenario, :memory)
       true
 
+      iex> scenario = %Benchee.Scenario{reductions_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}}
+      iex> data_processed?(scenario, :reductions)
+      true
+
       iex> scenario = %Benchee.Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 0}}}
       iex> data_processed?(scenario, :memory)
       false
@@ -124,5 +175,9 @@ defmodule Benchee.Scenario do
 
   def data_processed?(scenario, :memory) do
     scenario.memory_usage_data.statistics.sample_size > 0
+  end
+
+  def data_processed?(scenario, :reductions) do
+    scenario.reductions_data.statistics.sample_size > 0
   end
 end

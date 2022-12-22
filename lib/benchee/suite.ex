@@ -54,13 +54,20 @@ if Code.ensure_loaded?(Table.Reader) do
     alias Benchee.Scenario
 
     def init(suite) do
-      columns = get_columns_from_suite(suite)
-      {rows, count} = extract_rows_from_suite(suite)
+      measurements_processed = map_measurements_processed(suite)
+      columns = get_columns_from_suite(suite, measurements_processed)
+      {rows, count} = extract_rows_from_suite(suite, measurements_processed)
 
       {:rows, %{columns: columns, count: count}, rows}
     end
 
-    defp get_columns_from_suite(suite) do
+    defp map_measurements_processed(suite) do
+      Enum.filter(Scenario.measurement_types(), fn type ->
+        Enum.any?(suite.scenarios, fn scenario -> Scenario.data_processed?(scenario, type) end)
+      end)
+    end
+
+    defp get_columns_from_suite(suite, measurements_processed) do
       config_percentiles = suite.configuration.percentiles
 
       percentile_labels =
@@ -81,39 +88,32 @@ if Code.ensure_loaded?(Table.Reader) do
           "std_dev"
         ] ++ percentile_labels
 
-      memory_fields = Enum.map(fields_per_type, fn field -> "memory_#{field}" end)
-      reductions_fields = Enum.map(fields_per_type, fn field -> "reductions_#{field}" end)
-      run_time_fields = Enum.map(fields_per_type, fn field -> "run_time_#{field}" end)
+      measurement_headers =
+        Enum.flat_map(measurements_processed, fn measurement_type ->
+          Enum.map(fields_per_type, fn field -> "#{measurement_type}_#{field}" end)
+        end)
 
-      List.flatten([
-        "job_name",
-        memory_fields,
-        reductions_fields,
-        run_time_fields
-      ])
+      ["job_name" | measurement_headers]
     end
 
-    defp extract_rows_from_suite(suite) do
+    defp extract_rows_from_suite(suite, measurements_processed) do
       config_percentiles = suite.configuration.percentiles
 
       Enum.map_reduce(suite.scenarios, 0, fn %Scenario{} = scenario, count ->
-        mem_stats = get_stats_from_scenario(scenario.memory_usage_data, config_percentiles)
-        reduction_stats = get_stats_from_scenario(scenario.reductions_data, config_percentiles)
-        runtime_stats = get_stats_from_scenario(scenario.run_time_data, config_percentiles)
+        secenario_data =
+          Enum.flat_map(measurements_processed, fn measurment_type ->
+            scenario
+            |> Scenario.measurement_data(measurment_type)
+            |> get_stats_from_collection_data(config_percentiles)
+          end)
 
-        row =
-          Enum.concat([
-            [scenario.job_name],
-            mem_stats,
-            reduction_stats,
-            runtime_stats
-          ])
+        row = [scenario.job_name | secenario_data]
 
         {row, count + 1}
       end)
     end
 
-    defp get_stats_from_scenario(
+    defp get_stats_from_collection_data(
            %CollectionData{statistics: statistics} = collection_data,
            percentiles
          ) do
