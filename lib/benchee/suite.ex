@@ -53,15 +53,15 @@ if Code.ensure_loaded?(Table.Reader) do
     alias Benchee.CollectionData
     alias Benchee.Scenario
 
-    def init(suite_results) do
-      columns = get_columns_from_suite(suite_results)
-      {rows, count} = extract_rows_from_suite(suite_results)
+    def init(suite) do
+      columns = get_columns_from_suite(suite)
+      {rows, count} = extract_rows_from_suite(suite)
 
       {:rows, %{columns: columns, count: count}, rows}
     end
 
-    defp get_columns_from_suite(suite_results) do
-      config_percentiles = suite_results.configuration.percentiles
+    defp get_columns_from_suite(suite) do
+      config_percentiles = suite.configuration.percentiles
 
       percentile_labels =
         Enum.map(config_percentiles, fn percentile ->
@@ -93,10 +93,10 @@ if Code.ensure_loaded?(Table.Reader) do
       ])
     end
 
-    defp extract_rows_from_suite(suite_results) do
-      config_percentiles = suite_results.configuration.percentiles
+    defp extract_rows_from_suite(suite) do
+      config_percentiles = suite.configuration.percentiles
 
-      Enum.map_reduce(suite_results.scenarios, 0, fn %Scenario{} = scenario, count ->
+      Enum.map_reduce(suite.scenarios, 0, fn %Scenario{} = scenario, count ->
         mem_stats = get_stats_from_scenario(scenario.memory_usage_data, config_percentiles)
         reduction_stats = get_stats_from_scenario(scenario.reductions_data, config_percentiles)
         runtime_stats = get_stats_from_scenario(scenario.run_time_data, config_percentiles)
