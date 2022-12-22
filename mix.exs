@@ -27,7 +27,8 @@ defmodule Benchee.Mixfile do
       ],
       dialyzer: [
         flags: [:unmatched_returns, :error_handling, :underspecs],
-        plt_file: {:no_warn, "tools/plts/benchee.plt"}
+        plt_file: {:no_warn, "tools/plts/benchee.plt"},
+        plt_add_apps: [:table]
       ],
       name: "Benchee",
       description: """
