@@ -114,7 +114,7 @@ if Code.ensure_loaded?(Table.Reader) do
     end
 
     defp get_stats_from_collection_data(
-           %CollectionData{statistics: statistics} = collection_data,
+           %CollectionData{statistics: statistics, samples: samples},
            percentiles
          ) do
       percentile_data =
@@ -122,7 +122,7 @@ if Code.ensure_loaded?(Table.Reader) do
 
       Enum.concat([
         [
-          collection_data.samples,
+          samples,
           statistics.ips,
           statistics.average,
           statistics.maximum,
