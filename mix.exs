@@ -45,10 +45,9 @@ defmodule Benchee.Mixfile do
   end
 
   defp deps do
-    [
+    deps = [
       {:deep_merge, "~> 1.0"},
       {:statistex, "~> 1.0"},
-      {:table, "~> 0.1.0", optional: true},
       {:ex_guard, "~> 1.3", only: :dev},
       {:credo, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
@@ -56,6 +55,14 @@ defmodule Benchee.Mixfile do
       {:inch_ex, "~> 2.0", only: :docs, runtime: false},
       {:dialyxir, "~> 1.0", only: :dev, runtime: false}
     ]
+
+    # table relies on __STACKTRACE__ which was introduced in 1.7, we still support ~>1.6 though
+    # as it's optional, this does not affect the function of Benchee
+    if Version.compare(System.version(), "1.7.0") == :gt do
+      [{:table, "~> 0.1.0", optional: true} | deps]
+    else
+      deps
+    end
   end
 
   defp package do
