@@ -89,14 +89,21 @@ defmodule Benchee.ProfileTest do
     assert_receive {:profiling, ^name, ^profiler}
   end
 
-  # can't say warmup as some profilers will have it in the profile messing with the test
-  describe "warming up behavior" do
-    @profilers Profile.builtin_profilers()
+  @profilers Profile.builtin_profilers()
+  for profiler <- @profilers do
+    @profiler profiler
+    # can't say warmup as some profilers will have it in the profile messing with the test
+    describe "warming up behavior with #{@profiler}" do
+      setup _ do
+        # lots of odd process not started errors esp. with eprof, trying to remedy... although,
+        # the mix task we use already starts them so not sure this helps any...
 
-    for profiler <- @profilers do
-      @profiler profiler
+        @profiler.start()
+        :ok
+      end
+
       # can't say warmup in the test description as eprof picks it up and then it matches
-      test "the function will be called exactly once by default for profiling with #{@profiler}" do
+      test "the function will be called exactly once by default for profiling" do
         retrying(fn ->
           output =
             capture_io(fn ->
@@ -112,33 +119,40 @@ defmodule Benchee.ProfileTest do
         end)
       end
     end
+  end
 
+  # still can't say 'warmup' due to error messages and amtching
+  describe "general warming up" do
     test "You can still specify you really want to do warmup" do
-      output =
-        capture_io(fn ->
-          test_process = self()
+      retrying(fn ->
+        output =
+          capture_io(fn ->
+            test_process = self()
 
-          %Suite{configuration: %Configuration{profile_after: {:cprof, warmup: true}}}
-          |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
-          |> Profile.profile()
-        end)
+            %Suite{configuration: %Configuration{profile_after: {:cprof, warmup: true}}}
+            |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
+            |> Profile.profile()
+          end)
 
-      assert_received_exactly([:ran, :ran])
-      assert output =~ ~r/warmup/i
+        assert_received_exactly([:ran, :ran])
+        assert output =~ ~r/warmup/i
+      end)
     end
 
     test "specifying other options doesn't break the no warmup behavior" do
-      output =
-        capture_io(fn ->
-          test_process = self()
+      retrying(fn ->
+        output =
+          capture_io(fn ->
+            test_process = self()
 
-          %Suite{configuration: %Configuration{profile_after: {:cprof, something: true}}}
-          |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
-          |> Profile.profile()
-        end)
+            %Suite{configuration: %Configuration{profile_after: {:cprof, something: true}}}
+            |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
+            |> Profile.profile()
+          end)
 
-      assert_received_exactly([:ran])
-      refute output =~ ~r/warmup/i
+        assert_received_exactly([:ran])
+        refute output =~ ~r/warmup/i
+      end)
     end
   end
 
