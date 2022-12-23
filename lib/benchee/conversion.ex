@@ -52,9 +52,9 @@ defmodule Benchee.Conversion do
       }
   """
   def units(scenarios, scaling_strategy) do
-    run_time_measurements = measurments_for(scenarios, :run_time_data)
-    reductions_measurements = measurments_for(scenarios, :reductions_data)
-    memory_measurements = measurments_for(scenarios, :memory_usage_data)
+    run_time_measurements = measurements_for(scenarios, :run_time_data)
+    reductions_measurements = measurements_for(scenarios, :reductions_data)
+    memory_measurements = measurements_for(scenarios, :memory_usage_data)
 
     %{
       run_time: Duration.best(run_time_measurements.average, strategy: scaling_strategy),
@@ -64,7 +64,7 @@ defmodule Benchee.Conversion do
     }
   end
 
-  defp measurments_for(scenarios, path) do
+  defp measurements_for(scenarios, path) do
     paths = [Access.key(path), Access.key(:statistics)]
 
     scenarios
