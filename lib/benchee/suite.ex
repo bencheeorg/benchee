@@ -67,6 +67,20 @@ if Code.ensure_loaded?(Table.Reader) do
       end)
     end
 
+    @run_time_fields [
+      "samples",
+      "ips",
+      "average",
+      "std_dev",
+      "median",
+      "minimum",
+      "maximum",
+      "mode",
+      "sample_size"
+    ]
+
+    @non_run_time_fields List.delete(@run_time_fields, "ips")
+
     defp get_columns_from_suite(suite, measurements_processed) do
       config_percentiles = suite.configuration.percentiles
 
@@ -75,26 +89,18 @@ if Code.ensure_loaded?(Table.Reader) do
           "p_#{percentile}"
         end)
 
-      fields_per_type =
-        [
-          "samples",
-          "ips",
-          "average",
-          "std_dev",
-          "median",
-          "minimum",
-          "maximum",
-          "mode",
-          "sample_size"
-        ] ++ percentile_labels
-
       measurement_headers =
         Enum.flat_map(measurements_processed, fn measurement_type ->
-          Enum.map(fields_per_type, fn field -> "#{measurement_type}_#{field}" end)
+          fields = fields_for(measurement_type) ++ percentile_labels
+
+          Enum.map(fields, fn field -> "#{measurement_type}_#{field}" end)
         end)
 
       ["job_name" | measurement_headers]
     end
+
+    defp fields_for(:run_time), do: @run_time_fields
+    defp fields_for(_), do: @non_run_time_fields
 
     defp extract_rows_from_suite(suite, measurements_processed) do
       config_percentiles = suite.configuration.percentiles
@@ -104,7 +110,7 @@ if Code.ensure_loaded?(Table.Reader) do
           Enum.flat_map(measurements_processed, fn measurment_type ->
             scenario
             |> Scenario.measurement_data(measurment_type)
-            |> get_stats_from_collection_data(config_percentiles)
+            |> get_stats_from_collection_data(measurment_type, config_percentiles)
           end)
 
         row = [scenario.job_name | secenario_data]
@@ -115,15 +121,16 @@ if Code.ensure_loaded?(Table.Reader) do
 
     defp get_stats_from_collection_data(
            %CollectionData{statistics: statistics, samples: samples},
+           measurment_type,
            percentiles
          ) do
       percentile_data =
         Enum.map(percentiles, fn percentile -> statistics.percentiles[percentile] end)
 
       Enum.concat([
+        [samples],
+        maybe_ips(statistics, measurment_type),
         [
-          samples,
-          statistics.ips,
           statistics.average,
           statistics.std_dev,
           statistics.median,
@@ -135,5 +142,8 @@ if Code.ensure_loaded?(Table.Reader) do
         percentile_data
       ])
     end
+
+    defp maybe_ips(statistics, :run_time), do: [statistics.ips]
+    defp maybe_ips(_, _not_run_time), do: []
   end
 end
