@@ -107,10 +107,10 @@ if Code.ensure_loaded?(Table.Reader) do
 
       Enum.map_reduce(suite.scenarios, 0, fn %Scenario{} = scenario, count ->
         secenario_data =
-          Enum.flat_map(measurements_processed, fn measurment_type ->
+          Enum.flat_map(measurements_processed, fn measurement_type ->
             scenario
-            |> Scenario.measurement_data(measurment_type)
-            |> get_stats_from_collection_data(measurment_type, config_percentiles)
+            |> Scenario.measurement_data(measurement_type)
+            |> get_stats_from_collection_data(measurement_type, config_percentiles)
           end)
 
         row = [scenario.job_name | secenario_data]
@@ -121,7 +121,7 @@ if Code.ensure_loaded?(Table.Reader) do
 
     defp get_stats_from_collection_data(
            %CollectionData{statistics: statistics, samples: samples},
-           measurment_type,
+           measurement_type,
            percentiles
          ) do
       percentile_data =
@@ -129,7 +129,7 @@ if Code.ensure_loaded?(Table.Reader) do
 
       Enum.concat([
         [samples],
-        maybe_ips(statistics, measurment_type),
+        maybe_ips(statistics, measurement_type),
         [
           statistics.average,
           statistics.std_dev,
