@@ -80,12 +80,12 @@ if Code.ensure_loaded?(Table.Reader) do
           "samples",
           "ips",
           "average",
-          "maximum",
+          "std_dev",
           "median",
           "minimum",
+          "maximum",
           "mode",
-          "sample_size",
-          "std_dev"
+          "sample_size"
         ] ++ percentile_labels
 
       measurement_headers =
@@ -125,12 +125,12 @@ if Code.ensure_loaded?(Table.Reader) do
           samples,
           statistics.ips,
           statistics.average,
-          statistics.maximum,
+          statistics.std_dev,
           statistics.median,
           statistics.minimum,
+          statistics.maximum,
           statistics.mode,
-          statistics.sample_size,
-          statistics.std_dev
+          statistics.sample_size
         ],
         percentile_data
       ])
