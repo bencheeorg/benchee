@@ -37,8 +37,9 @@ defmodule Benchee.Collect.MemoryTest do
       # capture it.
       capture_io(fn ->
         Memory.collect(fn -> exit(:kill) end)
-        Process.sleep(10)
       end)
+
+      Process.sleep(50)
 
       assert Enum.count(Process.list()) == starting_processes
     end
