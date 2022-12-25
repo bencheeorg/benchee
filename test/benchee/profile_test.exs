@@ -105,14 +105,7 @@ defmodule Benchee.ProfileTest do
       # can't say warmup in the test description as eprof picks it up and then it matches
       test "the function will be called exactly once by default for profiling" do
         retrying(fn ->
-          output =
-            capture_io(fn ->
-              test_process = self()
-
-              %Suite{configuration: %Configuration{profile_after: @profiler}}
-              |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
-              |> Profile.profile()
-            end)
+          output = capture_profile_io_and_message_with_config(@profiler)
 
           assert_received_exactly([:ran])
           refute output =~ ~r/warmup/i
@@ -125,14 +118,7 @@ defmodule Benchee.ProfileTest do
   describe "general warming up" do
     test "You can still specify you really want to do warmup" do
       retrying(fn ->
-        output =
-          capture_io(fn ->
-            test_process = self()
-
-            %Suite{configuration: %Configuration{profile_after: {:cprof, warmup: true}}}
-            |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
-            |> Profile.profile()
-          end)
+        output = capture_profile_io_and_message_with_config({:cprof, warmup: true})
 
         assert_received_exactly([:ran, :ran])
         assert output =~ ~r/warmup/i
@@ -141,19 +127,25 @@ defmodule Benchee.ProfileTest do
 
     test "specifying other options doesn't break the no warmup behavior" do
       retrying(fn ->
-        output =
-          capture_io(fn ->
-            test_process = self()
-
-            %Suite{configuration: %Configuration{profile_after: {:cprof, something: true}}}
-            |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
-            |> Profile.profile()
-          end)
+        output = capture_profile_io_and_message_with_config({:cprof, something: true})
 
         assert_received_exactly([:ran])
         refute output =~ ~r/warmup/i
       end)
     end
+  end
+
+  defp capture_profile_io_and_message_with_config(opts) do
+    output =
+      capture_io(fn ->
+        test_process = self()
+
+        %Suite{configuration: %Configuration{profile_after: opts}}
+        |> Benchmark.benchmark("job", fn -> send(test_process, :ran) end)
+        |> Profile.profile()
+      end)
+
+    output
   end
 
   describe "hooks" do
