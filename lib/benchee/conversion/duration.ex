@@ -307,7 +307,7 @@ defmodule Benchee.Conversion.Duration do
   defp place_values(number, [base_unit]), do: [{number, base_unit}]
 
   defp place_values(number, [unit | units]) do
-    place_value = floor(number)
+    place_value = trunc(number)
     decimal_carry = number - place_value
     int_carry = rem(place_value, unit.magnitude)
 
