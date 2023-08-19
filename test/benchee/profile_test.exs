@@ -114,7 +114,7 @@ defmodule Benchee.ProfileTest do
     end
   end
 
-  # still can't say 'warmup' due to error messages and amtching
+  # still can't say 'warmup' due to error messages and matching
   describe "general warming up" do
     test "You can still specify you really want to do warmup" do
       retrying(fn ->
@@ -152,6 +152,9 @@ defmodule Benchee.ProfileTest do
     test "before each hook works" do
       # random flaky failures:      ** (exit) exited in: :gen_server.call(:eprof, {:profile_start, [], {:_, :_, :_}, {:erlang, :apply, [#Function<6.54153602/0 in Benchee.Benchmark.Runner.main_function/2>, []]}, [set_on_spawn: true]}, :infinity)
       retrying(fn ->
+        # the mix task we use does this and so we should be fine but worth a go anyhow
+        :eprof.start()
+
         capture_io(fn ->
           test_process = self()
 
