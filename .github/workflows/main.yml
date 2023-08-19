@@ -8,20 +8,18 @@ on: [pull_request, push]
 jobs:
   linux:
     name: Test on Ubuntu (Elixir ${{ matrix.elixir_version }}, OTP ${{ matrix.otp_version }})
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     strategy:
       matrix:
         # Thoroughly check the most recent versions
-        elixir_version: ['1.13.4', '1.14.2']
+        elixir_version: ['1.13.4', '1.14.5', '1.15.4']
         otp_version: ['23.3', '24.3', '25.2']
         # Spot check older versions
         #
         # Goal is to have old versions (elixir and erlang) have basically one test each.
         # That should be enough to affirm that they are working ok.
         include:
-          - elixir_version: '1.6.6'
-            otp_version: '19.3'
           - elixir_version: '1.7.4'
             otp_version: '20.3'
           - elixir_version: '1.8.2'
@@ -36,6 +34,9 @@ jobs:
             otp_version: '23.3'
           - elixir_version: '1.13.4'
             otp_version: '22.3'
+        exclude:
+          - elixir_version: '1.15.4'
+            otp_version: '23.3'
 
     steps:
       - name: Checkout
@@ -87,6 +88,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        # no versioning on brew but getting asdf or something was a bigger headache
       - name: Install Elixir
         run: brew install elixir
       - name: Restore deps and _build
@@ -118,10 +120,9 @@ jobs:
             ${{ runner.os }}-chocolatey-
       - name: Install Elixir
         run: |
-          cinst erlang --no-progress --version 23.3
-          cinst elixir --no-progress
+          choco install elixir --version=1.14.2 --no-progress
           set MIX_ENV=test
-          echo "C:\ProgramData\chocolatey\lib\Elixir\bin;C:\ProgramData\chocolatey\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\ProgramData\chocolatey\lib\Elixir\bin;C:\ProgramData\chocolatey\bin;C:\ProgramData\chocolatey\lib\Elixir\tools\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Build
         run: |
           echo "$PATH"

@@ -161,16 +161,18 @@ defmodule BencheeTest do
 
   @tag :needs_fast_function_repetition
   test "integration super fast function print warnings" do
-    output =
-      capture_io(fn ->
-        Benchee.run(
-          %{"Constant" => fn -> 0 end},
-          Keyword.merge(@test_configuration, time: 0.001, warmup: 0)
-        )
-      end)
+    retrying(fn ->
+      output =
+        capture_io(fn ->
+          Benchee.run(
+            %{"Constant" => fn -> 0 end},
+            Keyword.merge(@test_configuration, time: 0.001, warmup: 0)
+          )
+        end)
 
-    assert output =~ ~r/fast/
-    assert output =~ ~r/unreliable/
+      assert output =~ ~r/fast/
+      assert output =~ ~r/unreliable/
+    end)
   end
 
   @tag :needs_fast_function_repetition
@@ -967,14 +969,17 @@ defmodule BencheeTest do
   describe "warn when functions are evaluated" do
     test "warns when run in iex" do
       # test env to avoid repeated compilation on CI
-      port = Port.open({:spawn, "iex -S mix"}, [:binary, env: [{'MIX_ENV', 'test'}]])
+      port = Port.open({:spawn, "iex -S mix"}, [:binary, env: [{~c"MIX_ENV", ~c"test"}]])
+
+      # wait for startup
+      # timeout huge because of CI
+      assert_receive {^port, {:data, "iex(1)> "}}, 20_000
 
       send(
         port,
         {self(), {:command, "Benchee.run(%{\"test\" => fn -> 1 end}, time: 0.001, warmup: 0)\n"}}
       )
 
-      # timeout huge because of CI
       assert_receive {^port, {:data, "Warning: " <> message}}, 20_000
 
       assert message =~ ~r/test.+evaluated.+slower.+compiled.+module.+/is
