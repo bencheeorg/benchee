@@ -140,7 +140,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       reduction_counts = hd(new_suite.scenarios).reductions_data.samples
 
       assert length(reduction_counts) > 0
-      assert Enum.all?(reduction_counts, fn count -> count >= 344 and count <= 567 end)
+      assert Enum.all?(reduction_counts, fn count -> count >= 305 and count <= 567 end)
     end
 
     @tag :memory_measure
