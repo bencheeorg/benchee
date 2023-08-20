@@ -40,21 +40,21 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Elixir
         uses: erlef/setup-beam@v1
         with:
           elixir-version: ${{ matrix.elixir_version }}
           otp-version: ${{ matrix.otp_version }}
       - name: Restore deps and _build
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             deps
             _build
           key: erlef-${{ runner.os }}-mix-${{ matrix.elixir_version }}-${{ matrix.otp_version }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
       - name: Restore plts
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: tools/plts
           key: erlef-${{ runner.os }}-dialyzer-${{ matrix.elixir_version }}-${{ matrix.otp_version }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
@@ -87,12 +87,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         # no versioning on brew but getting asdf or something was a bigger headache
       - name: Install Elixir
         run: brew install elixir
       - name: Restore deps and _build
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             deps
@@ -110,9 +110,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Restore chocolatey
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: C:\Users\runneradmin\AppData\Local\Temp\chocolatey
           key: ${{ runner.os }}-chocolatey-${{ github.sha }}
