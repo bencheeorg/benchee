@@ -168,7 +168,7 @@ defmodule Benchee.Benchmark.Runner do
     Enum.map(reductions, &(&1 - offset))
   end
 
-  defp run_reductions_benchmark(_, %ScenarioContext{config: %{reduction_time: 0.0}}) do
+  defp run_reductions_benchmark(_, %ScenarioContext{config: %{reduction_time: +0.0}}) do
     []
   end
 
@@ -191,7 +191,7 @@ defmodule Benchee.Benchmark.Runner do
     do_benchmark(scenario, new_context, Collect.Reductions, [])
   end
 
-  defp run_memory_benchmark(_, %ScenarioContext{config: %{memory_time: 0.0}}) do
+  defp run_memory_benchmark(_, %ScenarioContext{config: %{memory_time: +0.0}}) do
     []
   end
 
@@ -216,7 +216,7 @@ defmodule Benchee.Benchmark.Runner do
 
   @spec measure_runtimes(Scenario.t(), ScenarioContext.t(), number, boolean) :: [number]
   defp measure_runtimes(scenario, context, run_time, fast_warning)
-  defp measure_runtimes(_, _, 0.0, _), do: []
+  defp measure_runtimes(_, _, +0.0, _), do: []
 
   defp measure_runtimes(scenario, scenario_context, run_time, fast_warning) do
     end_time = current_time() + run_time

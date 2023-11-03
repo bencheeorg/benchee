@@ -95,8 +95,8 @@ defmodule Benchee.RelativeStatistics do
     }
   end
 
-  defp zero_safe_division(0.0, 0.0), do: 1.0
+  defp zero_safe_division(+0.0, +0.0), do: 1.0
   defp zero_safe_division(_, 0), do: :infinity
-  defp zero_safe_division(_, 0.0), do: :infinity
+  defp zero_safe_division(_, +0.0), do: :infinity
   defp zero_safe_division(a, b), do: a / b
 end
