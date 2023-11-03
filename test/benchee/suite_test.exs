@@ -67,9 +67,9 @@ defmodule Benchee.SuiteTest do
                 relative_less: nil,
                 relative_more: nil,
                 sample_size: 3,
-                std_dev: 0.0,
+                std_dev: +0.0,
                 std_dev_ips: nil,
-                std_dev_ratio: 0.0
+                std_dev_ratio: +0.0
               }
             },
             name: "Test 1",
@@ -113,9 +113,9 @@ defmodule Benchee.SuiteTest do
                 relative_less: nil,
                 relative_more: nil,
                 sample_size: 3,
-                std_dev: 0.0,
+                std_dev: +0.0,
                 std_dev_ips: nil,
-                std_dev_ratio: 0.0
+                std_dev_ratio: +0.0
               }
             },
             name: "Test 2",
@@ -168,9 +168,9 @@ defmodule Benchee.SuiteTest do
                 relative_less: nil,
                 relative_more: nil,
                 sample_size: 3,
-                std_dev: 0.0,
+                std_dev: +0.0,
                 std_dev_ips: nil,
-                std_dev_ratio: 0.0
+                std_dev_ratio: +0.0
               }
             },
             reductions_data: %Benchee.CollectionData{
@@ -186,9 +186,9 @@ defmodule Benchee.SuiteTest do
                 relative_less: nil,
                 relative_more: nil,
                 sample_size: 2,
-                std_dev: 0.0,
+                std_dev: +0.0,
                 std_dev_ips: nil,
-                std_dev_ratio: 0.0
+                std_dev_ratio: +0.0
               }
             },
             run_time_data: %Benchee.CollectionData{
@@ -273,7 +273,7 @@ defmodule Benchee.SuiteTest do
                     5881.0,
                     [1_792, 1_792, 1_792],
                     1_792.0,
-                    0.0,
+                    +0.0,
                     1_792.0,
                     1_792,
                     1_792,
@@ -297,7 +297,7 @@ defmodule Benchee.SuiteTest do
                     5881.0,
                     [1_792, 1_792, 1_792],
                     1_792.0,
-                    0.0,
+                    +0.0,
                     1_792.0,
                     1_792,
                     1_792,
@@ -366,7 +366,7 @@ defmodule Benchee.SuiteTest do
                     5881.0,
                     [1_792, 1_792, 1_792],
                     1_792.0,
-                    0.0,
+                    +0.0,
                     1_792.0,
                     1_792,
                     1_792,
@@ -376,7 +376,7 @@ defmodule Benchee.SuiteTest do
                     1_792.0,
                     [55, 55],
                     55.0,
-                    0.0,
+                    +0.0,
                     55.0,
                     55,
                     55,

@@ -96,7 +96,7 @@ defmodule Benchee.Utility.FileCreation do
       ...>   ["Big Input", "Comparison", "great Stuff"])
       "bench/abc_big_input_comparison_great_stuff.csv"
 
-      iex> marker = Benchee.Benchmark.no_input
+      iex> marker = Benchee.Benchmark.no_input()
       iex> interleave("abc.csv", marker)
       "abc.csv"
       iex> interleave("abc.csv", [marker])
