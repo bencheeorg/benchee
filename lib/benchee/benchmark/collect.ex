@@ -12,7 +12,7 @@ defmodule Benchee.Benchmark.Collect do
   reason - it will then be ignored and not counted.
   """
   @type return_value :: {non_neg_integer | nil, any}
-  @type zero_arity_function :: (() -> any)
+  @type zero_arity_function :: (-> any)
   @type opts :: any
   @callback collect(zero_arity_function()) :: return_value()
   @callback collect(zero_arity_function(), opts) :: return_value()

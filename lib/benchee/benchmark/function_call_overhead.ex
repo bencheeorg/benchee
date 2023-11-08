@@ -40,7 +40,7 @@ defmodule Benchee.Benchmark.FunctionCallOverhead do
     do_run(function, [], end_time)
   end
 
-  @spec do_run((() -> any), [number], number) :: [number, ...]
+  @spec do_run((-> any), [number], number) :: [number, ...]
   defp do_run(function, durations, end_time) do
     {duration, _} = Time.collect(function)
 
