@@ -65,22 +65,22 @@ jobs:
       - run: MIX_ENV=test mix compile --warnings-as-errors
       - run: mix credo
       - name: Check if formatted
-        if: contains(matrix.elixir_version, '1.13')
+        if: contains(matrix.elixir_version, '1.15')
         run: mix format --check-formatted
       - name: Actual Tests
         # this will let warnings slip through but I don't wanna replicate all that magic
         # right now
         run: MIX_ENV=test mix coveralls.github || mix test --failed
         # Apparently the one with `!` can't go without the fancy expression syntax
-        if: ${{ !contains(matrix.elixir_version, '1.13') }}
+        if: ${{ !contains(matrix.elixir_version, '1.15') }}
       - name: Actual Tests WITH warnings as errors
         run: MIX_ENV=test mix coveralls.github --warnings-as-errors || mix test --failed
-        if: contains(matrix.elixir_version, '1.13')
+        if: contains(matrix.elixir_version, '1.15')
       - name: Dialyzer
         run: mix dialyzer --halt-exit-status
-        if: contains(matrix.elixir_version, '1.13')
+        if: contains(matrix.elixir_version, '1.15')
       - name: After script
-        if: contains(matrix.elixir_version, '1.13')
+        if: contains(matrix.elixir_version, '1.15')
         run: mix deps.get --only docs && MIX_ENV=docs mix inch.report
 
   macos:
