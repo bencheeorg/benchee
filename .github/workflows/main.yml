@@ -78,6 +78,7 @@ jobs:
         if: contains(matrix.elixir_version, '1.13')
       - name: Dialyzer
         run: mix dialyzer --halt-exit-status
+        if: contains(matrix.elixir_version, '1.13')
       - name: After script
         if: contains(matrix.elixir_version, '1.13')
         run: mix deps.get --only docs && MIX_ENV=docs mix inch.report
