@@ -14,7 +14,7 @@ jobs:
       matrix:
         # Thoroughly check the most recent versions
         elixir_version: ['1.13.4', '1.14.5', '1.15.4', '1.16.0-rc.0']
-        otp_version: ['23.3', '24.3', '25.3']
+        otp_version: ['23.3', '24.3', '25.3', '26.1']
         # Spot check older versions
         #
         # Goal is to have old versions (elixir and erlang) have basically one test each.
@@ -39,6 +39,10 @@ jobs:
             otp_version: '23.3'
           - elixir_version: '1.16.0-rc.0'
             otp_version: '23.3'
+          - elixir_version: '1.13.4'
+            otp_version: '26.1'
+          - elixir_version: '1.14.5'
+            otp_version: '26.1'
 
 
     steps:
