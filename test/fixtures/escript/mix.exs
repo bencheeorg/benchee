@@ -5,7 +5,7 @@ defmodule Escript.MixProject do
     [
       app: :escript,
       version: "0.1.0",
-      elixir: "~> 1.15",
+      elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       escript: [main_module: Escript]
