@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Bugfixes (User Facing)
 * Removed Elixir 1.16 compiler warnings around +0.0 and -0.0. Thanks [@tomciop](https://github.com/tomciopp).
+* Building an escript and running it is fixed. See [#384](https://github.com/bencheeorg/benchee/issues/384) and thanks [@Munksgaard](https://github.com/Munksgaard)!
 
 ## 1.1.0 (2022-03-08)
 
