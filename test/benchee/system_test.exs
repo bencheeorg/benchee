@@ -102,9 +102,10 @@ defmodule Benchee.SystemTest do
 
   describe "all_protocols_consolidated?/1" do
     test "normally it just works and is true for Bechee and does not log a warning" do
-      warning = capture_io(fn ->
-        assert true == all_protocols_consolidated?()
-      end)
+      warning =
+        capture_io(fn ->
+          assert true == all_protocols_consolidated?()
+        end)
 
       assert warning == ""
     end
@@ -112,9 +113,10 @@ defmodule Benchee.SystemTest do
     test "when it borks out it warns and defaults to true, see #384" do
       fake_lib_dir = fn _, _ -> {:error, :bad_name} end
 
-      warning = capture_io(fn ->
-        assert true == all_protocols_consolidated?(fake_lib_dir)
-      end)
+      warning =
+        capture_io(fn ->
+          assert true == all_protocols_consolidated?(fake_lib_dir)
+        end)
 
       assert warning =~ ~r/not.*check.*protocol.*consolidat/i
     end

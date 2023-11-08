@@ -194,8 +194,12 @@ defmodule Benchee.System do
         [path]
         |> Protocol.extract_protocols()
         |> Enum.all?(&Protocol.consolidated?/1)
+
       _error ->
-        IO.puts("Could not check if protocols are consolidated. Running as escript? Defaulting to they are consolidated.")
+        IO.puts(
+          "Could not check if protocols are consolidated. Running as escript? Defaulting to they are consolidated."
+        )
+
         true
     end
   end
