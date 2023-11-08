@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Features (User Facing)
 * Trying to benchmark evaluated functions will now result in a warning. Thanks [@BrooklinJazz](https://github.com/BrooklinJazz), [@czrpb](https://github.com/czrpb), [@aar2dee2](https://github.com/aar2dee2),[@ReecesPeanutButterCodes](https://github.com/ReecesPeanutButterCodes).
 
+### Bugfixes (User Facing)
+* Removed Elixir 1.16 compiler warnings around +0.0 and -0.0. Thanks [@tomciop](https://github.com/tomciopp).
+
 ## 1.1.0 (2022-03-08)
 
 Long time, huh? I'm sorry, combination of priorities, difficult to fix bugs, stress and arm problems kept me away too long.
