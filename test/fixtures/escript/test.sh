@@ -1,1 +1,1 @@
-mix escript.build && ./escript
+mix deps.get && mix escript.build && ./escript
