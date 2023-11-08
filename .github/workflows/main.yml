@@ -65,9 +65,11 @@ jobs:
         with:
           path: tools/plts
           key: erlef-${{ runner.os }}-dialyzer-${{ matrix.elixir_version }}-${{ matrix.otp_version }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+        if: contains(matrix.elixir_version, '1.15')
       - run: mix deps.get
       - run: MIX_ENV=test mix compile --warnings-as-errors
       - run: mix credo
+        if: contains(matrix.elixir_version, '1.15')
       - name: Check if formatted
         if: contains(matrix.elixir_version, '1.15')
         run: mix format --check-formatted
