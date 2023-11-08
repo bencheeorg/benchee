@@ -185,11 +185,18 @@ defmodule Benchee.System do
     end
   end
 
-  defp all_protocols_consolidated? do
-    path = :code.lib_dir(:elixir, :ebin)
-
-    [path]
-    |> Protocol.extract_protocols()
-    |> Enum.all?(&Protocol.consolidated?/1)
+  # just made public for easy testing purposes
+  @doc false
+  def all_protocols_consolidated?(lib_dir_fun \\ &:code.lib_dir/2) do
+    case lib_dir_fun.(:elixir, :ebin) do
+      # do we get a good old erlang charlist?
+      path when is_list(path) ->
+        [path]
+        |> Protocol.extract_protocols()
+        |> Enum.all?(&Protocol.consolidated?/1)
+      _error ->
+        IO.puts("Could not check if protocols are consolidated. Running as escript? Defaulting to they are consolidated.")
+        true
+    end
   end
 end
