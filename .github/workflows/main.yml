@@ -64,8 +64,6 @@ jobs:
       - run: mix deps.get
       - run: MIX_ENV=test mix compile --warnings-as-errors
       - run: mix credo
-        # credo does not support elixir 1.6 any more
-        if: ${{ !contains(matrix.elixir_version, '1.6') }}
       - name: Check if formatted
         if: contains(matrix.elixir_version, '1.13')
         run: mix format --check-formatted
@@ -80,8 +78,6 @@ jobs:
         if: contains(matrix.elixir_version, '1.13')
       - name: Dialyzer
         run: mix dialyzer --halt-exit-status
-        # credo does not support elixir 1.6 any more and it's compiled here.. not sure why
-        if: ${{ !contains(matrix.elixir_version, '1.6') }}
       - name: After script
         if: contains(matrix.elixir_version, '1.13')
         run: mix deps.get --only docs && MIX_ENV=docs mix inch.report
