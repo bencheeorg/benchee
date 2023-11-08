@@ -40,7 +40,7 @@ defmodule Benchee.Scenario do
 
   No arguments if no inputs are used, one argument if inputs are used.
   """
-  @type benchmarking_function :: (() -> any) | (any -> any)
+  @type benchmarking_function :: (-> any) | (any -> any)
 
   @typedoc """
   What shall be benchmarked, mostly a function but can contain options.
