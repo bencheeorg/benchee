@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## unreleased
+## 1.2.0 (2023-11-09)
+
+Long time, huh? 😉 I'm not gonna repeat all that, but I'm happy benchee is in a place where it just works and doesn't need too much support. Biggest feature here is the implementation of the `Table.Reader` protocol for a better Livebook experience.
 
 ### Features (User Facing)
 * Trying to benchmark evaluated functions will now result in a warning. Thanks [@BrooklinJazz](https://github.com/BrooklinJazz), [@czrpb](https://github.com/czrpb), [@aar2dee2](https://github.com/aar2dee2),[@ReecesPeanutButterCodes](https://github.com/ReecesPeanutButterCodes).
