@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features (User Facing)
 * Trying to benchmark evaluated functions will now result in a warning. Thanks [@BrooklinJazz](https://github.com/BrooklinJazz), [@czrpb](https://github.com/czrpb), [@aar2dee2](https://github.com/aar2dee2),[@ReecesPeanutButterCodes](https://github.com/ReecesPeanutButterCodes).
+* Add support for the [`Table.Reader`](https://hexdocs.pm/table/Table.html) protocol so that benchee works out of the box in Livebook. See [#369](https://github.com/bencheeorg/benchee/pull/369), big shoutout to [@akoutmos](https://github.com/akoutmos) and sorry for keeping it unreleased for so long.
 
 ### Bugfixes (User Facing)
 * Removed Elixir 1.16 compiler warnings around +0.0 and -0.0. Thanks [@tomciop](https://github.com/tomciopp).

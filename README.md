@@ -146,7 +146,7 @@ end
 
 Install via `mix deps.get` and then happy benchmarking as described in [Usage](#usage) :)
 
-Elixir versions supported/tested against are 1.6+. It _should_ theoretically still work with 1.4 & 1.5 but we don't actively test/support it.
+Elixir versions supported/tested against are 1.7+. It _should_ theoretically still work with 1.4, 1.5 & 1.6 but we don't actively test/support it as installing them on current CI systems is not supported out of the box.
 
 ## Usage
 
