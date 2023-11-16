@@ -69,6 +69,8 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     @doc false
     defdelegate collect(suite, printer), to: Benchee.Benchmark
     defdelegate statistics(suite), to: Benchee.Statistics
+    @doc false
+    defdelegate statistics(suite, printer), to: Benchee.Statistics
     defdelegate relative_statistics(suite), to: Benchee.RelativeStatistics
     defdelegate load(suite), to: Benchee.ScenarioLoader
     defdelegate profile(suite), to: Benchee.Profile

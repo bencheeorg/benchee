@@ -7,6 +7,7 @@ defmodule Benchee.Statistics do
   """
 
   alias Benchee.{CollectionData, Conversion.Duration, Scenario, Suite, Utility.Parallel}
+  alias Benchee.Output.ProgressPrinter
 
   require Integer
 
@@ -115,7 +116,7 @@ defmodule Benchee.Statistics do
       ...>   }
       ...> ]
       iex> suite = %Benchee.Suite{scenarios: scenarios}
-      iex> statistics(suite)
+      iex> statistics(suite, Benchee.Test.FakeProgressPrinter)
       %Benchee.Suite{
         scenarios: [
           %Benchee.Scenario{
@@ -161,7 +162,9 @@ defmodule Benchee.Statistics do
 
   """
   @spec statistics(Suite.t()) :: Suite.t()
-  def statistics(suite) do
+  def statistics(suite, printer \\ ProgressPrinter) do
+    printer.calculating_statistics(suite.configuration)
+
     percentiles = suite.configuration.percentiles
 
     update_in(suite.scenarios, fn scenarios ->

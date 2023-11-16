@@ -34,6 +34,10 @@ defmodule BencheeTest do
       end)
 
     readme_sample_asserts(output)
+
+    # The test with the custom functions does not print this
+    # so don't want to put it into the general function
+    assert output =~ ~r/formatting/i
   end
 
   test "integration step by step" do
@@ -208,6 +212,28 @@ defmodule BencheeTest do
       end)
 
     refute output =~ ~r/fast/
+  end
+
+  test "integration disabling all output configs and formatters we're left with an empty output" do
+    output =
+      capture_io(fn ->
+        Benchee.run(
+          %{"Blitz" => fn -> 0 end},
+          Keyword.merge(
+            @test_configuration,
+            time: 0.001,
+            warmup: 0,
+            print: [
+              fast_warning: false,
+              benchmarking: false,
+              configuration: false
+            ],
+            formatters: []
+          )
+        )
+      end)
+
+    assert output == ""
   end
 
   test "integration comparison report can be deactivated" do
@@ -1007,6 +1033,7 @@ defmodule BencheeTest do
     assert output =~ @header_regex
     assert output =~ body_regex("flat_map", tag_regex)
     assert output =~ body_regex("map.flatten", tag_regex)
+    assert output =~ ~r/calculat.*statistics/i
     assert output =~ ~r/Comparison/, output
     assert output =~ ~r/^map.flatten#{tag_regex}\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
     assert output =~ ~r/^flat_map#{tag_regex}\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m

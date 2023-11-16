@@ -1,6 +1,9 @@
 defmodule Benchee.StatistcsTest do
   use ExUnit.Case, async: true
+
   alias Benchee.{CollectionData, Configuration, Scenario, Statistics, Suite}
+  alias Benchee.Test.FakeProgressPrinter
+
   doctest Benchee.Statistics, import: true
 
   @sample_1 [600, 470, 170, 430, 300]
@@ -25,7 +28,7 @@ defmodule Benchee.StatistcsTest do
       ]
 
       suite = %Suite{scenarios: scenarios}
-      new_suite = Statistics.statistics(suite)
+      new_suite = Statistics.statistics(suite, FakeProgressPrinter)
 
       stats_1 = stats_for(new_suite, "Job 1", "Input")
       stats_2 = stats_for(new_suite, "Job 2", "Input")
@@ -73,7 +76,7 @@ defmodule Benchee.StatistcsTest do
         }
       }
 
-      new_suite = Statistics.statistics(suite)
+      new_suite = Statistics.statistics(suite, FakeProgressPrinter)
 
       stats_1_1 = stats_for(new_suite, "Job 1", "Input 1")
       stats_1_2 = stats_for(new_suite, "Job 2", "Input 1")
@@ -92,7 +95,8 @@ defmodule Benchee.StatistcsTest do
         configuration: %Configuration{formatters: []}
       }
 
-      assert %Suite{configuration: %{formatters: []}} = Statistics.statistics(suite)
+      assert %Suite{configuration: %{formatters: []}} =
+               Statistics.statistics(suite, FakeProgressPrinter)
     end
 
     test "calculates percentiles configured by the user" do
@@ -122,7 +126,7 @@ defmodule Benchee.StatistcsTest do
             }
           }
         ]
-      } = Statistics.statistics(suite)
+      } = Statistics.statistics(suite, FakeProgressPrinter)
     end
 
     test "always calculates the 50th percentile, even if not set in the config" do
@@ -152,7 +156,7 @@ defmodule Benchee.StatistcsTest do
             }
           }
         ]
-      } = Statistics.statistics(suite)
+      } = Statistics.statistics(suite, FakeProgressPrinter)
     end
 
     @nothing []
@@ -164,7 +168,7 @@ defmodule Benchee.StatistcsTest do
         }
       ]
 
-      suite = Statistics.statistics(%Suite{scenarios: scenarios})
+      suite = Statistics.statistics(%Suite{scenarios: scenarios}, FakeProgressPrinter)
 
       [
         %Scenario{
@@ -178,6 +182,12 @@ defmodule Benchee.StatistcsTest do
 
       assert run_time_stats.average == nil
       assert memory_stats.average == nil
+    end
+
+    test "lets you know it's benchmarking" do
+      Statistics.statistics(%Suite{}, FakeProgressPrinter)
+
+      assert_received :calculating_statistics
     end
 
     defp stats_for(suite, job_name, input_name) do
