@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features (User Facing)
 * System information now includes whether or not the JIT is enabled ([erlang docs](https://www.erlang.org/doc/apps/erts/beamasm)).
+* Benchee now let's you know when it's calculating statistics or running the formatters. Helps when you wonder what takes long or blows up memory.
 
 ### Features (Plugins)
 * `jit_enabled?` is exposed as part of the `suite.system` struct

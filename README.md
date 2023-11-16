@@ -225,7 +225,7 @@ The available options are the following (also documented in [hexdocs](https://he
 * `save` - specify a `path` where to store the results of the current benchmarking suite, tagged with the specified `tag`. See [Saving & Loading](#saving-loading-and-comparing-previous-runs).
 * `load` - load saved suite or suites to compare your current benchmarks against. Can be a string or a list of strings or patterns. See [Saving & Loading](#saving-loading-and-comparing-previous-runs).
 * `print` - a map or keyword list from atoms to `true` or `false` to configure if the output identified by the atom will be printed during the standard Benchee benchmarking process. All options are enabled by default (true). Options are:
-  * `:benchmarking`  - print when Benchee starts benchmarking a new job (`Benchmarking name ...`)
+  * `:benchmarking`  - print when Benchee starts benchmarking a new job (`Benchmarking name ...`) as well as when statistics are being calculated or formatting begins.
   * `:configuration` - a summary of configured benchmarking options including estimated total run time is printed before benchmarking starts
   * `:fast_warning` - warnings are displayed if functions are executed too fast leading to inaccurate measures
 * `:unit_scaling` - the strategy for choosing a unit for durations,
