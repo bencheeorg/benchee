@@ -44,6 +44,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
   defp system_information(%{
          erlang: erlang_version,
          elixir: elixir_version,
+         jit_enabled?: jit_enabled?,
          os: os,
          num_cores: num_cores,
          cpu_speed: cpu_speed,
@@ -56,6 +57,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
     Available memory: #{available_memory}
     Elixir #{elixir_version}
     Erlang #{erlang_version}
+    JIT enabled: #{jit_enabled?}
     """)
   end
 

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Features (User Facing)
+* System information now includes whether or not the JIT is enabled ([erlang docs](https://www.erlang.org/doc/apps/erts/beamasm)).
+
+### Features (Plugins)
+* `jit_enabled?` is exposed as part of the `suite.system` map
+
 ## 1.2.0 (2023-11-09)
 
 Long time, huh? 😉 I'm not gonna repeat all that, but I'm happy benchee is in a place where it just works and doesn't need too much support. Biggest feature here is the implementation of the `Table.Reader` protocol for a better Livebook experience.
