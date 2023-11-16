@@ -19,6 +19,7 @@ defmodule Benchee.Benchmark.RunnerTest do
   @system %{
     elixir: "1.4.0",
     erlang: "19.1",
+    jit_enabled?: false,
     num_cores: "4",
     os: "Super Duper",
     available_memory: "8 Trillion",
