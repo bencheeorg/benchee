@@ -7,8 +7,9 @@ defmodule Benchee.Output.BenchmarkPrintertest do
   import Benchee.Output.BenchmarkPrinter
 
   @system_info %{
-    elixir: "1.4",
-    erlang: "19.2",
+    elixir: "1.15.7",
+    erlang: "26.1",
+    jit_enabled?: true,
     os: :macOS,
     num_cores: 4,
     cpu_speed: "Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz",
@@ -37,8 +38,9 @@ defmodule Benchee.Output.BenchmarkPrintertest do
           |> configuration_information
         end)
 
-      assert output =~ "Erlang 19.2"
-      assert output =~ "Elixir 1.4"
+      assert output =~ "Erlang 26.1"
+      assert output =~ "Elixir 1.15.7"
+      assert output =~ ~r/jit.*.true/i
       assert output =~ "Intel"
       assert output =~ "Cores: 4"
       assert output =~ "macOS"

@@ -17,6 +17,7 @@ defmodule Benchee.System do
   @spec system(Suite.t()) :: Suite.t()
   def system(suite = %Suite{}) do
     erlang_version = erlang()
+
     system_info = %{
       elixir: elixir(),
       erlang: erlang_version,
