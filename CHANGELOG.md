@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * System information now includes whether or not the JIT is enabled ([erlang docs](https://www.erlang.org/doc/apps/erts/beamasm)).
 
 ### Features (Plugins)
-* `jit_enabled?` is exposed as part of the `suite.system` map
+* `jit_enabled?` is exposed as part of the `suite.system` struct
+* Yes, `Benchee.System` is now a struct so feel easier about relying on the fields
 
 ## 1.2.0 (2023-11-09)
 

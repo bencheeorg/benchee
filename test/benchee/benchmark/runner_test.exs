@@ -4,7 +4,7 @@ defmodule Benchee.Benchmark.RunnerTest do
   import Benchee.TestHelpers
   import ExUnit.CaptureIO
 
-  alias Benchee.{Benchmark, Configuration, Scenario, Suite}
+  alias Benchee.{Benchmark, Configuration, Scenario, Suite, System}
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
 
   @config %Configuration{
@@ -16,7 +16,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     print: %{fast_warning: false, configuration: true},
     measure_function_call_overhead: false
   }
-  @system %{
+  @system %System{
     elixir: "1.4.0",
     erlang: "19.1",
     jit_enabled?: false,

@@ -27,7 +27,7 @@ defmodule Benchee.Suite do
   """
   @type t :: %__MODULE__{
           configuration: Benchee.Configuration.t() | nil,
-          system: map | nil,
+          system: Benchee.System.t() | nil,
           scenarios: [] | [Benchee.Scenario.t()]
         }
 end

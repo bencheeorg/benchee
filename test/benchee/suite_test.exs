@@ -1,11 +1,22 @@
 defmodule Benchee.SuiteTest do
   use ExUnit.Case, async: true
 
-  alias Benchee.Suite
   import DeepMerge
 
+  alias Benchee.Suite
+  alias Benchee.System
+
+  @system %System{
+    elixir: "1.4.0",
+    erlang: "19.2",
+    jit_enabled?: false,
+    num_cores: "4",
+    os: "Super Duper",
+    available_memory: "8 Trillion",
+    cpu_speed: "light speed"
+  }
   @empty_suite %Suite{
-    system: %{elixir: "1.4.2", erlang: "19.2"},
+    system: @system,
     scenarios: []
   }
 
@@ -46,7 +57,7 @@ defmodule Benchee.SuiteTest do
   if Code.ensure_loaded?(Table.Reader) do
     describe "Table.Reader protocol" do
       @suite_with_data %Suite{
-        system: %{elixir: "1.4.2", erlang: "19.2"},
+        system: @system,
         configuration: %Benchee.Configuration{
           percentiles: [50, 99]
         },
@@ -147,7 +158,7 @@ defmodule Benchee.SuiteTest do
       }
 
       @suite_with_reductions %Suite{
-        system: %{elixir: "1.14.2", erlang: "25.2"},
+        system: @system,
         configuration: %Benchee.Configuration{
           percentiles: [50, 99]
         },
