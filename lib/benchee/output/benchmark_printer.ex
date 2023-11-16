@@ -1,7 +1,7 @@
 defmodule Benchee.Output.BenchmarkPrinter do
   @moduledoc false
 
-  alias Benchee.{Benchmark, Conversion.Duration}
+  alias Benchee.{Benchmark, Conversion.Duration, System}
 
   @doc """
   Shown when you try benchmark an evaluated function.
@@ -41,7 +41,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
     suite_information(scenarios, config)
   end
 
-  defp system_information(%{
+  defp system_information(%System{
          erlang: erlang_version,
          elixir: elixir_version,
          jit_enabled?: jit_enabled?,

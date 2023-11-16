@@ -11,6 +11,36 @@ defmodule Benchee.System do
   alias Benchee.Suite
   alias Benchee.Utility.ErlangVersion
 
+  @enforce_keys [
+    :elixir,
+    :erlang,
+    :jit_enabled?,
+    :num_cores,
+    :os,
+    :available_memory,
+    :cpu_speed
+  ]
+
+  defstruct [
+    :elixir,
+    :erlang,
+    :jit_enabled?,
+    :num_cores,
+    :os,
+    :available_memory,
+    :cpu_speed
+  ]
+
+  @type t :: %__MODULE__{
+          elixir: String.t(),
+          erlang: String.t(),
+          jit_enabled?: boolean(),
+          num_cores: pos_integer(),
+          os: :macOS | :Windows | :FreeBSD | :Linux,
+          cpu_speed: String.t(),
+          available_memory: String.t()
+        }
+
   @doc """
   Adds system information to the suite (currently elixir and erlang versions).
   """
@@ -18,7 +48,7 @@ defmodule Benchee.System do
   def system(suite = %Suite{}) do
     erlang_version = erlang()
 
-    system_info = %{
+    system_info = %__MODULE__{
       elixir: elixir(),
       erlang: erlang_version,
       jit_enabled?: jit_enabled?(erlang_version),
@@ -215,5 +245,15 @@ defmodule Benchee.System do
 
         true
     end
+  end
+end
+
+defimpl DeepMerge.Resolver, for: Benchee.System do
+  def resolve(original, override = %Benchee.System{}, resolver) do
+    Map.merge(original, override, resolver)
+  end
+
+  def resolve(original, override, resolver) when is_map(override) do
+    Map.merge(original, override, resolver)
   end
 end

@@ -5,6 +5,7 @@ defmodule Benchee.SystemTest do
   import Benchee.System
 
   alias Benchee.Suite
+  alias Benchee.System
   alias Benchee.Utility.ErlangVersion
 
   test ".system adds the content to a given suite" do
@@ -134,6 +135,22 @@ defmodule Benchee.SystemTest do
       assert jit_enabled?
     else
       refute jit_enabled?
+    end
+  end
+
+  @system %System{
+    elixir: "1.4.0",
+    erlang: "19.1",
+    jit_enabled?: false,
+    num_cores: "4",
+    os: "Super Duper",
+    available_memory: "8 Trillion",
+    cpu_speed: "light speed"
+  }
+  describe "deep_merge behaviour" do
+    test "it merges with a map preserving other keys" do
+      assert %{elixir: "1.15.7", erlang: "19.1"} =
+               DeepMerge.deep_merge(@system, %{elixir: "1.15.7"})
     end
   end
 end

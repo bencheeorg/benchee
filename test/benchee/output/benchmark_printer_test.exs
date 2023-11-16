@@ -1,12 +1,12 @@
 defmodule Benchee.Output.BenchmarkPrintertest do
   use ExUnit.Case, async: true
 
-  alias Benchee.{Benchmark, Configuration, Scenario}
+  alias Benchee.{Benchmark, Configuration, Scenario, System}
 
   import ExUnit.CaptureIO
   import Benchee.Output.BenchmarkPrinter
 
-  @system_info %{
+  @system_info %System{
     elixir: "1.15.7",
     erlang: "26.1",
     jit_enabled?: true,
