@@ -1,9 +1,11 @@
 defmodule Benchee.SystemTest do
   use ExUnit.Case, async: true
 
-  alias Benchee.Suite
   import ExUnit.CaptureIO
   import Benchee.System
+
+  alias Benchee.Suite
+  alias Benchee.Utility.ErlangVersion
 
   test ".system adds the content to a given suite" do
     system_info = system(%Suite{})
@@ -119,6 +121,19 @@ defmodule Benchee.SystemTest do
         end)
 
       assert warning =~ ~r/not.*check.*protocol.*consolidat/i
+    end
+  end
+
+  # It may be compiled in a way that it doesn't but in the CI and dev machines it should be fine
+  test ".jit_enabled? should say true for versions > 24.0.0" do
+    system_data = system(%Suite{}).system
+    jit_enabled? = system_data.jit_enabled?
+    erlang_version = system_data.erlang
+
+    if ErlangVersion.includes_fixes_from?(erlang_version, "24.0.0") do
+      assert jit_enabled?
+    else
+      refute jit_enabled?
     end
   end
 end

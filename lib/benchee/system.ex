@@ -9,15 +9,18 @@ defmodule Benchee.System do
 
   alias Benchee.Conversion.Memory
   alias Benchee.Suite
+  alias Benchee.Utility.ErlangVersion
 
   @doc """
   Adds system information to the suite (currently elixir and erlang versions).
   """
   @spec system(Suite.t()) :: Suite.t()
   def system(suite = %Suite{}) do
+    erlang_version = erlang()
     system_info = %{
       elixir: elixir(),
-      erlang: erlang(),
+      erlang: erlang_version,
+      jit_enabled?: jit_enabled?(erlang_version),
       num_cores: num_cores(),
       os: os(),
       available_memory: available_memory(),
@@ -49,6 +52,15 @@ defmodule Benchee.System do
   end
 
   defp elixir, do: System.version()
+
+  @first_jit_version "24.0.0"
+  defp jit_enabled?(erlang_version) do
+    if ErlangVersion.includes_fixes_from?(erlang_version, @first_jit_version) do
+      :erlang.system_info(:emu_flavor) == :jit
+    else
+      false
+    end
+  end
 
   defp num_cores do
     System.schedulers_online()
