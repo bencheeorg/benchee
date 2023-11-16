@@ -11,6 +11,7 @@ defmodule Benchee.Formatter do
   through `output/3`.
   """
 
+  alias Benchee.Output.ProgressPrinter
   alias Benchee.{Suite, Utility.Parallel}
   alias Benchee.Utility.DeepConvert
 
@@ -50,6 +51,8 @@ defmodule Benchee.Formatter do
   """
   @spec output(Suite.t()) :: Suite.t()
   def output(suite = %{configuration: %{formatters: formatters}}) do
+    print_formatting(suite.configuration)
+
     {parallelizable, serial} =
       formatters
       |> Enum.map(&normalize_module_configuration/1)
@@ -62,6 +65,15 @@ defmodule Benchee.Formatter do
     Enum.each(serial, fn function -> function.(suite) end)
 
     suite
+  end
+
+  # This is a bit of a hack, but we can't DI the printer like we usually do as we made the _great_
+  # decisions to use both `output/1` and `output/2` as part of the public interface. Adding the
+  # printer to `output/1` would clash with `output/2` and its second parameter is _also_ a module.
+  # So, we're abusing the `assigns` in the config a bit.
+  defp print_formatting(config) do
+    printer = config.assigns[:test][:progress_printer] || ProgressPrinter
+    printer.formatting(config)
   end
 
   defp normalize_module_configuration(formatter) when is_function(formatter, 1), do: formatter

@@ -5,7 +5,8 @@ defmodule Benchee.Benchmark.RunnerTest do
   import ExUnit.CaptureIO
 
   alias Benchee.{Benchmark, Configuration, Scenario, Suite, System}
-  alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
+  alias Benchee.Test.FakeBenchmarkPrinter
+  alias Benchee.Test.FakeProgressPrinter
 
   @config %Configuration{
     parallel: 1,
@@ -52,7 +53,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         new_suite =
           suite
           |> Benchmark.benchmark("Name", fn -> :timer.sleep(10) end)
-          |> Benchmark.collect(TestPrinter)
+          |> Benchmark.collect(FakeBenchmarkPrinter)
 
         assert new_suite.configuration == suite.configuration
         run_times = run_times_for(new_suite, "Name")
@@ -71,7 +72,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           suite
           |> Benchmark.benchmark("Name", fn -> :timer.sleep(19) end)
           |> Benchmark.benchmark("Name 2", fn -> :timer.sleep(9) end)
-          |> Benchmark.collect(TestPrinter)
+          |> Benchmark.collect(FakeBenchmarkPrinter)
 
         # should be 5 but gotta give it a bit leeway
         assert length(run_times_for(new_suite, "Name")) >= 4
@@ -88,7 +89,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         new_suite =
           suite
           |> Benchmark.benchmark("", fn -> :timer.sleep(10) end)
-          |> Benchmark.collect(TestPrinter)
+          |> Benchmark.collect(FakeBenchmarkPrinter)
 
         # it does more work when working in parallel than it does alone,
         # alone it should only manage to do ~6 (10ms sleep, 60ms time)
@@ -103,7 +104,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       new_suite =
         suite
         |> Benchmark.benchmark("", fn -> :timer.sleep(10) end)
-        |> Benchmark.collect(TestPrinter)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert length(new_suite.scenarios) == 1
     end
@@ -118,7 +119,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> Benchmark.benchmark("Name", fn ->
           Enum.map(0..100, fn _ -> [12.23, 30.536, 30.632, 7398.3295] end)
         end)
-        |> Benchmark.collect(TestPrinter)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
 
       memory_usages = List.first(new_suite.scenarios).memory_usage_data.samples
 
@@ -136,7 +137,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> Benchmark.benchmark("Name", fn ->
           Enum.map(0..100, fn _ -> [12.23, 30.536, 30.632, 7398.3295] end)
         end)
-        |> Benchmark.collect(TestPrinter)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
 
       reduction_counts = hd(new_suite.scenarios).reductions_data.samples
 
@@ -153,7 +154,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> Benchmark.benchmark("Name", fn ->
           Enum.map(0..1000, fn _ -> [12.23, 30.536, 30.632, 7398.3295] end)
         end)
-        |> Benchmark.collect(TestPrinter)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
 
       memory_usages = List.first(new_suite.scenarios).memory_usage_data.samples
 
@@ -167,7 +168,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       new_suite =
         suite
         |> Benchmark.benchmark("Boom", fn -> Enum.map([1, 2, 3], fn i -> i + 1 end) end)
-        |> Benchmark.collect(TestPrinter)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
 
       memory_usages = List.first(new_suite.scenarios).memory_usage_data.samples
 
@@ -198,8 +199,8 @@ defmodule Benchee.Benchmark.RunnerTest do
       suite =
         test_suite()
         |> Benchmark.benchmark("", fn -> 1 end)
-        |> Benchmark.collect(TestPrinter)
-        |> Benchee.statistics()
+        |> Benchmark.collect(FakeBenchmarkPrinter)
+        |> Benchee.statistics(FakeProgressPrinter)
 
       [%{run_time_data: %{statistics: %{median: median}}}] = suite.scenarios
 
@@ -211,8 +212,8 @@ defmodule Benchee.Benchmark.RunnerTest do
       %{configuration: %{measure_function_call_overhead: false}}
       |> test_suite()
       |> Benchmark.benchmark("", fn -> nil end)
-      |> Benchmark.collect(TestPrinter)
-      |> Benchee.statistics()
+      |> Benchmark.collect(FakeBenchmarkPrinter)
+      |> Benchee.statistics(FakeProgressPrinter)
 
       refute_received {:function_call_overhead, _}
     end
@@ -223,8 +224,8 @@ defmodule Benchee.Benchmark.RunnerTest do
           %{configuration: %{measure_function_call_overhead: true, time: 200_000_000}}
           |> test_suite()
           |> Benchmark.benchmark("", fn -> nil end)
-          |> Benchmark.collect(TestPrinter)
-          |> Benchee.statistics()
+          |> Benchmark.collect(FakeBenchmarkPrinter)
+          |> Benchee.statistics(FakeProgressPrinter)
 
         [%{run_time_data: %{statistics: %{minimum: minimum}}}] = suite.scenarios
 
@@ -251,7 +252,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           |> Benchmark.benchmark("", fn -> sleep_safe_time() end)
 
         {time, _} =
-          Benchmark.Collect.Time.collect(fn -> Benchmark.collect(suite, TestPrinter) end)
+          Benchmark.Collect.Time.collect(fn -> Benchmark.collect(suite, FakeBenchmarkPrinter) end)
 
         # if the system is too busy there are too many false positives
         leeway = projected * 0.4
@@ -269,7 +270,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       %Suite{configuration: %{time: 0.0, warmup: 0.0}}
       |> test_suite
       |> Benchmark.benchmark("", fn -> send(ref, :called) end)
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       refute_receive :called
     end
@@ -279,7 +280,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         %Suite{configuration: %{time: 0.0, warmup: 0.0}}
         |> test_suite
         |> Benchmark.benchmark("don't care", fn -> 0 end)
-        |> Benchmark.collect(TestPrinter)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert scenario.run_time_data.samples == []
     end
@@ -288,7 +289,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     test "asks to print what is currently benchmarking" do
       test_suite()
       |> Benchmark.benchmark("Something", fn -> :timer.sleep(10) end)
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert_receive {:benchmarking, "Something", @no_input}
     end
@@ -302,7 +303,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> test_suite
       |> Benchmark.benchmark("one", fn input -> send(ref, {:one, input}) end)
       |> Benchmark.benchmark("two", fn input -> send(ref, {:two, input}) end)
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       Enum.each(@inputs, fn {_name, value} ->
         assert_receive {:one, ^value}
@@ -314,7 +315,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       %Suite{configuration: %{inputs: @inputs}}
       |> test_suite
       |> Benchmark.benchmark("one", fn _ -> nil end)
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       Enum.each(@inputs, fn {name, _value} ->
         assert_received {:benchmarking, "one", ^name}
@@ -335,7 +336,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           %Suite{configuration: config}
           |> test_suite
           |> Benchmark.benchmark("sleep", fn input -> :timer.sleep(input) end)
-          |> Benchmark.collect(TestPrinter)
+          |> Benchmark.collect(FakeBenchmarkPrinter)
 
         # should be ~11 but the good old leeway
         assert length(run_times_for(new_suite, "sleep", "Short wait")) >= 8
@@ -349,7 +350,7 @@ defmodule Benchee.Benchmark.RunnerTest do
         %Suite{configuration: %{time: 1, warmup: 0.0}}
         |> test_suite
         |> Benchmark.benchmark("Sleeps", fn -> :timer.sleep(2) end)
-        |> Benchmark.collect(TestPrinter)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert length(run_times_for(new_suite, "Sleeps")) == 1
     end
@@ -370,7 +371,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           %Suite{configuration: %{time: 70_000_000, warmup: 0.0}}
           |> test_suite
           |> Benchmark.benchmark("Sleep more", increasing_function)
-          |> Benchmark.collect(TestPrinter)
+          |> Benchmark.collect(FakeBenchmarkPrinter)
           |> run_times_for("Sleep more")
 
         # should be 3 but good old leeway
@@ -399,7 +400,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       %Suite{scenarios: [scenario]} =
         suite
         |> test_suite
-        |> Benchmark.collect(TestPrinter)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
 
       # our previous run time isn't there anymore
       refute Enum.member?(scenario.run_time_data.samples, 1_000_000)
@@ -421,7 +422,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       }
       |> test_suite
       |> Benchmark.benchmark("job", fn -> sleep_safe_time() end)
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert_received_exactly([:before, :after])
     end
@@ -450,7 +451,7 @@ defmodule Benchee.Benchmark.RunnerTest do
          end,
          after_scenario: fn _ -> send(me, :after_scenario) end}
       )
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert_received_exactly([:before_scenario, :before, :after, :after_scenario])
     end
@@ -479,7 +480,7 @@ defmodule Benchee.Benchmark.RunnerTest do
          end,
          after_scenario: fn _ -> send(me, :after_scenario) end}
       )
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert_received_exactly([
         :before_scenario,
@@ -526,7 +527,7 @@ defmodule Benchee.Benchmark.RunnerTest do
          end,
          after_scenario: fn _ -> send(me, :local_after_scenario) end}
       )
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert_received_exactly([
         :global_before_scenario,
@@ -577,7 +578,7 @@ defmodule Benchee.Benchmark.RunnerTest do
          end}
       )
       |> Benchmark.benchmark("job 2", fn -> sleep_safe_time() end)
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert_received_exactly([
         :global_before,
@@ -629,7 +630,7 @@ defmodule Benchee.Benchmark.RunnerTest do
          after_each: fn _ -> send(me, :local_2_after) end,
          after_scenario: fn _ -> send(me, :local_2_after_scenario) end}
       )
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert_received_exactly([
         :local_before_scenario,
@@ -685,7 +686,7 @@ defmodule Benchee.Benchmark.RunnerTest do
              end,
              after_scenario: fn _ -> send(me, :local_after_scenario) end}
           )
-          |> Benchmark.collect(TestPrinter)
+          |> Benchmark.collect(FakeBenchmarkPrinter)
 
         {:messages, messages} = Process.info(self(), :messages)
 
@@ -753,7 +754,7 @@ defmodule Benchee.Benchmark.RunnerTest do
            end,
            after_each: fn _ -> send(me, :local_after) end}
         )
-        |> Benchmark.collect(TestPrinter)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
 
       {:messages, messages} = Process.info(self(), :messages)
       global_before_count = Enum.count(messages, fn message -> message == :global_before end)
@@ -793,7 +794,7 @@ defmodule Benchee.Benchmark.RunnerTest do
          sleep_safe_time()
          :value
        end, after_each: fn out -> send(me, {:local, out}) end})
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert_received_exactly([
         {:global, :value},
@@ -841,7 +842,7 @@ defmodule Benchee.Benchmark.RunnerTest do
        after_scenario: fn input ->
          send(me, {:local_after_scenario, input})
        end})
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert_received_exactly([
         {:global_scenario, 0},
@@ -893,7 +894,7 @@ defmodule Benchee.Benchmark.RunnerTest do
        after_scenario: fn input ->
          send(me, {:local_after_scenario, input})
        end})
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       no_input = Benchmark.no_input()
 
@@ -920,7 +921,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       |> test_suite
       |> Benchmark.benchmark("first", fn input -> send(me, {:first, input}) end)
       |> Benchmark.benchmark("second", fn input -> send(me, {:second, input}) end)
-      |> Benchmark.collect(TestPrinter)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
 
       assert_received_exactly([{:first, 100}, {:first, 1}, {:second, 100}, {:second, 1}])
     end
@@ -951,7 +952,7 @@ defmodule Benchee.Benchmark.RunnerTest do
              raise "This fails!"
            end}
         )
-        |> Benchmark.collect(TestPrinter)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
       rescue
         RuntimeError -> nil
       end
