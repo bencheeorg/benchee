@@ -140,6 +140,104 @@ defmodule Benchee.RelativeStatistcsTest do
     end
   end
 
+  describe "dealing correctly with different inputs" do
+    test "if it's just 2 scenarios with different inputs nothing is done" do
+      suite = %Suite{
+        scenarios: [
+          named_input_scenario_with_average("A", "1", 100.0),
+          named_input_scenario_with_average("A", "10", 100.0)
+        ]
+      }
+
+      suite = relative_statistics(suite)
+      stats = stats_from(suite)
+
+      Enum.each(stats, fn stat ->
+        refute stat.absolute_difference
+        refute stat.relative_more
+        refute stat.relative_less
+      end)
+    end
+
+    test "calculate the correct relatives based on input names" do
+      suite = %Suite{
+        scenarios: [
+          named_input_scenario_with_average("A", "1", 100.0),
+          named_input_scenario_with_average("B", "1", 250.0),
+          named_input_scenario_with_average("A", "10", 1000.0),
+          named_input_scenario_with_average("B", "10", 3000.0)
+        ]
+      }
+
+      suite = relative_statistics(suite)
+
+      stats =
+        suite.scenarios
+        |> Enum.map(
+          &{&1.name, &1.input_name, &1.run_time_data.statistics.absolute_difference,
+           &1.run_time_data.statistics.relative_more}
+        )
+        |> Enum.sort()
+
+      assert stats == [
+               {"A", "1", nil, nil},
+               {"A", "10", nil, nil},
+               {"B", "1", 150.0, 2.5},
+               {"B", "10", 2000.0, 3.0}
+             ]
+    end
+
+    test "calculate the correct relatives based on different ordering" do
+      suite = %Suite{
+        scenarios: [
+          named_input_scenario_with_average("A", "1", 100.0),
+          named_input_scenario_with_average("A", "10", 1000.0),
+          named_input_scenario_with_average("B", "1", 250.0),
+          named_input_scenario_with_average("B", "10", 3000.0)
+        ]
+      }
+
+      suite = relative_statistics(suite)
+
+      stats =
+        suite.scenarios
+        |> Enum.map(
+          &{&1.name, &1.input_name, &1.run_time_data.statistics.absolute_difference,
+           &1.run_time_data.statistics.relative_more}
+        )
+        |> Enum.sort()
+
+      assert stats == [
+               {"A", "1", nil, nil},
+               {"A", "10", nil, nil},
+               {"B", "1", 150.0, 2.5},
+               {"B", "10", 2000.0, 3.0}
+             ]
+    end
+
+    test "maintains original input order" do
+      suite = %Suite{
+        scenarios: [
+          named_input_scenario_with_average("A", "B", 100.0),
+          named_input_scenario_with_average("A", "1000", 1000.0),
+          named_input_scenario_with_average("A", "1", 250.0),
+          named_input_scenario_with_average("A", "10", 3000.0),
+          named_input_scenario_with_average("A", "A", 3000.0)
+        ]
+      }
+
+      suite = relative_statistics(suite)
+
+      assert Enum.map(suite.scenarios, & &1.input_name) == ["B", "1000", "1", "10", "A"]
+    end
+  end
+
+  defp named_input_scenario_with_average(name, input_name, average) do
+    scenario = scenario_with_average(average)
+
+    %Scenario{scenario | name: name, input_name: input_name}
+  end
+
   defp named_scenario_with_average(name, average, memory_average) do
     scenario = scenario_with_average(average, memory_average)
 

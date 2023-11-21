@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * System information now includes whether or not the JIT is enabled ([erlang docs](https://www.erlang.org/doc/apps/erts/beamasm)).
 * Benchee now let's you know when it's calculating statistics or running the formatters. Helps when you wonder what takes long or blows up memory.
 
+### Bugfixes (User Facing)
+* Fix a bug where relative statistics would always rely on the inputs provided in the config, which can break when you load saved benchmarks.
+
 ### Features (Plugins)
 * `jit_enabled?` is exposed as part of the `suite.system` struct
 * Yes, `Benchee.System` is now a struct so feel easier about relying on the fields

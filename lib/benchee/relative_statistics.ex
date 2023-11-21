@@ -22,21 +22,17 @@ defmodule Benchee.RelativeStatistics do
   """
   @spec relative_statistics(Suite.t()) :: Suite.t()
   def relative_statistics(suite) do
-    scenarios =
-      suite.scenarios
-      |> sort()
-      |> calculate_relative_statistics(suite.configuration.inputs)
-
-    %Suite{suite | scenarios: scenarios}
+    %Suite{suite | scenarios: calculate_relative_statistics(suite.scenarios)}
   end
 
-  defp calculate_relative_statistics([], _inputs), do: []
+  defp calculate_relative_statistics([]), do: []
 
-  defp calculate_relative_statistics(scenarios, inputs) do
+  defp calculate_relative_statistics(scenarios) do
     scenarios
-    |> scenarios_by_input(inputs)
+    |> scenarios_by_input()
     |> Enum.flat_map(fn scenarios_with_same_input ->
-      {reference, others} = split_reference_scenario(scenarios_with_same_input)
+      sorted_scenarios = sort(scenarios_with_same_input)
+      {reference, others} = split_reference_scenario(sorted_scenarios)
       others_with_relative = statistics_relative_to(others, reference)
       [reference | others_with_relative]
     end)
@@ -50,13 +46,16 @@ defmodule Benchee.RelativeStatistics do
     end)
   end
 
-  defp scenarios_by_input(scenarios, nil), do: [scenarios]
-
   # we can't just group_by `input_name` because that'd lose the order of inputs which might
   # be important
-  defp scenarios_by_input(scenarios, inputs) do
-    Enum.map(inputs, fn {input_name, _} ->
-      Enum.filter(scenarios, fn scenario -> scenario.input_name == input_name end)
+  # Thanks past Tobi, I was just about to do that. - Tobi, 5 years later
+  defp scenarios_by_input(scenarios) do
+    original_input_order = scenarios |> Enum.map(& &1.input_name) |> Enum.uniq()
+
+    grouped_scenarios = Enum.group_by(scenarios, & &1.input_name)
+
+    Enum.map(original_input_order, fn input_name ->
+      Access.fetch!(grouped_scenarios, input_name)
     end)
   end
 
