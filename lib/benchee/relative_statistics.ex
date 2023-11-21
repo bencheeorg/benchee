@@ -55,7 +55,7 @@ defmodule Benchee.RelativeStatistics do
     grouped_scenarios = Enum.group_by(scenarios, & &1.input_name)
 
     Enum.map(original_input_order, fn input_name ->
-      Access.fetch!(grouped_scenarios, input_name)
+      Map.fetch!(grouped_scenarios, input_name)
     end)
   end
 
