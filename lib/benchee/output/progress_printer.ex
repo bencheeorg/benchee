@@ -10,6 +10,6 @@ defmodule Benchee.Output.ProgressPrinter do
   def formatting(%{print: %{benchmarking: false}}), do: nil
 
   def formatting(_config) do
-    IO.puts("Formatting results..")
+    IO.puts("Formatting results...")
   end
 end
