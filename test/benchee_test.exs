@@ -668,7 +668,7 @@ defmodule BencheeTest do
             Benchee.run(%{}, Keyword.merge(@test_configuration, load: expected_file))
           end)
 
-        readme_sample_asserts(loaded_output, " (main)")
+        readme_sample_asserts(loaded_output, tag_string: " (main)")
 
         comparison_output =
           capture_io(fn ->
@@ -1024,16 +1024,59 @@ defmodule BencheeTest do
     end
   end
 
+  describe "report/1" do
+    test "raises without providing at least a load option" do
+      assert_raise(ArgumentError, ~r/load/i, fn -> Benchee.report([]) end)
+    end
+
+    test "saving first and then reporting on" do
+      save = [save: [path: "save.benchee", tag: nil]]
+      expected_file = "save.benchee"
+
+      try do
+        configuration = Keyword.merge(@test_configuration, save)
+        map_fun = fn i -> [i, i * i] end
+        list = Enum.to_list(1..10_000)
+
+        capture_io(fn ->
+          Benchee.run(
+            %{
+              "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
+              "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
+            },
+            configuration
+          )
+        end)
+
+        report_output =
+          capture_io(fn ->
+            Benchee.report(Keyword.merge(@test_configuration, load: expected_file))
+          end)
+
+        # no system information, benchmarking config or progress for omitted steps is printed out
+        readme_sample_asserts(report_output, benchmarking_prints: false)
+      after
+        if File.exists?(expected_file) do
+          File.rm!(expected_file)
+        end
+      end
+    end
+  end
+
   @slower_regex "\\s+- \\d+\\.\\d+x slower \\+\\d+(\\.\\d+)?.+"
-  defp readme_sample_asserts(output, tag_string \\ "") do
-    assert output =~ "warmup: 5 ms"
-    assert output =~ "time: 10 ms"
+  defp readme_sample_asserts(output, opts \\ [tag_string: "", benchmarking_prints: true]) do
+    if Access.get(opts, :benchmarking_prints) do
+      assert output =~ "warmup: 5 ms"
+      assert output =~ "time: 10 ms"
+      assert output =~ ~r/calculat.*statistics/i
+    end
+
+    tag_string = Access.get(opts, :tag_string, "")
 
     tag_regex = Regex.escape(tag_string)
     assert output =~ @header_regex
     assert output =~ body_regex("flat_map", tag_regex)
     assert output =~ body_regex("map.flatten", tag_regex)
-    assert output =~ ~r/calculat.*statistics/i
     assert output =~ ~r/Comparison/, output
     assert output =~ ~r/^map.flatten#{tag_regex}\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
     assert output =~ ~r/^flat_map#{tag_regex}\s+\d+(\.\d+)?\s*.?(#{@slower_regex})?$/m
