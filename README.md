@@ -530,12 +530,13 @@ Enum."-map/2-lists^map/1-0-"/2                  10001 26.38 2282    0.23
 
 ### Saving, loading and comparing previous runs
 
-Benchee can store the results of previous runs in a file and then load them again to compare them. For example this is useful to compare what was recorded on the main branch against a branch with performance improvements.
+Benchee can store the results of previous runs in a file and then load them again to compare them. For example this is useful to compare what was recorded on the main branch against a branch with performance improvements. You may also use this to benchmark across different exlixir/erlang versions.
 
-**Saving** is done through the `save` configuration option. You can specify a `path` where results are saved, or you can use the default option of`"benchmark.benchee"` if you don't pass a `path`. You can also pass a `tag` option which annotates these results (for instance with a branch name). The default option for the `tag` is a timestamp of when the benchmark was run.
+**Saving** is done through the `:save` configuration option. You can specify a `:path` where results are saved, or you can use the default option of`"benchmark.benchee"` if you don't pass a `:path`. You can also pass a `:tag` option which annotates these results (for instance with a branch name or elixir version number). The default option for the `:tag` is a timestamp of when the benchmark was run.
 
-**Loading** is done through the `load` option specifying a path to the file to
-load (for instance `"benchmark.benchee"`). You can also specify multiple files to load through a list of paths (`["my.benchee", "main_save.benchee"]`) - each one of those can also be a glob expression to match even more files glob (`"save_number*.benchee"`).
+**Loading** is done through the `:load` option specifying a path to the file to load (for instance `"benchmark.benchee"`). You can also specify multiple files to load through a list of paths (`["my.benchee", "main_save.benchee"]`) - each one of those can also be a glob expression to match even more files glob (`"save_number*.benchee"`).
+If all you want to do is to use `:load` without running any benchmarks then you can use `Benchee.report/1` which will take a normal configuration with a `:load` key and just format the loaded saved results with the given formatters.
+In the more verbose API loading is triggered via `Benchee.load/1`.
 
 ```elixir
 Benchee.run(
@@ -545,10 +546,8 @@ Benchee.run(
   save: [path: "save.benchee", tag: "first-try"]
 )
 
-Benchee.run(%{}, load: "save.benchee")
+Benchee.report(load: "save.benchee")
 ```
-
-In the more verbose API this is triggered via `Benchee.load/1`.
 
 ### Hooks (Setup, Teardown etc.)
 
