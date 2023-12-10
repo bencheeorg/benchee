@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Features (User Facing)
 * System information now includes whether or not the JIT is enabled ([erlang docs](https://www.erlang.org/doc/apps/erts/beamasm)).
 * Benchee now let's you know when it's calculating statistics or running the formatters. Helps when you wonder what takes long or blows up memory.
+* `Benchee.report/1` got introduced if you just want to load saves benchmarks and report on them.
 
 ### Bugfixes (User Facing)
 * Fix a bug where relative statistics would always rely on the inputs provided in the config, which can break when you load saved benchmarks.
