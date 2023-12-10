@@ -693,6 +693,43 @@ defmodule BencheeTest do
         end
       end
     end
+
+    test " report/1 raises without providing at least a load option" do
+      assert_raise(ArgumentError, ~r/load/i, fn -> Benchee.report([]) end)
+    end
+
+    test "report/1 saving first and then reporting on it" do
+      save = [save: [path: "save.benchee", tag: nil]]
+      expected_file = "save.benchee"
+
+      try do
+        configuration = Keyword.merge(@test_configuration, save)
+        map_fun = fn i -> [i, i * i] end
+        list = Enum.to_list(1..10_000)
+
+        capture_io(fn ->
+          Benchee.run(
+            %{
+              "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
+              "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
+            },
+            configuration
+          )
+        end)
+
+        report_output =
+          capture_io(fn ->
+            Benchee.report(Keyword.merge(@test_configuration, load: expected_file))
+          end)
+
+        # no system information, benchmarking config or progress for omitted steps is printed out
+        readme_sample_asserts(report_output, benchmarking_prints: false)
+      after
+        if File.exists?(expected_file) do
+          File.rm!(expected_file)
+        end
+      end
+    end
   end
 
   describe "hooks" do
@@ -1021,45 +1058,6 @@ defmodule BencheeTest do
 
       readme_sample_asserts(output)
       assert exit_status == 0
-    end
-  end
-
-  describe "report/1" do
-    test "raises without providing at least a load option" do
-      assert_raise(ArgumentError, ~r/load/i, fn -> Benchee.report([]) end)
-    end
-
-    test "saving first and then reporting on" do
-      save = [save: [path: "save.benchee", tag: nil]]
-      expected_file = "save.benchee"
-
-      try do
-        configuration = Keyword.merge(@test_configuration, save)
-        map_fun = fn i -> [i, i * i] end
-        list = Enum.to_list(1..10_000)
-
-        capture_io(fn ->
-          Benchee.run(
-            %{
-              "flat_map" => fn -> Enum.flat_map(list, map_fun) end,
-              "map.flatten" => fn -> list |> Enum.map(map_fun) |> List.flatten() end
-            },
-            configuration
-          )
-        end)
-
-        report_output =
-          capture_io(fn ->
-            Benchee.report(Keyword.merge(@test_configuration, load: expected_file))
-          end)
-
-        # no system information, benchmarking config or progress for omitted steps is printed out
-        readme_sample_asserts(report_output, benchmarking_prints: false)
-      after
-        if File.exists?(expected_file) do
-          File.rm!(expected_file)
-        end
-      end
     end
   end
 
