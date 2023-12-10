@@ -32,6 +32,7 @@ defmodule Benchee.Utility.FileCreation do
         "my.html",
         fn(file, content) -> IO.write(file, content) end)
   """
+  @spec each(%{(String.t() | list(String.t())) => String.t()}, String.t(), fun()) :: :ok
   def each(names_to_content, filename, function \\ &default_each/3) do
     ensure_directory_exists(filename)
 
@@ -108,6 +109,7 @@ defmodule Benchee.Utility.FileCreation do
       ...>   ["Something cool", marker, "Comparison"])
       "abc_something_cool_comparison.csv"
   """
+  @spec interleave(String.t(), String.t() | list(String.t())) :: String.t()
   def interleave(filename, names) when is_list(names) do
     file_names =
       names

@@ -4,6 +4,8 @@ defmodule Benchee.Utility.DeepConvert do
   @doc """
   Converts a deep keyword list to the corresponding deep map.
 
+  Exclusions can be provided for key names whose value should not be converted.
+
   ## Examples
 
   iex> to_map([a: 1, b: 2])
