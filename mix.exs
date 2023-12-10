@@ -41,10 +41,6 @@ defmodule Benchee.Mixfile do
   defp elixirc_paths(:test), do: ["lib", "test/support", "mix"]
   defp elixirc_paths(_), do: ["lib"]
 
-  def application do
-    []
-  end
-
   defp deps do
     deps = [
       {:deep_merge, "~> 1.0"},
