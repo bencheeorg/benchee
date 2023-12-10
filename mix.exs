@@ -26,7 +26,7 @@ defmodule Benchee.Mixfile do
         "safe_coveralls.travis": :test
       ],
       dialyzer: [
-        flags: [:unmatched_returns, :error_handling, :underspecs],
+        flags: [:underspecs],
         plt_file: {:no_warn, "tools/plts/benchee.plt"},
         plt_add_apps: [:table]
       ],
