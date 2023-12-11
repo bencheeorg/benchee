@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Features (Plugins)
 * `jit_enabled?` is exposed as part of the `suite.system` struct
 * Yes, `Benchee.System` is now a struct so feel easier about relying on the fields
+* Formatters can now implement an optional `sequential_output/2` callback to go lighter on memory consumption. For now it's not directly used by benchee, though - read its docs if interested!
 
 ## 1.2.0 (2023-11-09)
 
