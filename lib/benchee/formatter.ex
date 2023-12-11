@@ -53,7 +53,7 @@ defmodule Benchee.Formatter do
 
   That said, it may be used automatically in the future given a configuration option.
   """
-  @callback sequential_output(Suite.t(), options()) :: :ok | {:error, String.t()}
+  @callback sequential_output(Suite.t(), options()) :: Suite.t()
 
   @optional_callbacks sequential_output: 2
 
