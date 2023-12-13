@@ -6,7 +6,7 @@ defmodule Benchee.Statistics do
   See `statistics/1` for a breakdown of the included statistics.
   """
 
-  alias Benchee.{CollectionData, Conversion.Duration, Scenario, Suite, Utility.Parallel}
+  alias Benchee.{CollectionData, Conversion.Duration, Scenario, Suite}
   alias Benchee.Output.ProgressPrinter
 
   require Integer
@@ -168,36 +168,68 @@ defmodule Benchee.Statistics do
     percentiles = suite.configuration.percentiles
 
     update_in(suite.scenarios, fn scenarios ->
-      Parallel.map(scenarios, fn scenario ->
-        calculate_scenario_statistics(scenario, percentiles)
-      end)
+      scenario_statistics = compute_statistics_in_parallel(scenarios, percentiles)
+
+      update_scenarios_with_statistics(scenarios, scenario_statistics)
     end)
   end
 
-  defp calculate_scenario_statistics(scenario, percentiles) do
+  defp compute_statistics_in_parallel(scenarios, percentiles) do
+    scenarios
+    |> Enum.map(fn scenario ->
+      # we filter down the data here to avoid sending the input and benchmarking function to
+      # the other processes
+      # we send over all of the collection data as in the future (tm) we might want to already
+      # provide the sample size, which this gives us a way to do that and not touch this code
+      # again
+      {scenario.run_time_data, scenario.memory_usage_data, scenario.reductions_data}
+    end)
+    # async_stream as we might run a ton of scenarios depending on the benchmark
+    |> Task.async_stream(
+      fn scenario_collection_data ->
+        calculate_scenario_statistics(scenario_collection_data, percentiles)
+      end,
+      timeout: :infinity,
+      ordered: true
+    )
+    |> Enum.map(fn {:ok, stats} -> stats end)
+  end
+
+  defp update_scenarios_with_statistics(scenarios, scenario_statistics) do
+    # we can zip them as they retained order
+    Enum.zip_with(
+      scenarios,
+      scenario_statistics,
+      fn scenario, {run_time_stats, memory_stats, reductions_stats} ->
+        %Scenario{
+          scenario
+          | run_time_data: %CollectionData{
+              scenario.run_time_data
+              | statistics: run_time_stats
+            },
+            memory_usage_data: %CollectionData{
+              scenario.memory_usage_data
+              | statistics: memory_stats
+            },
+            reductions_data: %CollectionData{
+              scenario.reductions_data
+              | statistics: reductions_stats
+            }
+        }
+      end
+    )
+  end
+
+  defp calculate_scenario_statistics({run_time_data, memory_data, reductions_data}, percentiles) do
     run_time_stats =
-      scenario.run_time_data.samples
+      run_time_data.samples
       |> calculate_statistics(percentiles)
       |> add_ips
 
-    memory_stats = calculate_statistics(scenario.memory_usage_data.samples, percentiles)
-    reductions_stats = calculate_statistics(scenario.reductions_data.samples, percentiles)
+    memory_stats = calculate_statistics(memory_data.samples, percentiles)
+    reductions_stats = calculate_statistics(reductions_data.samples, percentiles)
 
-    %Scenario{
-      scenario
-      | run_time_data: %CollectionData{
-          scenario.run_time_data
-          | statistics: run_time_stats
-        },
-        memory_usage_data: %CollectionData{
-          scenario.memory_usage_data
-          | statistics: memory_stats
-        },
-        reductions_data: %CollectionData{
-          scenario.reductions_data
-          | statistics: reductions_stats
-        }
-    }
+    {run_time_stats, memory_stats, reductions_stats}
   end
 
   defp calculate_statistics([], _) do

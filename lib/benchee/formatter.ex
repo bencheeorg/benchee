@@ -153,6 +153,7 @@ defmodule Benchee.Formatter do
   # the results of that formatting are written in sequence.
   defp parallel_output(suite, module_configurations) do
     module_configurations
+    # clean up the suite
     |> Parallel.map(fn {module, options} -> {module, options, module.format(suite, options)} end)
     |> Enum.each(fn {module, options, output} -> module.write(output, options) end)
 
