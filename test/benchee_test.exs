@@ -658,9 +658,9 @@ defmodule BencheeTest do
           untagged_suite =
             content
             |> :erlang.binary_to_term()
-            |> suite_without_scenario_tags
+            |> suite_without_scenario_tags()
 
-          assert untagged_suite == suite
+          assert untagged_suite == without_functions_and_inputs(suite)
         end)
 
         loaded_output =
@@ -692,6 +692,16 @@ defmodule BencheeTest do
           File.rm!(expected_file)
         end
       end
+    end
+
+    # function and input provide no real benefit for the envisioned use case of comparing outputs
+    # what it does is balloon the file size written out and take performance to the groun
+    defp without_functions_and_inputs(suite) do
+      update_in(suite.scenarios, fn scenarios ->
+        Enum.map(scenarios, fn scenario ->
+          %Benchee.Scenario{scenario | function: nil, input: nil}
+        end)
+      end)
     end
 
     test " report/1 raises without providing at least a load option" do
