@@ -197,27 +197,25 @@ defmodule Benchee.Statistics do
 
   defp update_scenarios_with_statistics(scenarios, scenario_statistics) do
     # we can zip them as they retained order
-    Enum.zip_with(
-      scenarios,
-      scenario_statistics,
-      fn scenario, {run_time_stats, memory_stats, reductions_stats} ->
-        %Scenario{
-          scenario
-          | run_time_data: %CollectionData{
-              scenario.run_time_data
-              | statistics: run_time_stats
-            },
-            memory_usage_data: %CollectionData{
-              scenario.memory_usage_data
-              | statistics: memory_stats
-            },
-            reductions_data: %CollectionData{
-              scenario.reductions_data
-              | statistics: reductions_stats
-            }
-        }
-      end
-    )
+    scenarios
+    |> Enum.zip(scenario_statistics)
+    |> Enum.map(fn {scenario, {run_time_stats, memory_stats, reductions_stats}} ->
+      %Scenario{
+        scenario
+        | run_time_data: %CollectionData{
+            scenario.run_time_data
+            | statistics: run_time_stats
+          },
+          memory_usage_data: %CollectionData{
+            scenario.memory_usage_data
+            | statistics: memory_stats
+          },
+          reductions_data: %CollectionData{
+            scenario.reductions_data
+            | statistics: reductions_stats
+          }
+      }
+    end)
   end
 
   defp calculate_scenario_statistics({run_time_data, memory_data, reductions_data}, percentiles) do
