@@ -12,7 +12,7 @@ defmodule Benchee.Formatter do
   """
 
   alias Benchee.Output.ProgressPrinter
-  alias Benchee.{Suite, Utility.Parallel}
+  alias Benchee.{Scenario, Suite, Utility.Parallel}
   alias Benchee.Utility.DeepConvert
 
   @typedoc """
@@ -152,11 +152,32 @@ defmodule Benchee.Formatter do
   # behaviour. The output for all formatters is generated in parallel, and then
   # the results of that formatting are written in sequence.
   defp parallel_output(suite, module_configurations) do
+    scrubbed_suite = scrub_suite(suite)
+
     module_configurations
-    # clean up the suite
-    |> Parallel.map(fn {module, options} -> {module, options, module.format(suite, options)} end)
+    |> Parallel.map(fn {module, options} ->
+      {module, options, module.format(scrubbed_suite, options)}
+    end)
     |> Enum.each(fn {module, options, output} -> module.write(output, options) end)
 
     suite
+  end
+
+  # The actual benchmarking functions and the actual inputs should not be important for
+  # formatters (famous last words, I know) and processing them in parallel means that for
+  # benchmarks with a lot of data we end up doing a lot of copying with huge impact on run
+  # time and memory consumption.
+  # As the suite isn't actually returned from the formatters removing them also doesn't impact
+  # anyone negatively downstream.
+  # Hence, we scrub them away here. If you maintain a formatter plugin and rely on these please
+  # get in touch so we can work on a solution.
+  defp scrub_suite(suite) do
+    update_in(suite.scenarios, fn scenarios ->
+      Enum.map(scenarios, &scrub_scenario/1)
+    end)
+  end
+
+  defp scrub_scenario(scenario) do
+    %Scenario{scenario | function: nil, input: nil}
   end
 end

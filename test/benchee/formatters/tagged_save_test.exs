@@ -63,7 +63,7 @@ defmodule Benchee.Formatters.TaggedSaveTest do
       loaded_suite =
         binary
         |> :erlang.binary_to_term()
-        |> suite_without_scenario_tags
+        |> suite_without_scenario_tags()
 
       assert loaded_suite == @suite
       assert path == @filename
@@ -158,7 +158,7 @@ defmodule Benchee.Formatters.TaggedSaveTest do
       loaded_suite =
         etf_data
         |> :erlang.binary_to_term()
-        |> suite_without_scenario_tags
+        |> suite_without_scenario_tags()
 
       assert loaded_suite == @suite
     after
