@@ -80,7 +80,7 @@ defmodule Benchee.Formatter do
       |> Enum.map(&normalize_module_configuration/1)
       |> Enum.split_with(&is_tuple/1)
 
-    parallel_output(suite, parallelizable)
+    maybe_parallel_output(suite, parallelizable)
 
     Enum.each(serial, fn function -> function.(suite) end)
 
@@ -149,16 +149,27 @@ defmodule Benchee.Formatter do
   # Invokes `format/2` and `write/2` as defined by the `Benchee.Formatter`
   # behaviour. The output for all formatters is generated in parallel, and then
   # the results of that formatting are written in sequence.
-  defp parallel_output(suite, module_configurations) do
+  # If there is only one parallelizable formatter (common case) we don't do it
+  # in parallel at all to avoid the cost of copying all the data to a new process
+  # (and of us scrubbing it so we don't need as much data)
+  defp maybe_parallel_output(suite, module_configurations) do
     scrubbed_suite = scrub_suite(suite)
 
     module_configurations
-    |> Parallel.map(fn {module, options} ->
+    |> maybe_parallel_map(fn {module, options} ->
       {module, options, module.format(scrubbed_suite, options)}
     end)
     |> Enum.each(fn {module, options, output} -> module.write(output, options) end)
 
     suite
+  end
+
+  defp maybe_parallel_map([_one_element] = list, function) do
+    Enum.map(list, function)
+  end
+
+  defp maybe_parallel_map(list, function) do
+    Parallel.map(list, function)
   end
 
   # The actual benchmarking functions and the actual inputs should not be important for
