@@ -988,7 +988,7 @@ This doesn't seem to be too reliable right now, so suggestions and input are ver
 
 ## Known Issues
 
-There is a known issue affecting elixir versions from 1.14.0 to 1.16.0-rc.0: An optimization had been disabled affecting the performance of functions defined directly in the top level (i.e. outside of any module). The issue was fixed by re-enabling the optimization in [1.16.0-rc.1](https://github.com/elixir-lang/elixir/blob/v1.16/CHANGELOG.md#v1160-rc1-2023-12-12).
+There is a known issue affecting elixir versions from 1.14.0 to 1.16.0-rc.0: Optimizations (SSA and bool passes [change](https://github.com/elixir-lang/elixir/pull/11420)) had been disabled affecting the performance of functions defined directly in the top level (i.e. outside of any module). The issue was fixed by re-enabling the optimization in [1.16.0-rc.1](https://github.com/elixir-lang/elixir/blob/v1.16/CHANGELOG.md#v1160-rc1-2023-12-12).
 The issue is best show-cased by the following benchmark where we'd expect ~equal results:
 
 ```elixir
@@ -1019,6 +1019,7 @@ So, how do you fix it/make sure a benchmark you ran is not affected? All of thes
 * benchmark on an unaffected/fixed version of elixir (<= 1.13.4 or >= 1.16.0-rc.1)
 * put the code you want to benchmark into a module (just like it is done in `Compiled` in the example above)
 * you can also invoke benchee from within a module, such as:
+
 ```
 defmodule Compiled do
   def comprehension(list) do
@@ -1040,7 +1041,7 @@ end
 MyBenchmark.run()
 ```
 
-Also note that even if all your examples are top level functions you should still follow these tips (on affected elixir versions), as the missing optimization might affect them differently.
+Also note that even if all your examples are top level functions you should still follow these tips (on affected elixir versions), as the missing optimization might affect them differently. Further note, that even though your examples use top level functions they _may_ not be affected, as the specific disabled optimization may not impact them. Better safe than sorry though :)
 
 ## Plugins
 
