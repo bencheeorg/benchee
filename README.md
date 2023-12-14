@@ -1,6 +1,6 @@
 # Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee) [![Hex Docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/) [![CI](https://github.com/bencheeorg/benchee/workflows/CI/badge.svg)](https://github.com/bencheeorg/benchee/actions?query=branch%3Amain) [![Coverage Status](https://coveralls.io/repos/github/bencheeorg/benchee/badge.svg?branch=main)](https://coveralls.io/github/bencheeorg/benchee?branch=main) [![Total Download](https://img.shields.io/hexpm/dt/benchee.svg)](https://hex.pm/packages/benchee) [![License](https://img.shields.io/hexpm/l/benchee.svg)](https://github.com/bencheeorg/benchee/blob/main/LICENSE)
 
-**If you have benchmarked using elixir 1.14.0-1.16.0-rc.0, please check out [known issues](#known-issues)**
+**If you have benchmarked using elixir 1.14.0 - 1.16.0-rc.0, please check out [known issues](#known-issues)**
 
 Library for easy and nice (micro) benchmarking in Elixir. Benchee allows you to compare the performance of different pieces of code at a glance. It is also versatile and extensible, relying only on functions. There are also a bunch of [plugins](#plugins) to draw pretty graphs and more!
 
@@ -988,7 +988,7 @@ This doesn't seem to be too reliable right now, so suggestions and input are ver
 
 ## Known Issues
 
-There is a known issue affecting elixir version from 1.14.0 to 1.16.0-rc.0: An optimization had been disabled affecting the performance of top level functions. The issue was fixed by re-enabling the optimization in [1.16.0-rc.1](https://github.com/elixir-lang/elixir/blob/v1.16/CHANGELOG.md#v1160-rc1-2023-12-12).
+There is a known issue affecting elixir versions from 1.14.0 to 1.16.0-rc.0: An optimization had been disabled affecting the performance of functions defined directly in the top level (i.e. outside of any module). The issue was fixed by re-enabling the optimization in [1.16.0-rc.1](https://github.com/elixir-lang/elixir/blob/v1.16/CHANGELOG.md#v1160-rc1-2023-12-12).
 The issue is best show-cased by the following benchmark where we'd expect ~equal results:
 
 ```elixir
@@ -1006,7 +1006,7 @@ Benchee.run(%{
 })
 ```
 
-Which yields ~these results on a non fixed elixir version:
+Which yields ~these results on an affected elixir version:
 
 ```
 Comparison:
@@ -1016,7 +1016,7 @@ top_level (non-optimized)       11.91 K - 1.53x slower +29.14 μs
 
 So, how do you fix it/make sure a benchmark you ran is not affected? All of these work:
 
-* benchmark on an unaffected/fixed versions of elixir (<= 1.13.4 or >= 1.16.0-rc.1)
+* benchmark on an unaffected/fixed version of elixir (<= 1.13.4 or >= 1.16.0-rc.1)
 * put the code you want to benchmark into a module (just like it is done in `Compiled` in the example above)
 * you can also invoke benchee from within a module, such as:
 ```
