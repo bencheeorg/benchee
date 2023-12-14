@@ -153,23 +153,30 @@ defmodule Benchee.Formatter do
   # in parallel at all to avoid the cost of copying all the data to a new process
   # (and of us scrubbing it so we don't need as much data)
   defp maybe_parallel_output(suite, module_configurations) do
-    scrubbed_suite = scrub_suite(suite)
-
     module_configurations
-    |> maybe_parallel_map(fn {module, options} ->
-      {module, options, module.format(scrubbed_suite, options)}
-    end)
+    |> maybe_parallel_format(suite)
     |> Enum.each(fn {module, options, output} -> module.write(output, options) end)
 
     suite
   end
 
-  defp maybe_parallel_map([_one_element] = list, function) do
-    Enum.map(list, function)
+  # don't let it drop to the `Parallel` case so we don't do the scrubbing
+  # for nothing
+  defp maybe_parallel_format([], _suite), do: []
+
+  defp maybe_parallel_format(formatters = [_one_formatter], suite) do
+    Enum.map(formatters, fn {module, options} ->
+      {module, options, module.format(suite, options)}
+    end)
   end
 
-  defp maybe_parallel_map(list, function) do
-    Parallel.map(list, function)
+  defp maybe_parallel_format(formatters, suite) do
+    # suite only needs scrubbing for parallel processing due to data copying
+    scrubbed_suite = scrub_suite(suite)
+
+    Parallel.map(formatters, fn {module, options} ->
+      {module, options, module.format(scrubbed_suite, options)}
+    end)
   end
 
   # The actual benchmarking functions and the actual inputs should not be important for
