@@ -13,7 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `Benchee.report/1` got introduced if you just want to load saves benchmarks and report on them.
 
 ### Bugfixes (User Facing)
+* Memory usage should be massively reduced when dealing with larger sets of data in inputs or benchmarking functions. They were needlessly sent to processes calculating statistics or formatters which could lead to memory blowing up.
+* Similarly, inputs and benchmarking functions will no longer be saved when using the `:save` option, this makes it immensely faster and depending on the size of the data a lot slower (I have an example with a factor 200x). The side effect of this is that you also can't use `:load` and run the benchmarks saved again from just the file, this was never an intended use case though (as loading happens after benchmarking by default). You also still should have the benchmarking script so it's also not needed.
 * Fix a bug where relative statistics would always rely on the inputs provided in the config, which can break when you load saved benchmarks.
+
+### Breaking Changes (Plugins)
+Woopsie, didn't wanna do any of these in 1.x, sorry but there's good reason :(
+
+* Formatters have lost access to benchmarking functions and the inputs, this is to enable huge memory and run time savings when using a lot of data. I also believe they should not be needed for formatters, please get in touch if this is a problem so we can work it out. In detail this means:
+  * Each `Benchee.Scenario` struct in a formatter will have `:function` and `:input` set to `nil`
+  * The `inputs` list in `Configuration` retains the input names, but the values will be set to `:scrubbed_see_1_3_0_changelog`. It may be completely scrubbed in the future, use the newly introduced `input_names` instead if you need easy access to all the input names at once.
+  * Technically speaking formatters haven't generally lost access, only if they are processed in parallel - so not if it's the only formatter or if it's used via a function (`formatters: [fn suite -> MyFormatter.output(suite) end]`. Still, should not be used or relied upon.
+
+### Features (Plugins)
+* `Configuration` now has an `input_names` key that holds the name of all inputs, for the reasoning, see above.
 
 ### Features (Plugins)
 * `jit_enabled?` is exposed as part of the `suite.system` struct

@@ -20,12 +20,35 @@ defmodule Benchee.Formatter do
   """
   @type options :: any
 
+  @typedoc """
+  A suite scrubbed of heavy data.
+
+  Type to bring awareness to the fact that `format/2` doesn't have access to
+  _all_ data in `Benchee.Suite` - please read the docs for `format/2` to learn
+  more.
+  """
+  @type scrubbed_suite :: Suite.t()
+
   @doc """
+  Takes a suite and returns a representation `write/2` can use.
+
   Takes the suite and returns whatever representation the formatter wants to use
   to output that information. It is important that this function **needs to be
   pure** (aka have no side effects) as Benchee will run `format/1` functions
   of multiple formatters in parallel. The result will then be passed to
-  `write/1`.
+  `write/2`.
+
+  **Note:** Due to memory consumption issues in benchmarks with big inputs, the suite
+  passed to the formatters **is missing anything referencing big input data** to avoid
+  huge memory consumption and run time. Namely this constitutes:
+  * `Benchee.Scenario` will have `function` and `input` set to `nil`
+  * `Benchee.Configuration` will have `inputs`, but it won't have values only the names,
+  it may be removed in the future please use `input_names` instead if needed (or
+  `input_name` of `Benchee.Scenario`)
+
+  Technically speaking this "scrubbing" of `Benchee.Suite` only occurs when formatters
+  are run in parallel, you still shouldn't rely on those values (and they should not
+  be needed). If you do need them for some reason, please get in touch/open an issue.
   """
   @callback format(Suite.t(), options) :: any
 
