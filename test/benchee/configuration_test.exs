@@ -29,6 +29,22 @@ defmodule Benchee.ConfigurationTest do
                init(inputs: %{"map" => %{}, map: %{}})
     end
 
+    test "keeps ordered inputs basically as is" do
+      input_list = [{"map", %{}}, {"A", 1}]
+
+      assert %Suite{configuration: %{inputs: ^input_list}} =
+               init(inputs: input_list)
+    end
+
+    test "documents input_names" do
+      assert %Suite{configuration: %{input_names: ["A", "B"]}} =
+               init(inputs: %{"A" => 1, "B" => 2})
+    end
+
+    test "no inputs, no input_names" do
+      assert %Suite{configuration: %{input_names: []}} = init()
+    end
+
     test "uses information from :save to setup the external term formattter" do
       assert %Suite{
                configuration: %{

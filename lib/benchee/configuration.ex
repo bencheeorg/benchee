@@ -27,6 +27,7 @@ defmodule Benchee.Configuration do
               fast_warning: true
             },
             inputs: nil,
+            input_names: [],
             save: false,
             load: false,
             unit_scaling: :best,
@@ -150,6 +151,7 @@ defmodule Benchee.Configuration do
           formatters: [(Suite.t() -> Suite.t()) | module | {module, user_configuration}],
           print: map,
           inputs: %{Suite.key() => any} | [{Suite.key(), any}] | nil,
+          input_names: [String.t()],
           save: map | false,
           load: String.t() | [String.t()] | false,
           unit_scaling: Scale.scaling_strategy(),
@@ -184,6 +186,7 @@ defmodule Benchee.Configuration do
             time: 5_000_000_000.0,
             warmup: 2_000_000_000.0,
             inputs: nil,
+            input_names: [],
             save: false,
             load: false,
             formatters: [Benchee.Formatters.Console],
@@ -212,6 +215,7 @@ defmodule Benchee.Configuration do
             time: 1_000_000_000.0,
             warmup: 200_000_000.0,
             inputs: nil,
+            input_names: [],
             save: false,
             load: false,
             formatters: [Benchee.Formatters.Console],
@@ -240,6 +244,7 @@ defmodule Benchee.Configuration do
             time: 1_000_000_000.0,
             warmup: 200_000_000.0,
             inputs: nil,
+            input_names: [],
             save: false,
             load: false,
             formatters: [Benchee.Formatters.Console],
@@ -275,6 +280,7 @@ defmodule Benchee.Configuration do
             time: 1_000_000_000.0,
             warmup: 200_000_000.0,
             inputs: [{"Big", 9999}, {"Small", 5}],
+            input_names: ["Big", "Small"],
             save: false,
             load: false,
             formatters: [&IO.puts/1],
@@ -301,10 +307,11 @@ defmodule Benchee.Configuration do
 
     config =
       config
-      |> standardized_user_configuration
-      |> merge_with_defaults
-      |> convert_time_to_nano_s
-      |> save_option_conversion
+      |> standardized_user_configuration()
+      |> merge_with_defaults()
+      |> convert_time_to_nano_s()
+      |> save_option_conversion()
+      |> add_input_names()
 
     %Suite{configuration: config}
   end
@@ -334,6 +341,16 @@ defmodule Benchee.Configuration do
     else
       [{normalized_name, value} | acc]
     end
+  end
+
+  defp add_input_names(config) do
+    input_names =
+      case config.inputs do
+        nil -> []
+        inputs -> Enum.map(inputs, fn {name, _value} -> name end)
+      end
+
+    %{config | input_names: input_names}
   end
 
   defp merge_with_defaults(user_config) do
