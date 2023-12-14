@@ -63,6 +63,38 @@ defmodule Benchee.FormatterTest do
       assert_receive {:fun, ^suite, "me"}
     end
 
+    test "mixing functions and formatters works, even with multiple ones" do
+      suite = %Suite{
+        configuration: %Configuration{
+          formatters: [
+            {FakeFormatter, %{}},
+            fn suite -> send(self(), {:fun, suite, "me"}) end,
+            fn _suite -> send(self(), :more_fun) end,
+            {FakeFormatter, %{other: :one}}
+          ],
+          assigns: @no_print_assigns
+        }
+      }
+
+      Formatter.output(suite)
+
+      assert_receive {:write, "output of `format/1` with %{}", %{}}
+      assert_receive {:fun, ^suite, "me"}
+      assert_receive :more_fun
+      assert_receive {:write, "output of `format/1` with %{other: :one}", %{}}
+    end
+
+    test "no formatters, no problem" do
+      suite = %Suite{
+        configuration: %Configuration{
+          formatters: [],
+          assigns: @no_print_assigns
+        }
+      }
+
+      assert suite == Formatter.output(suite)
+    end
+
     test "returns the suite passed in as the first argument unchanged" do
       suite = %Suite{
         configuration: %Configuration{
