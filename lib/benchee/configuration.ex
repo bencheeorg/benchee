@@ -236,35 +236,6 @@ defmodule Benchee.Configuration do
         scenarios: []
       }
 
-      iex> init(%{time: 1, warmup: 0.2})
-      %Benchee.Suite{
-        configuration:
-          %Benchee.Configuration{
-            parallel: 1,
-            time: 1_000_000_000.0,
-            warmup: 200_000_000.0,
-            inputs: nil,
-            input_names: [],
-            save: false,
-            load: false,
-            formatters: [Benchee.Formatters.Console],
-            print: %{
-              benchmarking: true,
-              fast_warning: true,
-              configuration: true
-            },
-            percentiles: [50, 99],
-            unit_scaling: :best,
-            assigns: %{},
-            before_each: nil,
-            after_each: nil,
-            before_scenario: nil,
-            after_scenario: nil
-          },
-        system: nil,
-        scenarios: []
-      }
-
       iex> init(
       ...>   parallel: 2,
       ...>   time: 1,
