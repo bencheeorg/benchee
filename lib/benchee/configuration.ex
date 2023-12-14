@@ -147,7 +147,7 @@ defmodule Benchee.Configuration do
           memory_time: number,
           reduction_time: number,
           pre_check: boolean,
-          formatters: [(Suite.t() -> Suite.t()) | module | {module, map}],
+          formatters: [(Suite.t() -> Suite.t()) | module | {module, user_configuration}],
           print: map,
           inputs: %{Suite.key() => any} | [{Suite.key(), any}] | nil,
           save: map | false,
