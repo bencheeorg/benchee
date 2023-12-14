@@ -172,12 +172,26 @@ defmodule Benchee.Formatter do
   # Hence, we scrub them away here. If you maintain a formatter plugin and rely on these please
   # get in touch so we can work on a solution.
   defp scrub_suite(suite) do
-    update_in(suite.scenarios, fn scenarios ->
-      Enum.map(scenarios, &scrub_scenario/1)
-    end)
+    suite =
+      update_in(suite.scenarios, fn scenarios ->
+        Enum.map(scenarios, &scrub_scenario/1)
+      end)
+
+    update_in(suite.configuration, &scrub_configuration/1)
   end
 
   defp scrub_scenario(scenario) do
     %Scenario{scenario | function: nil, input: nil}
+  end
+
+  defp scrub_configuration(configuration) do
+    update_in(configuration.inputs, &scrub_inputs/1)
+  end
+
+  defp scrub_inputs(nil), do: nil
+  # Feels somewhat hacky, but while people should not be relying on the input itself, they
+  # may be relying on the input names/order
+  defp scrub_inputs(inputs) do
+    Enum.map(inputs, fn {name, _value} -> {name, :scrubbed_see_1_3_0_changelog} end)
   end
 end
