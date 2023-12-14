@@ -988,7 +988,7 @@ This doesn't seem to be too reliable right now, so suggestions and input are ver
 
 ## Known Issues
 
-There is a known issue affecting elixir versions from 1.14.0 to 1.16.0-rc.0: Optimizations (SSA and bool passes [change](https://github.com/elixir-lang/elixir/pull/11420)) had been disabled affecting the performance of functions defined directly in the top level (i.e. outside of any module). The issue was fixed by re-enabling the optimization in [1.16.0-rc.1](https://github.com/elixir-lang/elixir/blob/v1.16/CHANGELOG.md#v1160-rc1-2023-12-12).
+There is a known issue affecting elixir versions from 1.14.0 to 1.16.0-rc.0: Optimizations (SSA and bool passes, [see the original change](https://github.com/elixir-lang/elixir/pull/11420)) had been disabled affecting the performance of functions defined directly in the top level (i.e. outside of any module). The issue was fixed by re-enabling the optimization in [1.16.0-rc.1](https://github.com/elixir-lang/elixir/blob/v1.16/CHANGELOG.md#v1160-rc1-2023-12-12).
 The issue is best show-cased by the following benchmark where we'd expect ~equal results:
 
 ```elixir
