@@ -41,6 +41,11 @@ defmodule Benchee.ConfigurationTest do
                init(inputs: %{"A" => 1, "B" => 2})
     end
 
+    test "input_names are normalized" do
+      assert %Suite{configuration: %{input_names: ["a"]}} =
+               init(inputs: %{a: 1})
+    end
+
     test "no inputs, no input_names" do
       assert %Suite{configuration: %{input_names: []}} = init()
     end
