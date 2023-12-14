@@ -80,9 +80,7 @@ defmodule Benchee.Formatter do
       |> Enum.map(&normalize_module_configuration/1)
       |> Enum.split_with(&is_tuple/1)
 
-    # why do we ignore this suite? It shouldn't be changed anyway.
-    # We assign it because dialyzer would complain otherwise :D
-    _suite = parallel_output(suite, parallelizable)
+    parallel_output(suite, parallelizable)
 
     Enum.each(serial, fn function -> function.(suite) end)
 
