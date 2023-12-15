@@ -1034,18 +1034,25 @@ defmodule BencheeTest do
       # test env to avoid repeated compilation on CI
       port = Port.open({:spawn, "iex -S mix"}, [:binary, env: [{~c"MIX_ENV", ~c"test"}]])
 
-      # wait for startup
-      # timeout huge because of CI
-      assert_receive {^port, {:data, "iex(1)> "}}, 20_000
+      try do
+        # wait for startup
+        # timeout huge because of CI
+        assert_receive {^port, {:data, "iex(1)> "}}, 20_000
 
-      send(
-        port,
-        {self(), {:command, "Benchee.run(%{\"test\" => fn -> 1 end}, time: 0.001, warmup: 0)\n"}}
-      )
+        send(
+          port,
+          {self(),
+           {:command, "Benchee.run(%{\"test\" => fn -> 1 end}, time: 0.001, warmup: 0)\n"}}
+        )
 
-      assert_receive {^port, {:data, "Warning: " <> message}}, 20_000
+        assert_receive {^port, {:data, "Warning: " <> message}}, 20_000
+        assert message =~ ~r/test.+evaluated.+slower.+compiled.+module.+/is
 
-      assert message =~ ~r/test.+evaluated.+slower.+compiled.+module.+/is
+        # waiting for iex to be ready for input again
+        assert_receive {^port, {:data, "iex(2)> "}}, 20_000
+      after
+        Port.close(port)
+      end
     end
   end
 
