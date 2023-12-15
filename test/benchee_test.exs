@@ -1051,7 +1051,9 @@ defmodule BencheeTest do
         # waiting for iex to be ready for input again
         assert_receive {^port, {:data, "iex(2)> "}}, 20_000
       after
-        Port.close(port)
+        # https://elixirforum.com/t/starting-shutting-down-iex-with-a-port-gracefully/60388/2?u=pragtob
+        send(port, {self(), {:command, "\a"}})
+        send(port, {self(), {:command, "q\n"}})
       end
     end
   end
