@@ -1,20 +1,4 @@
 defmodule Benchee.Profile do
-  alias Benchee.Benchmark.BenchmarkConfig
-  alias Benchee.Benchmark.Collect
-  alias Benchee.Benchmark.RunOnce
-  alias Benchee.Benchmark.ScenarioContext
-  alias Benchee.Output.ProfilePrinter, as: Printer
-  alias Benchee.Suite
-
-  @default_profiler :eprof
-  @builtin_profilers [:cprof, :eprof, :fprof]
-  # we run the function a bunch already, no need for further warmup
-  @default_profiler_opts [warmup: false]
-
-  defmodule Benchee.UnknownProfilerError do
-    defexception message: "error"
-  end
-
   @moduledoc """
   Profiles each scenario after benchmarking them if the `profile_after` option is either set to:
     * `true`,
@@ -31,6 +15,22 @@ defmodule Benchee.Profile do
     It provides information related to the time spent on each function, both the *total* time spent on it and the time spent on it,
     *excluding* the time of called functions.
   """
+
+  alias Benchee.Benchmark.BenchmarkConfig
+  alias Benchee.Benchmark.Collect
+  alias Benchee.Benchmark.RunOnce
+  alias Benchee.Benchmark.ScenarioContext
+  alias Benchee.Output.ProfilePrinter, as: Printer
+  alias Benchee.Suite
+
+  @default_profiler :eprof
+  @builtin_profilers [:cprof, :eprof, :fprof]
+  # we run the function a bunch already, no need for further warmup
+  @default_profiler_opts [warmup: false]
+
+  defmodule Benchee.UnknownProfilerError do
+    defexception message: "error"
+  end
 
   @doc """
   Returns the atom corresponding to the default profiler.
