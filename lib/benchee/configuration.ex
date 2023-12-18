@@ -142,7 +142,7 @@ defmodule Benchee.Configuration do
   a map or struct at this point for easier handling in Benchee.
   """
   @type t :: %__MODULE__{
-          parallel: integer,
+          parallel: pos_integer,
           time: number,
           warmup: number,
           memory_time: number,

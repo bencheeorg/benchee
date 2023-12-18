@@ -8,6 +8,8 @@ defmodule Benchee.BenchmarkTest do
     Suite
   }
 
+  alias Benchee.Benchmark.BenchmarkConfig
+
   alias Benchee.Benchmark.ScenarioContext
   alias Benchee.Test.FakeBenchmarkPrinter, as: TestPrinter
   alias Benchee.Test.FakeBenchmarkRunner, as: TestRunner
@@ -104,8 +106,9 @@ defmodule Benchee.BenchmarkTest do
     test "sends the correct data to the benchmark runner" do
       scenarios = [%Scenario{job_name: "job_one"}]
       config = %Configuration{}
+      benchmark_config = BenchmarkConfig.from(config)
       suite = %Suite{scenarios: scenarios, configuration: config}
-      scenario_context = %ScenarioContext{config: config, printer: TestPrinter}
+      scenario_context = %ScenarioContext{config: benchmark_config, printer: TestPrinter}
 
       Benchmark.collect(suite, TestPrinter, TestRunner)
 

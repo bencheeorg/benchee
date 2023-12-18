@@ -4,7 +4,7 @@ defmodule Benchee.Benchmark do
   Exposes `benchmark/4` and `collect/3` functions.
   """
 
-  alias Benchee.Benchmark.{Runner, ScenarioContext}
+  alias Benchee.Benchmark.{BenchmarkConfig, Runner, ScenarioContext}
   alias Benchee.Output.BenchmarkPrinter, as: Printer
   alias Benchee.Scenario
   alias Benchee.Suite
@@ -118,7 +118,14 @@ defmodule Benchee.Benchmark do
         runner \\ Runner
       ) do
     printer.configuration_information(suite)
-    scenario_context = %ScenarioContext{config: config, printer: printer, system: system}
+    benchmark_config = BenchmarkConfig.from(config)
+
+    scenario_context = %ScenarioContext{
+      config: benchmark_config,
+      printer: printer,
+      system: system
+    }
+
     scenarios = runner.run_scenarios(scenarios, scenario_context)
     %Suite{suite | scenarios: scenarios}
   end

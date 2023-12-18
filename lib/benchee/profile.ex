@@ -1,4 +1,5 @@
 defmodule Benchee.Profile do
+  alias Benchee.Benchmark.BenchmarkConfig
   alias Benchee.Benchmark.Collect
   alias Benchee.Benchmark.RunOnce
   alias Benchee.Benchmark.ScenarioContext
@@ -104,7 +105,7 @@ defmodule Benchee.Profile do
 
     RunOnce.run(
       scenario,
-      %ScenarioContext{config: config},
+      %ScenarioContext{config: BenchmarkConfig.from(config)},
       {Collect.Profile, [profiler_module: profiler_module, profiler_opts: profiler_opts]}
     )
   end
