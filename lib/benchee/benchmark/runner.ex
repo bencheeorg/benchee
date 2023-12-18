@@ -6,7 +6,7 @@ defmodule Benchee.Benchmark.Runner do
   # This module actually runs our benchmark scenarios, adding information about
   # run time and memory usage to each scenario.
 
-  alias Benchee.{Benchmark, Configuration, Scenario, Utility.Parallel}
+  alias Benchee.{Benchmark, Scenario, Utility.Parallel}
 
   alias Benchmark.{
     Collect,
@@ -121,7 +121,7 @@ defmodule Benchee.Benchmark.Runner do
   defp run_warmup(
          scenario,
          scenario_context = %ScenarioContext{
-           config: %Configuration{warmup: warmup}
+           config: %{warmup: warmup}
          }
        ) do
     measure_runtimes(scenario, scenario_context, warmup, false)
@@ -130,7 +130,7 @@ defmodule Benchee.Benchmark.Runner do
   defp run_runtime_benchmark(
          scenario,
          scenario_context = %ScenarioContext{
-           config: %Configuration{
+           config: %{
              time: run_time,
              print: %{fast_warning: fast_warning}
            }
@@ -175,7 +175,7 @@ defmodule Benchee.Benchmark.Runner do
   defp run_reductions_benchmark(
          scenario,
          scenario_context = %ScenarioContext{
-           config: %Configuration{
+           config: %{
              reduction_time: reduction_time
            }
          }
@@ -198,7 +198,7 @@ defmodule Benchee.Benchmark.Runner do
   defp run_memory_benchmark(
          scenario,
          scenario_context = %ScenarioContext{
-           config: %Configuration{
+           config: %{
              memory_time: memory_time
            }
          }
