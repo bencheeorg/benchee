@@ -59,28 +59,6 @@ defmodule Benchee.Formatter do
   @callback write(any, options) :: :ok | {:error, String.t()}
 
   @doc """
-  Optional callback that should minimize memory usage by writing data as soon as possible.
-
-  The default `format/2` & `write/2` combination works most of the time, however it has
-  the downside that all formatted data must be kept in memory until processed by `write/2`.
-  Some formatters may format a lot of data, based on the number of scenarios, and this
-  can lead to memory consumption issues.
-  Hence, formatters _can_ implement this optional callback, the goal being to write data
-  out as soon as it was formatted to reduce memory consumption. F.ex. this means instead
-  of keeping the representation of reports for 30 different scenarios in memory, format
-  one and write it out immedeatly then format the next removing the need to keep it in memory.
-
-  Benchee does not treat this callback specially (yet), so in order to benefit from it users
-  must use a function formatter:
-  `formatters: [fn suite -> TheFormatter.sequential_output(suite, opts) end]`
-
-  That said, it may be used automatically in the future given a configuration option.
-  """
-  @callback sequential_output(Suite.t(), options()) :: :ok | {:error, String.t()}
-
-  @optional_callbacks sequential_output: 2
-
-  @doc """
   Format and output all configured formatters and formatting functions.
 
   Expects a suite that already has been run through all previous functions so has the aggregated
