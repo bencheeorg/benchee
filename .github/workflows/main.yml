@@ -83,7 +83,7 @@ jobs:
         run: MIX_ENV=test mix coveralls.github --warnings-as-errors || mix test --failed
         if: contains(matrix.elixir_version, '1.15')
       - name: Dialyzer
-        run: mix dialyzer --halt-exit-status
+        run: mix dialyzer --halt-exit-status --force-check --format github
         if: contains(matrix.elixir_version, '1.15')
 
   macos:
