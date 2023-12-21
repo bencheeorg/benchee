@@ -264,24 +264,25 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
-  Formats a number as a string.
+  Human friendly duration format for time as a string.
+
   The output is a sequence of values and unit labels separated by a space.
   Only units whose value is non-zero are included in the output.
   The passed number is duration in the base unit - nanoseconds.
 
-      iex> Benchee.Conversion.Duration.format_verbose(5_400_000_000_000)
+      iex> Benchee.Conversion.Duration.format_human(5_400_000_000_000)
       "1 h 30 min"
 
-      iex> Benchee.Conversion.Duration.format_verbose(12.5)
+      iex> Benchee.Conversion.Duration.format_human(12.5)
       "12.50 ns"
 
-      iex> Benchee.Conversion.Duration.format_verbose(3_660_001_001_000)
+      iex> Benchee.Conversion.Duration.format_human(3_660_001_001_000)
       "1 h 1 min 1 ms 1 μs"
   """
-  def format_verbose(number) when is_number(number) do
+  def format_human(number) when is_number(number) do
     number
     |> place_values()
-    |> Enum.map_join(" ", &format(&1))
+    |> Enum.map_join(" ", &format/1)
   end
 
   # Returns a list of place vaules with corresponding units for the `number`.

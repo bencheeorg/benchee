@@ -75,13 +75,13 @@ defmodule Benchee.Output.BenchmarkPrinter do
 
     IO.puts("""
     Benchmark suite executing with the following configuration:
-    warmup: #{Duration.format_verbose(warmup)}
-    time: #{Duration.format_verbose(time)}
-    memory time: #{Duration.format_verbose(memory_time)}
-    reduction time: #{Duration.format_verbose(reduction_time)}
+    warmup: #{Duration.format_human(warmup)}
+    time: #{Duration.format_human(time)}
+    memory time: #{Duration.format_human(memory_time)}
+    reduction time: #{Duration.format_human(reduction_time)}
     parallel: #{parallel}
     inputs: #{inputs_out(inputs)}
-    Estimated total run time: #{Duration.format_verbose(total_time)}
+    Estimated total run time: #{Duration.format_human(total_time)}
     """)
   end
 
