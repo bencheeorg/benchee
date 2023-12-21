@@ -143,6 +143,10 @@ defmodule Benchee.Conversion.Duration do
     Scale.unit_for(@units, unit)
   end
 
+  def units do
+    @units
+  end
+
   @doc """
   Scales a duration value in nanoseconds into a value in the specified unit
 
@@ -264,57 +268,22 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
-  Human friendly duration format for time as a string.
+  iex> format_human(5_400_000_000_000)
+  "1 h 30 min"
 
-  The output is a sequence of values and unit labels separated by a space.
-  Only units whose value is non-zero are included in the output.
-  The passed number is duration in the base unit - nanoseconds.
+  iex> format_human(12.5)
+  "12.50 ns"
 
-      iex> Benchee.Conversion.Duration.format_human(5_400_000_000_000)
-      "1 h 30 min"
+  iex> format_human(1000.555)
+  "1 μs 0.55 ns"
 
-      iex> Benchee.Conversion.Duration.format_human(12.5)
-      "12.50 ns"
+  iex> format_human(3_660_001_001_000)
+  "1 h 1 min 1 ms 1 μs"
 
-      iex> Benchee.Conversion.Duration.format_human(3_660_001_001_000)
-      "1 h 1 min 1 ms 1 μs"
+  iex> format_human(0)
+  "0 ns"
   """
-  def format_human(number) when is_number(number) do
-    number
-    |> place_values()
-    |> Enum.map_join(" ", &format/1)
-  end
-
-  # Returns a list of place vaules with corresponding units for the `number`.
-  # The output is sorted descending by magnitude of units and excludes tuples with place value 0.
-  # Place values are `non_neg_integer` for non-base units,
-  # however base unit may also be `float` becuase the decimals can't be split further.
-  @spec place_values(number) :: [{number, Scale.unit()}]
-  defp place_values(number) do
-    desc_units =
-      @units
-      |> Map.values()
-      |> Enum.sort(&(&1.magnitude >= &2.magnitude))
-
-    case place_values(number, desc_units) do
-      [] -> [{0, base_unit()}]
-      res -> res
-    end
-  end
-
-  @spec place_values(number, [Scale.unit()]) :: [{number, Scale.unit()}]
-  defp place_values(0, _units), do: []
-
-  defp place_values(number, [base_unit]), do: [{number, base_unit}]
-
-  defp place_values(number, [unit | units]) do
-    place_value = trunc(number)
-    decimal_carry = number - place_value
-    int_carry = rem(place_value, unit.magnitude)
-
-    case div(place_value, unit.magnitude) do
-      0 -> place_values(int_carry + decimal_carry, units)
-      place_value -> [{place_value, unit} | place_values(int_carry + decimal_carry, units)]
-    end
+  def format_human(duration) do
+    Format.format_human(duration, __MODULE__)
   end
 end
