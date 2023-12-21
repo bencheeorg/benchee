@@ -2,7 +2,7 @@ defmodule Benchee.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/bencheeorg/benchee"
-  @version "1.2.0"
+  @version "1.3.0-dev"
 
   def project do
     [
