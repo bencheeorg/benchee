@@ -49,69 +49,69 @@ defmodule Benchee.Conversion.DurationTest do
     end
   end
 
-  describe ".format_verbose" do
-    test ".format_verbose(0)" do
-      assert format_verbose(0) == "0 ns"
+  describe ".format_human" do
+    test ".format_human(0)" do
+      assert format_human(0) == "0 ns"
     end
 
-    test ".format_verbose(0.00)" do
-      assert format_verbose(0.00) == "0 ns"
+    test ".format_human(0.00)" do
+      assert format_human(0.00) == "0 ns"
     end
 
-    test ".format_verbose(98.7654321)" do
-      assert format_verbose(98.7654321) == "98.77 ns"
+    test ".format_human(98.7654321)" do
+      assert format_human(98.7654321) == "98.77 ns"
     end
 
-    test ".format_verbose(523.0)" do
-      assert format_verbose(523.0) == "523 ns"
+    test ".format_human(523.0)" do
+      assert format_human(523.0) == "523 ns"
     end
 
-    test ".format_verbose(987.654321)" do
-      assert format_verbose(987.654321) == "987.65 ns"
+    test ".format_human(987.654321)" do
+      assert format_human(987.654321) == "987.65 ns"
     end
 
-    test ".format_verbose(9_008)" do
-      assert format_verbose(9_008) == "9 μs 8 ns"
+    test ".format_human(9_008)" do
+      assert format_human(9_008) == "9 μs 8 ns"
     end
 
-    test ".format_verbose(9_876.54321)" do
-      assert format_verbose(9_876.54321) == "9 μs 876.54 ns"
+    test ".format_human(9_876.54321)" do
+      assert format_human(9_876.54321) == "9 μs 876.54 ns"
     end
 
-    test ".format_verbose(98_765.4321)" do
-      assert format_verbose(98_765.4321) == "98 μs 765.43 ns"
+    test ".format_human(98_765.4321)" do
+      assert format_human(98_765.4321) == "98 μs 765.43 ns"
     end
 
-    test ".format_verbose(987_654.321)" do
-      assert format_verbose(987_654.321) == "987 μs 654.32 ns"
+    test ".format_human(987_654.321)" do
+      assert format_human(987_654.321) == "987 μs 654.32 ns"
     end
 
-    test ".format_verbose(9_008_000_000)" do
-      assert format_verbose(9_008_000_000) == "9 s 8 ms"
+    test ".format_human(9_008_000_000)" do
+      assert format_human(9_008_000_000) == "9 s 8 ms"
     end
 
-    test ".format_verbose(9_876_543_210)" do
-      assert format_verbose(9_876_543_210) == "9 s 876 ms 543 μs 210 ns"
+    test ".format_human(9_876_543_210)" do
+      assert format_human(9_876_543_210) == "9 s 876 ms 543 μs 210 ns"
     end
 
-    test ".format_verbose(90_000_000_000)" do
-      assert format_verbose(90_000_000_000) == "1 min 30 s"
+    test ".format_human(90_000_000_000)" do
+      assert format_human(90_000_000_000) == "1 min 30 s"
     end
 
-    test ".format_verbose(98_765_432_190)" do
-      assert format_verbose(98_765_432_190) == "1 min 38 s 765 ms 432 μs 190 ns"
+    test ".format_human(98_765_432_190)" do
+      assert format_human(98_765_432_190) == "1 min 38 s 765 ms 432 μs 190 ns"
     end
 
-    test ".format_verbose(987_654_321_987.6)" do
-      assert format_verbose(987_654_321_987.6) == "16 min 27 s 654 ms 321 μs 987.60 ns"
+    test ".format_human(987_654_321_987.6)" do
+      assert format_human(987_654_321_987.6) == "16 min 27 s 654 ms 321 μs 987.60 ns"
     end
 
-    test ".format_verbose(3_900_000_000_000)" do
-      assert format_verbose(3_900_000_000_000) == "1 h 5 min"
+    test ".format_human(3_900_000_000_000)" do
+      assert format_human(3_900_000_000_000) == "1 h 5 min"
     end
 
-    test ".format_verbose(9_876_543_219_876.5)" do
-      assert format_verbose(9_876_543_219_876.5) == "2 h 44 min 36 s 543 ms 219 μs 876.50 ns"
+    test ".format_human(9_876_543_219_876.5)" do
+      assert format_human(9_876_543_219_876.5) == "2 h 44 min 36 s 543 ms 219 μs 876.50 ns"
     end
   end
 
