@@ -88,7 +88,7 @@ defmodule Benchee.Conversion.Format do
   # The output is sorted descending by magnitude of units and excludes tuples with place value 0.
   # Place values are `non_neg_integer` for non-base units,
   # however base unit may also be `float` becuase the decimals can't be split further.
-  @spec split_into_place_values(number, module) :: [{number, Scale.unit()}]
+  @spec split_into_place_values(number, module) :: [{number, Unit.t()}]
   defp split_into_place_values(number, module) do
     descending_units = units_descending(module)
 
@@ -101,7 +101,7 @@ defmodule Benchee.Conversion.Format do
     |> Enum.sort(&(&1.magnitude >= &2.magnitude))
   end
 
-  @spec place_values(number, [Scale.unit()]) :: [{number, Scale.unit()}]
+  @spec place_values(number, [Unit.t()]) :: [{number, Unit.t()}]
   defp place_values(0, _units), do: []
 
   # smalles unit, carries the decimal
