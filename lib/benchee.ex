@@ -66,7 +66,8 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     that data missing (aka not running benchmarks, only running relative statistics).
 
     You can use config options as normal, but some options related to benchmarking won't take
-    effect (such as `:time`).
+    effect (such as `:time`). The `:load` option however is mandatory to use, as you need to
+    load some benchmarks to report on them.
 
     ## Usage
 
