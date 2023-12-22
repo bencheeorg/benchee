@@ -48,6 +48,11 @@ defmodule Benchee.Conversion.Scale do
   @callback unit_for(any_unit) :: unit
 
   @doc """
+  List of all the units supported by this type.
+  """
+  @callback units :: [unit]
+
+  @doc """
   Takes a tuple of a number and a unit and a unit to be converted to, returning
   the the number scaled to the new unit and the new unit.
   """

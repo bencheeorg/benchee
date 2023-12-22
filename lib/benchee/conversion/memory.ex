@@ -15,7 +15,7 @@ defmodule Benchee.Conversion.Memory do
   @bytes_per_gigabyte @bytes_per_megabyte * @bytes_per_kilobyte
   @bytes_per_terabyte @bytes_per_gigabyte * @bytes_per_kilobyte
 
-  @units %{
+  @units_map %{
     terabyte: %Unit{
       name: :terabyte,
       magnitude: @bytes_per_terabyte,
@@ -47,6 +47,8 @@ defmodule Benchee.Conversion.Memory do
       long: "Bytes"
     }
   }
+
+  @units Map.values(@units_map)
 
   @type unit_atom :: :byte | :kilobyte | :megabyte | :gigabyte | :terabyte
   @type any_unit :: unit_atom | Unit.t()
@@ -162,7 +164,11 @@ defmodule Benchee.Conversion.Memory do
       }
   """
   def unit_for(unit) do
-    Scale.unit_for(@units, unit)
+    Scale.unit_for(@units_map, unit)
+  end
+
+  def units do
+    @units
   end
 
   @doc """
@@ -225,8 +231,9 @@ defmodule Benchee.Conversion.Memory do
   def base_unit, do: unit_for(:byte)
 
   @doc """
-  Formats a number as a string, with a unit label. To specify the unit, pass
-  a tuple of `{value, unit_atom}` like `{1_234, :kilobyte}`
+  Formats a memory as a string, with a unit label.
+
+  To specify the unit, pass a tuple of `{value, unit_atom}` like `{1_234, :kilobyte}`.
 
   ## Examples
 
@@ -248,5 +255,20 @@ defmodule Benchee.Conversion.Memory do
   """
   def format(memory) do
     Format.format(memory, __MODULE__)
+  end
+
+  @doc """
+  Formats in a more human way, where multiple units are used.
+
+  ## Examples
+
+      iex> format_human(45_678.9)
+      "44 KB 622.90 B"
+
+      iex> format_human(1024 * 1024 * 1024)
+      "1 GB"
+  """
+  def format_human(memory) do
+    Format.format_human(memory, __MODULE__)
   end
 end

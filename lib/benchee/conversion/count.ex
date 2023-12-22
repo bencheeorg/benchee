@@ -14,7 +14,7 @@ defmodule Benchee.Conversion.Count do
   @one_million 1_000_000
   @one_thousand 1_000
 
-  @units %{
+  @units_map %{
     billion: %Unit{
       name: :billion,
       magnitude: @one_billion,
@@ -40,6 +40,8 @@ defmodule Benchee.Conversion.Count do
       long: ""
     }
   }
+
+  @units Map.values(@units_map)
 
   @type unit_atoms :: :one | :thousand | :million | :billion
   @type units :: unit_atoms | Unit.t()
@@ -111,7 +113,11 @@ defmodule Benchee.Conversion.Count do
       }
   """
   def unit_for(unit) do
-    Scale.unit_for(@units, unit)
+    Scale.unit_for(@units_map, unit)
+  end
+
+  def units do
+    @units
   end
 
   @doc """
@@ -191,8 +197,9 @@ defmodule Benchee.Conversion.Count do
   def base_unit, do: unit_for(:one)
 
   @doc """
-  Formats a number as a string, with a unit label. To specify the unit, pass
-  a tuple of `{value, unit_atom}` like `{1_234, :million}`
+  Formats a number as a string, with a unit label.
+
+  To specify the unit, pass a tuple of `{value, unit_atom}` like `{1_234, :million}`
 
   ## Examples
 
@@ -210,5 +217,23 @@ defmodule Benchee.Conversion.Count do
   """
   def format(count) do
     Format.format(count, __MODULE__)
+  end
+
+  @doc """
+  Formats in a more "human" way separating by units.
+
+  ## Examples
+
+      iex> format_human(45_678.9)
+      "45 K 678.90"
+
+      iex> format_human(1_000_000)
+      "1 M"
+
+      iex> format_human(1_001_000)
+      "1 M 1 K"
+  """
+  def format_human(count) do
+    Format.format_human(count, __MODULE__)
   end
 end
