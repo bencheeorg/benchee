@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * System information now includes whether or not the JIT is enabled ([erlang docs](https://www.erlang.org/doc/apps/erts/beamasm)).
 * Benchee now let's you know when it's calculating statistics or running the formatters. Helps when you wonder what takes long or blows up memory.
 * `Benchee.report/1` got introduced if you just want to load saves benchmarks and report on them.
+* Configuration times will now be displayed in a more human friendly format (1min 12s vs. 1.2min). Thanks to [@drobnyd](https://github.com/drobnyd).
 
 ### Bugfixes (User Facing)
 * Memory usage should be massively reduced when dealing with larger sets of data in inputs or benchmarking functions. They were needlessly sent to processes calculating statistics or formatters which could lead to memory blowing up.
@@ -26,11 +27,10 @@ Woopsie, didn't wanna do any of these in 1.x, sorry but there's good reason :(
   * Technically speaking formatters haven't generally lost access, only if they are processed in parallel - so not if it's the only formatter or if it's used via a function (`formatters: [fn suite -> MyFormatter.output(suite) end]`. Still, should not be used or relied upon.
 
 ### Features (Plugins)
-* `Configuration` now has an `input_names` key that holds the name of all inputs, for the reasoning, see above.
-
-### Features (Plugins)
 * `jit_enabled?` is exposed as part of the `suite.system` struct
 * Yes, `Benchee.System` is now a struct so feel easier about relying on the fields
+* `Configuration` now has an `input_names` key that holds the name of all inputs, for the reasoning, see above.
+* The more human friendly formats are accessible via `Format.format_human/2` or `Duration.format_human/1` (& friends)
 
 ## 1.2.0 (2023-11-09)
 
