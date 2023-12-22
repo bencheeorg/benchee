@@ -5,21 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 1.3.0 (2023-12-22)
+A big swath of bug fixes and improvements. The highlights certainly are fixes and conveniences around saved benchmarks and loading them again via the new `Benchee.report/1`. The other big one is saving a lot of memory (and time!) when processing big inputs. Sadly the latter comes with some breaking changes for plugins, but they are well justified and shouldn't actually affect any plugin in practice.
 
 ### Features (User Facing)
 * System information now includes whether or not the JIT is enabled ([erlang docs](https://www.erlang.org/doc/apps/erts/beamasm)).
-* Benchee now let's you know when it's calculating statistics or running the formatters. Helps when you wonder what takes long or blows up memory.
-* `Benchee.report/1` got introduced if you just want to load saves benchmarks and report on them.
-* Configuration times will now be displayed in a more human friendly format (1min 12s vs. 1.2min). Thanks to [@drobnyd](https://github.com/drobnyd).
+* Benchee now let's you know when it's calculating statistics or running the formatters. Helps when you wonder what's taking so long or blows up memory.
+* `Benchee.report/1` introduced if you just want to load saved benchmarks and report on them (---> run formatters).
+* Configuration times will now be displayed in a more human friendly format (1 min 12 s vs. 1.2 min). Thanks to [@drobnyd](https://github.com/drobnyd).
 
 ### Bugfixes (User Facing)
 * Memory usage should be massively reduced when dealing with larger sets of data in inputs or benchmarking functions. They were needlessly sent to processes calculating statistics or formatters which could lead to memory blowing up.
-* Similarly, inputs and benchmarking functions will no longer be saved when using the `:save` option, this makes it immensely faster and depending on the size of the data a lot slower (I have an example with a factor 200x). The side effect of this is that you also can't use `:load` and run the benchmarks saved again from just the file, this was never an intended use case though (as loading happens after benchmarking by default). You also still should have the benchmarking script so it's also not needed.
-* Fix a bug where relative statistics would always rely on the inputs provided in the config, which can break when you load saved benchmarks.
+* Similarly, inputs and benchmarking functions will no longer be saved when using the `:save` option, this makes it immensely faster and depending on the size of the data a lot slower (I have an example with a factor 200x for the size). The side effect of this is that you also can't use `:load` and run the benchmarks saved again from just the file, this was never an intended use case though (as loading happens after benchmarking by default). You also still should have the benchmarking script so it's also not needed.
+* Fix a bug where relative statistics would always rely on the inputs provided in the config, which can break when you load saved benchmarks but don't specify the `inputs` again.
 
 ### Breaking Changes (Plugins)
-Woopsie, didn't wanna do any of these in 1.x, sorry but there's good reason :(
+Woopsie, didn't wanna do any of these in 1.x, sorry but there's good reason :( However, counting them as bugs.
 
 * Formatters have lost access to benchmarking functions and the inputs, this is to enable huge memory and run time savings when using a lot of data. I also believe they should not be needed for formatters, please get in touch if this is a problem so we can work it out. In detail this means:
   * Each `Benchee.Scenario` struct in a formatter will have `:function` and `:input` set to `nil`
