@@ -74,6 +74,11 @@ defmodule Benchee.Conversion.DurationTest do
       assert format_human(9_008) == "9 μs 8 ns"
     end
 
+    # particularly nasty bug
+    test ".format_human()" do
+      assert format_human(2_000_000_000.0) == "2 s"
+    end
+
     test ".format_human(9_876.54321)" do
       assert format_human(9_876.54321) == "9 μs 876.54 ns"
     end

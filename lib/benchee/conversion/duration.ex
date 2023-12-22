@@ -288,6 +288,9 @@ defmodule Benchee.Conversion.Duration do
 
       iex> format_human(0)
       "0 ns"
+
+      iex> format_human(2 * 1000 * 1000 * 1000)
+      "2 s"
   """
   def format_human(duration) do
     Format.format_human(duration, __MODULE__)
