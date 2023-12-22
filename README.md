@@ -25,13 +25,13 @@ Benchee.run(
 Produces the following output on the console:
 
 ```
-tobi@qiqi:~/github/benchee$ mix run samples/run.exs
 Operating System: Linux
 CPU Information: AMD Ryzen 9 5900X 12-Core Processor
 Number of Available Cores: 24
-Available memory: 31.27 GB
-Elixir 1.13.3
-Erlang 24.2.1
+Available memory: 31.25 GB
+Elixir 1.16.0-rc.1
+Erlang 26.1.2
+JIT enabled: true
 
 Benchmark suite executing with the following configuration:
 warmup: 2 s
@@ -44,14 +44,16 @@ Estimated total run time: 28 s
 
 Benchmarking flat_map ...
 Benchmarking map.flatten ...
+Calculating statistics...
+Formatting results...
 
 Name                  ips        average  deviation         median         99th %
-flat_map           3.71 K      269.48 μs     ±8.10%      267.14 μs      333.89 μs
-map.flatten        2.13 K      469.18 μs    ±36.34%      410.03 μs      904.42 μs
+flat_map           3.79 K      263.87 μs    ±15.49%      259.47 μs      329.29 μs
+map.flatten        1.96 K      509.19 μs    ±51.36%      395.23 μs     1262.27 μs
 
 Comparison:
-flat_map           3.71 K
-map.flatten        2.13 K - 1.74x slower +199.71 μs
+flat_map           3.79 K
+map.flatten        1.96 K - 1.93x slower +245.32 μs
 
 Memory usage statistics:
 
