@@ -85,6 +85,10 @@ defmodule Benchee.Conversion.Format do
     format(0, module)
   end
 
+  def format_human(+0.0, module) do
+    format(0, module)
+  end
+
   def format_human(number, module) when is_number(number) do
     number
     |> split_into_place_values(module)
@@ -108,6 +112,7 @@ defmodule Benchee.Conversion.Format do
 
   @spec place_values(number, [Unit.t()]) :: [{number, Unit.t()}]
   defp place_values(0, _units), do: []
+  defp place_values(+0.0, _units), do: []
 
   # smalles unit, carries the decimal
   defp place_values(number, [base_unit = %Unit{magnitude: 1}]), do: [{number, base_unit}]
