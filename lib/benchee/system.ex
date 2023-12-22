@@ -4,7 +4,7 @@ defmodule Benchee.System do
 
   Includes information such as elixir/erlang version, OS, CPU and memory.
 
-  So far supports/should work for Linux, MacOS, FreeBSD and Windows.
+  So far supports/should work for Linux, MacOS, FreeBSD, Solaris and Windows.
   """
 
   alias Benchee.Conversion.Memory
@@ -36,7 +36,7 @@ defmodule Benchee.System do
           erlang: String.t(),
           jit_enabled?: boolean(),
           num_cores: pos_integer(),
-          os: :macOS | :Windows | :FreeBSD | :Linux,
+          os: :macOS | :Windows | :FreeBSD | :Solaris | :Linux,
           cpu_speed: String.t(),
           available_memory: String.t()
         }
@@ -105,6 +105,7 @@ defmodule Benchee.System do
   defp os(:darwin), do: :macOS
   defp os(:nt), do: :Windows
   defp os(:freebsd), do: :FreeBSD
+  defp os(:sunos), do: :Solaris
   defp os(_), do: :Linux
 
   defp cpu_speed, do: cpu_speed(os())
@@ -119,6 +120,10 @@ defmodule Benchee.System do
 
   defp cpu_speed(:FreeBSD) do
     parse_cpu_for(:FreeBSD, system_cmd("sysctl", ["-n", "hw.model"]))
+  end
+
+  defp cpu_speed(:Solaris) do
+    parse_cpu_for(:Solaris, system_cmd("kstat", ["-j", "cpu_info:0::brand"]))
   end
 
   defp cpu_speed(:Linux) do
@@ -138,6 +143,11 @@ defmodule Benchee.System do
   def parse_cpu_for(:macOS, raw_output), do: String.trim(raw_output)
 
   def parse_cpu_for(:FreeBSD, raw_output), do: String.trim(raw_output)
+
+  def parse_cpu_for(:Solaris, raw_output) do
+    {:ok, [decoded]} = Jason.decode(raw_output)
+    decoded["data"]["brand"]
+  end
 
   def parse_cpu_for(:Linux, raw_output) do
     match_info = Regex.run(@linux_cpuinfo_regex, raw_output, capture: :all_but_first)
@@ -165,6 +175,10 @@ defmodule Benchee.System do
     parse_memory_for(:FreeBSD, system_cmd("sysctl", ["-n", "hw.physmem"]))
   end
 
+  defp available_memory(:Solaris) do
+    parse_memory_for(:Solaris, system_cmd("prtconf", ["-m"]))
+  end
+
   defp available_memory(:Linux) do
     parse_memory_for(:Linux, system_cmd("cat", ["/proc/meminfo"]))
   end
@@ -185,6 +199,12 @@ defmodule Benchee.System do
   defp parse_memory_for(:FreeBSD, raw_output) do
     {memory, _} = Integer.parse(raw_output)
     Memory.format(memory)
+  end
+
+  defp parse_memory_for(:Solaris, raw_output) do
+    {memory_in_megabytes, _} = Integer.parse(raw_output)
+    {memory_in_bytes, _} = Memory.convert({memory_in_megabytes, :megabyte}, :byte)
+    Memory.format(memory_in_bytes)
   end
 
   defp parse_memory_for(:Linux, raw_output) do
