@@ -539,8 +539,8 @@ Benchee can store the results of previous runs in a file and then load them agai
 **Saving** is done through the `:save` configuration option. You can specify a `:path` where results are saved, or you can use the default option of`"benchmark.benchee"` if you don't pass a `:path`. You can also pass a `:tag` option which annotates these results (for instance with a branch name or elixir version number). The default option for the `:tag` is a timestamp of when the benchmark was run.
 
 **Loading** is done through the `:load` option specifying a path to the file to load (for instance `"benchmark.benchee"`). You can also specify multiple files to load through a list of paths (`["my.benchee", "main_save.benchee"]`) - each one of those can also be a glob expression to match even more files glob (`"save_number*.benchee"`).
-If all you want to do is to use `:load` without running any benchmarks then you can use `Benchee.report/1` which will take a normal configuration with a `:load` key and just format the loaded saved results with the given formatters.
 In the more verbose API loading is triggered via `Benchee.load/1`.
+If all you want to do is to use `:load` without running any benchmarks then you can use `Benchee.report/1` which will take a normal configuration with a `:load` key and just format the loaded saved results with the given formatters.
 
 ```elixir
 Benchee.run(
