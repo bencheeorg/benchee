@@ -92,7 +92,8 @@ defmodule Benchee.Configuration do
     output identified by the atom will be printed. All options are enabled by
     default (true). Options are:
       * `:benchmarking`  - print when Benchee starts benchmarking a new job
-      (Benchmarking name ..)
+      (Benchmarking name ..) as well as when statistics are being calculated
+      or formatting begins.
       * `:configuration` - a summary of configured benchmarking options
       including estimated total run time is printed before benchmarking starts
       * `:fast_warning`  - warnings are displayed if functions are executed
