@@ -14,24 +14,31 @@ defmodule Benchee.Conversion.Format do
   """
   @callback format(number) :: String.t()
 
+  @doc """
+  Formats in a more "human" way, one biggest unit at a time.
+
+  So instead of 1.5h it says 1h 30min
+  """
+  @callback format_human(number) :: String.t()
+
   # Generic formatting functions
 
   @doc """
   Formats a unit value with specified label and separator
   """
-  def format(count, label, separator) do
+  def format(number, label, separator) do
     separator = separator(label, separator)
-    "#{number_format(count)}#{separator}#{label}"
+    "#{number_format(number)}#{separator}#{label}"
   end
 
-  defp number_format(count) when is_float(count) do
-    count
-    |> :erlang.float_to_list(decimals: float_precision(count))
+  defp number_format(number) when is_float(number) do
+    number
+    |> :erlang.float_to_list(decimals: float_precision(number))
     |> to_string
   end
 
-  defp number_format(count) when is_integer(count) do
-    to_string(count)
+  defp number_format(number) when is_integer(number) do
+    to_string(number)
   end
 
   @doc """
@@ -49,16 +56,16 @@ defmodule Benchee.Conversion.Format do
       "1 KB"
 
   """
-  def format({count, unit = %Unit{}}) do
-    format(count, label(unit), separator())
+  def format({number, unit = %Unit{}}) do
+    format(number, label(unit), separator())
   end
 
-  def format({count, unit = %Unit{}}, _module) do
-    format({count, unit})
+  def format({number, unit = %Unit{}}, _module) do
+    format({number, unit})
   end
 
-  def format({count, unit_atom}, module) do
-    format({count, module.unit_for(unit_atom)})
+  def format({number, unit_atom}, module) do
+    format({number, module.unit_for(unit_atom)})
   end
 
   def format(number, module) when is_number(number) do
@@ -96,9 +103,7 @@ defmodule Benchee.Conversion.Format do
   end
 
   defp units_descending(module) do
-    module.units()
-    |> Map.values()
-    |> Enum.sort(&(&1.magnitude >= &2.magnitude))
+    Enum.sort(module.units(), &(&1.magnitude >= &2.magnitude))
   end
 
   @spec place_values(number, [Unit.t()]) :: [{number, Unit.t()}]

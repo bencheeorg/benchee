@@ -21,7 +21,7 @@ defmodule Benchee.Conversion.Duration do
   @nanoseconds_per_minute @nanoseconds_per_second * @seconds_per_minute
   @nanoseconds_per_hour @nanoseconds_per_minute * @minutes_per_hour
 
-  @units %{
+  @units_map %{
     hour: %Unit{
       name: :hour,
       magnitude: @nanoseconds_per_hour,
@@ -59,6 +59,8 @@ defmodule Benchee.Conversion.Duration do
       long: "Nanoseconds"
     }
   }
+
+  @units Map.values(@units_map)
 
   @doc """
   Scales a duration value in nanoseconds into a larger unit if appropriate
@@ -140,7 +142,7 @@ defmodule Benchee.Conversion.Duration do
       }
   """
   def unit_for(unit) do
-    Scale.unit_for(@units, unit)
+    Scale.unit_for(@units_map, unit)
   end
 
   def units do
@@ -268,20 +270,24 @@ defmodule Benchee.Conversion.Duration do
   end
 
   @doc """
-  iex> format_human(5_400_000_000_000)
-  "1 h 30 min"
+  Formats in a more "human" way - 1h 30min instead of 1.5h.
 
-  iex> format_human(12.5)
-  "12.50 ns"
+  ## Examples
 
-  iex> format_human(1000.555)
-  "1 μs 0.55 ns"
+      iex> format_human(5_400_000_000_000)
+      "1 h 30 min"
 
-  iex> format_human(3_660_001_001_000)
-  "1 h 1 min 1 ms 1 μs"
+      iex> format_human(12.5)
+      "12.50 ns"
 
-  iex> format_human(0)
-  "0 ns"
+      iex> format_human(1000.555)
+      "1 μs 0.55 ns"
+
+      iex> format_human(3_660_001_001_000)
+      "1 h 1 min 1 ms 1 μs"
+
+      iex> format_human(0)
+      "0 ns"
   """
   def format_human(duration) do
     Format.format_human(duration, __MODULE__)

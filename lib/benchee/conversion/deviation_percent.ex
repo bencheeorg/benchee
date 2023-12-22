@@ -11,9 +11,10 @@ defmodule Benchee.Conversion.DeviationPercent do
   @behaviour Format
 
   @doc """
-  Formats the standard deviation ratio to an equivalent percent number
-  including special signs. The ± is an important part of it as it shows that
-  the deviation might be up but also might be down.
+  Formats the standard deviation ratio to an equivalent percent number including special signs.
+
+  The ± is an important part of it as it shows that the deviation might be up but also might be
+  down.
 
   ## Examples
 
@@ -27,5 +28,19 @@ defmodule Benchee.Conversion.DeviationPercent do
     "~ts~.2f%"
     |> :io_lib.format(["±", std_dev_ratio * 100.0])
     |> to_string
+  end
+
+  @doc """
+  Formats standard deviation percent, same as `format/1`.
+
+  Implemented for consistency.
+
+  ## Examples
+
+      iex> format_human(0.1)
+      "±10.00%"
+  """
+  def format_human(std_dev_ratio) do
+    format(std_dev_ratio)
   end
 end
