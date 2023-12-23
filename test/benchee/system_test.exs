@@ -39,7 +39,10 @@ defmodule Benchee.SystemTest do
   end
 
   test ".os returns an atom of the current os" do
-    assert Enum.member?([:Linux, :Solaris, :FreeBSD, :macOS, :Windows], system(%Suite{}).system.os)
+    assert Enum.member?(
+             [:Linux, :Solaris, :FreeBSD, :macOS, :Windows],
+             system(%Suite{}).system.os
+           )
   end
 
   test ".cpu_speed returns a string (more accurate tests in .parse_cpu_for)" do

@@ -123,7 +123,7 @@ defmodule Benchee.System do
   end
 
   defp cpu_speed(:Solaris) do
-    parse_cpu_for(:Solaris, system_cmd("kstat", ["-j", "cpu_info:0::brand"]))
+    parse_cpu_for(:Solaris, system_cmd("kstat", ["-p", "cpu_info:0::brand"]))
   end
 
   defp cpu_speed(:Linux) do
@@ -131,6 +131,7 @@ defmodule Benchee.System do
   end
 
   @linux_cpuinfo_regex ~r/model name.*:([\w \(\)\-\@\.]*)/i
+  @solaris_cpubrand_regex ~r/^cpu_info:0:cpu_info0:brand\s+(.*)\s*$/i
 
   @doc false
   def parse_cpu_for(_, "N/A"), do: "N/A"
@@ -145,8 +146,12 @@ defmodule Benchee.System do
   def parse_cpu_for(:FreeBSD, raw_output), do: String.trim(raw_output)
 
   def parse_cpu_for(:Solaris, raw_output) do
-    {:ok, [decoded]} = Jason.decode(raw_output)
-    decoded["data"]["brand"]
+    match_info = Regex.run(@solaris_cpubrand_regex, raw_output, capture: :all_but_first)
+
+    case match_info do
+      [cpu_info] -> cpu_info
+      _ -> "Unrecognized processor"
+    end
   end
 
   def parse_cpu_for(:Linux, raw_output) do
