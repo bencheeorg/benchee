@@ -74,6 +74,20 @@ defmodule Benchee.SystemTest do
       output = parse_cpu_for(:Linux, raw_output)
       assert output == "Unrecognized processor"
     end
+
+    @solaris_kstat_brand_excerpt """
+    cpu_info:0:cpu_info0:brand      Intel(r) Xeon(r) CPU E5-2678 v3 @ 2.50GHz
+    """
+    test "for :Solaris handles some normal intel output" do
+      output = parse_cpu_for(:Solaris, @solaris_kstat_brand_excerpt)
+      assert output =~ "Intel(r) Xeon(r) CPU E5-2678 v3 @ 2.50GHz"
+    end
+
+    test "for :Solaris handles unknown architectures" do
+      raw_output = "Bender Bending Rodriguez"
+      output = parse_cpu_for(:Solaris, raw_output)
+      assert output == "Unrecognized processor"
+    end
   end
 
   test ".available_memory returns the available memory on the computer" do
