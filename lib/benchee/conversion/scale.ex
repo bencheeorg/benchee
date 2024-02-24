@@ -167,7 +167,7 @@ defmodule Benchee.Conversion.Scale do
   end
 
   defp do_best_unit([], module, _) do
-    module.base_unit
+    module.base_unit()
   end
 
   defp do_best_unit(list, module, opts) do
