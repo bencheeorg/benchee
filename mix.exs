@@ -49,7 +49,8 @@ defmodule Benchee.Mixfile do
       {:credo, "~> 1.7.2-rc.0", only: :dev, runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:excoveralls, "~> 0.13", only: :test},
-      {:dialyxir, "~> 1.0", only: :dev, runtime: false}
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
+      {:doctest_formatter, "~> 0.2", only: :dev, runtime: false}
     ]
 
     # table relies on __STACKTRACE__ which was introduced in 1.7, we still support ~>1.6 though
