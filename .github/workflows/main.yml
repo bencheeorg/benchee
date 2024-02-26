@@ -65,26 +65,26 @@ jobs:
         with:
           path: tools/plts
           key: erlef-${{ runner.os }}-dialyzer-${{ matrix.elixir_version }}-${{ matrix.otp_version }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
-        if: contains(matrix.elixir_version, '1.15')
+        if: contains(matrix.elixir_version, '1.16')
       - run: mix deps.get
       - run: MIX_ENV=test mix compile --warnings-as-errors
       - run: mix credo
-        if: contains(matrix.elixir_version, '1.15')
+        if: contains(matrix.elixir_version, '1.16')
       - name: Check if formatted
-        if: contains(matrix.elixir_version, '1.15')
+        if: contains(matrix.elixir_version, '1.16')
         run: mix format --check-formatted
       - name: Actual Tests
         # this will let warnings slip through but I don't wanna replicate all that magic
         # right now
         run: MIX_ENV=test mix coveralls.github || mix test --failed
         # Apparently the one with `!` can't go without the fancy expression syntax
-        if: ${{ !contains(matrix.elixir_version, '1.15') }}
+        if: ${{ !contains(matrix.elixir_version, '1.16') }}
       - name: Actual Tests WITH warnings as errors
         run: MIX_ENV=test mix coveralls.github --warnings-as-errors || mix test --failed
-        if: contains(matrix.elixir_version, '1.15')
+        if: contains(matrix.elixir_version, '1.16')
       - name: Dialyzer
         run: mix dialyzer --halt-exit-status
-        if: contains(matrix.elixir_version, '1.15')
+        if: contains(matrix.elixir_version, '1.16')
 
   macos:
     name: Test on MacOS
