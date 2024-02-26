@@ -148,6 +148,10 @@ defmodule Benchee.SystemTest do
     jit_enabled? = system_data.jit_enabled?
     erlang_version = system_data.erlang
 
+    IO.puts("JIT TEST")
+    IO.inspect(erlang_version)
+    IO.inspect(:erlang.system_info(:emu_flavor), label: "emu flavor")
+
     if ErlangVersion.includes_fixes_from?(erlang_version, "24.0.0") do
       assert jit_enabled?
     else
