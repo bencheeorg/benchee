@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         # Thoroughly check the most recent versions
-        elixir_version: ['1.13.4', '1.14.5', '1.15.7', '1.16.0']
+        elixir_version: ['1.13.4', '1.14.5', '1.15.7', '1.16.1']
         otp_version: ['23.3', '24.3', '25.3', '26.2']
         # Spot check older versions
         #
@@ -37,7 +37,7 @@ jobs:
         exclude:
           - elixir_version: '1.15.7'
             otp_version: '23.3'
-          - elixir_version: '1.16.0'
+          - elixir_version: '1.16.1'
             otp_version: '23.3'
           - elixir_version: '1.13.4'
             otp_version: '26.2'
