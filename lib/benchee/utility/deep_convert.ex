@@ -8,13 +8,13 @@ defmodule Benchee.Utility.DeepConvert do
 
   ## Examples
 
-  iex> to_map([a: 1, b: 2])
+  iex> to_map(a: 1, b: 2)
   %{a: 1, b: 2}
 
-  iex> to_map([a: [b: 2], c: [d: 3, e: 4, e: 5]])
+  iex> to_map(a: [b: 2], c: [d: 3, e: 4, e: 5])
   %{a: %{b: 2}, c: %{d: 3, e: 5}}
 
-  iex> to_map([a: [b: 2], c: [1, 2, 3], d: []])
+  iex> to_map(a: [b: 2], c: [1, 2, 3], d: [])
   %{a: %{b: 2}, c: [1, 2, 3], d: []}
 
   iex> to_map(%{a: %{b: 2}, c: %{d: 3, e: 5}})

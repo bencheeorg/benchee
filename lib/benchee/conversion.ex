@@ -18,37 +18,39 @@ defmodule Benchee.Conversion do
   ## Examples
 
       iex> statistics = %Benchee.Statistics{average: 1_000_000.0, ips: 1000.0}
-      iex> scenario = %Benchee.Scenario{
+      ...> 
+      ...> scenario = %Benchee.Scenario{
       ...>   run_time_data: %Benchee.CollectionData{statistics: statistics},
       ...>   memory_usage_data: %Benchee.CollectionData{statistics: statistics},
       ...>   reductions_data: %Benchee.CollectionData{statistics: statistics}
       ...> }
-      iex> Benchee.Conversion.units([scenario], :best)
+      ...> 
+      ...> Benchee.Conversion.units([scenario], :best)
       %{
-        ips:             %Benchee.Conversion.Unit{
-                           label: "K",
-                           long: "Thousand",
-                           magnitude: 1000,
-                           name: :thousand
-                         },
-        run_time:        %Benchee.Conversion.Unit{
-                           label: "ms",
-                           long: "Milliseconds",
-                           magnitude: 1_000_000,
-                           name: :millisecond
-                         },
-        memory:          %Benchee.Conversion.Unit{
-                           label: "KB",
-                           long: "Kilobytes",
-                           magnitude: 1024,
-                           name: :kilobyte
-                         },
+        ips: %Benchee.Conversion.Unit{
+          label: "K",
+          long: "Thousand",
+          magnitude: 1000,
+          name: :thousand
+        },
+        run_time: %Benchee.Conversion.Unit{
+          label: "ms",
+          long: "Milliseconds",
+          magnitude: 1_000_000,
+          name: :millisecond
+        },
+        memory: %Benchee.Conversion.Unit{
+          label: "KB",
+          long: "Kilobytes",
+          magnitude: 1024,
+          name: :kilobyte
+        },
         reduction_count: %Benchee.Conversion.Unit{
-                           label: "M",
-                           long: "Million",
-                           magnitude: 1000000,
-                           name: :million
-                         }
+          label: "M",
+          long: "Million",
+          magnitude: 1_000_000,
+          name: :million
+        }
       }
   """
   def units(scenarios, scaling_strategy) do

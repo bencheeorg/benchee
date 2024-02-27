@@ -78,35 +78,47 @@ defmodule Benchee.Utility.FileCreation do
       iex> interleave("bench/abc.csv", "Big Input")
       "bench/abc_big_input.csv"
 
-      iex> interleave("bench/abc.csv",
-      ...>   ["Big Input"])
+      iex> interleave(
+      ...>   "bench/abc.csv",
+      ...>   ["Big Input"]
+      ...> )
       "bench/abc_big_input.csv"
 
       iex> interleave("abc.csv", [])
       "abc.csv"
 
-      iex> interleave("bench/abc.csv",
-      ...>   ["Big Input", "Comparison"])
+      iex> interleave(
+      ...>   "bench/abc.csv",
+      ...>   ["Big Input", "Comparison"]
+      ...> )
       "bench/abc_big_input_comparison.csv"
 
-      iex> interleave("bench/A B C.csv",
-      ...>   ["Big Input", "Comparison"])
+      iex> interleave(
+      ...>   "bench/A B C.csv",
+      ...>   ["Big Input", "Comparison"]
+      ...> )
       "bench/A B C_big_input_comparison.csv"
 
-      iex> interleave("bench/abc.csv",
-      ...>   ["Big Input", "Comparison", "great Stuff"])
+      iex> interleave(
+      ...>   "bench/abc.csv",
+      ...>   ["Big Input", "Comparison", "great Stuff"]
+      ...> )
       "bench/abc_big_input_comparison_great_stuff.csv"
 
       iex> marker = Benchee.Benchmark.no_input()
-      iex> interleave("abc.csv", marker)
+      ...> interleave("abc.csv", marker)
       "abc.csv"
       iex> interleave("abc.csv", [marker])
       "abc.csv"
-      iex> interleave("abc.csv",
-      ...>   [marker, "Comparison"])
+      iex> interleave(
+      ...>   "abc.csv",
+      ...>   [marker, "Comparison"]
+      ...> )
       "abc_comparison.csv"
-      iex> interleave("abc.csv",
-      ...>   ["Something cool", marker, "Comparison"])
+      iex> interleave(
+      ...>   "abc.csv",
+      ...>   ["Something cool", marker, "Comparison"]
+      ...> )
       "abc_something_cool_comparison.csv"
   """
   @spec interleave(String.t(), String.t() | list(String.t())) :: String.t()

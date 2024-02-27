@@ -181,58 +181,56 @@ defmodule Benchee.Configuration do
 
       iex> init()
       %Benchee.Suite{
-        configuration:
-          %Benchee.Configuration{
-            parallel: 1,
-            time: 5_000_000_000.0,
-            warmup: 2_000_000_000.0,
-            inputs: nil,
-            input_names: [],
-            save: false,
-            load: false,
-            formatters: [Benchee.Formatters.Console],
-            print: %{
-              benchmarking: true,
-              fast_warning: true,
-              configuration: true
-            },
-            percentiles: [50, 99],
-            unit_scaling: :best,
-            assigns: %{},
-            before_each: nil,
-            after_each: nil,
-            before_scenario: nil,
-            after_scenario: nil
+        configuration: %Benchee.Configuration{
+          parallel: 1,
+          time: 5_000_000_000.0,
+          warmup: 2_000_000_000.0,
+          inputs: nil,
+          input_names: [],
+          save: false,
+          load: false,
+          formatters: [Benchee.Formatters.Console],
+          print: %{
+            benchmarking: true,
+            fast_warning: true,
+            configuration: true
           },
+          percentiles: [50, 99],
+          unit_scaling: :best,
+          assigns: %{},
+          before_each: nil,
+          after_each: nil,
+          before_scenario: nil,
+          after_scenario: nil
+        },
         system: nil,
         scenarios: []
       }
 
       iex> init(time: 1, warmup: 0.2)
       %Benchee.Suite{
-        configuration:
-          %Benchee.Configuration{
-            parallel: 1,
-            time: 1_000_000_000.0,
-            warmup: 200_000_000.0,
-            inputs: nil,
-            input_names: [],
-            save: false,
-            load: false,
-            formatters: [Benchee.Formatters.Console],
-            print: %{
-              benchmarking: true,
-              fast_warning: true,
-              configuration: true
-            },
-            percentiles: [50, 99],
-            unit_scaling: :best,
-            assigns: %{},
-            before_each: nil,
-            after_each: nil,
-            before_scenario: nil,
-            after_scenario: nil
+        configuration: %Benchee.Configuration{
+          parallel: 1,
+          time: 1_000_000_000.0,
+          warmup: 200_000_000.0,
+          inputs: nil,
+          input_names: [],
+          save: false,
+          load: false,
+          formatters: [Benchee.Formatters.Console],
+          print: %{
+            benchmarking: true,
+            fast_warning: true,
+            configuration: true
           },
+          percentiles: [50, 99],
+          unit_scaling: :best,
+          assigns: %{},
+          before_each: nil,
+          after_each: nil,
+          before_scenario: nil,
+          after_scenario: nil
+        },
         system: nil,
         scenarios: []
       }
@@ -244,31 +242,31 @@ defmodule Benchee.Configuration do
       ...>   formatters: [&IO.puts/1],
       ...>   print: [fast_warning: false],
       ...>   inputs: %{"Small" => 5, "Big" => 9999},
-      ...>   unit_scaling: :smallest)
+      ...>   unit_scaling: :smallest
+      ...> )
       %Benchee.Suite{
-        configuration:
-          %Benchee.Configuration{
-            parallel: 2,
-            time: 1_000_000_000.0,
-            warmup: 200_000_000.0,
-            inputs: [{"Big", 9999}, {"Small", 5}],
-            input_names: ["Big", "Small"],
-            save: false,
-            load: false,
-            formatters: [&IO.puts/1],
-            print: %{
-              benchmarking: true,
-              fast_warning: false,
-              configuration: true
-            },
-            percentiles: [50, 99],
-            unit_scaling: :smallest,
-            assigns: %{},
-            before_each: nil,
-            after_each: nil,
-            before_scenario: nil,
-            after_scenario: nil
+        configuration: %Benchee.Configuration{
+          parallel: 2,
+          time: 1_000_000_000.0,
+          warmup: 200_000_000.0,
+          inputs: [{"Big", 9999}, {"Small", 5}],
+          input_names: ["Big", "Small"],
+          save: false,
+          load: false,
+          formatters: [&IO.puts/1],
+          print: %{
+            benchmarking: true,
+            fast_warning: false,
+            configuration: true
           },
+          percentiles: [50, 99],
+          unit_scaling: :smallest,
+          assigns: %{},
+          before_each: nil,
+          after_each: nil,
+          before_scenario: nil,
+          after_scenario: nil
+        },
         system: nil,
         scenarios: []
       }

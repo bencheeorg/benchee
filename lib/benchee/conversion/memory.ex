@@ -59,14 +59,14 @@ defmodule Benchee.Conversion.Memory do
   ## Examples
 
     iex> {value, unit} = convert({1024, :kilobyte}, :megabyte)
-    iex> value
+    ...> value
     1.0
     iex> unit.name
     :megabyte
 
-    iex> current_unit = unit_for :kilobyte
-    iex> {value, unit} = convert({1024, current_unit}, :megabyte)
-    iex> value
+    iex> current_unit = unit_for(:kilobyte)
+    ...> {value, unit} = convert({1024, current_unit}, :megabyte)
+    ...> value
     1.0
     iex> unit.name
     :megabyte
@@ -84,25 +84,25 @@ defmodule Benchee.Conversion.Memory do
   ## Examples
 
     iex> {value, unit} = scale(1)
-    iex> value
+    ...> value
     1.0
     iex> unit.name
     :byte
 
     iex> {value, unit} = scale(1_234)
-    iex> value
+    ...> value
     1.205078125
     iex> unit.name
     :kilobyte
 
     iex> {value, unit} = scale(11_234_567_890.123)
-    iex> value
+    ...> value
     10.463006692121736
     iex> unit.name
     :gigabyte
 
     iex> {value, unit} = scale(1_111_234_567_890.123)
-    iex> value
+    ...> value
     1.0106619519229962
     iex> unit.name
     :terabyte
@@ -142,25 +142,25 @@ defmodule Benchee.Conversion.Memory do
 
   ## Examples
 
-      iex> unit_for :gigabyte
+      iex> unit_for(:gigabyte)
       %Benchee.Conversion.Unit{
-          name:      :gigabyte,
-          magnitude: 1_073_741_824,
-          label:     "GB",
-          long:      "Gigabytes"
+        name: :gigabyte,
+        magnitude: 1_073_741_824,
+        label: "GB",
+        long: "Gigabytes"
       }
 
       iex> unit_for(%Benchee.Conversion.Unit{
-      ...>   name:      :gigabyte,
+      ...>   name: :gigabyte,
       ...>   magnitude: 1_073_741_824,
-      ...>   label:     "GB",
-      ...>   long:      "Gigabytes"
-      ...>})
+      ...>   label: "GB",
+      ...>   long: "Gigabytes"
+      ...> })
       %Benchee.Conversion.Unit{
-          name:      :gigabyte,
-          magnitude: 1_073_741_824,
-          label:     "GB",
-          long:      "Gigabytes"
+        name: :gigabyte,
+        magnitude: 1_073_741_824,
+        label: "GB",
+        long: "Gigabytes"
       }
   """
   def unit_for(unit) do
@@ -246,10 +246,14 @@ defmodule Benchee.Conversion.Memory do
       iex> format({45.6789, :kilobyte})
       "45.68 KB"
 
-      iex> format {45.6789,
-      ...>   %Benchee.Conversion.Unit{
-      ...>     long: "Kilobytes", magnitude: 1024, label: "KB"}
-      ...>   }
+      iex> format(
+      ...>   {45.6789,
+      ...>    %Benchee.Conversion.Unit{
+      ...>      long: "Kilobytes",
+      ...>      magnitude: 1024,
+      ...>      label: "KB"
+      ...>    }}
+      ...> )
       "45.68 KB"
 
   """

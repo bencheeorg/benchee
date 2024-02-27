@@ -48,7 +48,9 @@ defmodule Benchee.Formatters.Console do
   ```
   iex> scenarios = [
   ...>   %Benchee.Scenario{
-  ...>     name: "My Job", input_name: "My input", run_time_data: %Benchee.CollectionData{
+  ...>     name: "My Job",
+  ...>     input_name: "My input",
+  ...>     run_time_data: %Benchee.CollectionData{
   ...>       statistics: %Benchee.Statistics{
   ...>         average: 200.0,
   ...>         ips: 5000.0,
@@ -61,7 +63,9 @@ defmodule Benchee.Formatters.Console do
   ...>     memory_usage_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{}}
   ...>   },
   ...>   %Benchee.Scenario{
-  ...>     name: "Job 2", input_name: "My input", run_time_data: %Benchee.CollectionData{
+  ...>     name: "Job 2",
+  ...>     input_name: "My input",
+  ...>     run_time_data: %Benchee.CollectionData{
   ...>       statistics: %Benchee.Statistics{
   ...>         average: 400.0,
   ...>         ips: 2500.0,
@@ -74,16 +78,23 @@ defmodule Benchee.Formatters.Console do
   ...>     memory_usage_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{}}
   ...>   }
   ...> ]
-  iex> suite = %Benchee.Suite{
+  ...> 
+  ...> suite = %Benchee.Suite{
   ...>   scenarios: scenarios,
   ...>   configuration: %Benchee.Configuration{
-  ...>     unit_scaling: :best,
+  ...>     unit_scaling: :best
   ...>   }
   ...> }
-  iex> format(suite, %{comparison: false, extended_statistics: false})
-  [["\n##### With input My input #####", "\nName             ips        average  deviation         median         99th %\n",
-  "My Job           5 K         200 ns    ±10.00%         190 ns      300.10 ns\n",
-  "Job 2         2.50 K         400 ns    ±20.00%         390 ns      500.10 ns\n"]]
+  ...> 
+  ...> format(suite, %{comparison: false, extended_statistics: false})
+  [
+    [
+      "\n##### With input My input #####",
+      "\nName             ips        average  deviation         median         99th %\n",
+      "My Job           5 K         200 ns    ±10.00%         190 ns      300.10 ns\n",
+      "Job 2         2.50 K         400 ns    ±20.00%         390 ns      500.10 ns\n"
+    ]
+  ]
 
   ```
 

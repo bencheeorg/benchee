@@ -113,16 +113,29 @@ defmodule Benchee.Scenario do
 
   ## Examples
 
-      iex> scenario = %Benchee.Scenario{run_time_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}}
-      iex> measurement_data(scenario, :run_time)
+      iex> scenario = %Benchee.Scenario{
+      ...>   run_time_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}
+      ...> }
+      ...> 
+      ...> measurement_data(scenario, :run_time)
       %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}
 
-      iex> scenario = %Benchee.Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 2}}}
-      iex> measurement_data(scenario, :memory)
+      iex> scenario = %Benchee.Scenario{
+      ...>   memory_usage_data: %Benchee.CollectionData{
+      ...>     statistics: %Benchee.Statistics{sample_size: 2}
+      ...>   }
+      ...> }
+      ...> 
+      ...> measurement_data(scenario, :memory)
       %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 2}}
 
-      iex> scenario = %Benchee.Scenario{reductions_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 3}}}
-      iex> measurement_data(scenario, :reductions)
+      iex> scenario = %Benchee.Scenario{
+      ...>   reductions_data: %Benchee.CollectionData{
+      ...>     statistics: %Benchee.Statistics{sample_size: 3}
+      ...>   }
+      ...> }
+      ...> 
+      ...> measurement_data(scenario, :reductions)
       %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 3}}
 
       iex> measurement_data(%Benchee.Scenario{}, :memory)
@@ -152,20 +165,40 @@ defmodule Benchee.Scenario do
 
   ## Examples
 
-      iex> scenario = %Benchee.Scenario{run_time_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 100}}}
-      iex> data_processed?(scenario, :run_time)
+      iex> scenario = %Benchee.Scenario{
+      ...>   run_time_data: %Benchee.CollectionData{
+      ...>     statistics: %Benchee.Statistics{sample_size: 100}
+      ...>   }
+      ...> }
+      ...> 
+      ...> data_processed?(scenario, :run_time)
       true
 
-      iex> scenario = %Benchee.Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}}
-      iex> data_processed?(scenario, :memory)
+      iex> scenario = %Benchee.Scenario{
+      ...>   memory_usage_data: %Benchee.CollectionData{
+      ...>     statistics: %Benchee.Statistics{sample_size: 1}
+      ...>   }
+      ...> }
+      ...> 
+      ...> data_processed?(scenario, :memory)
       true
 
-      iex> scenario = %Benchee.Scenario{reductions_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}}
-      iex> data_processed?(scenario, :reductions)
+      iex> scenario = %Benchee.Scenario{
+      ...>   reductions_data: %Benchee.CollectionData{
+      ...>     statistics: %Benchee.Statistics{sample_size: 1}
+      ...>   }
+      ...> }
+      ...> 
+      ...> data_processed?(scenario, :reductions)
       true
 
-      iex> scenario = %Benchee.Scenario{memory_usage_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 0}}}
-      iex> data_processed?(scenario, :memory)
+      iex> scenario = %Benchee.Scenario{
+      ...>   memory_usage_data: %Benchee.CollectionData{
+      ...>     statistics: %Benchee.Statistics{sample_size: 0}
+      ...>   }
+      ...> }
+      ...> 
+      ...> data_processed?(scenario, :memory)
       false
   """
   @spec data_processed?(t, :run_time | :memory) :: boolean

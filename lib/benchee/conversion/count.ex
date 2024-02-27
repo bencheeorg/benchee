@@ -52,13 +52,13 @@ defmodule Benchee.Conversion.Count do
   ## Examples
 
       iex> {value, unit} = scale(4_321.09)
-      iex> value
+      ...> value
       4.32109
       iex> unit.name
       :thousand
 
       iex> {value, unit} = scale(0.0045)
-      iex> value
+      ...> value
       0.0045
       iex> unit.name
       :one
@@ -91,25 +91,25 @@ defmodule Benchee.Conversion.Count do
 
   ## Examples
 
-      iex> unit_for :thousand
+      iex> unit_for(:thousand)
       %Benchee.Conversion.Unit{
-        name:      :thousand,
+        name: :thousand,
         magnitude: 1_000,
-        label:     "K",
-        long:      "Thousand"
+        label: "K",
+        long: "Thousand"
       }
 
       iex> unit_for(%Benchee.Conversion.Unit{
-      ...>   name:      :thousand,
+      ...>   name: :thousand,
       ...>   magnitude: 1_000,
-      ...>   label:     "K",
-      ...>   long:      "Thousand"
-      ...>})
+      ...>   label: "K",
+      ...>   long: "Thousand"
+      ...> })
       %Benchee.Conversion.Unit{
-        name:      :thousand,
+        name: :thousand,
         magnitude: 1_000,
-        label:     "K",
-        long:      "Thousand"
+        label: "K",
+        long: "Thousand"
       }
   """
   def unit_for(unit) do
@@ -148,7 +148,7 @@ defmodule Benchee.Conversion.Count do
   ## Examples
 
     iex> {value, unit} = convert({2500, :thousand}, :million)
-    iex> value
+    ...> value
     2.5
     iex> unit.name
     :million
@@ -212,7 +212,9 @@ defmodule Benchee.Conversion.Count do
       iex> format({45.6789, :thousand})
       "45.68 K"
 
-      iex> format({45.6789, %Benchee.Conversion.Unit{long: "Thousand", magnitude: "1_000", label: "K"}})
+      iex> format(
+      ...>   {45.6789, %Benchee.Conversion.Unit{long: "Thousand", magnitude: "1_000", label: "K"}}
+      ...> )
       "45.68 K"
   """
   def format(count) do
