@@ -83,7 +83,7 @@ defmodule Benchee.Conversion.Scale do
   ## Examples
 
       iex> unit = %Benchee.Conversion.Unit{magnitude: 1000}
-      iex> scale 12345, unit
+      ...> scale(12345, unit)
       12.345
   """
   def scale(value, %Unit{magnitude: magnitude}) do
@@ -135,31 +135,31 @@ defmodule Benchee.Conversion.Scale do
   ## Examples
 
       iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
-      iex> best_unit(list, Benchee.Conversion.Count, strategy: :best).name
+      ...> best_unit(list, Benchee.Conversion.Count, strategy: :best).name
       :thousand
 
       iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
-      iex> best_unit(list, Benchee.Conversion.Count, strategy: :smallest).name
+      ...> best_unit(list, Benchee.Conversion.Count, strategy: :smallest).name
       :one
 
       iex> list = [1, 101, 1_001, 10_001, 100_001, 1_000_001]
-      iex> best_unit(list, Benchee.Conversion.Count, strategy: :largest).name
+      ...> best_unit(list, Benchee.Conversion.Count, strategy: :largest).name
       :million
 
       iex> list = []
-      iex> best_unit(list, Benchee.Conversion.Count, strategy: :best).name
+      ...> best_unit(list, Benchee.Conversion.Count, strategy: :best).name
       :one
 
       iex> list = [nil]
-      iex> best_unit(list, Benchee.Conversion.Count, strategy: :best).name
+      ...> best_unit(list, Benchee.Conversion.Count, strategy: :best).name
       :one
 
       iex> list = [nil, nil, nil, nil]
-      iex> best_unit(list, Benchee.Conversion.Count, strategy: :best).name
+      ...> best_unit(list, Benchee.Conversion.Count, strategy: :best).name
       :one
 
       iex> list = [nil, nil, nil, nil, 2_000]
-      iex> best_unit(list, Benchee.Conversion.Count, strategy: :best).name
+      ...> best_unit(list, Benchee.Conversion.Count, strategy: :best).name
       :thousand
   """
   def best_unit(measurements, module, options) do

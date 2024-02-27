@@ -68,19 +68,19 @@ defmodule Benchee.Conversion.Duration do
   ## Examples
 
       iex> {value, unit} = scale(1)
-      iex> value
+      ...> value
       1.0
       iex> unit.name
       :nanosecond
 
       iex> {value, unit} = scale(1_234)
-      iex> value
+      ...> value
       1.234
       iex> unit.name
       :microsecond
 
       iex> {value, unit} = scale(11_234_567_890_123)
-      iex> value
+      ...> value
       3.1207133028119443
       iex> unit.name
       :hour
@@ -120,25 +120,25 @@ defmodule Benchee.Conversion.Duration do
 
   ## Examples
 
-      iex> unit_for :hour
+      iex> unit_for(:hour)
       %Benchee.Conversion.Unit{
-        name:      :hour,
+        name: :hour,
         magnitude: 3_600_000_000_000,
-        label:     "h",
-        long:      "Hours"
+        label: "h",
+        long: "Hours"
       }
 
       iex> unit_for(%Benchee.Conversion.Unit{
-      ...>   name:      :hour,
+      ...>   name: :hour,
       ...>   magnitude: 3_600_000_000_000,
-      ...>   label:     "h",
-      ...>   long:      "Hours"
-      ...>})
+      ...>   label: "h",
+      ...>   long: "Hours"
+      ...> })
       %Benchee.Conversion.Unit{
-        name:      :hour,
+        name: :hour,
         magnitude: 3_600_000_000_000,
-        label:     "h",
-        long:      "Hours"
+        label: "h",
+        long: "Hours"
       }
   """
   def unit_for(unit) do
@@ -174,7 +174,7 @@ defmodule Benchee.Conversion.Duration do
   ## Examples
 
     iex> {value, unit} = convert({90, :minute}, :hour)
-    iex> value
+    ...> value
     1.5
     iex> unit.name
     :hour
@@ -195,8 +195,8 @@ defmodule Benchee.Conversion.Duration do
       7.404e7
 
       iex> microseconds = convert_value({1.234, :minute}, :microsecond)
-      iex> {value, _} = convert({microseconds, :microsecond}, :minute)
-      iex> value
+      ...> {value, _} = convert({microseconds, :microsecond}, :minute)
+      ...> value
       1.234
 
   """
@@ -258,10 +258,14 @@ defmodule Benchee.Conversion.Duration do
       iex> format({45.6789, :millisecond})
       "45.68 ms"
 
-      iex> format {45.6789,
-      ...>   %Benchee.Conversion.Unit{
-      ...>     long: "Milliseconds", magnitude: 1000, label: "ms"}
-      ...>   }
+      iex> format(
+      ...>   {45.6789,
+      ...>    %Benchee.Conversion.Unit{
+      ...>      long: "Milliseconds",
+      ...>      magnitude: 1000,
+      ...>      label: "ms"
+      ...>    }}
+      ...> )
       "45.68 ms"
 
   """

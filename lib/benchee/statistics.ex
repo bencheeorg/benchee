@@ -115,8 +115,9 @@ defmodule Benchee.Statistics do
       ...>     input: "Input"
       ...>   }
       ...> ]
-      iex> suite = %Benchee.Suite{scenarios: scenarios}
-      iex> statistics(suite, Benchee.Test.FakeProgressPrinter)
+      ...> 
+      ...> suite = %Benchee.Suite{scenarios: scenarios}
+      ...> statistics(suite, Benchee.Test.FakeProgressPrinter)
       %Benchee.Suite{
         scenarios: [
           %Benchee.Scenario{
@@ -126,33 +127,33 @@ defmodule Benchee.Statistics do
             run_time_data: %Benchee.CollectionData{
               samples: [200, 400, 400, 400, 500, 500, 500, 700, 900],
               statistics: %Benchee.Statistics{
-                average:       500.0,
-                ips:           2000_000.0,
-                std_dev:       200.0,
+                average: 500.0,
+                ips: 2000_000.0,
+                std_dev: 200.0,
                 std_dev_ratio: 0.4,
-                std_dev_ips:   800_000.0,
-                median:        500.0,
-                percentiles:   %{50 => 500.0, 99 => 900.0},
-                mode:          [500, 400],
-                minimum:       200,
-                maximum:       900,
-                sample_size:   9
+                std_dev_ips: 800_000.0,
+                median: 500.0,
+                percentiles: %{50 => 500.0, 99 => 900.0},
+                mode: [500, 400],
+                minimum: 200,
+                maximum: 900,
+                sample_size: 9
               }
             },
             memory_usage_data: %Benchee.CollectionData{
               samples: [200, 400, 400, 400, 500, 500, 500, 700, 900],
               statistics: %Benchee.Statistics{
-                average:       500.0,
-                ips:           nil,
-                std_dev:       200.0,
+                average: 500.0,
+                ips: nil,
+                std_dev: 200.0,
                 std_dev_ratio: 0.4,
-                std_dev_ips:   nil,
-                median:        500.0,
-                percentiles:   %{50 => 500.0, 99 => 900.0},
-                mode:          [500, 400],
-                minimum:       200,
-                maximum:       900,
-                sample_size:   9
+                std_dev_ips: nil,
+                median: 500.0,
+                percentiles: %{50 => 500.0, 99 => 900.0},
+                mode: [500, 400],
+                minimum: 200,
+                maximum: 900,
+                sample_size: 9
               }
             }
           }

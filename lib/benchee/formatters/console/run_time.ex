@@ -35,14 +35,22 @@ defmodule Benchee.Formatters.Console.RunTime do
 
   ```
   iex> memory_statistics = %Benchee.Statistics{average: 100.0}
-  iex> scenarios = [
+  ...> 
+  ...> scenarios = [
   ...>   %Benchee.Scenario{
   ...>     name: "My Job",
   ...>     run_time_data: %Benchee.CollectionData{
   ...>       statistics: %Benchee.Statistics{
-  ...>         average: 200.0, ips: 5000.0,std_dev_ratio: 0.1, median: 190.0, percentiles: %{99 => 300.1},
-  ...>         minimum: 100.1, maximum: 200.2, sample_size: 10_101, mode: 333.2
-  ...>       },
+  ...>         average: 200.0,
+  ...>         ips: 5000.0,
+  ...>         std_dev_ratio: 0.1,
+  ...>         median: 190.0,
+  ...>         percentiles: %{99 => 300.1},
+  ...>         minimum: 100.1,
+  ...>         maximum: 200.2,
+  ...>         sample_size: 10_101,
+  ...>         mode: 333.2
+  ...>       }
   ...>     },
   ...>     memory_usage_data: %Benchee.CollectionData{statistics: memory_statistics}
   ...>   },
@@ -50,22 +58,32 @@ defmodule Benchee.Formatters.Console.RunTime do
   ...>     name: "Job 2",
   ...>     run_time_data: %Benchee.CollectionData{
   ...>       statistics: %Benchee.Statistics{
-  ...>         average: 400.0, ips: 2500.0, std_dev_ratio: 0.2, median: 390.0, percentiles: %{99 => 500.1},
-  ...>         minimum: 200.2, maximum: 400.4, sample_size: 20_202, mode: [612.3, 554.1]
+  ...>         average: 400.0,
+  ...>         ips: 2500.0,
+  ...>         std_dev_ratio: 0.2,
+  ...>         median: 390.0,
+  ...>         percentiles: %{99 => 500.1},
+  ...>         minimum: 200.2,
+  ...>         maximum: 400.4,
+  ...>         sample_size: 20_202,
+  ...>         mode: [612.3, 554.1]
   ...>       }
   ...>     },
   ...>     memory_usage_data: %Benchee.CollectionData{statistics: memory_statistics}
   ...>   }
   ...> ]
-  iex> configuration = %{comparison: false, unit_scaling: :best, extended_statistics: true}
-  iex> format_scenarios(scenarios, configuration)
-  ["\nName             ips        average  deviation         median         99th %\n",
-  "My Job           5 K         200 ns    ±10.00%         190 ns      300.10 ns\n",
-  "Job 2         2.50 K         400 ns    ±20.00%         390 ns      500.10 ns\n",
-  "\nExtended statistics: \n",
-  "\nName           minimum        maximum    sample size                     mode\n",
-  "My Job       100.10 ns      200.20 ns        10.10 K                333.20 ns\n",
-  "Job 2        200.20 ns      400.40 ns        20.20 K     612.30 ns, 554.10 ns\n"]
+  ...> 
+  ...> configuration = %{comparison: false, unit_scaling: :best, extended_statistics: true}
+  ...> format_scenarios(scenarios, configuration)
+  [
+    "\nName             ips        average  deviation         median         99th %\n",
+    "My Job           5 K         200 ns    ±10.00%         190 ns      300.10 ns\n",
+    "Job 2         2.50 K         400 ns    ±20.00%         390 ns      500.10 ns\n",
+    "\nExtended statistics: \n",
+    "\nName           minimum        maximum    sample size                     mode\n",
+    "My Job       100.10 ns      200.20 ns        10.10 K                333.20 ns\n",
+    "Job 2        200.20 ns      400.40 ns        20.20 K     612.30 ns, 554.10 ns\n"
+  ]
 
   ```
 
