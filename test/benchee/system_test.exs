@@ -143,6 +143,8 @@ defmodule Benchee.SystemTest do
   end
 
   # It may be compiled in a way that it doesn't but in the CI and dev machines it should be fine
+  # except for mac sometimes, where of course it isn't
+  @tag :guaranteed_jit
   test ".jit_enabled? should say true for versions > 24.0.0" do
     system_data = system(%Suite{}).system
     jit_enabled? = system_data.jit_enabled?

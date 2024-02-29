@@ -54,4 +54,14 @@ exclusions =
     exclusions
   end
 
+# somehow on CI macos doesn't have the JIT enabled installed via brew: https://github.com/bencheeorg/benchee/pull/426
+exclusions =
+  case os do
+    :darwin ->
+      [{:guaranteed_jit, true} | exclusions]
+
+    _ ->
+      exclusions
+  end
+
 ExUnit.start(exclude: exclusions)
