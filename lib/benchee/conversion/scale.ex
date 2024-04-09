@@ -175,7 +175,7 @@ defmodule Benchee.Conversion.Scale do
       :best -> best_unit(list, module)
       :largest -> largest_unit(list, module)
       :smallest -> smallest_unit(list, module)
-      :none -> module.base_unit
+      :none -> module.base_unit()
     end
   end
 
