@@ -34,6 +34,12 @@ jobs:
             otp_version: '23.3'
           - elixir_version: '1.13.4'
             otp_version: '22.3'
+
+          # Check elixir main, sadly allow-failure is not a thing and workarounds seem hard
+          # feature request: https://github.com/orgs/community/discussions/15452
+          # potential workaround: https://github.com/mainmatter/continue-on-error-comment
+          - elixir_version: 'main'
+            otp_version: '26.2'
         exclude:
           - elixir_version: '1.15.7'
             otp_version: '23.3'
