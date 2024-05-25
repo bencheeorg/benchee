@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Solaris systems will now correctly be identified and have their CPU and memory parsed. Thanks to [@brianewell](https://github.com/brianewell)!
 
 ### Bugfixes (User Facing)
-* A warning has been removed when running elixir-main/to be elixir 1.17. Thanks to [@mhanberg](https://github.com/mhanberg)!
+* warnings on elixir-main/1.17-rr have been removed. Thanks to [@mhanberg](https://github.com/mhanberg) & [@alco](https://github.com/alco)!
 
 ## 1.3.0 (2023-12-22)
 A big swath of bug fixes and improvements. The highlights certainly are fixes and conveniences around saved benchmarks and loading them again via the new `Benchee.report/1`. The other big one is saving a lot of memory (and time!) when processing big inputs. Sadly the latter comes with some breaking changes for plugins, but they are well justified and shouldn't actually affect any plugin in practice.
