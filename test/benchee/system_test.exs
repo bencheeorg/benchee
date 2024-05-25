@@ -131,7 +131,7 @@ defmodule Benchee.SystemTest do
     end
 
     test "when it borks out it warns and defaults to true, see #384" do
-      fake_lib_dir = fn _, _ -> {:error, :bad_name} end
+      fake_lib_dir = fn _ -> {:error, :bad_name} end
 
       warning =
         capture_io(fn ->

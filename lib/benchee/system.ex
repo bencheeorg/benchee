@@ -255,11 +255,13 @@ defmodule Benchee.System do
 
   # just made public for easy testing purposes
   @doc false
-  def all_protocols_consolidated?(lib_dir_fun \\ &lib_dir/2) do
-    case lib_dir_fun.(:elixir, :ebin) do
+  def all_protocols_consolidated?(lib_dir_fun \\ &:code.lib_dir/1) do
+    case lib_dir_fun.(:elixir) do
       # do we get a good old erlang charlist?
       path when is_list(path) ->
-        [path]
+        ebin_path = Path.join(path, "ebin")
+
+        [ebin_path]
         |> Protocol.extract_protocols()
         |> Enum.all?(&Protocol.consolidated?/1)
 
@@ -271,8 +273,6 @@ defmodule Benchee.System do
         true
     end
   end
-
-  defp lib_dir(app, subdir), do: Path.join(:code.lib_dir(app), subdir)
 end
 
 defimpl DeepMerge.Resolver, for: Benchee.System do
