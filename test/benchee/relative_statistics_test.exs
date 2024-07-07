@@ -147,6 +147,34 @@ defmodule Benchee.RelativeStatistcsTest do
       assert_in_delta c_stats.relative_more, 1.5, 0.001
       assert_in_delta c_stats.relative_less, 0.66, 0.01
     end
+
+    # Technically should not happen as we want to terminate/raise on invalid configs, but you never know
+    test "given a bogus reference_job we default to fastest as reference_job and proceed as normal" do
+      suite = %Suite{
+        scenarios: [
+          named_scenario_with_average("A", 3.0, nil),
+          named_scenario_with_average("B", 1.0, nil),
+          named_scenario_with_average("C", 2.0, nil)
+        ],
+        configuration: %Configuration{reference_job: "404"}
+      }
+
+      suite = relative_statistics(suite)
+      # now we get the fastest in (which for fun we made B be this time around)
+      assert [b_stats, c_stats, a_stats] = stats_from(suite)
+
+      assert b_stats.relative_more == nil
+      assert b_stats.relative_less == nil
+      assert b_stats.absolute_difference == nil
+
+      assert c_stats.absolute_difference == 1.0
+      assert_in_delta c_stats.relative_more, 2.0, 0.001
+      assert_in_delta c_stats.relative_less, 0.5, 0.01
+
+      assert a_stats.absolute_difference == 2.0
+      assert_in_delta a_stats.relative_more, 3.0, 0.001
+      assert_in_delta a_stats.relative_less, 0.33, 0.01
+    end
   end
 
   describe "sorting behaviour" do
