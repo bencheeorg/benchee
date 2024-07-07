@@ -1,7 +1,7 @@
 defmodule Benchee.RelativeStatistcsTest do
   use ExUnit.Case, async: true
 
-  alias Benchee.{CollectionData, Scenario, Statistics, Suite}
+  alias Benchee.{CollectionData, Configuration, Scenario, Statistics, Suite}
   import Benchee.RelativeStatistics
 
   describe "computing relative statistics" do
@@ -43,7 +43,7 @@ defmodule Benchee.RelativeStatistcsTest do
       assert stats.relative_less == nil
     end
 
-    test "handles the fastest value being zerio alright" do
+    test "handles the fastest value being zero alright" do
       suite = %Suite{
         scenarios: [
           scenario_with_average(0.0),
@@ -98,6 +98,55 @@ defmodule Benchee.RelativeStatistcsTest do
       assert stats2.relative_less == 1.0
       assert stats2.absolute_difference == 0.0
     end
+
+    test "setting the reference job to be the slowest" do
+      suite = %Suite{
+        scenarios: [
+          named_scenario_with_average("A", 394.0, nil),
+          named_scenario_with_average("B", 14.0, nil)
+        ],
+        configuration: %Configuration{reference_job: "A"}
+      }
+
+      suite = relative_statistics(suite)
+      # reference scenario always comes out on top even if slowest
+      assert [a_stats, b_stats] = stats_from(suite)
+
+      assert a_stats.relative_more == nil
+      assert a_stats.relative_less == nil
+      assert a_stats.absolute_difference == nil
+
+      assert b_stats.absolute_difference == -380.0
+      assert_in_delta b_stats.relative_more, 0.0355, 0.001
+      assert_in_delta b_stats.relative_less, 28.14, 0.1
+    end
+
+    test "sandwich reference job" do
+      suite = %Suite{
+        scenarios: [
+          named_scenario_with_average("A", 1.0, nil),
+          named_scenario_with_average("B", 2.0, nil),
+          named_scenario_with_average("C", 3.0, nil)
+        ],
+        configuration: %Configuration{reference_job: "B"}
+      }
+
+      suite = relative_statistics(suite)
+      # reference scenario always comes out on top even if slowest
+      assert [b_stats, a_stats, c_stats] = stats_from(suite)
+
+      assert b_stats.relative_more == nil
+      assert b_stats.relative_less == nil
+      assert b_stats.absolute_difference == nil
+
+      assert a_stats.absolute_difference == -1.0
+      assert_in_delta a_stats.relative_more, 0.5, 0.001
+      assert_in_delta a_stats.relative_less, 2.0, 0.01
+
+      assert c_stats.absolute_difference == 1.0
+      assert_in_delta c_stats.relative_more, 1.5, 0.001
+      assert_in_delta c_stats.relative_less, 0.66, 0.01
+    end
   end
 
   describe "sorting behaviour" do
@@ -137,6 +186,24 @@ defmodule Benchee.RelativeStatistcsTest do
       sorted = relative_statistics(%Suite{scenarios: scenarios}).scenarios
 
       assert Enum.map(sorted, fn scenario -> scenario.name end) == ["1", "2", "3"]
+    end
+
+    test "given a configured reference_job returns that as the first regardless of performance" do
+      fourth = named_scenario_with_average("4", 400.1, nil)
+      second = named_scenario_with_average("2", 200.0, nil)
+      third = named_scenario_with_average("3", 400.0, nil)
+      first = named_scenario_with_average("1", 100.0, nil)
+      reference = named_scenario_with_average("Ref", 500.0, nil)
+
+      scenarios = [fourth, second, third, first, reference]
+
+      sorted =
+        relative_statistics(%Suite{
+          scenarios: scenarios,
+          configuration: %Configuration{reference_job: "Ref"}
+        }).scenarios
+
+      assert Enum.map(sorted, fn scenario -> scenario.name end) == ["Ref", "1", "2", "3", "4"]
     end
   end
 
@@ -184,6 +251,35 @@ defmodule Benchee.RelativeStatistcsTest do
                {"A", "10", nil, nil},
                {"B", "1", 150.0, 2.5},
                {"B", "10", 2000.0, 3.0}
+             ]
+    end
+
+    test "calculate the correct relatives based on input names even given a reference_job" do
+      suite = %Suite{
+        scenarios: [
+          named_input_scenario_with_average("A", "1", 100.0),
+          named_input_scenario_with_average("B", "1", 200.0),
+          named_input_scenario_with_average("A", "10", 1_000.0),
+          named_input_scenario_with_average("B", "10", 10_000.0)
+        ],
+        configuration: %Configuration{reference_job: "B"}
+      }
+
+      suite = relative_statistics(suite)
+
+      stats =
+        suite.scenarios
+        |> Enum.map(
+          &{&1.name, &1.input_name, &1.run_time_data.statistics.absolute_difference,
+           &1.run_time_data.statistics.relative_more}
+        )
+        |> Enum.sort()
+
+      assert stats == [
+               {"A", "1", -100.0, 0.5},
+               {"A", "10", -9_000, 0.1},
+               {"B", "1", nil, nil},
+               {"B", "10", nil, nil}
              ]
     end
 

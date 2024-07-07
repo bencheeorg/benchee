@@ -9,7 +9,7 @@ defmodule Benchee.RelativeStatistics do
   has to happen before they are loaded to avoid recalculating their statistics.
   """
 
-  alias Benchee.{Scenario, Statistics, Suite}
+  alias Benchee.{Configuration, Scenario, Statistics, Suite}
 
   @doc """
   Calculate the statistics of scenarios relative to each other and sorts scenarios.
@@ -22,17 +22,17 @@ defmodule Benchee.RelativeStatistics do
   """
   @spec relative_statistics(Suite.t()) :: Suite.t()
   def relative_statistics(suite) do
-    %Suite{suite | scenarios: calculate_relative_statistics(suite.scenarios)}
+    %Suite{suite | scenarios: calculate_relative_statistics(suite.scenarios, suite.configuration)}
   end
 
-  defp calculate_relative_statistics([]), do: []
+  defp calculate_relative_statistics([], _config), do: []
 
-  defp calculate_relative_statistics(scenarios) do
+  defp calculate_relative_statistics(scenarios, config) do
     scenarios
     |> scenarios_by_input()
     |> Enum.flat_map(fn scenarios_with_same_input ->
       sorted_scenarios = sort(scenarios_with_same_input)
-      {reference, others} = split_reference_scenario(sorted_scenarios)
+      {reference, others} = split_reference_scenario(sorted_scenarios, config)
       others_with_relative = statistics_relative_to(others, reference)
       [reference | others_with_relative]
     end)
@@ -59,9 +59,25 @@ defmodule Benchee.RelativeStatistics do
     end)
   end
 
-  # right now we take the first scenario as we sorted them and it is the fastest,
-  # whenever we implement #179 though this becomes more involved
-  defp split_reference_scenario(scenarios) do
+  defp split_reference_scenario(scenarios, config)
+
+  defp split_reference_scenario(scenarios, %Configuration{reference_job: reference_job})
+       when is_binary(reference_job) do
+    split_scenarios =
+      Enum.split_with(scenarios, fn scenario -> scenario.name == reference_job end)
+
+    case split_scenarios do
+      {[reference_scenario], others} -> {reference_scenario, others}
+      _reference_not_found -> fastest_as_reference(scenarios)
+    end
+  end
+
+  # no reference_job configured? Just take the first one, as this is post sort it'll be the fastet
+  defp split_reference_scenario(scenarios, _config) do
+    fastest_as_reference(scenarios)
+  end
+
+  defp fastest_as_reference(scenarios) do
     [reference | others] = scenarios
     {reference, others}
   end

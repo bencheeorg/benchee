@@ -39,7 +39,8 @@ defmodule Benchee.Configuration do
             after_scenario: nil,
             measure_function_call_overhead: false,
             title: nil,
-            profile_after: false
+            profile_after: false,
+            reference_job: nil
 
   @typedoc """
   The configuration supplied by the user as either a map or a keyword list
@@ -133,6 +134,7 @@ defmodule Benchee.Configuration do
       [`:cprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Cprof.html),
       [`:eprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Eprof.html) and
       [`:fprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Fprof.html).
+    * `:reference_job` - Set which function in the benchmark all others will be compared against.
   """
   @type user_configuration :: map | keyword
 
@@ -163,7 +165,8 @@ defmodule Benchee.Configuration do
           after_scenario: Hooks.hook_function() | nil,
           measure_function_call_overhead: boolean,
           title: String.t() | nil,
-          profile_after: boolean | atom | {atom, keyword}
+          profile_after: boolean | atom | {atom, keyword},
+          reference_job: String.t() | nil
         }
 
   @time_keys [:time, :warmup, :memory_time, :reduction_time]
