@@ -1039,6 +1039,8 @@ defmodule BencheeTest do
     end
   end
 
+  # timeout huge because of CI
+  @overly_long_ci_waiting_time 20_000
   describe "warn when functions are evaluated" do
     test "warns when run in iex" do
       # test env to avoid repeated compilation on CI
@@ -1046,20 +1048,22 @@ defmodule BencheeTest do
 
       try do
         # wait for startup
-        # timeout huge because of CI
-        assert_receive {^port, {:data, "iex(1)> "}}, 20_000
+        assert_receive {^port, {:data, "iex(1)> "}}, @overly_long_ci_waiting_time
 
         send(
           port,
-          {self(),
-           {:command, "Benchee.run(%{\"test\" => fn -> 1 end}, time: 0.001, warmup: 0)\n"}}
+          {
+            self(),
+            # end with nil to avoid printing of the entire suite
+            {:command, "Benchee.run(%{\"test\" => fn -> 1 end}, time: 0.001, warmup: 0); nil\n"}
+          }
         )
 
-        assert_receive {^port, {:data, "Warning: " <> message}}, 20_000
+        assert_receive {^port, {:data, "Warning: " <> message}}, @overly_long_ci_waiting_time
         assert message =~ ~r/test.+evaluated.+slower.+compiled.+module.+/is
 
         # waiting for iex to be ready for input again
-        assert_receive {^port, {:data, "iex(2)> "}}, 20_000
+        assert_receive {^port, {:data, "iex(2)> "}}, @overly_long_ci_waiting_time
       after
         # https://elixirforum.com/t/starting-shutting-down-iex-with-a-port-gracefully/60388/2?u=pragtob
         send(port, {self(), {:command, "\a"}})
