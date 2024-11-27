@@ -23,7 +23,7 @@ defmodule Benchee.Profile do
   alias Benchee.Suite
 
   @default_profiler :eprof
-  @builtin_profilers [:cprof, :eprof, :fprof]
+  @builtin_profilers [:cprof, :eprof, :fprof, :tprof]
   # we run the function a bunch already, no need for further warmup
   @default_profiler_opts [warmup: false]
 
