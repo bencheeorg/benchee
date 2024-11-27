@@ -89,8 +89,7 @@ defmodule Benchee.ProfileTest do
     assert_receive {:profiling, ^name, ^profiler}
   end
 
-  @profilers Profile.builtin_profilers()
-  for profiler <- @profilers do
+  for profiler <- Profile.builtin_profilers() do
     @profiler profiler
     # can't say warmup as some profilers will have it in the profile messing with the test
     describe "warming up behavior with #{@profiler}" do
