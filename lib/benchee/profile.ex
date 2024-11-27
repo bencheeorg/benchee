@@ -30,6 +30,7 @@ defmodule Benchee.Profile do
   if Version.match?(System.version(), ">= 1.17.0") do
     @builtin_profilers [:tprof | @builtin_profilers]
   end
+
   # we run the function a bunch already, no need for further warmup
   @default_profiler_opts [warmup: false]
 
