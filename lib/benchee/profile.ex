@@ -23,7 +23,13 @@ defmodule Benchee.Profile do
   alias Benchee.Suite
 
   @default_profiler :eprof
-  @builtin_profilers [:cprof, :eprof, :fprof, :tprof]
+  @builtin_profilers [:cprof, :eprof, :fprof]
+  # https://hexdocs.pm/mix/1.17.0/Mix.Tasks.Profile.Tprof.html
+  # Was introduced in 1.17.0, it also requires OTP 27 but I trust it to error fine for
+  # that case itself
+  if Version.match?(System.version(), ">= 1.17.0") do
+    @builtin_profilers [:tprof | @builtin_profilers]
+  end
   # we run the function a bunch already, no need for further warmup
   @default_profiler_opts [warmup: false]
 
