@@ -6,10 +6,10 @@ defmodule BencheeTest do
     Formatter,
     Formatters.Console,
     Profile,
-    Profile.Benchee.UnknownProfilerError,
     Statistics,
     Suite,
-    Test.FakeFormatter
+    Test.FakeFormatter,
+    UnknownProfilerError
   }
 
   import ExUnit.CaptureIO

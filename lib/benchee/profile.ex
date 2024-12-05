@@ -28,10 +28,6 @@ defmodule Benchee.Profile do
   # we run the function a bunch already, no need for further warmup
   @default_profiler_opts [warmup: false]
 
-  defmodule Benchee.UnknownProfilerError do
-    defexception message: "error"
-  end
-
   @doc """
   Returns the atom corresponding to the default profiler.
   """
