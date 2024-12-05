@@ -4,7 +4,8 @@ defmodule Benchee.Benchmark.Collect.ReturnValue do
   # Returns the value of the evaluated function.
   # Used for pre checks.
 
-  @behaviour Benchee.Benchmark.Collect
+  # Does not strictly speaking implement Benchee.Benchmark.Collect because
+  # it does not return a metric.
 
   @spec collect((-> any)) :: {any, any}
   def collect(function) do
