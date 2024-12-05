@@ -55,7 +55,7 @@ defmodule Benchee.Benchmark.Runner do
   # This will run the given scenario exactly once, including the before and
   # after hooks, to ensure the function can execute without raising an error.
   defp pre_check(scenario, scenario_context) do
-    RunOnce.run(scenario, scenario_context, Collect.Time)
+    RunOnce.run(scenario, scenario_context, Collect.ReturnValue)
   end
 
   def measure_and_report_function_call_overhead(prtiner) do

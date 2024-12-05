@@ -12,8 +12,8 @@ defmodule Benchee.Benchmark.RunOnce do
   def run(scenario, scenario_context, collector) do
     scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
-    _ = Runner.collect(scenario, scenario_context, collector)
+    collected = Runner.collect(scenario, scenario_context, collector)
     _ = Hooks.run_after_scenario(scenario, scenario_context)
-    nil
+    collected
   end
 end
