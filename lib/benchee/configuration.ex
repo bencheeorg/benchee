@@ -74,7 +74,12 @@ defmodule Benchee.Configuration do
     * `pre_check` - whether or not to run each job with each input - including all
     given before or after scenario or each hooks - before the benchmarks are
     measured to ensure that your code executes without error. This can save time
-    while developing your suites. Defaults to `false`.
+    while developing your suites. Defaults to `false`. Possible values are:
+      * `false` - no pre check is run
+      * `true` - each scenario is run but the return value is ignored
+      * `:all_same` - raises if all scenarios are not returning the same value for
+      each input. This is useful when benchmarking alternative implementations of a
+      deterministic function.
     * `parallel`   - each the function of each job will be executed in
     `parallel` number processes. If `parallel` is `4` then 4 processes will be
     spawned that all execute the _same_ function for the given time. When these

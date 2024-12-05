@@ -33,8 +33,10 @@ defmodule Benchee.Benchmark.Runner do
   """
   @spec run_scenarios([Scenario.t()], ScenarioContext.t()) :: [Scenario.t()]
   def run_scenarios(scenarios, scenario_context) do
-    if scenario_context.config.pre_check do
-      Enum.each(scenarios, fn scenario -> pre_check(scenario, scenario_context) end)
+    case scenario_context.config.pre_check do
+      true -> Enum.each(scenarios, fn scenario -> pre_check(scenario, scenario_context) end)
+      false -> :ok
+      :all_same -> all_same(scenarios, scenario_context)
     end
 
     function_call_overhead =
@@ -55,7 +57,26 @@ defmodule Benchee.Benchmark.Runner do
   # This will run the given scenario exactly once, including the before and
   # after hooks, to ensure the function can execute without raising an error.
   defp pre_check(scenario, scenario_context) do
-    RunOnce.run(scenario, scenario_context, Collect.Time)
+    RunOnce.run(scenario, scenario_context, Collect.ReturnValue)
+  end
+
+  defp all_same(scenarios, scenario_context) do
+    Enum.reduce(scenarios, %{}, fn %{input_name: input_name} = scenario, previous_runs ->
+      return_value = pre_check(scenario, scenario_context)
+
+      case previous_runs do
+        %{^input_name => {previous_job, previous_value}} when return_value !== previous_value ->
+          raise Benchee.PreCheckError,
+            message: """
+            all_same pre check failed for input #{inspect(input_name)}:
+            - #{previous_job} returned #{inspect(previous_value)}
+            - #{scenario.job_name} returned #{inspect(return_value)}
+            """
+
+        _ ->
+          Map.put_new(previous_runs, input_name, {scenario.job_name, return_value})
+      end
+    end)
   end
 
   def measure_and_report_function_call_overhead(prtiner) do
