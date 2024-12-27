@@ -75,7 +75,7 @@ for {module, moduledoc} <- [{Benchee, elixir_doc}, {:benchee, erlang_doc}] do
     """
     @spec report(keyword) :: Benchee.Suite.t()
     def report(config) do
-      unless Access.get(config, :load), do: raise_missing_load()
+      if !Access.get(config, :load), do: raise_missing_load()
 
       config
       |> Benchee.init()

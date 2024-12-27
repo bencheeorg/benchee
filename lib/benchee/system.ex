@@ -244,7 +244,7 @@ defmodule Benchee.System do
   end
 
   defp warn_about_performance_degrading_settings do
-    unless all_protocols_consolidated?() do
+    if !all_protocols_consolidated?() do
       IO.puts("""
       Not all of your protocols have been consolidated. In order to achieve the
       best possible accuracy for benchmarks, please ensure protocol

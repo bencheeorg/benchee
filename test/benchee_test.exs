@@ -1102,7 +1102,7 @@ defmodule BencheeTest do
     # In windows time resolution seems to be milliseconds, hence even
     # standard examples produce a fast warning.
     # So we skip this "basically everything is going fine" test on windows
-    unless windows?(), do: refute(output =~ ~r/fast/i)
+    if !windows?(), do: refute(output =~ ~r/fast/i)
   end
 
   defp body_regex(benchmark_name, tag_regex \\ "") do

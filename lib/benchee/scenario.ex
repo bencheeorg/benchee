@@ -116,7 +116,7 @@ defmodule Benchee.Scenario do
       iex> scenario = %Benchee.Scenario{
       ...>   run_time_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}
       ...> }
-      ...>
+      ...> 
       ...> measurement_data(scenario, :run_time)
       %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}
 
@@ -125,7 +125,7 @@ defmodule Benchee.Scenario do
       ...>     statistics: %Benchee.Statistics{sample_size: 2}
       ...>   }
       ...> }
-      ...>
+      ...> 
       ...> measurement_data(scenario, :memory)
       %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 2}}
 
@@ -134,7 +134,7 @@ defmodule Benchee.Scenario do
       ...>     statistics: %Benchee.Statistics{sample_size: 3}
       ...>   }
       ...> }
-      ...>
+      ...> 
       ...> measurement_data(scenario, :reductions)
       %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 3}}
 
@@ -167,7 +167,7 @@ defmodule Benchee.Scenario do
       ...>     statistics: %Benchee.Statistics{sample_size: 100}
       ...>   }
       ...> }
-      ...>
+      ...> 
       ...> data_processed?(scenario, :run_time)
       true
 
@@ -176,7 +176,7 @@ defmodule Benchee.Scenario do
       ...>     statistics: %Benchee.Statistics{sample_size: 1}
       ...>   }
       ...> }
-      ...>
+      ...> 
       ...> data_processed?(scenario, :memory)
       true
 
@@ -185,7 +185,7 @@ defmodule Benchee.Scenario do
       ...>     statistics: %Benchee.Statistics{sample_size: 1}
       ...>   }
       ...> }
-      ...>
+      ...> 
       ...> data_processed?(scenario, :reductions)
       true
 
@@ -194,7 +194,7 @@ defmodule Benchee.Scenario do
       ...>     statistics: %Benchee.Statistics{sample_size: 0}
       ...>   }
       ...> }
-      ...>
+      ...> 
       ...> data_processed?(scenario, :memory)
       false
   """
