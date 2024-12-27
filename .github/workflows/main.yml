@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         # Thoroughly check the most recent versions
-        elixir_version: ['1.13.4', '1.14.5', '1.15.7', '1.16.3', '1.17.3']
+        elixir_version: ['1.13.4', '1.14.5', '1.15.7', '1.16.3', '1.17.3', '1.18.1']
         otp_version: ['23.3', '24.3', '25.3', '26.2']
         # Spot check older versions
         #
@@ -35,7 +35,9 @@ jobs:
           - elixir_version: '1.13.4'
             otp_version: '22.3'
           - elixir_version: '1.17.3'
-            otp_version: '27.1'
+            otp_version: '27.2'
+          - elixir_version: '1.18.1'
+            otp_version: '27.2'
         exclude:
           - elixir_version: '1.15.7'
             otp_version: '23.3'
@@ -48,6 +50,10 @@ jobs:
           - elixir_version: '1.17.3'
             otp_version: '23.3'
           - elixir_version: '1.17.3'
+            otp_version: '24.3'
+          - elixir_version: '1.18.1'
+            otp_version: '23.3'
+          - elixir_version: '1.18.1'
             otp_version: '24.3'
 
     steps:
@@ -70,26 +76,26 @@ jobs:
         with:
           path: tools/plts
           key: erlef-${{ runner.os }}-dialyzer-${{ matrix.elixir_version }}-${{ matrix.otp_version }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
-        if: contains(matrix.elixir_version, '1.17')
+        if: contains(matrix.elixir_version, '1.18')
       - run: mix deps.get
       - run: MIX_ENV=test mix compile --warnings-as-errors
       - run: mix credo
-        if: contains(matrix.elixir_version, '1.17')
+        if: contains(matrix.elixir_version, '1.18')
       - name: Check if formatted
-        if: contains(matrix.elixir_version, '1.17')
+        if: contains(matrix.elixir_version, '1.18')
         run: mix format --check-formatted
       - name: Actual Tests
         # this will let warnings slip through but I don't wanna replicate all that magic
         # right now
         run: MIX_ENV=test mix coveralls.github || mix test --failed
         # Apparently the one with `!` can't go without the fancy expression syntax
-        if: ${{ !contains(matrix.elixir_version, '1.17') }}
+        if: ${{ !contains(matrix.elixir_version, '1.18') }}
       - name: Actual Tests WITH warnings as errors
         run: MIX_ENV=test mix coveralls.github --warnings-as-errors || mix test --failed
-        if: contains(matrix.elixir_version, '1.17')
+        if: contains(matrix.elixir_version, '1.18')
       - name: Dialyzer
         run: mix dialyzer --halt-exit-status
-        if: contains(matrix.elixir_version, '1.17')
+        if: contains(matrix.elixir_version, '1.18')
 
   macos:
     name: Test on MacOS
