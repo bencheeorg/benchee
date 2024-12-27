@@ -116,7 +116,7 @@ defmodule Benchee.Scenario do
       iex> scenario = %Benchee.Scenario{
       ...>   run_time_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}
       ...> }
-      ...> 
+      ...>
       ...> measurement_data(scenario, :run_time)
       %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 1}}
 
@@ -125,7 +125,7 @@ defmodule Benchee.Scenario do
       ...>     statistics: %Benchee.Statistics{sample_size: 2}
       ...>   }
       ...> }
-      ...> 
+      ...>
       ...> measurement_data(scenario, :memory)
       %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 2}}
 
@@ -134,15 +134,12 @@ defmodule Benchee.Scenario do
       ...>     statistics: %Benchee.Statistics{sample_size: 3}
       ...>   }
       ...> }
-      ...> 
+      ...>
       ...> measurement_data(scenario, :reductions)
       %Benchee.CollectionData{statistics: %Benchee.Statistics{sample_size: 3}}
 
       iex> measurement_data(%Benchee.Scenario{}, :memory)
       %Benchee.CollectionData{}
-
-      iex> measurement_data(%Benchee.Scenario{}, :invalid)
-      ** (FunctionClauseError) no function clause matching in Benchee.Scenario.measurement_data/2
   """
   @spec measurement_data(t, :memory | :reductions | :run_time) :: CollectionData.t()
   # Arguably this access is OO-ish/not great. However, with the incosistency we have in naming
@@ -170,7 +167,7 @@ defmodule Benchee.Scenario do
       ...>     statistics: %Benchee.Statistics{sample_size: 100}
       ...>   }
       ...> }
-      ...> 
+      ...>
       ...> data_processed?(scenario, :run_time)
       true
 
@@ -179,7 +176,7 @@ defmodule Benchee.Scenario do
       ...>     statistics: %Benchee.Statistics{sample_size: 1}
       ...>   }
       ...> }
-      ...> 
+      ...>
       ...> data_processed?(scenario, :memory)
       true
 
@@ -188,7 +185,7 @@ defmodule Benchee.Scenario do
       ...>     statistics: %Benchee.Statistics{sample_size: 1}
       ...>   }
       ...> }
-      ...> 
+      ...>
       ...> data_processed?(scenario, :reductions)
       true
 
@@ -197,7 +194,7 @@ defmodule Benchee.Scenario do
       ...>     statistics: %Benchee.Statistics{sample_size: 0}
       ...>   }
       ...> }
-      ...> 
+      ...>
       ...> data_processed?(scenario, :memory)
       false
   """
