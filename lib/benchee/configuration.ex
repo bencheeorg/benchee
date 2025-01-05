@@ -134,10 +134,11 @@ defmodule Benchee.Configuration do
       * a boolean   - `true` will enable profiling with the default profiler
       (`:eprof`) and `false` will disable profiling. Defaults to `false`.
       * a profiler  - either as a tuple of `{profiler, opts}` (e.g., `{:fprof, [sort: :own]}`)
-      or just the profiler (e.g., `:fprof`), which is equivalent to `{profiler, []}`. The accepted built-in profilers are
+      or just the profiler (e.g., `:fprof`), which is equivalent to `{profiler, []}`. The accepted built-in profilers are:
       [`:cprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Cprof.html),
-      [`:eprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Eprof.html) and
-      [`:fprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Fprof.html).
+      [`:eprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Eprof.html)
+      [`:fprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Fprof.html) and
+      [`:tprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Tprof.html) (requires elixir >= 1.17 and erlang >= 27).
   """
   @type user_configuration :: map | keyword
 
