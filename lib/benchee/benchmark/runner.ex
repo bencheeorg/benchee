@@ -13,7 +13,6 @@ defmodule Benchee.Benchmark.Runner do
     FunctionCallOverhead,
     Hooks,
     RepeatedMeasurement,
-    RunOnce,
     ScenarioContext
   }
 
@@ -57,7 +56,15 @@ defmodule Benchee.Benchmark.Runner do
   # This will run the given scenario exactly once, including the before and
   # after hooks, to ensure the function can execute without raising an error.
   defp pre_check(scenario, scenario_context) do
-    RunOnce.run(scenario, scenario_context, Collect.ReturnValue)
+    run_once(scenario, scenario_context, Collect.ReturnValue)
+  end
+
+  def run_once(scenario, scenario_context, collector) do
+    scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
+    scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
+    collected = collect(scenario, scenario_context, collector)
+    _ = Hooks.run_after_scenario(scenario, scenario_context)
+    collected
   end
 
   defp all_same(scenarios, scenario_context) do
