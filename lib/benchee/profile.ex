@@ -26,8 +26,10 @@ defmodule Benchee.Profile do
   @builtin_profilers [:cprof, :eprof, :fprof]
   # https://hexdocs.pm/mix/1.17.0/Mix.Tasks.Profile.Tprof.html
   # Tprof was introduced in elixir 1.17.0 and requires OTP 27
-  # Elixir errors out fine, but our test kind of put their trust into `builtin_profilers` being runnable.
-  if Version.match?(System.version(), ">= 1.17.0") && String.to_integer(System.otp_release()) >= 27 do
+  # Elixir errors out fine, but our test kind of put their trust into `builtin_profilers`
+  # being runnable.
+  if Version.match?(System.version(), ">= 1.17.0") &&
+       String.to_integer(System.otp_release()) >= 27 do
     @builtin_profilers [:tprof | @builtin_profilers]
   end
 

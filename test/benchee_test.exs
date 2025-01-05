@@ -925,8 +925,7 @@ defmodule BencheeTest do
       assert output =~ end_of_profiling_regex(Profile.default_profiler())
     end
 
-    @profilers [:cprof, :eprof, :fprof]
-    for profiler <- @profilers do
+    for profiler <- Benchee.Profile.builtin_profilers() do
       @profiler profiler
       test "integration profiling runs #{inspect(@profiler)} profiler" do
         output =
