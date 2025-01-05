@@ -12,13 +12,14 @@ jobs:
 
     strategy:
       matrix:
-        # Thoroughly check the most recent versions
-        elixir_version: ['1.13.4', '1.14.5', '1.15.7', '1.16.3', '1.17.3', '1.18.1']
-        otp_version: ['23.3', '24.3', '25.3', '26.2']
+        # Run a full matrix only for the last 3 versions (where possible)
+        elixir_version: ['1.16.3', '1.17.3', '1.18.1']
+        otp_version: ['25.3', '26.2', '27.2']
         # Spot check older versions
         #
         # Goal is to have old versions (elixir and erlang) have basically one test each.
         # That should be enough to affirm that they are working ok.
+        # https://hexdocs.pm/elixir/compatibility-and-deprecations.html#between-elixir-and-erlang-otp
         include:
           - elixir_version: '1.7.4'
             otp_version: '20.3'
@@ -34,27 +35,13 @@ jobs:
             otp_version: '23.3'
           - elixir_version: '1.13.4'
             otp_version: '22.3'
-          - elixir_version: '1.17.3'
-            otp_version: '27.2'
-          - elixir_version: '1.18.1'
-            otp_version: '27.2'
-        exclude:
-          - elixir_version: '1.15.7'
-            otp_version: '23.3'
-          - elixir_version: '1.16.3'
-            otp_version: '23.3'
-          - elixir_version: '1.13.4'
-            otp_version: '26.2'
           - elixir_version: '1.14.5'
-            otp_version: '26.2'
-          - elixir_version: '1.17.3'
             otp_version: '23.3'
-          - elixir_version: '1.17.3'
+          - elixir_version: '1.15.7'
             otp_version: '24.3'
-          - elixir_version: '1.18.1'
-            otp_version: '23.3'
-          - elixir_version: '1.18.1'
-            otp_version: '24.3'
+        exclude:
+          - elixir_version: '1.16.3'
+            otp_version: '27.2'
 
     steps:
       - name: Checkout
