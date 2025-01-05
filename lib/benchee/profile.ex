@@ -17,7 +17,6 @@ defmodule Benchee.Profile do
   """
 
   alias Benchee.Benchmark.BenchmarkConfig
-  alias Benchee.Benchmark.Collect
   alias Benchee.Benchmark.Runner
   alias Benchee.Benchmark.ScenarioContext
   alias Benchee.Output.ProfilePrinter, as: Printer
@@ -99,10 +98,11 @@ defmodule Benchee.Profile do
        ) do
     printer.profiling(scenario.name, profiler)
 
-    Runner.run_once(
-      scenario,
-      %ScenarioContext{config: BenchmarkConfig.from(config)},
-      {Collect.Profile, [profiler_module: profiler_module, profiler_opts: profiler_opts]}
+    profiler_module.profile(
+      fn ->
+        Runner.run_once(scenario, %ScenarioContext{config: BenchmarkConfig.from(config)})
+      end,
+      profiler_opts
     )
   end
 

@@ -56,15 +56,15 @@ defmodule Benchee.Benchmark.Runner do
   # This will run the given scenario exactly once, including the before and
   # after hooks, to ensure the function can execute without raising an error.
   defp pre_check(scenario, scenario_context) do
-    run_once(scenario, scenario_context, Collect.ReturnValue)
+    run_once(scenario, scenario_context)
   end
 
-  def run_once(scenario, scenario_context, collector) do
+  def run_once(scenario, scenario_context) do
     scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
-    collected = collect(scenario, scenario_context, collector)
+    return_value = collect_return_value(scenario, scenario_context)
     _ = Hooks.run_after_scenario(scenario, scenario_context)
-    collected
+    return_value
   end
 
   defp all_same(scenarios, scenario_context) do
@@ -300,6 +300,18 @@ defmodule Benchee.Benchmark.Runner do
   @spec updated_measurements(number | nil, [number]) :: [number]
   defp updated_measurements(nil, measurements), do: measurements
   defp updated_measurements(measurement, measurements), do: [measurement | measurements]
+
+  # Support functionality that just runs once via `run_once` and does not care about measurements.
+  # At the time of this writing that's pre checks and profilers.
+  defp collect_return_value(scenario, scenario_context) do
+    new_input = Hooks.run_before_each(scenario, scenario_context)
+    function = main_function(scenario.function, new_input)
+
+    return_value = function.()
+
+    Hooks.run_after_each(return_value, scenario, scenario_context)
+    return_value
+  end
 
   @doc """
   Takes one measure with the given collector.
