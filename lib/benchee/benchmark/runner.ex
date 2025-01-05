@@ -16,6 +16,8 @@ defmodule Benchee.Benchmark.Runner do
     ScenarioContext
   }
 
+  @no_input Benchmark.no_input()
+
   @doc """
   Executes the benchmarks defined before by first running the defined functions
   for `warmup` time without gathering results and them running them for `time`
@@ -75,7 +77,7 @@ defmodule Benchee.Benchmark.Runner do
         %{^input_name => {previous_job, previous_value}} when return_value !== previous_value ->
           raise Benchee.PreCheckError,
             message: """
-            all_same pre check failed for input #{inspect(input_name)}:
+            all_same pre check failed#{pre_check_failed_input_message(input_name)}:
             - #{previous_job} returned #{inspect(previous_value)}
             - #{scenario.job_name} returned #{inspect(return_value)}
             """
@@ -85,6 +87,9 @@ defmodule Benchee.Benchmark.Runner do
       end
     end)
   end
+
+  defp pre_check_failed_input_message(@no_input), do: ""
+  defp pre_check_failed_input_message(input_name), do: " for input #{inspect(input_name)}"
 
   def measure_and_report_function_call_overhead(prtiner) do
     overhead = FunctionCallOverhead.measure()
@@ -345,7 +350,6 @@ defmodule Benchee.Benchmark.Runner do
     RepeatedMeasurement.collect(scenario, scenario_context, collector)
   end
 
-  @no_input Benchmark.no_input()
   def main_function(function, @no_input), do: function
   def main_function(function, input), do: fn -> function.(input) end
 

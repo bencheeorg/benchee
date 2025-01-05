@@ -1007,5 +1007,23 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> Benchmark.collect(FakeBenchmarkPrinter)
       end
     end
+
+    test "the failure message handles the ominous no input value nicely" do
+      config = %{time: 0, warmup: 0, pre_check: :all_same}
+
+      message = """
+      all_same pre check failed:
+      - double returned 2
+      - triple returned 3
+      """
+
+      assert_raise Benchee.PreCheckError, message, fn ->
+        %Suite{configuration: config}
+        |> test_suite
+        |> Benchmark.benchmark("double", fn -> 2 end)
+        |> Benchmark.benchmark("triple", fn -> 3 end)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
+      end
+    end
   end
 end
