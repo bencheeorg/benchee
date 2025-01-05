@@ -35,7 +35,7 @@ defmodule Benchee.Benchmark.Runner do
     case scenario_context.config.pre_check do
       true -> Enum.each(scenarios, fn scenario -> pre_check(scenario, scenario_context) end)
       false -> :ok
-      :all_same -> all_same(scenarios, scenario_context)
+      :all_same -> pre_check_all_same(scenarios, scenario_context)
     end
 
     function_call_overhead =
@@ -67,7 +67,7 @@ defmodule Benchee.Benchmark.Runner do
     return_value
   end
 
-  defp all_same(scenarios, scenario_context) do
+  defp pre_check_all_same(scenarios, scenario_context) do
     Enum.reduce(scenarios, %{}, fn %{input_name: input_name} = scenario, previous_runs ->
       return_value = pre_check(scenario, scenario_context)
 
