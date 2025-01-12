@@ -5,7 +5,6 @@ defmodule Benchee.SystemTest do
   import Benchee.System
 
   alias Benchee.Suite
-  alias Benchee.System
   alias Benchee.Utility.ErlangVersion
 
   test ".system adds the content to a given suite" do
@@ -104,20 +103,32 @@ defmodule Benchee.SystemTest do
     assert rest =~ ~r/GB/
   end
 
-  test ".system_cmd handles errors gracefully" do
-    system_func = fn _, _ -> {"ERROR", 1} end
+  describe ".system_cmd/3" do
+    test "handles error return values gracefully" do
+      system_func = fn _, _ -> {"ERROR", 1} end
 
-    captured_io =
-      capture_io(fn ->
-        system_cmd("cat", "dev/null", system_func)
-      end)
+      captured_io =
+        capture_io(fn ->
+          system_cmd("cat", "dev/null", system_func) == "N/A"
+        end)
 
-    assert captured_io =~ "Something went wrong"
-    assert captured_io =~ "ERROR"
+      assert captured_io =~ "Something went wrong"
+      assert captured_io =~ "ERROR"
+    end
 
-    capture_io(fn ->
-      assert system_cmd("cat", "dev/null", system_func) == "N/A"
-    end)
+    # programs might not be installed or deprecated, see https://github.com/bencheeorg/benchee/issues/442
+    test "handles exceptions gracefully" do
+      # this raises an Erlang error: :enoent - but in case that changes I wanted to trigger it
+      system_func = fn _, _ -> System.cmd("definitely-not-existing-command32832", ["bogus"]) end
+
+      captured_io =
+        capture_io(fn ->
+          system_cmd("does", "not/matter", system_func) == "N/A"
+        end)
+
+      assert captured_io =~ "Something went wrong"
+      assert captured_io =~ "enoent"
+    end
   end
 
   describe "all_protocols_consolidated?/1" do
@@ -157,7 +168,7 @@ defmodule Benchee.SystemTest do
     end
   end
 
-  @system %System{
+  @system %Benchee.System{
     elixir: "1.4.0",
     erlang: "19.1",
     jit_enabled?: false,
