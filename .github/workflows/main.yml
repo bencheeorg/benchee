@@ -12,13 +12,13 @@ jobs:
 
     strategy:
       matrix:
-        # Run a full matrix only for the last 3 versions (where possible)
-        elixir_version: ['1.16.3', '1.17.3', '1.18.1']
-        otp_version: ['25.3', '26.2', '27.2']
-        # Spot check older versions
+        # Run tests at least once for every supported elixir or erlang version
         #
-        # Goal is to have old versions (elixir and erlang) have basically one test each.
-        # That should be enough to affirm that they are working ok.
+        # Since all the code is running at least once with each version, that should cover enough.
+        # Like, what are the chances a bug would happen on 1.18@26 but not on 1.17@26 or 1.18@27?
+        # And if it does, it's more likely an elixir bug than a benchee bug. We'll see.
+        # We've been using enough of githubs CI resources and our own wait time :)
+        #
         # https://hexdocs.pm/elixir/compatibility-and-deprecations.html#between-elixir-and-erlang-otp
         include:
           - elixir_version: '1.7.4'
@@ -39,8 +39,11 @@ jobs:
             otp_version: '23.3'
           - elixir_version: '1.15.7'
             otp_version: '24.3'
-        exclude:
           - elixir_version: '1.16.3'
+            otp_version: '25.3'
+          - elixir_version: '1.17.3'
+            otp_version: '26.2'
+          - elixir_version: '1.18.1'
             otp_version: '27.2'
 
     steps:
