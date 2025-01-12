@@ -232,7 +232,17 @@ defmodule Benchee.System do
 
   @doc false
   def system_cmd(cmd, args, system_func \\ &System.cmd/2) do
-    {output, exit_code} = system_func.(cmd, args)
+    {output, exit_code} =
+      try do
+        system_func.(cmd, args)
+      rescue
+        e ->
+          message = Exception.format(:error, e, __STACKTRACE__)
+
+          # this mimics an error return code from the command,
+          # which is the same behavior we want to have
+          {message, 1}
+      end
 
     if exit_code > 0 do
       IO.puts("Something went wrong trying to get system information:")
