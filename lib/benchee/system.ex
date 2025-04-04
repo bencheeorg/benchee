@@ -130,9 +130,6 @@ defmodule Benchee.System do
     parse_cpu_for(:Linux, system_cmd("cat", ["/proc/cpuinfo"]))
   end
 
-  @linux_cpuinfo_regex ~r/model name.*:([\w \(\)\-\@\.]*)/i
-  @solaris_cpubrand_regex ~r/^cpu_info:0:cpu_info0:brand\s+(.*)\s*$/i
-
   @doc false
   def parse_cpu_for(_, "N/A"), do: "N/A"
 
@@ -146,7 +143,8 @@ defmodule Benchee.System do
   def parse_cpu_for(:FreeBSD, raw_output), do: String.trim(raw_output)
 
   def parse_cpu_for(:Solaris, raw_output) do
-    match_info = Regex.run(@solaris_cpubrand_regex, raw_output, capture: :all_but_first)
+    solaris_cpubrand_regex = ~r/^cpu_info:0:cpu_info0:brand\s+(.*)\s*$/i
+    match_info = Regex.run(solaris_cpubrand_regex, raw_output, capture: :all_but_first)
 
     case match_info do
       [cpu_info] -> cpu_info
@@ -155,7 +153,8 @@ defmodule Benchee.System do
   end
 
   def parse_cpu_for(:Linux, raw_output) do
-    match_info = Regex.run(@linux_cpuinfo_regex, raw_output, capture: :all_but_first)
+    linux_cpuinfo_regex = ~r/model name.*:([\w \(\)\-\@\.]*)/i
+    match_info = Regex.run(linux_cpuinfo_regex, raw_output, capture: :all_but_first)
 
     case match_info do
       [cpu_info] -> String.trim(cpu_info)

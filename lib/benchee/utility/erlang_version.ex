@@ -100,8 +100,9 @@ defmodule Benchee.Utility.ErlangVersion do
 
   # `Version` only supports full SemVer, Erlang loves version numbers like `22.3.4.24` or `22.0`
   # which makes `Version` error out so we gotta manually alter them so that it's `22.3.4`
-  @last_version_segment ~r/\.\d+$/
   defp parse_erlang_version(erlang_version) do
+    last_version_segment = ~r/\.\d+$/
+
     # dot count is a heuristic but it should work
     dot_count =
       erlang_version
@@ -110,7 +111,7 @@ defmodule Benchee.Utility.ErlangVersion do
 
     version =
       case dot_count do
-        3 -> Regex.replace(@last_version_segment, erlang_version, "")
+        3 -> Regex.replace(last_version_segment, erlang_version, "")
         1 -> deal_with_major_minor(erlang_version)
         0 -> "#{erlang_version}.0.0"
         _ -> erlang_version
