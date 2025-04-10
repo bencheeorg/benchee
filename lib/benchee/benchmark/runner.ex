@@ -91,9 +91,9 @@ defmodule Benchee.Benchmark.Runner do
   defp pre_check_failed_input_message(@no_input), do: ""
   defp pre_check_failed_input_message(input_name), do: " for input #{inspect(input_name)}"
 
-  def measure_and_report_function_call_overhead(prtiner) do
+  def measure_and_report_function_call_overhead(printer) do
     overhead = FunctionCallOverhead.measure()
-    prtiner.function_call_overhead(overhead)
+    printer.function_call_overhead(overhead)
     overhead
   end
 
