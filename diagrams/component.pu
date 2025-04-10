@@ -1,0 +1,47 @@
+@startuml component
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+title C4 Representation: Level 3 Component Diagram
+
+System_Boundary(Benchee, "Benchee", "A microbenchmarking tool for Elixir") {
+    Container(Config, "Benchee.Configuration", "", "Configures the inital benchmarking suite using a series of default and user-defined settings")
+    Container(System, "Benchee.System", "", "Gathers System data and adds it to the suite")
+    Boundary(Benchmark, "Benchee.Benchmark", "", "Defines and runs the functions to be benchmarked, collecting raw data") {
+        Component(BenchmarkConfig, "BenchmarkConfig", "", "Provides just the necessary configuration for the benchmark and lets out all of the suite configuration that is not needed")
+        
+        Component(Hooks, "Hooks", "", "Provides support for hooks")
+
+        Component(ScenarioContext, "ScenarioContext", "", "Provides the data the runner needs while running a scenario")
+
+        Component(Runner, "Runner", "", "Runs the benchmarking suite")
+
+        Component(Collect, "Collect", "", "Collects the data for a scenario")
+        Component(Memory, "Collect.Memory", "", "Measures memory usage")
+        Component(Time, "Collect.Time", "", "Measures time")
+        Component(Reductions, "Collect.Reductions", "", "Measures BEAM's 'unit of work'")
+    }
+    Container(Statistics, "Benchee.Statistics", "", "Calculates statistics based on the raw data")
+    Container(RelativeStatistics, "Benchee.RelativeStatistics", "", "Calculates statistics between scenarios (functions)")
+    Container(Output, "Benchee.Fomatter", "", "Formats the statistics in a suitable way")
+}
+
+Rel(Config, System, "Configured suite")
+
+Rel(System, BenchmarkConfig, "Configured suite + System data")
+
+Rel(BenchmarkConfig, Runner, "")
+Rel(Runner, Hooks, "")
+Rel(Runner, ScenarioContext, "")
+BiRel_L(Runner, Collect, "")
+
+BiRel_D(Collect, Time, "")
+BiRel_U(Collect, Memory, "")
+BiRel(Collect, Reductions, "")
+
+Rel_R(Runner, Statistics, "Measurements")
+Rel(Statistics, RelativeStatistics, "Statistics for all scenarios")
+Rel(RelativeStatistics, Output, "Statistics between scenarios with the same input")
+
+Rel(Output, Report, "Produces")
+@enduml
