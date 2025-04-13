@@ -25,6 +25,11 @@ benchee-*.tar
 # Temporary files for e.g. tests.
 /tmp/
 
+# Kinda changed my opinion on this, it became annoying to upgrade patch versions on my other
+# systems just to be in sync. Since this is a library that should work on _many_ versions and
+# runs CI that way there is no need for strict enforcement.
+.tool-versions
+
 # Misc.
 save.benchee
 /test/tmp/
