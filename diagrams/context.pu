@@ -1,0 +1,13 @@
+@startuml context
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+title C4 Representation: Level 1 Context Diagram
+
+Person_Ext(User, "User", "Anyone who wants to benchmark on the BEAM to compare its execution time, memory usage and reductions")
+
+System(Benchee, "Benchee", "A microbenchmarking tool for Elixir")
+
+Rel(User, Benchee, "Uses")
+Rel(Benchee, Report, "Produces")
+@enduml
