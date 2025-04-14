@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.4.0 (2025-04-14)
+
+Some nice features (`pre_check: :all_same` is cool) along with adding support for some new stuff (`tprof`) and fixing some bugs.
+
+### Features (User Facing)
+* `pre_check` now accepts the option `:all_same` - which raises if any job returns a value different from another for the same input. Useful when benchmarking multiple variants of the same function. Thanks to [@sabiwara](https://github.com/sabiwara)!
+* Enable the [`tprof`](https://www.erlang.org/doc/apps/tools/tprof.html) profiler that shipped with OTP 27, requires OTP 27+ and elixir 1.17+.
+
+## Bugfixes (User Facing)
+* Make gathering of system data more resilient, if the commands we ran didn't exist it may have crashed previously. Most notably, occurring on Windows 11 due to te removal of the tool we use to gather processor information. Now "N/A" is returned.
+* An incompatibility with the upcoming OTP 28 that'd emit a warning on newer elixir versions was removed. Thanks [TBK145](https://github.com/TBK145)!
+
 ## 1.3.1 (2024-06-05)
 
 Small release to remove warnings for the upcoming elixir 1.17 as well as add proper solaris support.
