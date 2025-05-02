@@ -8,7 +8,7 @@ on: [pull_request, push]
 jobs:
   linux:
     name: Test on Ubuntu (Elixir ${{ matrix.elixir_version }}, OTP ${{ matrix.otp_version }})
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
@@ -20,29 +20,24 @@ jobs:
         # We've been using enough of githubs CI resources and our own wait time :)
         #
         # https://hexdocs.pm/elixir/compatibility-and-deprecations.html#between-elixir-and-erlang-otp
+        #
+        # We're also further limited by the support the setup-beam action offers:
+        # https://github.com/erlef/setup-beam?tab=readme-ov-file#compatibility-between-operating-system-and-erlangotp
         include:
-          - elixir_version: '1.7'
-            otp_version: '20.3'
-          - elixir_version: '1.8'
-            otp_version: '20.3'
-          - elixir_version: '1.9'
-            otp_version: '21.3'
-          - elixir_version: '1.10'
-            otp_version: '21.3'
           - elixir_version: '1.11'
-            otp_version: '22.3'
-          - elixir_version: '1.12'
-            otp_version: '23.3'
-          - elixir_version: '1.13'
-            otp_version: '22.3'
-          - elixir_version: '1.14'
-            otp_version: '23.3'
-          - elixir_version: '1.15'
             otp_version: '24.3'
-          - elixir_version: '1.16'
+          - elixir_version: '1.12'
+            otp_version: '24.3'
+          - elixir_version: '1.13'
             otp_version: '25.3'
-          - elixir_version: '1.17'
+          - elixir_version: '1.14'
+            otp_version: '25.3'
+          - elixir_version: '1.15'
             otp_version: '26.2'
+          - elixir_version: '1.16'
+            otp_version: '26.2'
+          - elixir_version: '1.17'
+            otp_version: '27.3'
           - elixir_version: '1.18'
             otp_version: '27.3'
             type_check: true
