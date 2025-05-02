@@ -110,29 +110,17 @@ jobs:
 
   windows:
     name: Test on Windows
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Restore chocolatey
-        uses: actions/cache@v3
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1
         with:
-          path: C:\Users\runneradmin\AppData\Local\Temp\chocolatey
-          key: ${{ runner.os }}-chocolatey-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-chocolatey-
-      - name: Install Elixir
-        run: |
-          choco install elixir --version=1.14.2 --no-progress
-          set MIX_ENV=test
-          echo "C:\ProgramData\chocolatey\lib\Elixir\bin;C:\ProgramData\chocolatey\bin;C:\ProgramData\chocolatey\lib\Elixir\tools\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      - name: Build
-        run: |
-          echo "$PATH"
-          mix local.hex --force
-          mix deps.get
-          mix local.rebar --force
-          mix compile --warnings-as-errors
+          elixir-version: '1.18'
+          otp-version: '27.3'
+      - name: Get deps
+        run: mix deps.get
       - name: Test
         run: mix test || mix test --failed
