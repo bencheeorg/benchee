@@ -1,7 +1,5 @@
 # Benchee [![Hex Version](https://img.shields.io/hexpm/v/benchee.svg)](https://hex.pm/packages/benchee) [![Hex Docs](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/benchee/) [![CI](https://github.com/bencheeorg/benchee/workflows/CI/badge.svg)](https://github.com/bencheeorg/benchee/actions?query=branch%3Amain) [![Coverage Status](https://coveralls.io/repos/github/bencheeorg/benchee/badge.svg?branch=main)](https://coveralls.io/github/bencheeorg/benchee?branch=main) [![Total Download](https://img.shields.io/hexpm/dt/benchee.svg)](https://hex.pm/packages/benchee) [![License](https://img.shields.io/hexpm/l/benchee.svg)](https://github.com/bencheeorg/benchee/blob/main/LICENSE)
 
-**If you have benchmarked using elixir 1.14.0 - 1.16.0-rc.0, please check out [known issues](#known-issues)**
-
 Library for easy and nice (micro) benchmarking in Elixir. Benchee allows you to compare the performance of different pieces of code at a glance. It is also versatile and extensible, relying only on functions. There are also a bunch of [plugins](#plugins) to draw pretty graphs and more!
 
 Benchee runs each of your functions for a given amount of time after an initial warmup, it then measures their run time and optionally memory consumption. It then shows different statistical values like average, standard deviation etc. See [features](#features).
@@ -1028,7 +1026,7 @@ So, how do you fix it/make sure a benchmark you ran is not affected? All of thes
 * put the code you want to benchmark into a module (just like it is done in `Compiled` in the example above)
 * you can also invoke benchee from within a module, such as:
 
-```
+```elixir
 defmodule Compiled do
   def comprehension(list) do
     for x <- list, rem(x, 2) == 1, do: x + 1
