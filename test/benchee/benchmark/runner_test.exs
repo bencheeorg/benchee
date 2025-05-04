@@ -268,7 +268,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       ref = self()
 
       %Suite{configuration: %{time: 0.0, warmup: 0.0, memory_time: 0.0, reduction_time: 0.0}}
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark("", fn -> send(ref, :called) end)
       |> Benchmark.collect(FakeBenchmarkPrinter)
 
@@ -279,7 +279,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       ref = self()
 
       %Suite{configuration: %{time: 0, warmup: 0, memory_time: 0, reduction_time: 0}}
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark("", fn -> send(ref, :called) end)
       |> Benchmark.collect(FakeBenchmarkPrinter)
 
@@ -289,7 +289,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     test "run times of the scenarios are empty when nothing runs" do
       %{scenarios: [scenario]} =
         %Suite{configuration: %{time: 0.0, warmup: 0.0}}
-        |> test_suite
+        |> test_suite()
         |> Benchmark.benchmark("don't care", fn -> 0 end)
         |> Benchmark.collect(FakeBenchmarkPrinter)
 
@@ -311,7 +311,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       ref = self()
 
       %Suite{configuration: %{inputs: @inputs}}
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark("one", fn input -> send(ref, {:one, input}) end)
       |> Benchmark.benchmark("two", fn input -> send(ref, {:two, input}) end)
       |> Benchmark.collect(FakeBenchmarkPrinter)
@@ -324,7 +324,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
     test "notifies which input is being benchmarked now" do
       %Suite{configuration: %{inputs: @inputs}}
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark("one", fn _ -> nil end)
       |> Benchmark.collect(FakeBenchmarkPrinter)
 
@@ -345,7 +345,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
         new_suite =
           %Suite{configuration: config}
-          |> test_suite
+          |> test_suite()
           |> Benchmark.benchmark("sleep", fn input -> :timer.sleep(input) end)
           |> Benchmark.collect(FakeBenchmarkPrinter)
 
@@ -359,7 +359,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     test "runs the job exactly once if its time exceeds given time" do
       new_suite =
         %Suite{configuration: %{time: 1, warmup: 0.0}}
-        |> test_suite
+        |> test_suite()
         |> Benchmark.benchmark("Sleeps", fn -> :timer.sleep(2) end)
         |> Benchmark.collect(FakeBenchmarkPrinter)
 
@@ -380,7 +380,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
         run_times =
           %Suite{configuration: %{time: 70_000_000, warmup: 0.0}}
-          |> test_suite
+          |> test_suite()
           |> Benchmark.benchmark("Sleep more", increasing_function)
           |> Benchmark.collect(FakeBenchmarkPrinter)
           |> run_times_for("Sleep more")
@@ -410,7 +410,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       %Suite{scenarios: [scenario]} =
         suite
-        |> test_suite
+        |> test_suite()
         |> Benchmark.collect(FakeBenchmarkPrinter)
 
       # our previous run time isn't there anymore
@@ -424,7 +424,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       config = %{time: 0.0, warmup: 0.0, inputs: inputs, pre_check: :all_same}
 
       %Suite{configuration: config}
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark("first", fn input ->
         send(me, {:first, input})
         input * 2
@@ -451,7 +451,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       assert_raise Benchee.PreCheckError, message, fn ->
         %Suite{configuration: config}
-        |> test_suite
+        |> test_suite()
         |> Benchmark.benchmark("double", fn input -> input * 2 end)
         |> Benchmark.benchmark("triple", fn input -> input * 3 end)
         |> Benchmark.collect(FakeBenchmarkPrinter)
@@ -469,7 +469,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       assert_raise Benchee.PreCheckError, message, fn ->
         %Suite{configuration: config}
-        |> test_suite
+        |> test_suite()
         |> Benchmark.benchmark("double", fn -> 2 end)
         |> Benchmark.benchmark("triple", fn -> 3 end)
         |> Benchmark.collect(FakeBenchmarkPrinter)
@@ -493,7 +493,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           after_each: fn _ -> send(me, :after) end
         }
       }
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark("job", fn -> sleep_safe_time() end)
       |> Benchmark.collect(FakeBenchmarkPrinter)
 
@@ -509,7 +509,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           time: 100
         }
       }
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark(
         "job",
         {fn -> sleep_safe_time() end,
@@ -538,7 +538,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           time: 100
         }
       }
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark(
         "job",
         {fn -> sleep_safe_time() end,
@@ -585,7 +585,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           inputs: %{"one" => 1, "two" => 2}
         }
       }
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark(
         "job",
         {fn _ -> sleep_safe_time() end,
@@ -637,7 +637,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           after_scenario: fn _ -> send(me, :global_after_scenario) end
         }
       }
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark(
         "job",
         {fn -> sleep_safe_time() end,
@@ -679,7 +679,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           after_each: fn _ -> send(me, :global_after) end
         }
       }
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark(
         "job",
         {fn -> sleep_safe_time() end,
@@ -744,7 +744,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
         result =
           suite
-          |> test_suite
+          |> test_suite()
           |> Benchmark.benchmark(
             "job",
             {fn -> sleep_safe_time() end,
@@ -817,7 +817,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       result =
         suite
-        |> test_suite
+        |> test_suite()
         |> Benchmark.benchmark(
           "job",
           {fn -> 0 end,
@@ -861,7 +861,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           after_each: fn out -> send(me, {:global, out}) end
         }
       }
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark("job", {fn ->
          # still keep to make sure we only get one iteration and not too fast
          sleep_safe_time()
@@ -898,7 +898,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           inputs: %{"basic input" => 0}
         }
       }
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark("job", {fn input ->
          # still keep to make sure we only get one iteration and not too fast
          sleep_safe_time()
@@ -951,7 +951,7 @@ defmodule Benchee.Benchmark.RunnerTest do
           end
         }
       }
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark("job", {fn ->
          # still keep to make sure we only get one iteration and not too fast
          sleep_safe_time()
@@ -991,7 +991,7 @@ defmodule Benchee.Benchmark.RunnerTest do
       config = %{time: 0.0, warmup: 0.0, inputs: inputs, pre_check: true}
 
       %Suite{configuration: config}
-      |> test_suite
+      |> test_suite()
       |> Benchmark.benchmark("first", fn input -> send(me, {:first, input}) end)
       |> Benchmark.benchmark("second", fn input -> send(me, {:second, input}) end)
       |> Benchmark.collect(FakeBenchmarkPrinter)
@@ -1006,7 +1006,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       try do
         %Suite{configuration: config}
-        |> test_suite
+        |> test_suite()
         |> Benchmark.benchmark("first", fn -> send(me, :first) end)
         |> Benchmark.benchmark(
           "job",
