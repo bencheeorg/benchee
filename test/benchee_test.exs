@@ -214,22 +214,22 @@ defmodule BencheeTest do
     refute output =~ ~r/fast/
   end
 
+  @disable_all_output_options [
+    print: [
+      fast_warning: false,
+      benchmarking: false,
+      configuration: false
+    ],
+    formatters: []
+  ]
   test "integration disabling all output configs and formatters we're left with an empty output" do
     output =
       capture_io(fn ->
         Benchee.run(
           %{"Blitz" => fn -> 0 end},
-          Keyword.merge(
-            @test_configuration,
-            time: 0.001,
-            warmup: 0,
-            print: [
-              fast_warning: false,
-              benchmarking: false,
-              configuration: false
-            ],
-            formatters: []
-          )
+          @test_configuration
+          |> Keyword.merge(time: 0.001, warmup: 0)
+          |> Keyword.merge(@disable_all_output_options)
         )
       end)
 
@@ -490,6 +490,31 @@ defmodule BencheeTest do
     assert String.contains?(output, ["number_one", "symbol_one"])
     occurrences = Regex.scan(body_regex("identity"), output)
     assert length(occurrences) == 2
+  end
+
+  test "max_sample_size & multiple inputs with very fast functions" do
+    max_sample_size = 3
+
+    configuration =
+      @test_configuration
+      |> Keyword.merge(@disable_all_output_options)
+      |> Keyword.merge(
+        max_sample_size: max_sample_size,
+        inputs: %{"number_one" => 1, :symbole_one => :one}
+      )
+
+    suite =
+      Benchee.run(
+        %{
+          "identity" => fn i -> i end
+        },
+        configuration
+      )
+
+    Enum.each(suite.scenarios, fn scenario ->
+      # if this becomes flakey, change to <=
+      assert scenario.run_time_data.statistics.sample_size == max_sample_size
+    end)
   end
 
   test ".run returns the suite intact" do
