@@ -417,6 +417,68 @@ defmodule Benchee.Benchmark.RunnerTest do
       refute Enum.member?(scenario.run_time_data.samples, 1_000_000)
     end
 
+    test "succeeds when using :all_same pre check and all implementations return the same values" do
+      me = self()
+      inputs = %{"zero" => 0, "one" => 1}
+
+      config = %{time: 0.0, warmup: 0.0, inputs: inputs, pre_check: :all_same}
+
+      %Suite{configuration: config}
+      |> test_suite
+      |> Benchmark.benchmark("first", fn input ->
+        send(me, {:first, input})
+        input * 2
+      end)
+      |> Benchmark.benchmark("second", fn input ->
+        send(me, {:second, input})
+        input + input
+      end)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
+
+      assert_received_exactly([{:first, 1}, {:first, 0}, {:second, 1}, {:second, 0}])
+    end
+
+    test "fails when using :all_same pre check and returning different values" do
+      inputs = %{"zero" => 0, "one" => 1}
+
+      config = %{time: 0.0, warmup: 0.0, inputs: inputs, pre_check: :all_same}
+
+      message = """
+      all_same pre check failed for input "one":
+      - double returned 2
+      - triple returned 3
+      """
+
+      assert_raise Benchee.PreCheckError, message, fn ->
+        %Suite{configuration: config}
+        |> test_suite
+        |> Benchmark.benchmark("double", fn input -> input * 2 end)
+        |> Benchmark.benchmark("triple", fn input -> input * 3 end)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
+      end
+    end
+
+    test "the failure message handles the ominous no input value nicely" do
+      config = %{time: 0, warmup: 0, pre_check: :all_same}
+
+      message = """
+      all_same pre check failed:
+      - double returned 2
+      - triple returned 3
+      """
+
+      assert_raise Benchee.PreCheckError, message, fn ->
+        %Suite{configuration: config}
+        |> test_suite
+        |> Benchmark.benchmark("double", fn -> 2 end)
+        |> Benchmark.benchmark("triple", fn -> 3 end)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
+      end
+    end
+  end
+
+  # hooks are pretty much their own beast
+  describe "hook related tests" do
     test "global hooks triggers" do
       me = self()
 
@@ -976,65 +1038,6 @@ defmodule Benchee.Benchmark.RunnerTest do
         :after,
         :after_scenario
       ])
-    end
-
-    test "succeeds when using :all_same pre check and all implementations return the same values" do
-      me = self()
-      inputs = %{"zero" => 0, "one" => 1}
-
-      config = %{time: 0.0, warmup: 0.0, inputs: inputs, pre_check: :all_same}
-
-      %Suite{configuration: config}
-      |> test_suite
-      |> Benchmark.benchmark("first", fn input ->
-        send(me, {:first, input})
-        input * 2
-      end)
-      |> Benchmark.benchmark("second", fn input ->
-        send(me, {:second, input})
-        input + input
-      end)
-      |> Benchmark.collect(FakeBenchmarkPrinter)
-
-      assert_received_exactly([{:first, 1}, {:first, 0}, {:second, 1}, {:second, 0}])
-    end
-
-    test "fails when using :all_same pre check and returning different values" do
-      inputs = %{"zero" => 0, "one" => 1}
-
-      config = %{time: 0.0, warmup: 0.0, inputs: inputs, pre_check: :all_same}
-
-      message = """
-      all_same pre check failed for input "one":
-      - double returned 2
-      - triple returned 3
-      """
-
-      assert_raise Benchee.PreCheckError, message, fn ->
-        %Suite{configuration: config}
-        |> test_suite
-        |> Benchmark.benchmark("double", fn input -> input * 2 end)
-        |> Benchmark.benchmark("triple", fn input -> input * 3 end)
-        |> Benchmark.collect(FakeBenchmarkPrinter)
-      end
-    end
-
-    test "the failure message handles the ominous no input value nicely" do
-      config = %{time: 0, warmup: 0, pre_check: :all_same}
-
-      message = """
-      all_same pre check failed:
-      - double returned 2
-      - triple returned 3
-      """
-
-      assert_raise Benchee.PreCheckError, message, fn ->
-        %Suite{configuration: config}
-        |> test_suite
-        |> Benchmark.benchmark("double", fn -> 2 end)
-        |> Benchmark.benchmark("triple", fn -> 3 end)
-        |> Benchmark.collect(FakeBenchmarkPrinter)
-      end
     end
   end
 end
