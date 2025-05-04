@@ -233,8 +233,8 @@ defmodule Benchee.Benchmark.RunnerTest do
         # in Windows/Mac CI this measured overhead might legitimately be 0
         assert overhead >= 0
 
-        # Should be 0 if it works correctly, give a bit of leeway - especially the appveyor CI
-        # with Windows has a tougher time here as it repeats the function call
+        # Should be 0 if it works correctly, give a bit of leeway - especially the Windows CI
+        # has a tough time here
         assert minimum <= 60
       end)
     end
