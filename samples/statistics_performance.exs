@@ -4,9 +4,9 @@ list_1M = 1..1_000_000 |> Enum.to_list() |> Enum.shuffle()
 
 Benchee.run(
   [
-    {"10k", fn -> Enum.sort(list_10k) end},
-    {"100k", fn -> Enum.sort(list_100k) end},
-    {"1M", fn -> Enum.sort(list_1M) end}
+    {"10k", fn -> Statistex.statistics(list_10k) end},
+    {"100k", fn -> Statistex.statistics(list_100k) end},
+    {"1M", fn -> Statistex.statistics(list_1M) end}
   ],
   memory_time: 2
 )
