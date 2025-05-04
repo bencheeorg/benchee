@@ -16,8 +16,8 @@ defmodule Benchee.Configuration do
   defstruct parallel: 1,
             time: 5,
             warmup: 2,
-            memory_time: 0.0,
-            reduction_time: 0.0,
+            memory_time: 0,
+            reduction_time: 0,
             pre_check: false,
             formatters: [Console],
             percentiles: [50, 99],
@@ -39,7 +39,8 @@ defmodule Benchee.Configuration do
             after_scenario: nil,
             measure_function_call_overhead: false,
             title: nil,
-            profile_after: false
+            profile_after: false,
+            max_sample_size: 1_000_000
 
   @typedoc """
   The configuration supplied by the user as either a map or a keyword list
@@ -139,6 +140,9 @@ defmodule Benchee.Configuration do
       [`:eprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Eprof.html)
       [`:fprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Fprof.html) and
       [`:tprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Tprof.html) (requires elixir >= 1.17 and erlang >= 27).
+    * `max_sample_size` - the maximum number of samples collected per scenario. Defaults to `1_000_000`.
+      This is used to limit memory consumption and unnecessary processing - 1 Million samples is plenty.
+      You can set your own number or set it to `nil` if you don't want any limit.
   """
   @type user_configuration :: map | keyword
 
