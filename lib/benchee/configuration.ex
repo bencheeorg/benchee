@@ -40,6 +40,14 @@ defmodule Benchee.Configuration do
             measure_function_call_overhead: false,
             title: nil,
             profile_after: false,
+            # Why a million? Well, it's a nice number :P
+            # Seriously, though: That's usually enough samples to be significant enough as a
+            # result.
+            # At the same time, at least on my machine it takes less than one second for
+            # `Statistex` to calculate the statistics for a list that large.
+            # It also generates less than 1GB in data (some of which is garbage collected/
+            # not necessarily all in RAM at the same time) - which seems reasonable enough.
+            # see `samples/statistics_performance.exs` and also maybe run it yourself.
             max_sample_size: 1_000_000
 
   @typedoc """
