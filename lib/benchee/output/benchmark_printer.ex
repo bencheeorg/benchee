@@ -98,9 +98,6 @@ defmodule Benchee.Output.BenchmarkPrinter do
   """
   def benchmarking(_, _, %{print: %{benchmarking: false}}), do: nil
 
-  def benchmarking(_, _, %{time: +0.0, warmup: +0.0, memory_time: +0.0, reduction_time: +0.0}),
-    do: nil
-
   def benchmarking(name, input_name, config) do
     time_configs = [config.time, config.warmup, config.memory_time, config.reduction_time]
 
