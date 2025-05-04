@@ -134,6 +134,7 @@ defmodule Benchee.Benchmark.Runner do
   defp measure_scenario(scenario, scenario_context) do
     scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
+
     _ = run_warmup(scenario, scenario_context)
 
     run_times =
@@ -156,7 +157,7 @@ defmodule Benchee.Benchmark.Runner do
   defp run_warmup(
          scenario,
          scenario_context = %ScenarioContext{
-           config: %{warmup: warmup}
+           config: %BenchmarkConfig{warmup: warmup}
          }
        ) do
     measure_runtimes(scenario, scenario_context, warmup, false)
