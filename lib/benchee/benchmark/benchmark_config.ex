@@ -23,7 +23,8 @@ defmodule Benchee.Benchmark.BenchmarkConfig do
     :before_scenario,
     :after_scenario,
     :parallel,
-    :print
+    :print,
+    :max_sample_size
   ]
 
   defstruct @keys
@@ -41,7 +42,8 @@ defmodule Benchee.Benchmark.BenchmarkConfig do
           before_scenario: Hooks.hook_function() | nil,
           after_scenario: Hooks.hook_function() | nil,
           measure_function_call_overhead: boolean,
-          parallel: pos_integer()
+          parallel: pos_integer(),
+          max_sample_size: pos_integer()
         }
 
   alias Benchee.Configuration

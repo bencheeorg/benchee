@@ -6,6 +6,7 @@ defmodule Benchee.Benchmark.Runner do
   # This module actually runs our benchmark scenarios, adding information about
   # run time and memory usage to each scenario.
 
+  alias Benchee.Benchmark.BenchmarkConfig
   alias Benchee.{Benchmark, Scenario, Utility.Parallel}
 
   alias Benchmark.{
@@ -265,7 +266,9 @@ defmodule Benchee.Benchmark.Runner do
       scenario_context
       | current_time: current_time(),
         end_time: end_time,
-        num_iterations: num_iterations
+        num_iterations: num_iterations,
+        # we have the initial run time
+        sample_size: 1
     }
 
     do_benchmark(scenario, new_context, Collect.Time, [initial_run_time])
@@ -282,19 +285,28 @@ defmodule Benchee.Benchmark.Runner do
          _scenario,
          %ScenarioContext{
            current_time: current_time,
-           end_time: end_time
+           end_time: end_time,
+           sample_size: sample_size,
+           config: %BenchmarkConfig{
+             max_sample_size: max_sample_size
+           }
          },
          _collector,
          measurements
        )
-       when current_time > end_time and measurements != [] do
+       when (current_time > end_time or sample_size >= max_sample_size) and measurements != [] do
     # restore correct order - important for graphing
     Enum.reverse(measurements)
   end
 
   defp do_benchmark(scenario, scenario_context, collector, measurements) do
     measurement = collect(scenario, scenario_context, collector)
-    updated_context = %ScenarioContext{scenario_context | current_time: current_time()}
+
+    updated_context = %ScenarioContext{
+      scenario_context
+      | current_time: current_time(),
+        sample_size: scenario_context.sample_size + 1
+    }
 
     do_benchmark(
       scenario,

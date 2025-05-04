@@ -18,7 +18,8 @@ defmodule Benchee.Benchmark.ScenarioContext do
     # before_scenario can alter the original input
     :scenario_input,
     num_iterations: 1,
-    function_call_overhead: 0
+    function_call_overhead: 0,
+    sample_size: 0
   ]
 
   @type t :: %__MODULE__{
@@ -28,6 +29,7 @@ defmodule Benchee.Benchmark.ScenarioContext do
           end_time: pos_integer | nil,
           scenario_input: any,
           num_iterations: pos_integer,
-          function_call_overhead: non_neg_integer
+          function_call_overhead: non_neg_integer,
+          sample_size: non_neg_integer()
         }
 end
