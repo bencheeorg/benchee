@@ -517,6 +517,49 @@ defmodule BencheeTest do
     end)
   end
 
+  # normally I wouldn't test defaults like this, but since we need a test that there will be more
+  # when setting max_sample_size to `nil` and that the whole process works, this is needed
+  @default_max_sample_size 1_000_000
+  @tag :performance
+  test "max_sample_size by default is set to 1 Million" do
+    # not disabling the formatters as I want the formatters to run through with that as well
+    capture_io(fn ->
+      suite =
+        Benchee.run(
+          %{
+            "fast" => fn -> :fast end
+          },
+          time: 1,
+          warmup: 0
+        )
+
+      Enum.each(suite.scenarios, fn scenario ->
+        # if this becomes flakey, change to <=
+        assert scenario.run_time_data.statistics.sample_size == @default_max_sample_size
+      end)
+    end)
+  end
+
+  @tag :performance
+  test "max_sample_size can be set to `nil` to gather unlimited samples again" do
+    # not disabling the formatters as I want the formatters to run through with that as well
+    capture_io(fn ->
+      suite =
+        Benchee.run(
+          %{
+            "fast" => fn -> :fast end
+          },
+          time: 1,
+          warmup: 0,
+          max_sample_size: nil
+        )
+
+      Enum.each(suite.scenarios, fn scenario ->
+        assert scenario.run_time_data.statistics.sample_size > @default_max_sample_size
+      end)
+    end)
+  end
+
   test ".run returns the suite intact" do
     capture_io(fn ->
       suite =

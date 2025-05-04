@@ -295,7 +295,9 @@ defmodule Benchee.Benchmark.Runner do
          _collector,
          measurements
        )
-       when (current_time > end_time or sample_size >= max_sample_size) and measurements != [] do
+       when (current_time > end_time or
+               (not is_nil(max_sample_size) and sample_size >= max_sample_size)) and
+              measurements != [] do
     # restore correct order - important for graphing
     Enum.reverse(measurements)
   end
