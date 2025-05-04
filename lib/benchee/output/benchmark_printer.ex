@@ -1,7 +1,9 @@
 defmodule Benchee.Output.BenchmarkPrinter do
   @moduledoc false
 
-  alias Benchee.{Benchmark, Conversion.Duration, System}
+  alias Benchee.Benchmark
+  alias Benchee.Conversion.Duration
+  alias Benchee.System
 
   @doc """
   Shown when you try benchmark an evaluated function.
@@ -99,8 +101,14 @@ defmodule Benchee.Output.BenchmarkPrinter do
   def benchmarking(_, _, %{time: +0.0, warmup: +0.0, memory_time: +0.0, reduction_time: +0.0}),
     do: nil
 
-  def benchmarking(name, input_name, _config) do
-    IO.puts("Benchmarking #{name}#{input_information(input_name)} ...")
+  def benchmarking(name, input_name, config) do
+    time_configs = [config.time, config.warmup, config.memory_time, config.reduction_time]
+
+    if Enum.all?(time_configs, fn time -> time == 0 end) do
+      nil
+    else
+      IO.puts("Benchmarking #{name}#{input_information(input_name)} ...")
+    end
   end
 
   @no_input Benchmark.no_input()

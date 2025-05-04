@@ -1,7 +1,11 @@
 defmodule Benchee.Output.BenchmarkPrintertest do
   use ExUnit.Case, async: true
 
-  alias Benchee.{Benchmark, Configuration, Scenario, System}
+  alias Benchee.Benchmark
+  alias Benchee.Benchmark.BenchmarkConfig
+  alias Benchee.Configuration
+  alias Benchee.Scenario
+  alias Benchee.System
 
   import ExUnit.CaptureIO
   import Benchee.Output.BenchmarkPrinter
@@ -125,7 +129,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
     test "prints information that it's currently benchmarking without input" do
       output =
         capture_io(fn ->
-          benchmarking("Something", @no_input, %{})
+          benchmarking("Something", @no_input, %BenchmarkConfig{})
         end)
 
       assert output =~ ~r/Benchmarking.+Something/i
@@ -134,7 +138,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
     test "prints information that it's currently benchmarking with input" do
       output =
         capture_io(fn ->
-          benchmarking("Something", "great input", %{})
+          benchmarking("Something", "great input", %BenchmarkConfig{})
         end)
 
       assert output =~ ~r/Benchmarking.+Something with input great input/i
@@ -143,7 +147,21 @@ defmodule Benchee.Output.BenchmarkPrintertest do
     test "doesn't print if it's deactivated" do
       output =
         capture_io(fn ->
-          benchmarking("A", "some", %{print: %{benchmarking: false}})
+          benchmarking("A", "some", %BenchmarkConfig{print: %{benchmarking: false}})
+        end)
+
+      assert output == ""
+    end
+
+    test "doesn't print if all times are set to 0.0" do
+      output =
+        capture_io(fn ->
+          benchmarking("Never", "don't care", %BenchmarkConfig{
+            time: 0.0,
+            warmup: 0.0,
+            memory_time: 0.0,
+            reduction_time: 0.0
+          })
         end)
 
       assert output == ""
@@ -152,10 +170,11 @@ defmodule Benchee.Output.BenchmarkPrintertest do
     test "doesn't print if all times are set to 0" do
       output =
         capture_io(fn ->
-          benchmarking("Never", "don't care", %Configuration{
-            time: 0.0,
-            warmup: 0.0,
-            memory_time: 0.0
+          benchmarking("Never", "don't care", %BenchmarkConfig{
+            time: 0,
+            warmup: 0,
+            memory_time: 0,
+            reduction_time: 0
           })
         end)
 
