@@ -264,10 +264,21 @@ defmodule Benchee.Benchmark.RunnerTest do
       end)
     end
 
+    test "never calls the function if warmup and time are 0.0" do
+      ref = self()
+
+      %Suite{configuration: %{time: 0.0, warmup: 0.0, memory_time: 0.0, reduction_time: 0.0}}
+      |> test_suite
+      |> Benchmark.benchmark("", fn -> send(ref, :called) end)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
+
+      refute_receive :called
+    end
+
     test "never calls the function if warmup and time are 0" do
       ref = self()
 
-      %Suite{configuration: %{time: 0.0, warmup: 0.0}}
+      %Suite{configuration: %{time: 0, warmup: 0, memory_time: 0, reduction_time: 0}}
       |> test_suite
       |> Benchmark.benchmark("", fn -> send(ref, :called) end)
       |> Benchmark.collect(FakeBenchmarkPrinter)
