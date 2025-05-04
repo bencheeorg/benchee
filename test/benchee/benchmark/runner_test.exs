@@ -501,6 +501,9 @@ defmodule Benchee.Benchmark.RunnerTest do
       assert length(scenario.reductions_data.samples) == max_sample_size
     end
 
+    # The test failed on Windows CI, presumably due to fast function repetition which is to be
+    # expected (as the function would be executed multiple times)
+    @tag :nanosecond_resolution_clock
     # I changed my mind on this, initially I thought it shouldn't apply to warmup as there is no
     # memory problem there.
     # However, that makes the code & rules more complex - it's not a crucial feature - it is
