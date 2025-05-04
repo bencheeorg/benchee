@@ -16,8 +16,8 @@ defmodule Benchee.Configuration do
   defstruct parallel: 1,
             time: 5,
             warmup: 2,
-            memory_time: 0,
-            reduction_time: 0,
+            memory_time: 0.0,
+            reduction_time: 0.0,
             pre_check: false,
             formatters: [Console],
             percentiles: [50, 99],
@@ -173,7 +173,8 @@ defmodule Benchee.Configuration do
           after_scenario: Hooks.hook_function() | nil,
           measure_function_call_overhead: boolean,
           title: String.t() | nil,
-          profile_after: boolean | atom | {atom, keyword}
+          profile_after: boolean | atom | {atom, keyword},
+          max_sample_size: pos_integer()
         }
 
   @time_keys [:time, :warmup, :memory_time, :reduction_time]
