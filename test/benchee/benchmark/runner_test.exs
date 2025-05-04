@@ -492,13 +492,34 @@ defmodule Benchee.Benchmark.RunnerTest do
             reduction_time: @small_time
           }
         }
-        |> Benchmark.benchmark("some benchmak", fn -> 2 end)
+        |> Benchmark.benchmark("some benchmark", fn -> 2 end)
         |> Benchmark.collect(FakeBenchmarkPrinter)
 
       # if it starts going flakey might need to do <= which is in the spirit of max
       assert length(scenario.run_time_data.samples) == max_sample_size
       assert length(scenario.memory_usage_data.samples) == max_sample_size
       assert length(scenario.reductions_data.samples) == max_sample_size
+    end
+
+    # I changed my mind on this, initially I thought it shouldn't apply to warmup as there is no
+    # memory problem there.
+    # However, that makes the code & rules more complex - it's not a crucial feature - it is
+    # easier to understand that at max there will be this many iterations - no special casing.
+    test "max_sample_size does apply to warmups as well" do
+      max_sample_size = 1
+
+      self = self()
+
+      %Suite{
+        configuration: %Configuration{
+          max_sample_size: max_sample_size,
+          time: 0.0
+        }
+      }
+      |> Benchmark.benchmark("some benchmark", fn -> send(self, :benchmarked) end)
+      |> Benchmark.collect(FakeBenchmarkPrinter)
+
+      assert_received_exactly([:benchmarked])
     end
   end
 

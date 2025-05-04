@@ -141,8 +141,9 @@ defmodule Benchee.Configuration do
       [`:fprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Fprof.html) and
       [`:tprof`](https://hexdocs.pm/mix/Mix.Tasks.Profile.Tprof.html) (requires elixir >= 1.17 and erlang >= 27).
     * `max_sample_size` - the maximum number of samples collected per scenario. Defaults to `1_000_000`.
-      This is used to limit memory consumption and unnecessary processing - 1 Million samples is plenty.
-      You can set your own number or set it to `nil` if you don't want any limit.
+    This is used to limit memory consumption and unnecessary processing - 1 Million samples is plenty.
+    This limit also applies to number of iterations done during warmup.
+    You can set your own number or set it to `nil` if you don't want any limit.
   """
   @type user_configuration :: map | keyword
 
