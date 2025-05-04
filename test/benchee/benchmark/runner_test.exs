@@ -8,9 +8,12 @@ defmodule Benchee.Benchmark.RunnerTest do
   alias Benchee.Test.FakeBenchmarkPrinter
   alias Benchee.Test.FakeProgressPrinter
 
+  # times are in ns, so this is 40ms
+  @small_time 40_000_000
+
   @config %Configuration{
     parallel: 1,
-    time: 40_000_000,
+    time: @small_time,
     warmup: 20_000_000,
     inputs: nil,
     pre_check: false,
@@ -474,6 +477,28 @@ defmodule Benchee.Benchmark.RunnerTest do
         |> Benchmark.benchmark("triple", fn -> 3 end)
         |> Benchmark.collect(FakeBenchmarkPrinter)
       end
+    end
+
+    test "max_sample_size is abided by across all times" do
+      max_sample_size = 3
+
+      %Suite{scenarios: [scenario]} =
+        %Suite{
+          configuration: %Configuration{
+            max_sample_size: max_sample_size,
+            # each one of those should easily be able to gather the samples in time
+            time: @small_time,
+            memory_time: @small_time,
+            reduction_time: @small_time
+          }
+        }
+        |> Benchmark.benchmark("some benchmak", fn -> 2 end)
+        |> Benchmark.collect(FakeBenchmarkPrinter)
+
+      # if it starts going flakey might need to do <= which is in the spirit of max
+      assert length(scenario.run_time_data.samples) == max_sample_size
+      assert length(scenario.memory_usage_data.samples) == max_sample_size
+      assert length(scenario.reductions_data.samples) == max_sample_size
     end
   end
 
