@@ -27,7 +27,7 @@ minimum_millisecond_resolution = 1000
 
 exclusions =
   if clock_resolution < minimum_millisecond_resolution do
-    [{:millisecond_resolution_clock, true} | exclusions]
+    [{:minimum_millisecond_resolution_clock, true} | exclusions]
   else
     exclusions
   end
