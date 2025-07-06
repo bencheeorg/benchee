@@ -121,7 +121,7 @@ defmodule Benchee.Statistics do
       ...>     input: "Input"
       ...>   }
       ...> ]
-      ...> 
+      ...>
       ...> suite = %Benchee.Suite{scenarios: scenarios}
       ...> statistics(suite, Benchee.Test.FakeProgressPrinter)
       %Benchee.Suite{
@@ -179,15 +179,17 @@ defmodule Benchee.Statistics do
     printer.calculating_statistics(suite.configuration)
 
     percentiles = suite.configuration.percentiles
+    exclude_outliers? = suite.configuration.exclude_outliers
 
     update_in(suite.scenarios, fn scenarios ->
-      scenario_statistics = compute_statistics_in_parallel(scenarios, percentiles)
+      scenario_statistics =
+        compute_statistics_in_parallel(scenarios, percentiles, exclude_outliers?)
 
       update_scenarios_with_statistics(scenarios, scenario_statistics)
     end)
   end
 
-  defp compute_statistics_in_parallel(scenarios, percentiles) do
+  defp compute_statistics_in_parallel(scenarios, percentiles, exclude_outliers?) do
     scenarios
     |> Enum.map(fn scenario ->
       # we filter down the data here to avoid sending the input and benchmarking function to
@@ -200,7 +202,7 @@ defmodule Benchee.Statistics do
     # async_stream as we might run a ton of scenarios depending on the benchmark
     |> Task.async_stream(
       fn scenario_collection_data ->
-        calculate_scenario_statistics(scenario_collection_data, percentiles)
+        calculate_scenario_statistics(scenario_collection_data, percentiles, exclude_outliers?)
       end,
       timeout: :infinity,
       ordered: true
@@ -235,27 +237,33 @@ defmodule Benchee.Statistics do
     end)
   end
 
-  defp calculate_scenario_statistics({run_time_data, memory_data, reductions_data}, percentiles) do
+  defp calculate_scenario_statistics(
+         {run_time_data, memory_data, reductions_data},
+         percentiles,
+         exclude_outliers?
+       ) do
     run_time_stats =
       run_time_data.samples
-      |> calculate_statistics(percentiles)
+      |> calculate_statistics(percentiles, exclude_outliers?)
       |> add_ips
 
-    memory_stats = calculate_statistics(memory_data.samples, percentiles)
-    reductions_stats = calculate_statistics(reductions_data.samples, percentiles)
+    memory_stats = calculate_statistics(memory_data.samples, percentiles, exclude_outliers?)
+
+    reductions_stats =
+      calculate_statistics(reductions_data.samples, percentiles, exclude_outliers?)
 
     {run_time_stats, memory_stats, reductions_stats}
   end
 
-  defp calculate_statistics([], _) do
+  defp calculate_statistics([], _, _) do
     %__MODULE__{
       sample_size: 0
     }
   end
 
-  defp calculate_statistics(samples, percentiles) do
+  defp calculate_statistics(samples, percentiles, exclude_outliers?) do
     samples
-    |> Statistex.statistics(percentiles: percentiles)
+    |> Statistex.statistics(percentiles: percentiles, exclude_outliers: exclude_outliers?)
     |> convert_from_statistex
   end
 
