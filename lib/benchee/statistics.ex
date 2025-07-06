@@ -115,7 +115,7 @@ defmodule Benchee.Statistics do
       ...>     input: "Input"
       ...>   }
       ...> ]
-      ...> 
+      ...>
       ...> suite = %Benchee.Suite{scenarios: scenarios}
       ...> statistics(suite, Benchee.Test.FakeProgressPrinter)
       %Benchee.Suite{
@@ -133,7 +133,7 @@ defmodule Benchee.Statistics do
                 std_dev_ratio: 0.4,
                 std_dev_ips: 800_000.0,
                 median: 500.0,
-                percentiles: %{50 => 500.0, 99 => 900.0},
+                percentiles: %{50 => 500.0, 99 => 900.0, 25 => 400.0, 75 => 600.0},
                 mode: [500, 400],
                 minimum: 200,
                 maximum: 900,
@@ -149,7 +149,7 @@ defmodule Benchee.Statistics do
                 std_dev_ratio: 0.4,
                 std_dev_ips: nil,
                 median: 500.0,
-                percentiles: %{50 => 500.0, 99 => 900.0},
+                percentiles: %{50 => 500.0, 99 => 900.0, 25 => 400.0, 75 => 600.0},
                 mode: [500, 400],
                 minimum: 200,
                 maximum: 900,
