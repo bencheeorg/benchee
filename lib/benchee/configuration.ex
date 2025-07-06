@@ -48,7 +48,8 @@ defmodule Benchee.Configuration do
             # It also generates less than 1GB in data (some of which is garbage collected/
             # not necessarily all in RAM at the same time) - which seems reasonable enough.
             # see `samples/statistics_performance.exs` and also maybe run it yourself.
-            max_sample_size: 1_000_000
+            max_sample_size: 1_000_000,
+            exclude_outliers: false
 
   @typedoc """
   The configuration supplied by the user as either a map or a keyword list
@@ -152,6 +153,11 @@ defmodule Benchee.Configuration do
     This is used to limit memory consumption and unnecessary processing - 1 Million samples is plenty.
     This limit also applies to number of iterations done during warmup.
     You can set your own number or set it to `nil` if you don't want any limit.
+    * `exclude_outliers` - whether or not statistical outliers should be removed for the calculated statistics.
+    Defaults to `false`.
+    This means that values that are far outside the usual range (as determined by the percentiles/quantiles) will
+    be removed from the gathered samples and the calculated statistics. You might want to enable this if you
+    don't want things like the garbage collection triggering to influence your results as much.
   """
   @type user_configuration :: map | keyword
 
@@ -183,7 +189,8 @@ defmodule Benchee.Configuration do
           measure_function_call_overhead: boolean,
           title: String.t() | nil,
           profile_after: boolean | atom | {atom, keyword},
-          max_sample_size: pos_integer()
+          max_sample_size: pos_integer(),
+          exclude_outliers: boolean()
         }
 
   @time_keys [:time, :warmup, :memory_time, :reduction_time]
