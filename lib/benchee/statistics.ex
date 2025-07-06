@@ -25,6 +25,9 @@ defmodule Benchee.Statistics do
     :relative_more,
     :relative_less,
     :absolute_difference,
+    :outliers,
+    :lower_outlier_bound,
+    :upper_outlier_bound,
     sample_size: 0
   ]
 
@@ -85,6 +88,9 @@ defmodule Benchee.Statistics do
           relative_more: float | nil | :infinity,
           relative_less: float | nil | :infinity,
           absolute_difference: float | nil,
+          outliers: [number],
+          lower_outlier_bound: number,
+          upper_outlier_bound: number,
           sample_size: integer
         }
 
@@ -115,7 +121,7 @@ defmodule Benchee.Statistics do
       ...>     input: "Input"
       ...>   }
       ...> ]
-      ...>
+      ...> 
       ...> suite = %Benchee.Suite{scenarios: scenarios}
       ...> statistics(suite, Benchee.Test.FakeProgressPrinter)
       %Benchee.Suite{
@@ -137,7 +143,10 @@ defmodule Benchee.Statistics do
                 mode: [500, 400],
                 minimum: 200,
                 maximum: 900,
-                sample_size: 9
+                sample_size: 9,
+                outliers: [],
+                lower_outlier_bound: 100.0,
+                upper_outlier_bound: 900.0
               }
             },
             memory_usage_data: %Benchee.CollectionData{
@@ -153,7 +162,10 @@ defmodule Benchee.Statistics do
                 mode: [500, 400],
                 minimum: 200,
                 maximum: 900,
-                sample_size: 9
+                sample_size: 9,
+                outliers: [],
+                lower_outlier_bound: 100.0,
+                upper_outlier_bound: 900.0
               }
             }
           }
@@ -247,6 +259,14 @@ defmodule Benchee.Statistics do
     |> convert_from_statistex
   end
 
+  # It might seem silly to maintain and map statistex to our own struct,
+  # but this gives benchee more control  and makes it safer to upgrade and change.
+  # Also, we don't expose changes in statistex versions automatically to plugins.
+  #
+  # As an example right now it's being discussed in statistex to add an `m2` statistic that holds
+  # no value for benchee (as it's ony used to calculate variance).
+  #
+  # We also manually add `ips` related stats (see `add_ips/1`) so differences are sufficient.
   defp convert_from_statistex(statistex_statistics) do
     %__MODULE__{
       average: statistex_statistics.average,
@@ -257,7 +277,10 @@ defmodule Benchee.Statistics do
       mode: statistex_statistics.mode,
       minimum: statistex_statistics.minimum,
       maximum: statistex_statistics.maximum,
-      sample_size: statistex_statistics.sample_size
+      sample_size: statistex_statistics.sample_size,
+      outliers: statistex_statistics.outliers,
+      lower_outlier_bound: statistex_statistics.lower_outlier_bound,
+      upper_outlier_bound: statistex_statistics.upper_outlier_bound
     }
   end
 
