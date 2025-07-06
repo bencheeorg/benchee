@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## Features (User Facing)
+* Introduce `max_sample_size` which guides how many samples will be gathered at most for a given scenario. This avoids a variety of issues when scenarios gather too many samples (memory consumption etc). Defaults to `1_000_000`, setting it to `nil` gathers unlimited samples again (behavior before this version).
+
 ### Bugfixes (User Facing)
 * fix a bug where if times were supplied as `0` instead of `0.0` we'd sometimes gather a single measurement
 
