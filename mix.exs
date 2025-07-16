@@ -17,14 +17,6 @@ defmodule Benchee.Mixfile do
       docs: docs(),
       package: package(),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
-        coveralls: :test,
-        "coveralls.detail": :test,
-        "coveralls.post": :test,
-        "coveralls.html": :test,
-        "coveralls.travis": :test,
-        "safe_coveralls.travis": :test
-      ],
       dialyzer: [
         flags: [:underspecs],
         plt_file: {:no_warn, "tools/plts/benchee.plt"},
@@ -35,6 +27,19 @@ defmodule Benchee.Mixfile do
       Versatile (micro) benchmarking that is extensible. Get statistics such as:
       average, iterations per second, standard deviation and the median.
       """
+    ]
+  end
+
+  def cli do
+    [
+      preferred_envs: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
+        "coveralls.travis": :test,
+        "safe_coveralls.travis": :test
+      ]
     ]
   end
 
