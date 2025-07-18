@@ -25,6 +25,9 @@ defmodule Benchee.Statistics do
     :relative_more,
     :relative_less,
     :absolute_difference,
+    :outliers,
+    :lower_outlier_bound,
+    :upper_outlier_bound,
     sample_size: 0
   ]
 
@@ -85,6 +88,9 @@ defmodule Benchee.Statistics do
           relative_more: float | nil | :infinity,
           relative_less: float | nil | :infinity,
           absolute_difference: float | nil,
+          outliers: [number],
+          lower_outlier_bound: number,
+          upper_outlier_bound: number,
           sample_size: integer
         }
 
@@ -133,11 +139,14 @@ defmodule Benchee.Statistics do
                 std_dev_ratio: 0.4,
                 std_dev_ips: 800_000.0,
                 median: 500.0,
-                percentiles: %{50 => 500.0, 99 => 900.0},
+                percentiles: %{50 => 500.0, 99 => 900.0, 25 => 400.0, 75 => 600.0},
                 mode: [500, 400],
                 minimum: 200,
                 maximum: 900,
-                sample_size: 9
+                sample_size: 9,
+                outliers: [],
+                lower_outlier_bound: 100.0,
+                upper_outlier_bound: 900.0
               }
             },
             memory_usage_data: %Benchee.CollectionData{
@@ -149,11 +158,14 @@ defmodule Benchee.Statistics do
                 std_dev_ratio: 0.4,
                 std_dev_ips: nil,
                 median: 500.0,
-                percentiles: %{50 => 500.0, 99 => 900.0},
+                percentiles: %{50 => 500.0, 99 => 900.0, 25 => 400.0, 75 => 600.0},
                 mode: [500, 400],
                 minimum: 200,
                 maximum: 900,
-                sample_size: 9
+                sample_size: 9,
+                outliers: [],
+                lower_outlier_bound: 100.0,
+                upper_outlier_bound: 900.0
               }
             }
           }
@@ -167,15 +179,17 @@ defmodule Benchee.Statistics do
     printer.calculating_statistics(suite.configuration)
 
     percentiles = suite.configuration.percentiles
+    exclude_outliers? = suite.configuration.exclude_outliers
 
     update_in(suite.scenarios, fn scenarios ->
-      scenario_statistics = compute_statistics_in_parallel(scenarios, percentiles)
+      scenario_statistics =
+        compute_statistics_in_parallel(scenarios, percentiles, exclude_outliers?)
 
       update_scenarios_with_statistics(scenarios, scenario_statistics)
     end)
   end
 
-  defp compute_statistics_in_parallel(scenarios, percentiles) do
+  defp compute_statistics_in_parallel(scenarios, percentiles, exclude_outliers?) do
     scenarios
     |> Enum.map(fn scenario ->
       # we filter down the data here to avoid sending the input and benchmarking function to
@@ -188,7 +202,7 @@ defmodule Benchee.Statistics do
     # async_stream as we might run a ton of scenarios depending on the benchmark
     |> Task.async_stream(
       fn scenario_collection_data ->
-        calculate_scenario_statistics(scenario_collection_data, percentiles)
+        calculate_scenario_statistics(scenario_collection_data, percentiles, exclude_outliers?)
       end,
       timeout: :infinity,
       ordered: true
@@ -219,30 +233,44 @@ defmodule Benchee.Statistics do
     end)
   end
 
-  defp calculate_scenario_statistics({run_time_data, memory_data, reductions_data}, percentiles) do
+  defp calculate_scenario_statistics(
+         {run_time_data, memory_data, reductions_data},
+         percentiles,
+         exclude_outliers?
+       ) do
     run_time_stats =
       run_time_data.samples
-      |> calculate_statistics(percentiles)
+      |> calculate_statistics(percentiles, exclude_outliers?)
       |> add_ips
 
-    memory_stats = calculate_statistics(memory_data.samples, percentiles)
-    reductions_stats = calculate_statistics(reductions_data.samples, percentiles)
+    memory_stats = calculate_statistics(memory_data.samples, percentiles, exclude_outliers?)
+
+    reductions_stats =
+      calculate_statistics(reductions_data.samples, percentiles, exclude_outliers?)
 
     {run_time_stats, memory_stats, reductions_stats}
   end
 
-  defp calculate_statistics([], _) do
+  defp calculate_statistics([], _, _) do
     %__MODULE__{
       sample_size: 0
     }
   end
 
-  defp calculate_statistics(samples, percentiles) do
+  defp calculate_statistics(samples, percentiles, exclude_outliers?) do
     samples
-    |> Statistex.statistics(percentiles: percentiles)
+    |> Statistex.statistics(percentiles: percentiles, exclude_outliers: exclude_outliers?)
     |> convert_from_statistex
   end
 
+  # It might seem silly to maintain and map statistex to our own struct,
+  # but this gives benchee more control  and makes it safer to upgrade and change.
+  # Also, we don't expose changes in statistex versions automatically to plugins.
+  #
+  # As an example right now it's being discussed in statistex to add an `m2` statistic that holds
+  # no value for benchee (as it's ony used to calculate variance).
+  #
+  # We also manually add `ips` related stats (see `add_ips/1`) so differences are sufficient.
   defp convert_from_statistex(statistex_statistics) do
     %__MODULE__{
       average: statistex_statistics.average,
@@ -253,7 +281,10 @@ defmodule Benchee.Statistics do
       mode: statistex_statistics.mode,
       minimum: statistex_statistics.minimum,
       maximum: statistex_statistics.maximum,
-      sample_size: statistex_statistics.sample_size
+      sample_size: statistex_statistics.sample_size,
+      outliers: statistex_statistics.outliers,
+      lower_outlier_bound: statistex_statistics.lower_outlier_bound,
+      upper_outlier_bound: statistex_statistics.upper_outlier_bound
     }
   end
 

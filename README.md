@@ -136,6 +136,8 @@ In addition, you can optionally output an extended set of statistics:
 * **sample size** - the number of measurements taken
 * **mode**        - the measured values that occur the most. Often one value, but can be multiple values if they occur exactly as often. If no value occurs at least twice, this value will be `nil`.
 
+Benchee can also [remove outliers](#remove-outliers).
+
 ## Installation
 
 Add `:benchee` to your list of dependencies in `mix.exs`:
@@ -303,6 +305,7 @@ So, what happens if a function executes too fast for Benchee to measure? If Benc
 * essentially every single measurement is now an average across 10 runs making lots of statistics less meaningful
 
 Benchee will print a big warning when this happens.
+
 #### Measuring Memory Consumption
 
 Starting with version 0.13, users can now get measurements of how much memory their benchmarked scenarios use. The measurement is **limited to the process that Benchee executes your provided code in** - i.e. other processes (like worker pools)/the whole BEAM isn't taken into account.
@@ -541,6 +544,21 @@ Enum."-map/2-lists^map/1-0-"/2                  10001 26.38 2282    0.23
 ```
 
 **Note about after_each hooks:** `after_each` hooks currently don't work when profiling a function, as they are not passed the return value of the function after the profiling run. It's already fixed on the elixir side and is waiting for release, likely in 1.14. It should then just work.
+
+### Remove Outliers
+
+Benchee can remove outliers from the gathered samples.
+That is, as determined by percentiles/quantiles (we follow [this approach](https://en.wikipedia.org/wiki/Interquartile_range#Outliers)).
+
+You can simply pass `exclude_outliers: true` to Benchee to trigger the removal of outliers.
+
+```elixir
+Benchee.run(jobs, exclude_outliers: true)
+```
+
+The outliers themselves (aka the samples that have been determined to be outliers)
+as well as the lower/upper bound after which samples are considered outliers are accessible
+in the `Benchee.Statistics` struct.
 
 ### Saving, loading and comparing previous runs
 
