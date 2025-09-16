@@ -50,6 +50,7 @@ end
 
 if Code.ensure_loaded?(Table.Reader) do
   defimpl Table.Reader, for: Benchee.Suite do
+    alias Benchee.Benchmark
     alias Benchee.CollectionData
     alias Benchee.Scenario
 
@@ -96,7 +97,7 @@ if Code.ensure_loaded?(Table.Reader) do
           Enum.map(fields, fn field -> "#{measurement_type}_#{field}" end)
         end)
 
-      ["job_name" | measurement_headers]
+      ["job_name", "input_name"] ++ measurement_headers
     end
 
     defp fields_for(:run_time), do: @run_time_fields
@@ -113,7 +114,15 @@ if Code.ensure_loaded?(Table.Reader) do
             |> get_stats_from_collection_data(measurement_type, config_percentiles)
           end)
 
-        row = [scenario.job_name | secenario_data]
+        no_input = Benchmark.no_input()
+
+        input_name =
+          case scenario.input_name do
+            name when name in [nil, no_input] -> ""
+            name -> name
+          end
+
+        row = [scenario.job_name, input_name] ++ secenario_data
 
         {row, count + 1}
       end)
