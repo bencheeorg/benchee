@@ -225,16 +225,359 @@ defmodule Benchee.SuiteTest do
         ]
       }
 
+      @suite_with_inputs %Suite{
+        system: @system,
+        configuration: %Benchee.Configuration{
+          inputs: [
+            {"small", [1, 2, 3, 4]},
+            {"large", [1, 2, 3, 4, 5, 6, 7, 8]}
+          ],
+          input_names: ["small", "large"],
+          percentiles: [50, 99]
+        },
+        scenarios: [
+          %Benchee.Scenario{
+            input_name: "small",
+            input: [1, 2, 3, 4],
+            job_name: "Test 1",
+            memory_usage_data: %Benchee.CollectionData{
+              samples: [1_792, 1_792, 1_792],
+              statistics: %Benchee.Statistics{
+                absolute_difference: nil,
+                average: 1_792.0,
+                ips: nil,
+                maximum: 1_792,
+                median: 1_792.0,
+                minimum: 1_792,
+                mode: 1_792,
+                percentiles: %{50 => 1_792.0, 99 => 1_792.0},
+                relative_less: nil,
+                relative_more: nil,
+                sample_size: 3,
+                std_dev: +0.0,
+                std_dev_ips: nil,
+                std_dev_ratio: +0.0
+              }
+            },
+            name: "Test 1",
+            reductions_data: %Benchee.CollectionData{
+              samples: [],
+              statistics: %Benchee.Statistics{}
+            },
+            run_time_data: %Benchee.CollectionData{
+              samples: [21_580, 2_986, 11_502],
+              statistics: %Benchee.Statistics{
+                absolute_difference: nil,
+                average: 2_854.02659820102,
+                ips: 350_382.1585371105,
+                maximum: 3_741_076,
+                median: 2_164.0,
+                minimum: 2_063,
+                mode: 2_124,
+                percentiles: %{50 => 2_164.0, 99 => 5881.0},
+                relative_less: nil,
+                relative_more: nil,
+                sample_size: 3,
+                std_dev: 13_106.875011228927,
+                std_dev_ips: 1_609_100.3359973046,
+                std_dev_ratio: 4.592415158110506
+              }
+            }
+          },
+          %Benchee.Scenario{
+            job_name: "Test 2",
+            input_name: "small",
+            input: [1, 2, 3, 4],
+            memory_usage_data: %Benchee.CollectionData{
+              samples: [1_792, 1_792, 1_792],
+              statistics: %Benchee.Statistics{
+                absolute_difference: nil,
+                average: 1_792.0,
+                ips: nil,
+                maximum: 1_792,
+                median: 1_792.0,
+                minimum: 1_792,
+                mode: 1_792,
+                percentiles: %{50 => 1_792.0, 99 => 1_792.0},
+                relative_less: nil,
+                relative_more: nil,
+                sample_size: 3,
+                std_dev: +0.0,
+                std_dev_ips: nil,
+                std_dev_ratio: +0.0
+              }
+            },
+            name: "Test 2",
+            reductions_data: %Benchee.CollectionData{
+              samples: [],
+              statistics: %Benchee.Statistics{}
+            },
+            run_time_data: %Benchee.CollectionData{
+              samples: [21_580, 2_986, 11_502],
+              statistics: %Benchee.Statistics{
+                absolute_difference: nil,
+                average: 2_854.02659820102,
+                ips: 350_382.1585371105,
+                maximum: 3_741_076,
+                median: 2_164.0,
+                minimum: 2_063,
+                mode: 2_124,
+                percentiles: %{50 => 2_164.0, 99 => 5881.0},
+                relative_less: nil,
+                relative_more: nil,
+                sample_size: 3,
+                std_dev: 13_106.875011228927,
+                std_dev_ips: 1_609_100.3359973046,
+                std_dev_ratio: 4.592415158110506
+              }
+            }
+          },
+          %Benchee.Scenario{
+            job_name: "Test 1",
+            input_name: "large",
+            input: [1, 2, 3, 4, 5, 6, 7, 8],
+            memory_usage_data: %Benchee.CollectionData{
+              samples: [1_792, 1_792, 1_792],
+              statistics: %Benchee.Statistics{
+                absolute_difference: nil,
+                average: 1_792.0,
+                ips: nil,
+                maximum: 1_792,
+                median: 1_792.0,
+                minimum: 1_792,
+                mode: 1_792,
+                percentiles: %{50 => 1_792.0, 99 => 1_792.0},
+                relative_less: nil,
+                relative_more: nil,
+                sample_size: 3,
+                std_dev: +0.0,
+                std_dev_ips: nil,
+                std_dev_ratio: +0.0
+              }
+            },
+            name: "Test 1",
+            reductions_data: %Benchee.CollectionData{
+              samples: [],
+              statistics: %Benchee.Statistics{}
+            },
+            run_time_data: %Benchee.CollectionData{
+              samples: [21_580, 2_986, 11_502],
+              statistics: %Benchee.Statistics{
+                absolute_difference: nil,
+                average: 2_854.02659820102,
+                ips: 350_382.1585371105,
+                maximum: 3_741_076,
+                median: 2_164.0,
+                minimum: 2_063,
+                mode: 2_124,
+                percentiles: %{50 => 2_164.0, 99 => 5881.0},
+                relative_less: nil,
+                relative_more: nil,
+                sample_size: 3,
+                std_dev: 13_106.875011228927,
+                std_dev_ips: 1_609_100.3359973046,
+                std_dev_ratio: 4.592415158110506
+              }
+            }
+          },
+          %Benchee.Scenario{
+            job_name: "Test 2",
+            input_name: "large",
+            input: [1, 2, 3, 4, 5, 6, 7, 8],
+            memory_usage_data: %Benchee.CollectionData{
+              samples: [1_792, 1_792, 1_792],
+              statistics: %Benchee.Statistics{
+                absolute_difference: nil,
+                average: 1_792.0,
+                ips: nil,
+                maximum: 1_792,
+                median: 1_792.0,
+                minimum: 1_792,
+                mode: 1_792,
+                percentiles: %{50 => 1_792.0, 99 => 1_792.0},
+                relative_less: nil,
+                relative_more: nil,
+                sample_size: 3,
+                std_dev: +0.0,
+                std_dev_ips: nil,
+                std_dev_ratio: +0.0
+              }
+            },
+            name: "Test 2",
+            reductions_data: %Benchee.CollectionData{
+              samples: [],
+              statistics: %Benchee.Statistics{}
+            },
+            run_time_data: %Benchee.CollectionData{
+              samples: [21_580, 2_986, 11_502],
+              statistics: %Benchee.Statistics{
+                absolute_difference: nil,
+                average: 2_854.02659820102,
+                ips: 350_382.1585371105,
+                maximum: 3_741_076,
+                median: 2_164.0,
+                minimum: 2_063,
+                mode: 2_124,
+                percentiles: %{50 => 2_164.0, 99 => 5881.0},
+                relative_less: nil,
+                relative_more: nil,
+                sample_size: 3,
+                std_dev: 13_106.875011228927,
+                std_dev_ips: 1_609_100.3359973046,
+                std_dev_ratio: 4.592415158110506
+              }
+            }
+          }
+        ]
+      }
+
       test "should return a table when no scenarios are in the suite" do
         table_results = Table.Reader.init(@empty_suite)
 
         assert {:rows,
                 %{
                   columns: [
-                    "job_name"
+                    "job_name",
+                    "input_name"
                   ],
                   count: 0
                 }, []} = table_results
+      end
+
+      test "should return a table with data when multiple scenarios and inputs are in the suite" do
+        table_results = Table.Reader.init(@suite_with_inputs)
+
+        assert {:rows,
+                %{
+                  columns: [
+                    "job_name",
+                    "input_name",
+                    "run_time_samples",
+                    "run_time_ips",
+                    "run_time_average",
+                    "run_time_std_dev",
+                    "run_time_median",
+                    "run_time_minimum",
+                    "run_time_maximum",
+                    "run_time_mode",
+                    "run_time_sample_size",
+                    "run_time_p_50",
+                    "run_time_p_99",
+                    "memory_samples",
+                    "memory_average",
+                    "memory_std_dev",
+                    "memory_median",
+                    "memory_minimum",
+                    "memory_maximum",
+                    "memory_mode",
+                    "memory_sample_size",
+                    "memory_p_50",
+                    "memory_p_99"
+                  ],
+                  count: 4
+                },
+                [
+                  [
+                    "Test 1",
+                    "small",
+                    [21_580, 2_986, 11_502],
+                    350_382.1585371105,
+                    2_854.02659820102,
+                    13_106.875011228927,
+                    2_164.0,
+                    2_063,
+                    3_741_076,
+                    2_124,
+                    3,
+                    2_164.0,
+                    5881.0,
+                    [1_792, 1_792, 1_792],
+                    1_792.0,
+                    +0.0,
+                    1_792.0,
+                    1_792,
+                    1_792,
+                    1_792,
+                    3,
+                    1_792.0,
+                    1_792.0
+                  ],
+                  [
+                    "Test 2",
+                    "small",
+                    [21_580, 2_986, 11_502],
+                    350_382.1585371105,
+                    2_854.02659820102,
+                    13_106.875011228927,
+                    2_164.0,
+                    2_063,
+                    3_741_076,
+                    2_124,
+                    3,
+                    2_164.0,
+                    5881.0,
+                    [1_792, 1_792, 1_792],
+                    1_792.0,
+                    +0.0,
+                    1_792.0,
+                    1_792,
+                    1_792,
+                    1_792,
+                    3,
+                    1_792.0,
+                    1_792.0
+                  ],
+                  [
+                    "Test 1",
+                    "large",
+                    [21_580, 2_986, 11_502],
+                    350_382.1585371105,
+                    2_854.02659820102,
+                    13_106.875011228927,
+                    2_164.0,
+                    2_063,
+                    3_741_076,
+                    2_124,
+                    3,
+                    2_164.0,
+                    5881.0,
+                    [1_792, 1_792, 1_792],
+                    1_792.0,
+                    +0.0,
+                    1_792.0,
+                    1_792,
+                    1_792,
+                    1_792,
+                    3,
+                    1_792.0,
+                    1_792.0
+                  ],
+                  [
+                    "Test 2",
+                    "large",
+                    [21_580, 2_986, 11_502],
+                    350_382.1585371105,
+                    2_854.02659820102,
+                    13_106.875011228927,
+                    2_164.0,
+                    2_063,
+                    3_741_076,
+                    2_124,
+                    3,
+                    2_164.0,
+                    5881.0,
+                    [1_792, 1_792, 1_792],
+                    1_792.0,
+                    +0.0,
+                    1_792.0,
+                    1_792,
+                    1_792,
+                    1_792,
+                    3,
+                    1_792.0,
+                    1_792.0
+                  ]
+                ]} = table_results
       end
 
       test "should return a table with data when multiple scenarios are in the suite" do
@@ -244,6 +587,7 @@ defmodule Benchee.SuiteTest do
                 %{
                   columns: [
                     "job_name",
+                    "input_name",
                     "run_time_samples",
                     "run_time_ips",
                     "run_time_average",
@@ -271,6 +615,7 @@ defmodule Benchee.SuiteTest do
                 [
                   [
                     "Test 1",
+                    "",
                     [21_580, 2_986, 11_502],
                     350_382.1585371105,
                     2_854.02659820102,
@@ -295,6 +640,7 @@ defmodule Benchee.SuiteTest do
                   ],
                   [
                     "Test 2",
+                    "",
                     [21_580, 2_986, 11_502],
                     350_382.1585371105,
                     2_854.02659820102,
@@ -327,6 +673,7 @@ defmodule Benchee.SuiteTest do
                 %{
                   columns: [
                     "job_name",
+                    "input_name",
                     "run_time_samples",
                     "run_time_ips",
                     "run_time_average",
@@ -364,6 +711,7 @@ defmodule Benchee.SuiteTest do
                 [
                   [
                     "Test 1",
+                    "",
                     [21_580, 2_986, 11_502],
                     350_382.1585371105,
                     2_854.02659820102,
