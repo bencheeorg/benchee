@@ -18,13 +18,13 @@ defmodule Benchee.Conversion do
   ## Examples
 
       iex> statistics = %Benchee.Statistics{average: 1_000_000.0, ips: 1000.0}
-      ...> 
+      ...>
       ...> scenario = %Benchee.Scenario{
       ...>   run_time_data: %Benchee.CollectionData{statistics: statistics},
       ...>   memory_usage_data: %Benchee.CollectionData{statistics: statistics},
       ...>   reductions_data: %Benchee.CollectionData{statistics: statistics}
       ...> }
-      ...> 
+      ...>
       ...> Benchee.Conversion.units([scenario], :best)
       %{
         ips: %Benchee.Conversion.Unit{
