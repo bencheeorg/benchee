@@ -115,7 +115,7 @@ defmodule Benchee.Statistics do
       ...>     input: "Input"
       ...>   }
       ...> ]
-      ...> 
+      ...>
       ...> suite = %Benchee.Suite{scenarios: scenarios}
       ...> statistics(suite, Benchee.Test.FakeProgressPrinter)
       %Benchee.Suite{
@@ -133,7 +133,7 @@ defmodule Benchee.Statistics do
                 std_dev_ratio: 0.4,
                 std_dev_ips: 800_000.0,
                 median: 500.0,
-                percentiles: %{50 => 500.0, 99 => 900.0},
+                percentiles: %{25 => 400.0, 50 => 500.0, 75 => 600.0, 99 => 900.0},
                 mode: [500, 400],
                 minimum: 200,
                 maximum: 900,
@@ -149,7 +149,7 @@ defmodule Benchee.Statistics do
                 std_dev_ratio: 0.4,
                 std_dev_ips: nil,
                 median: 500.0,
-                percentiles: %{50 => 500.0, 99 => 900.0},
+                percentiles: %{25 => 400.0, 50 => 500.0, 75 => 600.0, 99 => 900.0},
                 mode: [500, 400],
                 minimum: 200,
                 maximum: 900,
@@ -200,7 +200,11 @@ defmodule Benchee.Statistics do
     # we can zip them as they retained order
     scenarios
     |> Enum.zip(scenario_statistics)
-    |> Enum.map(fn {scenario, {run_time_stats, memory_stats, reductions_stats}} ->
+    |> Enum.map(fn {%Scenario{
+                      run_time_data: %CollectionData{},
+                      memory_usage_data: %CollectionData{},
+                      reductions_data: %CollectionData{}
+                    } = scenario, {run_time_stats, memory_stats, reductions_stats}} ->
       %Scenario{
         scenario
         | run_time_data: %CollectionData{
@@ -260,7 +264,7 @@ defmodule Benchee.Statistics do
   defp add_ips(statistics = %__MODULE__{sample_size: 0}), do: statistics
   defp add_ips(statistics = %__MODULE__{average: +0.0}), do: statistics
 
-  defp add_ips(statistics) do
+  defp add_ips(statistics = %__MODULE__{}) do
     ips = Duration.convert_value({1, :second}, :nanosecond) / statistics.average
     standard_dev_ips = ips * statistics.std_dev_ratio
 

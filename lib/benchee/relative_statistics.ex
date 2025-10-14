@@ -21,7 +21,7 @@ defmodule Benchee.RelativeStatistics do
   all formatters. Scenarios are sorted first by run time average, then by memory average.
   """
   @spec relative_statistics(Suite.t()) :: Suite.t()
-  def relative_statistics(suite) do
+  def relative_statistics(suite = %Suite{}) do
     %Suite{suite | scenarios: calculate_relative_statistics(suite.scenarios)}
   end
 
@@ -85,7 +85,7 @@ defmodule Benchee.RelativeStatistics do
   defp add_relative_statistics(statistics = %{average: nil}, _reference), do: statistics
   defp add_relative_statistics(statistics, %{average: nil}), do: statistics
 
-  defp add_relative_statistics(statistics, reference_statistics) do
+  defp add_relative_statistics(statistics = %Statistics{}, reference_statistics) do
     %Statistics{
       statistics
       | relative_more: zero_safe_division(statistics.average, reference_statistics.average),

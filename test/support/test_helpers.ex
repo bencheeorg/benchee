@@ -31,9 +31,9 @@ defmodule Benchee.TestHelpers do
     |> Enum.each(fn message -> refute_received(^message) end)
   end
 
-  def suite_without_scenario_tags(suite) do
+  def suite_without_scenario_tags(suite = %Benchee.Suite{}) do
     scenarios =
-      Enum.map(suite.scenarios, fn scenario ->
+      Enum.map(suite.scenarios, fn %Benchee.Scenario{} = scenario ->
         %Benchee.Scenario{scenario | tag: nil, name: scenario.job_name}
       end)
 

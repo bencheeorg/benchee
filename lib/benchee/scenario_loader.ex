@@ -15,7 +15,7 @@ defmodule Benchee.ScenarioLoader do
   Load the file(s) specified as `load_path` and add the scenarios to the list of the
   current scenarios in the suite.
   """
-  def load(suite = %{configuration: %{load: load_path}, scenarios: scenarios}) do
+  def load(suite = %Suite{configuration: %{load: load_path}, scenarios: scenarios}) do
     loaded = load_scenarios(load_path)
     %Suite{suite | scenarios: scenarios ++ loaded}
   end

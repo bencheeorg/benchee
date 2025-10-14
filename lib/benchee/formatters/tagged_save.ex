@@ -70,7 +70,7 @@ defmodule Benchee.Formatters.TaggedSave do
     scenario
   end
 
-  defp update_name(scenario) do
+  defp update_name(scenario = %Scenario{}) do
     %Scenario{scenario | name: Scenario.display_name(scenario)}
   end
 

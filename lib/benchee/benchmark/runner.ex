@@ -35,7 +35,7 @@ defmodule Benchee.Benchmark.Runner do
   parallel.
   """
   @spec run_scenarios([Scenario.t()], ScenarioContext.t()) :: [Scenario.t()]
-  def run_scenarios(scenarios, scenario_context) do
+  def run_scenarios(scenarios, scenario_context = %ScenarioContext{}) do
     case scenario_context.config.pre_check do
       true -> Enum.each(scenarios, fn scenario -> pre_check(scenario, scenario_context) end)
       false -> :ok
@@ -63,7 +63,7 @@ defmodule Benchee.Benchmark.Runner do
     run_once(scenario, scenario_context)
   end
 
-  def run_once(scenario, scenario_context) do
+  def run_once(scenario, scenario_context = %ScenarioContext{}) do
     scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
     return_value = collect_return_value(scenario, scenario_context)
@@ -131,7 +131,7 @@ defmodule Benchee.Benchmark.Runner do
   end
 
   @spec measure_scenario(Scenario.t(), ScenarioContext.t()) :: {[number], [number], [number]}
-  defp measure_scenario(scenario, scenario_context) do
+  defp measure_scenario(scenario, scenario_context = %ScenarioContext{}) do
     scenario_input = Hooks.run_before_scenario(scenario, scenario_context)
     scenario_context = %ScenarioContext{scenario_context | scenario_input: scenario_input}
 
@@ -256,7 +256,7 @@ defmodule Benchee.Benchmark.Runner do
   defp measure_runtimes(scenario, context, run_time, fast_warning)
   defp measure_runtimes(_, _, time, _) when time in @zero_values, do: []
 
-  defp measure_runtimes(scenario, scenario_context, run_time, fast_warning) do
+  defp measure_runtimes(scenario, scenario_context = %ScenarioContext{}, run_time, fast_warning) do
     end_time = current_time() + run_time
     :erlang.garbage_collect()
 
@@ -302,7 +302,7 @@ defmodule Benchee.Benchmark.Runner do
     Enum.reverse(measurements)
   end
 
-  defp do_benchmark(scenario, scenario_context, collector, measurements) do
+  defp do_benchmark(scenario, scenario_context = %ScenarioContext{}, collector, measurements) do
     measurement = collect(scenario, scenario_context, collector)
 
     updated_context = %ScenarioContext{

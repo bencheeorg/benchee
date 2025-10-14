@@ -197,7 +197,7 @@ defmodule Benchee.Formatter do
     update_in(suite.configuration, &scrub_configuration/1)
   end
 
-  defp scrub_scenario(scenario) do
+  defp scrub_scenario(scenario = %Scenario{}) do
     %Scenario{scenario | function: nil, input: nil}
   end
 
