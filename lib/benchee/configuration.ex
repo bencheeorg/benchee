@@ -364,7 +364,7 @@ defmodule Benchee.Configuration do
 
   defp save_option_conversion(config = %{save: false}), do: config
 
-  defp save_option_conversion(config = %{save: save_values}) do
+  defp save_option_conversion(config = %__MODULE__{save: save_values}) do
     save_options = Map.merge(save_defaults(), save_values)
     tagged_save_options = %{tag: save_options.tag, path: save_options.path}
     formatters = config.formatters ++ [{Benchee.Formatters.TaggedSave, tagged_save_options}]

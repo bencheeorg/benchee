@@ -766,7 +766,7 @@ defmodule BencheeTest do
     # what it does is balloon the file size written out and take performance to the groun
     defp without_functions_and_inputs(suite) do
       update_in(suite.scenarios, fn scenarios ->
-        Enum.map(scenarios, fn scenario ->
+        Enum.map(scenarios, fn %Benchee.Scenario{} = scenario ->
           %Benchee.Scenario{scenario | function: nil, input: nil}
         end)
       end)
