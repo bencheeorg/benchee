@@ -78,14 +78,14 @@ defmodule Benchee.Formatters.Console do
   ...>     memory_usage_data: %Benchee.CollectionData{statistics: %Benchee.Statistics{}}
   ...>   }
   ...> ]
-  ...> 
+  ...>
   ...> suite = %Benchee.Suite{
   ...>   scenarios: scenarios,
   ...>   configuration: %Benchee.Configuration{
   ...>     unit_scaling: :best
   ...>   }
   ...> }
-  ...> 
+  ...>
   ...> format(suite, %{comparison: false, extended_statistics: false})
   [
     [

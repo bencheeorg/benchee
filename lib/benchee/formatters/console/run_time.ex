@@ -35,7 +35,7 @@ defmodule Benchee.Formatters.Console.RunTime do
 
   ```
   iex> memory_statistics = %Benchee.Statistics{average: 100.0}
-  ...> 
+  ...>
   ...> scenarios = [
   ...>   %Benchee.Scenario{
   ...>     name: "My Job",
@@ -72,7 +72,7 @@ defmodule Benchee.Formatters.Console.RunTime do
   ...>     memory_usage_data: %Benchee.CollectionData{statistics: memory_statistics}
   ...>   }
   ...> ]
-  ...> 
+  ...>
   ...> configuration = %{comparison: false, unit_scaling: :best, extended_statistics: true}
   ...> format_scenarios(scenarios, configuration)
   [
