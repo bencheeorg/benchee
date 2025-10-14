@@ -17,6 +17,7 @@ defmodule Benchee.Mixfile do
       docs: docs(),
       package: package(),
       test_coverage: [tool: ExCoveralls],
+      test_ignore_filters: [~r/test\/fixtures/],
       dialyzer: [
         flags: [:underspecs],
         plt_file: {:no_warn, "tools/plts/benchee.plt"},
