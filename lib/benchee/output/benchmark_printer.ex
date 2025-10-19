@@ -69,7 +69,8 @@ defmodule Benchee.Output.BenchmarkPrinter do
          warmup: warmup,
          inputs: inputs,
          memory_time: memory_time,
-         reduction_time: reduction_time
+         reduction_time: reduction_time,
+         exclude_outliers: exclude_outliers
        }) do
     scenario_count = length(scenarios)
     exec_time = warmup + time + memory_time + reduction_time
@@ -84,6 +85,7 @@ defmodule Benchee.Output.BenchmarkPrinter do
     parallel: #{parallel}
     inputs: #{inputs_out(inputs)}
     Estimated total run time: #{Duration.format_human(total_time)}
+    Excluding outliers: #{exclude_outliers}
     """)
   end
 
