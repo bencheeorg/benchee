@@ -211,6 +211,62 @@ defmodule Benchee.StatistcsTest do
       assert_received :calculating_statistics
     end
 
+    test "determinism and outlier removal" do
+      scenarios = [
+        %Scenario{
+          input: "Input",
+          input_name: "Input",
+          job_name: "Job 1",
+          run_time_data: %CollectionData{samples: @sample_1}
+        }
+      ]
+
+      suite = %Suite{scenarios: scenarios}
+      new_suite = Statistics.statistics(suite, FakeProgressPrinter)
+      new_suite2 = Statistics.statistics(suite, FakeProgressPrinter)
+
+      # deterministic
+      assert new_suite == new_suite2
+
+      stats_1 = run_time_stats_for(new_suite, "Job 1", "Input")
+      # Statistex tests these values itself
+      assert stats_1.outliers == []
+      assert stats_1.lower_outlier_bound <= 100
+      assert stats_1.upper_outlier_bound >= 900
+
+      sample_1_asserts(stats_1)
+
+      outlier = 2000
+
+      outlier_scenarios = [
+        %Scenario{
+          input: "Input",
+          input_name: "Input",
+          job_name: "Job 1",
+          run_time_data: %CollectionData{samples: [outlier | @sample_1]}
+        }
+      ]
+
+      outlier_suite = %Suite{
+        scenarios: outlier_scenarios,
+        configuration: %Benchee.Configuration{exclude_outliers: true}
+      }
+
+      outlier_suite = Statistics.statistics(outlier_suite, FakeProgressPrinter)
+
+      # we're not the same
+      refute outlier_suite == new_suite
+
+      stats_1_outlier = run_time_stats_for(outlier_suite, "Job 1", "Input")
+      assert stats_1_outlier.outliers == [outlier]
+
+      # However thanks to the outlier removal, our stats (minus outliers) are,
+      # down to the sample_size even
+      sample_1_asserts(stats_1_outlier)
+      assert stats_1.lower_outlier_bound <= 100
+      assert stats_1.upper_outlier_bound <= 2000
+    end
+
     defp run_time_stats_for(suite, job_name, input_name) do
       stats_for(suite, job_name, input_name, :run_time_data)
     end
