@@ -12,6 +12,7 @@ defmodule Benchee.StatistcsTest do
   @sample_4 [100, 100, 100, 100]
   @sample_5 [5, 10, 15]
   @sample_6 [10, 20]
+
   describe ".statistics" do
     test "computes the statistics for all jobs correctly" do
       scenarios = [
@@ -176,7 +177,7 @@ defmodule Benchee.StatistcsTest do
     end
 
     @nothing []
-    test "doesn't blow up whenthere are no measurements" do
+    test "doesn't blow up when there are no measurements" do
       scenarios = [
         %Scenario{
           run_time_data: %CollectionData{samples: @nothing},
@@ -204,7 +205,7 @@ defmodule Benchee.StatistcsTest do
       assert reductions_stats.average == nil
     end
 
-    test "lets you know it's benchmarking" do
+    test "lets you know it's calculating statistics" do
       Statistics.statistics(%Suite{}, FakeProgressPrinter)
 
       assert_received :calculating_statistics
