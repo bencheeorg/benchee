@@ -571,6 +571,8 @@ in the `Benchee.Statistics` struct.
 
 The samples themselves still include the outliers, they are only removed for calculating statistics.
 
+Right now Benchee doesn't print the outliers yet, but you can inspect the resulting data structures if you're interested (or send a PR :) )
+
 ### Saving, loading and comparing previous runs
 
 Benchee can store the results of previous runs in a file and then load them again to compare them. For example this is useful to compare what was recorded on the main branch against a branch with performance improvements. You may also use this to benchmark across different exlixir/erlang versions.
