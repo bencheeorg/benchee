@@ -76,6 +76,9 @@ defmodule Benchee.Statistics do
     the difference of the averages of the scenarios. e.g. for reference at 100, this
     scenario 200 then it is 100.
     * sample_size - the number of measurements/samples taken into account for calculating statistics
+    * outliers - if outlier exclusion was enabled, may include any samples of outliers that were found, empty list otherwise
+    * lower_outlier_bound - value below which values are considered an outlier
+    * upper_outlier_bound - value above which values are considered an outlier
   """
   @type t :: %__MODULE__{
           average: float,
