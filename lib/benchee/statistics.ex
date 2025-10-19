@@ -46,26 +46,26 @@ defmodule Benchee.Statistics do
 
   Overview of all the statistics Benchee currently provides:
 
-    * average       - average of all the samples (the lower the better)
-    * ips           - iterations per second, how often can the given function be
+    * average - average of all the samples (the lower the better)
+    * ips - iterations per second, how often can the given function be
     executed within one second, used only for run times (the higher the better)
-    * std_dev       - standard deviation, how much results vary among the samples
+    * std_dev - standard deviation, how much results vary among the samples
     (the higher the more the results vary)
     * std_dev_ratio - standard deviation expressed as how much it is relative to
     the average
-    * std_dev_ips   - the absolute standard deviation of iterations per second
-    * median        - when all measured times are sorted, this is the middle
+    * std_dev_ips - the absolute standard deviation of iterations per second
+    * median - when all measured times are sorted, this is the middle
     value (or average of the two middle values when the number of times is
     even). More stable than the average and somewhat more likely to be a
     typical value you see.
-    * percentiles   - a map of percentile ranks. These are the values below
+    * percentiles - a map of percentile ranks. These are the values below
       which x% of the samples lie. For example, 99% of samples are less than
       is a value for which 99% of the run times are less than it.
-    * mode          - the samples that occur the most. Often one value, but
+    * mode - the samples that occur the most. Often one value, but
       can be multiple values if they occur the same amount of times. If no value
       occurs at least twice, this value will be `nil`.
-    * minimum       - the smallest sample measured for the scenario
-    * maximum       - the biggest sample measured for the scenario
+    * minimum - the smallest sample measured for the scenario
+    * maximum - the biggest sample measured for the scenario
     * relative_more - relative to the reference (usually the fastest scenario) how much more
     was the average of this scenario. E.g. for reference at 100, this scenario 200 then it
     is 2.0.
@@ -75,7 +75,7 @@ defmodule Benchee.Statistics do
     * absolute_difference - relative to the reference (usually the fastest scenario) what is
     the difference of the averages of the scenarios. e.g. for reference at 100, this
     scenario 200 then it is 100.
-    * sample_size   - the number of measurements/samples taken into account for calculating statistics
+    * sample_size - the number of measurements/samples taken into account for calculating statistics
   """
   @type t :: %__MODULE__{
           average: float,
