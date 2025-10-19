@@ -55,6 +55,26 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       assert output =~ "memory time: 0 ns"
       assert output =~ "parallel: 2"
       assert output =~ "Estimated total run time: 20 μs"
+      assert output =~ "Excluding outliers: false"
+    end
+
+    test "tells you when outliers are being excluded" do
+      output =
+        capture_io(fn ->
+          %{
+            configuration: %Configuration{
+              time: 10_000,
+              warmup: 0,
+              inputs: nil,
+              exclude_outliers: true
+            },
+            scenarios: [%Scenario{job_name: "one"}],
+            system: @system_info
+          }
+          |> configuration_information
+        end)
+
+      assert output =~ "Excluding outliers: true"
     end
 
     test "it scales times appropriately" do
@@ -86,7 +106,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       output =
         capture_io(fn ->
           %{
-            configuration: %{
+            configuration: %Configuration{
               parallel: 2,
               time: 10_000,
               warmup: 0,
@@ -111,6 +131,7 @@ defmodule Benchee.Output.BenchmarkPrintertest do
       assert output =~ "parallel: 2"
       assert output =~ "inputs: Arg 1, Arg 2"
       assert output =~ "Estimated total run time: 44 μs"
+      assert output =~ "Excluding outliers: false"
     end
 
     test "does not print if disabled" do

@@ -1167,6 +1167,7 @@ defmodule BencheeTest do
 
       # As the outlier is removed, all measurements are the same
       assert output =~ ~r/all.*reduction.*same/i
+      assert output =~ ~r/exclud.*outlier.*true/i
     end
   end
 
