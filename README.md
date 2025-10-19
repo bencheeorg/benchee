@@ -26,9 +26,9 @@ Produces the following output on the console:
 Operating System: Linux
 CPU Information: AMD Ryzen 9 5900X 12-Core Processor
 Number of Available Cores: 24
-Available memory: 31.25 GB
-Elixir 1.16.0-rc.1
-Erlang 26.1.2
+Available memory: 31.26 GB
+Elixir 1.19.0
+Erlang 28.1
 JIT enabled: true
 
 Benchmark suite executing with the following configuration:
@@ -39,6 +39,7 @@ reduction time: 0 ns
 parallel: 1
 inputs: none specified
 Estimated total run time: 28 s
+Excluding outliers: false
 
 Benchmarking flat_map ...
 Benchmarking map.flatten ...
@@ -46,18 +47,18 @@ Calculating statistics...
 Formatting results...
 
 Name                  ips        average  deviation         median         99th %
-flat_map           3.79 K      263.87 μs    ±15.49%      259.47 μs      329.29 μs
-map.flatten        1.96 K      509.19 μs    ±51.36%      395.23 μs     1262.27 μs
+flat_map           3.96 K      252.74 μs    ±15.64%      247.61 μs      321.85 μs
+map.flatten        1.84 K      543.57 μs    ±44.18%      414.16 μs     1223.92 μs
 
 Comparison:
-flat_map           3.79 K
-map.flatten        1.96 K - 1.93x slower +245.32 μs
+flat_map           3.96 K
+map.flatten        1.84 K - 2.15x slower +290.83 μs
 
 Memory usage statistics:
 
 Name           Memory usage
-flat_map             625 KB
-map.flatten       781.25 KB - 1.25x memory usage +156.25 KB
+flat_map          624.97 KB
+map.flatten       781.25 KB - 1.25x memory usage +156.28 KB
 
 **All measurements for memory usage were the same**
 ```
