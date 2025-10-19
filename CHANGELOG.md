@@ -8,7 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ## Features (User Facing)
-* Introduce `max_sample_size` which guides how many samples will be gathered at most for a given scenario. This avoids a variety of issues when scenarios gather too many samples (memory consumption etc). Defaults to `1_000_000`, setting it to `nil` gathers unlimited samples again (behavior before this version).
+* Introduce `max_sample_size` which guides how many samples will be gathered at most for a given scenario.
+This avoids a variety of issues when scenarios gather too many samples (memory consumption, statistics taking long to calculate, formatters hanging/not working).
+Defaults to `1_000_000`, setting it to `nil` gathers unlimited samples again (behavior before this version).
+* Introduce `exclude_outliers` option which when set to `true` will automatically exclude outliers from the samples gathered.
+Especially important for run time, you can remove samples caused by garbage collection or external factors.
+Defaults to `false`.
+Shout out to [@NickNeck](https://github.com/NickNeck) who implemented this long wished for feature over in `Statistex`.
 
 ### Bugfixes (User Facing)
 * fixed a bug where if times were supplied as `0` instead of `0.0` we'd sometimes gather a single measurement
