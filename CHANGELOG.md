@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * fixed a bug where if times were supplied as `0` instead of `0.0` we'd sometimes gather a single measurement
 * elixir `1.19` compilation warnings have been removed
 
+### Features (Plugins)
+* The `%Benchee.Statistics{}` struct now comes with values to accompany the outlier exclusion feature:
+  * outliers - if outlier exclusion was enabled, may include any samples of outliers that were found, empty list otherwise
+  * lower_outlier_bound - value below which values are considered an outlier
+  * upper_outlier_bound - value above which values are considered an outlier
+
 ## 1.4.0 (2025-04-14)
 
 Some nice features (`pre_check: :all_same` is cool) along with adding support for some new stuff (`tprof`) and fixing some bugs.
