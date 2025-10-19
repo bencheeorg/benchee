@@ -83,6 +83,7 @@ The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/be
   - [Formatters](#formatters)
     - [Console Formatter options](#console-formatter-options)
   - [Profiling after a run](#profiling-after-a-run)
+  - [Remove Outliers](#remove-outliers)
   - [Saving, loading and comparing previous runs](#saving-loading-and-comparing-previous-runs)
   - [Hooks (Setup, Teardown etc.)](#hooks-setup-teardown-etc)
     - [Suite hooks](#suite-hooks)
@@ -115,6 +116,7 @@ The aforementioned [plugins](#plugins) like [benchee_html](https://github.com/be
 * as precise as it can get, measure with up to nanosecond precision (Operating System dependent)
 * nicely formatted console output with units scaled to appropriately (nanoseconds to minutes)
 * (optionally) measures the overhead of function calls so that the measured/reported times really are the execution time of _your_code_ without that overhead.
+* (optionally) [removes outliers](#remove-outliers)
 * [hooks](#hooks-setup-teardown-etc) to execute something before/after a benchmarking invocation, without it impacting the measured time
 * execute benchmark jobs in parallel to gather more results in the same time, or simulate a system under load
 * well documented & well tested
@@ -265,6 +267,11 @@ The available options are the following (also documented in [hexdocs](https://he
   This is used to limit memory consumption and unnecessary processing - 1 Million samples is plenty.
   This limit also applies to number of iterations done during warmup.
   You can set your own number or set it to `nil` if you don't want any limit.
+* `exclude_outliers` - whether or not statistical outliers should be removed for the calculated statistics.
+Defaults to `false`.
+This means that values that are far outside the usual range (as determined by the percentiles/quantiles) will
+be removed from the gathered samples and the calculated statistics. You might want to enable this if you
+don't want things like the garbage collection triggering to influence your results as much.
 
 ### Metrics to measure
 
@@ -547,8 +554,10 @@ Enum."-map/2-lists^map/1-0-"/2                  10001 26.38 2282    0.23
 
 ### Remove Outliers
 
-Benchee can remove outliers from the gathered samples.
+Benchee can remove outliers from the gathered samples while calculating statistics.
 That is, as determined by percentiles/quantiles (we follow [this approach](https://en.wikipedia.org/wiki/Interquartile_range#Outliers)).
+
+You might consider excluding outliers for extreme micro/nano-benchmarks where individual results can be skewed a lot by the Garbage Collection.
 
 You can simply pass `exclude_outliers: true` to Benchee to trigger the removal of outliers.
 
@@ -559,6 +568,8 @@ Benchee.run(jobs, exclude_outliers: true)
 The outliers themselves (aka the samples that have been determined to be outliers)
 as well as the lower/upper bound after which samples are considered outliers are accessible
 in the `Benchee.Statistics` struct.
+
+The samples themselves still include the outliers, they are only removed for calculating statistics.
 
 ### Saving, loading and comparing previous runs
 
