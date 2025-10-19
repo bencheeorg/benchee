@@ -33,8 +33,8 @@ defmodule Benchee.Formatters.Console do
 
   @behaviour Benchee.Formatter
 
-  alias Benchee.Suite
   alias Benchee.Formatters.Console.{Memory, Reductions, RunTime}
+  alias Benchee.Suite
 
   @doc """
   Formats the benchmark statistics to a report suitable for output on the CLI.
