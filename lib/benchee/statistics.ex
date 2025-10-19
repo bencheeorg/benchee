@@ -39,40 +39,43 @@ defmodule Benchee.Statistics do
   @typedoc """
   All the statistics `statistics/1` computes from the samples.
 
+  This used for run times, memory and reductions. Generally with these,
+  the lower the better (less run time, memory consumption or reductions).
+
+  These values mostly correspond to their cousins in `Statistex`.
+
   Overview of all the statistics Benchee currently provides:
 
-    * average       - average run time of the job in μs (the lower the better)
+    * average       - average of all the samples (the lower the better)
     * ips           - iterations per second, how often can the given function be
-      executed within one second (the higher the better)
-    * std_dev       - standard deviation, a measurement how much results vary
-      (the higher the more the results vary)
+    executed within one second, used only for run times (the higher the better)
+    * std_dev       - standard deviation, how much results vary among the samples
+    (the higher the more the results vary)
     * std_dev_ratio - standard deviation expressed as how much it is relative to
-      the average
+    the average
     * std_dev_ips   - the absolute standard deviation of iterations per second
-      (= ips * std_dev_ratio)
     * median        - when all measured times are sorted, this is the middle
-      value (or average of the two middle values when the number of times is
-      even). More stable than the average and somewhat more likely to be a
-      typical value you see.
+    value (or average of the two middle values when the number of times is
+    even). More stable than the average and somewhat more likely to be a
+    typical value you see.
     * percentiles   - a map of percentile ranks. These are the values below
-      which x% of the run times lie. For example, 99% of run times are shorter
-      than the 99th percentile (99th %) rank.
-      is a value for which 99% of the run times are shorter.
-    * mode          - the run time(s) that occur the most. Often one value, but
+      which x% of the samples lie. For example, 99% of samples are less than
+      is a value for which 99% of the run times are less than it.
+    * mode          - the samples that occur the most. Often one value, but
       can be multiple values if they occur the same amount of times. If no value
-      occurs at least twice, this value will be nil.
+      occurs at least twice, this value will be `nil`.
     * minimum       - the smallest sample measured for the scenario
     * maximum       - the biggest sample measured for the scenario
     * relative_more - relative to the reference (usually the fastest scenario) how much more
-      was the average of this scenario. E.g. for reference at 100, this scenario 200 then it
-      is 2.0.
+    was the average of this scenario. E.g. for reference at 100, this scenario 200 then it
+    is 2.0.
     * relative_less - relative to the reference (usually the fastest scenario) how much less
-      was the average of this scenario. E.g. for reference at 100, this scenario 200 then it
-      is 0.5.
+    was the average of this scenario. E.g. for reference at 100, this scenario 200 then it
+    is 0.5.
     * absolute_difference - relative to the reference (usually the fastest scenario) what is
-      the difference of the averages of the scenarios. e.g. for reference at 100, this
-      scenario 200 then it is 100.
-    * sample_size   - the number of run time measurements taken
+    the difference of the averages of the scenarios. e.g. for reference at 100, this
+    scenario 200 then it is 100.
+    * sample_size   - the number of measurements/samples taken into account for calculating statistics
   """
   @type t :: %__MODULE__{
           average: float,
