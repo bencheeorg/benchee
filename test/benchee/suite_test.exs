@@ -56,6 +56,7 @@ defmodule Benchee.SuiteTest do
 
   if Code.ensure_loaded?(Table.Reader) do
     describe "Table.Reader protocol" do
+      @no_input Benchee.Benchmark.no_input()
       @suite_with_data %Suite{
         system: @system,
         configuration: %Benchee.Configuration{
@@ -64,6 +65,9 @@ defmodule Benchee.SuiteTest do
         scenarios: [
           %Benchee.Scenario{
             job_name: "Test 1",
+            name: "Test 1",
+            input_name: @no_input,
+            input: @no_input,
             memory_usage_data: %Benchee.CollectionData{
               samples: [1_792, 1_792, 1_792],
               statistics: %Benchee.Statistics{
@@ -83,7 +87,6 @@ defmodule Benchee.SuiteTest do
                 std_dev_ratio: +0.0
               }
             },
-            name: "Test 1",
             reductions_data: %Benchee.CollectionData{
               samples: [],
               statistics: %Benchee.Statistics{}
@@ -110,6 +113,9 @@ defmodule Benchee.SuiteTest do
           },
           %Benchee.Scenario{
             job_name: "Test 2",
+            name: "Test 2",
+            input_name: @no_input,
+            input: @no_input,
             memory_usage_data: %Benchee.CollectionData{
               samples: [1_792, 1_792, 1_792],
               statistics: %Benchee.Statistics{
@@ -129,7 +135,6 @@ defmodule Benchee.SuiteTest do
                 std_dev_ratio: +0.0
               }
             },
-            name: "Test 2",
             reductions_data: %Benchee.CollectionData{
               samples: [],
               statistics: %Benchee.Statistics{}
@@ -165,6 +170,9 @@ defmodule Benchee.SuiteTest do
         scenarios: [
           %Benchee.Scenario{
             job_name: "Test 1",
+            name: "Test 1",
+            input_name: @no_input,
+            input: @no_input,
             memory_usage_data: %Benchee.CollectionData{
               samples: [1_792, 1_792, 1_792],
               statistics: %Benchee.Statistics{

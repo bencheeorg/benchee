@@ -11,10 +11,12 @@ defmodule Benchee.Benchmark do
   alias Benchee.Utility.DeepConvert
 
   @no_input :__no_input
+  @type no_input :: :__no_input
 
   @doc """
   Public access for the special key representing no input for a scenario.
   """
+  @spec no_input() :: no_input()
   def no_input, do: @no_input
 
   @doc """
