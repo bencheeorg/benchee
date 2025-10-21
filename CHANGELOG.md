@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 1.5.0 (2025-10-21)
+Finally `max_sample_size` is here to alleviate a variety of woes resulting from gathering too many samples!
+Also finally, Benchee lets you exclude outliers!
 
 ## Features (User Facing)
 * Introduce `max_sample_size` which guides how many samples will be gathered at most for a given scenario.
@@ -19,7 +21,7 @@ Shout out to [@NickNeck](https://github.com/NickNeck) who implemented this long 
 
 ### Bugfixes (User Facing)
 * fixed a bug where if times were supplied as `0` instead of `0.0` we'd sometimes gather a single measurement
-* elixir `1.19` compilation warnings have been removed
+* elixir `1.19` compilation warnings have been fixed
 
 ### Features (Plugins)
 * The `%Benchee.Statistics{}` struct now comes with values to accompany the outlier exclusion feature:
