@@ -118,7 +118,7 @@ if Code.ensure_loaded?(Table.Reader) do
 
         input_name =
           case scenario.input_name do
-            name when name in [nil, no_input] -> ""
+            ^no_input -> ""
             name -> name
           end
 
