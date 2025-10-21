@@ -71,7 +71,19 @@
         # or the `schema` macro in Ecto schemas to trigger DuplicatedCode, just
         # set the `excluded_macros` parameter to `[:schema, :setup, :test]`.
         #
-        {Credo.Check.Design.DuplicatedCode, excluded_macros: [], files: %{excluded: "test/**/*_test.exs"}},
+        {
+          Credo.Check.Design.DuplicatedCode,
+          excluded_macros: [],
+          files: %{
+            excluded: [
+              # Tests may have a bit of duplication, it's fine
+              "test/**/*_test.exs",
+              # Ah the formatters... we may want to make them nicer one of these days or use a library.
+              # But.. not now.
+              "lib/benchee/formatters/console/*.ex"
+            ]
+          }
+        },
         # You can also customize the exit_status of each check.
         # If you don't want TODO comments to cause `mix credo` to fail, just
         # set this value to 0 (zero).
