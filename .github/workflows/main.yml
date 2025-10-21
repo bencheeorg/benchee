@@ -40,10 +40,10 @@ jobs:
             otp_version: '27.3'
           - elixir_version: '1.18'
             otp_version: '27.3'
-            type_check: true
-            lint: true
           - elixir_version: '1.19'
             otp_version: '28.1'
+            type_check: true
+            lint: true
 
     steps:
       - name: Checkout
