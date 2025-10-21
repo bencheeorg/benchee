@@ -15,6 +15,7 @@ Defaults to `1_000_000`, setting it to `nil` gathers unlimited samples again (be
 Especially important for run time, you can remove samples caused by garbage collection or external factors.
 Defaults to `false`.
 Shout out to [@NickNeck](https://github.com/NickNeck) who implemented this long wished for feature over in `Statistex`.
+* Display `input_name` entries in Livebook/`Table.Reader` protocol. Thanks [@madlep](https://github.com/madlep)!
 
 ### Bugfixes (User Facing)
 * fixed a bug where if times were supplied as `0` instead of `0.0` we'd sometimes gather a single measurement
