@@ -107,7 +107,7 @@ if Code.ensure_loaded?(Table.Reader) do
       config_percentiles = suite.configuration.percentiles
 
       Enum.map_reduce(suite.scenarios, 0, fn %Scenario{} = scenario, count ->
-        secenario_data =
+        scenario_data =
           Enum.flat_map(measurements_processed, fn measurement_type ->
             scenario
             |> Scenario.measurement_data(measurement_type)
@@ -122,7 +122,7 @@ if Code.ensure_loaded?(Table.Reader) do
             name -> name
           end
 
-        row = [scenario.name, input_name] ++ secenario_data
+        row = [scenario.name, input_name] ++ scenario_data
 
         {row, count + 1}
       end)
