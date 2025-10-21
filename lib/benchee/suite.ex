@@ -122,7 +122,7 @@ if Code.ensure_loaded?(Table.Reader) do
             name -> name
           end
 
-        row = [scenario.job_name, input_name] ++ secenario_data
+        row = [scenario.name, input_name] ++ secenario_data
 
         {row, count + 1}
       end)
