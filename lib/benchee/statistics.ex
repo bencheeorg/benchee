@@ -9,8 +9,6 @@ defmodule Benchee.Statistics do
   alias Benchee.{CollectionData, Conversion.Duration, Scenario, Suite}
   alias Benchee.Output.ProgressPrinter
 
-  require Integer
-
   defstruct [
     :average,
     :ips,
