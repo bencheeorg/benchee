@@ -49,7 +49,7 @@ defmodule Benchee.SuiteTest do
 
     test "raises when anything else is tried" do
       assert_raise FunctionClauseError, fn ->
-        deep_merge(@empty_suite, "lol this doesn't fit")
+        deep_merge(@empty_suite, [])
       end
     end
   end
