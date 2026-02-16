@@ -667,7 +667,7 @@ defmodule BencheeTest do
           )
         )
 
-      assert length(scenario.run_time_data.samples) > 0
+      refute Enum.empty?(scenario.run_time_data.samples)
     end)
   end
 

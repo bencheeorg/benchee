@@ -126,7 +126,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       memory_usages = List.first(new_suite.scenarios).memory_usage_data.samples
 
-      assert length(memory_usages) > 0
+      refute Enum.empty?(memory_usages)
     end
 
     test "measures the reduction count of a scenario" do
@@ -144,7 +144,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       reduction_counts = hd(new_suite.scenarios).reductions_data.samples
 
-      assert length(reduction_counts) > 0
+      refute Enum.empty?(reduction_counts)
       assert Enum.all?(reduction_counts, fn count -> count >= 305 and count <= 567 end)
     end
 
@@ -161,7 +161,7 @@ defmodule Benchee.Benchmark.RunnerTest do
 
       memory_usages = List.first(new_suite.scenarios).memory_usage_data.samples
 
-      assert length(memory_usages) > 0
+      refute Enum.empty?(memory_usages)
     end
 
     @tag :memory_measure
