@@ -44,7 +44,7 @@ jobs:
             otp_version: '28.3'
             type_check: true
             lint: true
-          - elixir_version: '1.20.0-rc.1'
+          - elixir_version: '1.20.0-rc.4'
             otp_version: '28.3'
 
     steps:
