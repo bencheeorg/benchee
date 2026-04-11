@@ -316,7 +316,8 @@ Benchee will print a big warning when this happens.
 
 #### Measuring Memory Consumption
 
-Starting with version 0.13, users can now get measurements of how much memory their benchmarked scenarios use. The measurement is **limited to the process that Benchee executes your provided code in** - i.e. other processes (like worker pools)/the whole BEAM isn't taken into account.
+Benchee can measure memory consumption of scenarios. The measurement is **limited to the process that Benchee executes your provided code in** - i.e. other processes (like worker pools)/the whole BEAM isn't taken into account.
+Similarly, only BEAM managed & reported memory is counted - i.e. memory allocated by NIFs also doesn't show up.
 
 This measurement is **not** the actual effect on the size of the BEAM VM size, but the total amount of memory that was allocated during the execution of a given scenario. This includes all memory that was garbage collected during the execution of that scenario.
 
