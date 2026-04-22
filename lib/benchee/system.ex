@@ -111,7 +111,7 @@ defmodule Benchee.System do
   defp cpu_speed, do: cpu_speed(os())
 
   defp cpu_speed(:Windows) do
-    parse_cpu_for(:Windows, system_cmd("WMIC", ["CPU", "GET", "NAME"]))
+    parse_cpu_for(:Windows, system_cmd("powershell", ["-Command", "(gcim Win32_Processor).Name"]))
   end
 
   defp cpu_speed(:macOS) do
@@ -133,10 +133,7 @@ defmodule Benchee.System do
   @doc false
   def parse_cpu_for(_, "N/A"), do: "N/A"
 
-  def parse_cpu_for(:Windows, raw_output) do
-    "Name" <> cpu_info = raw_output
-    String.trim(cpu_info)
-  end
+  def parse_cpu_for(:Windows, raw_output), do: String.trim(raw_output)
 
   def parse_cpu_for(:macOS, raw_output), do: String.trim(raw_output)
 
@@ -167,7 +164,7 @@ defmodule Benchee.System do
   defp available_memory(:Windows) do
     parse_memory_for(
       :Windows,
-      system_cmd("WMIC", ["COMPUTERSYSTEM", "GET", "TOTALPHYSICALMEMORY"])
+      system_cmd("powershell", ["-Command", "(gcim Win32_ComputerSystem).TotalPhysicalMemory"])
     )
   end
 
