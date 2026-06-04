@@ -480,7 +480,7 @@ defmodule Benchee.Benchmark.RunnerTest do
     end
 
     test "max_sample_size is abided by across all times" do
-      max_sample_size = 3
+      max_sample_size = 2
 
       %Suite{scenarios: [scenario]} =
         %Suite{

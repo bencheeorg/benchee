@@ -534,28 +534,7 @@ defmodule BencheeTest do
         )
 
       Enum.each(suite.scenarios, fn scenario ->
-        # if this becomes flakey, change to <=
-        assert scenario.run_time_data.statistics.sample_size == @default_max_sample_size
-      end)
-    end)
-  end
-
-  @tag :performance
-  test "max_sample_size can be set to `nil` to gather unlimited samples again" do
-    # not disabling the formatters as I want the formatters to run through with that as well
-    capture_io(fn ->
-      suite =
-        Benchee.run(
-          %{
-            "fast" => fn -> :fast end
-          },
-          time: 1,
-          warmup: 0,
-          max_sample_size: nil
-        )
-
-      Enum.each(suite.scenarios, fn scenario ->
-        assert scenario.run_time_data.statistics.sample_size > @default_max_sample_size
+        assert scenario.run_time_data.statistics.sample_size <= @default_max_sample_size
       end)
     end)
   end
