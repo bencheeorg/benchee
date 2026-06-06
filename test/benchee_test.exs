@@ -14,6 +14,8 @@ defmodule BencheeTest do
   import Benchee.IntegrationHelpers
   import Benchee.TestHelpers
 
+  # Several integration tests are split out of this file into their own files so more tests can run in parallel
+
   @header_regex ~r/^Name.+ips.+average.+deviation.+median.+99th %$/m
   @test_configuration [time: 0.01, warmup: 0.005]
 
