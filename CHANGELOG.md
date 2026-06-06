@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.5.1 (2026-06-06)
+
+### Bugfixes (User Facing)
+* Windows system stats now rely on power shell and not the outdated WMIC. Thanks [@mipaaa](https://github.com/mipaaa)!
+* Compile time warnings found by newer elixir versions were fixed
+
 ## 1.5.0 (2025-10-21)
 Finally `max_sample_size` is here to alleviate a variety of woes resulting from gathering too many samples!
 Also finally, Benchee lets you exclude outliers!
