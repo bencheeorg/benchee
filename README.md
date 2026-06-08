@@ -1103,7 +1103,7 @@ Of course there also are normal bar charts including standard deviation:
 
 ![flat_map_ips](http://www.pragtob.info/benchee/images/flat_map_ips.png)
 
-## Contributing [![Open Source Helpers](https://www.codetriage.com/pragtob/benchee/badges/users.svg)](https://www.codetriage.com/pragtob/benchee)
+## Contributing
 
 Contributions to Benchee are **very welcome**! Bug reports, documentation, spelling corrections, whole features, feature ideas, bugfixes, new plugins, fancy graphics... all of those (and probably more) are much appreciated contributions!
 
