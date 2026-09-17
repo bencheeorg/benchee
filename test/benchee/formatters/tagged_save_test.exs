@@ -128,6 +128,16 @@ defmodule Benchee.Formatters.TaggedSaveTest do
              ]
     end
 
+    test "a loaded tag that just contains the desired tag is not an increment" do
+      tagged_scenario = %Scenario{job_name: "foo", tag: "#{@benchee_tag}-baseline"}
+      new_scenario = %Scenario{job_name: "foo"}
+      suite = %Suite{@suite | scenarios: [tagged_scenario, new_scenario]}
+
+      scenarios = scenarios_from_formatted(suite)
+
+      assert sorted_tags(scenarios) == ["#{@benchee_tag}-1", "#{@benchee_tag}-baseline"]
+    end
+
     defp scenarios_from_formatted(suite) do
       {binary, _path} = format(suite, @options)
       loaded_suite = :erlang.binary_to_term(binary)
