@@ -153,26 +153,6 @@ defmodule Benchee.Formatters.Console.Memory do
     warning <> "\n" <> data
   end
 
-  defp format_scenario(scenario, %{memory: memory_unit}, label_width, true) do
-    %Scenario{
-      name: name,
-      memory_usage_data: %{
-        statistics: %Statistics{
-          average: average
-        }
-      }
-    } = scenario
-
-    "~*ts~*ts\n"
-    |> :io_lib.format([
-      -label_width,
-      name,
-      @average_width,
-      memory_output(average, memory_unit)
-    ])
-    |> to_string
-  end
-
   defp format_scenario(scenario, %{memory: memory_unit}, label_width, percentile) do
     %Scenario{
       name: name,

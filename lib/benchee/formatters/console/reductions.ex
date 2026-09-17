@@ -144,26 +144,6 @@ defmodule Benchee.Formatters.Console.Reductions do
     warning <> "\n" <> data
   end
 
-  defp format_scenario(scenario, %{reduction_count: reductions_unit}, label_width, true) do
-    %Scenario{
-      name: name,
-      reductions_data: %{
-        statistics: %Statistics{
-          average: average
-        }
-      }
-    } = scenario
-
-    "~*ts~*ts\n"
-    |> :io_lib.format([
-      -label_width,
-      name,
-      @average_width,
-      Helpers.count_output(average, reductions_unit)
-    ])
-    |> to_string
-  end
-
   defp format_scenario(scenario, %{reduction_count: reductions_unit}, label_width, percentile) do
     %Scenario{
       name: name,
