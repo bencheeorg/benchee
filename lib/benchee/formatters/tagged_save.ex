@@ -48,11 +48,19 @@ defmodule Benchee.Formatters.TaggedSave do
     tags
     |> Enum.map(fn tag -> String.replace(tag, ~r/#{Regex.escape(desired_tag)}-?/, "") end)
     |> Enum.map(&tag_increaser/1)
-    |> Enum.max()
+    # tags that merely contain the desired tag are no increments of it
+    |> Enum.reject(&is_nil/1)
+    |> Enum.max(fn -> 0 end)
   end
 
   defp tag_increaser(""), do: 1
-  defp tag_increaser(string_number), do: String.to_integer(string_number)
+
+  defp tag_increaser(string_number) do
+    case Integer.parse(string_number) do
+      {number, ""} -> number
+      _ -> nil
+    end
+  end
 
   defp tag_scenarios(scenarios, tag) do
     Enum.map(scenarios, fn scenario ->
