@@ -240,6 +240,31 @@ defmodule Benchee.Formatters.Console.MemoryTest do
       refute Regex.match?(~r/(Comparison|x memory)/, Enum.join([header, result]))
     end
 
+    test "displays the highest configured percentile when it is not the 99th" do
+      scenarios = [
+        %Scenario{
+          name: "First job",
+          memory_usage_data: %CollectionData{
+            statistics: %Statistics{
+              average: 200.0,
+              std_dev: 5.0,
+              std_dev_ratio: 0.10,
+              median: 195.5,
+              percentiles: %{25 => 150.0, 50 => 195.5, 75 => 250.0, 90 => 300.1},
+              sample_size: 50_000
+            }
+          },
+          run_time_data: %CollectionData{statistics: %Statistics{}}
+        }
+      ]
+
+      assert [_, header, result] = Memory.format_scenarios(scenarios, @console_config)
+
+      assert header =~ ~r/90th %/
+      refute header =~ ~r/99th %/
+      assert result =~ ~r/300.10/
+    end
+
     test "doesn't display statistics if all deviations are 0.0" do
       scenarios = [
         %Scenario{

@@ -107,13 +107,18 @@ defmodule Benchee.Formatters.Console.RunTime do
     %{unit_scaling: scaling_strategy} = config
     units = Conversion.units(scenarios, scaling_strategy)
     label_width = Helpers.label_width(scenarios)
+    percentile = Helpers.displayed_percentile(run_time_statistics(scenarios))
 
     List.flatten([
-      column_descriptors(label_width),
-      scenario_reports(scenarios, units, label_width),
+      column_descriptors(label_width, percentile),
+      scenario_reports(scenarios, units, label_width, percentile),
       comparison_report(scenarios, units, label_width, config),
       extended_statistics_report(scenarios, units, label_width, config)
     ])
+  end
+
+  defp run_time_statistics(scenarios) do
+    Enum.map(scenarios, & &1.run_time_data.statistics)
   end
 
   @spec extended_statistics_report([Scenario.t()], unit_per_statistic, integer, map) :: [
@@ -186,8 +191,8 @@ defmodule Benchee.Formatters.Console.RunTime do
     |> to_string
   end
 
-  @spec column_descriptors(integer) :: String.t()
-  defp column_descriptors(label_width) do
+  @spec column_descriptors(integer, number) :: String.t()
+  defp column_descriptors(label_width, percentile) do
     "\n~*s~*s~*s~*s~*s~*s\n"
     |> :io_lib.format([
       -label_width,
@@ -201,20 +206,25 @@ defmodule Benchee.Formatters.Console.RunTime do
       @median_width,
       "median",
       @percentile_width,
-      "99th %"
+      Helpers.percentile_header(percentile)
     ])
     |> to_string
   end
 
-  @spec scenario_reports([Scenario.t()], unit_per_statistic, integer) :: [String.t()]
-  defp scenario_reports(scenarios, units, label_width) do
+  @spec scenario_reports([Scenario.t()], unit_per_statistic, integer, number) :: [String.t()]
+  defp scenario_reports(scenarios, units, label_width, percentile) do
     Enum.map(scenarios, fn scenario ->
-      format_scenario(scenario, units, label_width)
+      format_scenario(scenario, units, label_width, percentile)
     end)
   end
 
-  @spec format_scenario(Scenario.t(), unit_per_statistic, integer) :: String.t()
-  defp format_scenario(scenario, %{run_time: run_time_unit, ips: ips_unit}, label_width) do
+  @spec format_scenario(Scenario.t(), unit_per_statistic, integer, number) :: String.t()
+  defp format_scenario(
+         scenario,
+         %{run_time: run_time_unit, ips: ips_unit},
+         label_width,
+         percentile
+       ) do
     %Scenario{
       name: name,
       run_time_data: %{
@@ -223,7 +233,7 @@ defmodule Benchee.Formatters.Console.RunTime do
           ips: ips,
           std_dev_ratio: std_dev_ratio,
           median: median,
-          percentiles: %{99 => percentile_99}
+          percentiles: percentiles
         }
       }
     } = scenario
@@ -241,7 +251,7 @@ defmodule Benchee.Formatters.Console.RunTime do
       @median_width,
       duration_output(median, run_time_unit),
       @percentile_width,
-      duration_output(percentile_99, run_time_unit)
+      duration_output(Helpers.percentile_value(percentiles, percentile), run_time_unit)
     ])
     |> to_string
   end

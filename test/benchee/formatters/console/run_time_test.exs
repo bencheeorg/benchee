@@ -335,6 +335,31 @@ defmodule Benchee.Formatters.Console.RunTimeTest do
       refute Regex.match?(~r/(Comparison|x slower)/, Enum.join([header, result]))
     end
 
+    test "displays the highest configured percentile when it is not the 99th" do
+      scenarios = [
+        %Scenario{
+          name: "First job",
+          run_time_data: %CollectionData{
+            statistics: %Statistics{
+              average: 200.0,
+              ips: 5_000.0,
+              std_dev_ratio: 0.1,
+              median: 195.5,
+              percentiles: %{25 => 150.0, 50 => 195.5, 75 => 250.0, 90 => 300.1},
+              sample_size: 50_000
+            }
+          },
+          memory_usage_data: %CollectionData{statistics: %Statistics{}}
+        }
+      ]
+
+      assert [header, result] = RunTime.format_scenarios(scenarios, @console_config)
+
+      assert header =~ ~r/90th %/
+      refute header =~ ~r/99th %/
+      assert result =~ ~r/300.10 ns/
+    end
+
     test "formats small averages, medians, and percentiles more precisely" do
       scenarios = [
         %Scenario{

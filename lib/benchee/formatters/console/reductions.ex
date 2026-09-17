@@ -45,11 +45,12 @@ defmodule Benchee.Formatters.Console.Reductions do
     units = Conversion.units(scenarios, scaling_strategy)
     label_width = Helpers.label_width(scenarios)
     hide_statistics = all_have_deviation_of_0?(scenarios)
+    percentile = Helpers.displayed_percentile(reductions_statistics(scenarios))
 
     List.flatten([
       "\nReduction count statistics:\n",
-      column_descriptors(label_width, hide_statistics),
-      scenario_reports(scenarios, units, label_width, hide_statistics),
+      column_descriptors(label_width, hide_statistics, percentile),
+      scenario_reports(scenarios, units, label_width, hide_statistics, percentile),
       comparison_report(scenarios, units, label_width, config, hide_statistics),
       extended_statistics_report(scenarios, units, label_width, config, hide_statistics)
     ])
@@ -61,9 +62,13 @@ defmodule Benchee.Formatters.Console.Reductions do
     end)
   end
 
-  defp column_descriptors(label_width, hide_statistics)
+  defp reductions_statistics(scenarios) do
+    Enum.map(scenarios, & &1.reductions_data.statistics)
+  end
 
-  defp column_descriptors(label_width, false) do
+  defp column_descriptors(label_width, hide_statistics, percentile)
+
+  defp column_descriptors(label_width, false, percentile) do
     "\n~*s~*s~*s~*s~*s\n"
     |> :io_lib.format([
       -label_width,
@@ -75,12 +80,12 @@ defmodule Benchee.Formatters.Console.Reductions do
       @median_width,
       "median",
       @percentile_width,
-      "99th %"
+      Helpers.percentile_header(percentile)
     ])
     |> to_string
   end
 
-  defp column_descriptors(label_width, true) do
+  defp column_descriptors(label_width, true, _percentile) do
     "\n~*s~*s\n"
     |> :io_lib.format([
       -label_width,
@@ -91,10 +96,12 @@ defmodule Benchee.Formatters.Console.Reductions do
     |> to_string
   end
 
-  @spec scenario_reports([Scenario.t()], unit_per_statistic, integer, boolean) :: [String.t()]
-  defp scenario_reports(scenarios, units, label_width, hide_statistics)
+  @spec scenario_reports([Scenario.t()], unit_per_statistic, integer, boolean, number) :: [
+          String.t()
+        ]
+  defp scenario_reports(scenarios, units, label_width, hide_statistics, percentile)
 
-  defp scenario_reports([scenario | other_scenarios], units, label_width, true) do
+  defp scenario_reports([scenario | other_scenarios], units, label_width, true, _percentile) do
     [
       reference_report(scenario, units, label_width),
       comparisons(other_scenarios, units, label_width),
@@ -102,16 +109,16 @@ defmodule Benchee.Formatters.Console.Reductions do
     ]
   end
 
-  defp scenario_reports(scenarios, units, label_width, hide_statistics) do
+  defp scenario_reports(scenarios, units, label_width, false, percentile) do
     Enum.map(scenarios, fn scenario ->
-      format_scenario(scenario, units, label_width, hide_statistics)
+      format_scenario(scenario, units, label_width, percentile)
     end)
   end
 
   @na "N/A"
 
-  @spec format_scenario(Scenario.t(), unit_per_statistic, integer, boolean) :: String.t()
-  defp format_scenario(scenario, units, label_width, hide_statistics)
+  @spec format_scenario(Scenario.t(), unit_per_statistic, integer, number) :: String.t()
+  defp format_scenario(scenario, units, label_width, percentile)
 
   defp format_scenario(
          scenario = %Scenario{reductions_data: %{statistics: %{sample_size: 0}}},
@@ -137,35 +144,6 @@ defmodule Benchee.Formatters.Console.Reductions do
     warning <> "\n" <> data
   end
 
-  defp format_scenario(scenario, %{reduction_count: reductions_unit}, label_width, false) do
-    %Scenario{
-      name: name,
-      reductions_data: %{
-        statistics: %Statistics{
-          average: average,
-          std_dev_ratio: std_dev_ratio,
-          median: median,
-          percentiles: %{99 => percentile_99}
-        }
-      }
-    } = scenario
-
-    "~*ts~*ts~*ts~*ts~*ts\n"
-    |> :io_lib.format([
-      -label_width,
-      name,
-      @average_width,
-      Helpers.count_output(average, reductions_unit),
-      @deviation_width,
-      Helpers.deviation_output(std_dev_ratio),
-      @median_width,
-      Helpers.count_output(median, reductions_unit),
-      @percentile_width,
-      Helpers.count_output(percentile_99, reductions_unit)
-    ])
-    |> to_string
-  end
-
   defp format_scenario(scenario, %{reduction_count: reductions_unit}, label_width, true) do
     %Scenario{
       name: name,
@@ -182,6 +160,35 @@ defmodule Benchee.Formatters.Console.Reductions do
       name,
       @average_width,
       Helpers.count_output(average, reductions_unit)
+    ])
+    |> to_string
+  end
+
+  defp format_scenario(scenario, %{reduction_count: reductions_unit}, label_width, percentile) do
+    %Scenario{
+      name: name,
+      reductions_data: %{
+        statistics: %Statistics{
+          average: average,
+          std_dev_ratio: std_dev_ratio,
+          median: median,
+          percentiles: percentiles
+        }
+      }
+    } = scenario
+
+    "~*ts~*ts~*ts~*ts~*ts\n"
+    |> :io_lib.format([
+      -label_width,
+      name,
+      @average_width,
+      Helpers.count_output(average, reductions_unit),
+      @deviation_width,
+      Helpers.deviation_output(std_dev_ratio),
+      @median_width,
+      Helpers.count_output(median, reductions_unit),
+      @percentile_width,
+      Helpers.count_output(Helpers.percentile_value(percentiles, percentile), reductions_unit)
     ])
     |> to_string
   end
