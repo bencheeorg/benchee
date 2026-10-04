@@ -20,6 +20,56 @@ defmodule BencheeTest do
   @header_regex ~r/^Name.+ips.+average.+deviation.+median.+99th %$/m
   @test_configuration [time: 0.01, warmup: 0.005]
 
+  test "configured percentiles work through all console reports" do
+    counter = :atomics.new(1, [])
+
+    output =
+      capture_io(fn ->
+        Benchee.run(
+          %{
+            "Sleeps" => fn ->
+              count = :atomics.add_get(counter, 1, 1)
+              Enum.to_list(1..(1 + rem(count, 2) * 1000))
+            end
+          },
+          Keyword.merge(@test_configuration,
+            memory_time: 0.01,
+            reduction_time: 0.01,
+            percentiles: [50, 90]
+          )
+        )
+      end)
+
+    assert length(Regex.scan(~r/90th %/, output)) == 3
+    refute output =~ "99th %"
+    assert output =~ "Memory usage statistics"
+    assert output =~ "Reduction count statistics"
+  end
+
+  test "empty configuration uses the calculated quartiles" do
+    counter = :atomics.new(1, [])
+
+    output =
+      capture_io(fn ->
+        Benchee.run(
+          %{
+            "Sleeps" => fn ->
+              count = :atomics.add_get(counter, 1, 1)
+              Enum.to_list(1..(1 + rem(count, 2) * 1000))
+            end
+          },
+          Keyword.merge(@test_configuration,
+            memory_time: 0.01,
+            reduction_time: 0.01,
+            percentiles: []
+          )
+        )
+      end)
+
+    refute output =~ "99th %"
+    assert length(Regex.scan(~r/75th %/, output)) == 3
+  end
+
   test "integration high level README example" do
     output =
       capture_io(fn ->

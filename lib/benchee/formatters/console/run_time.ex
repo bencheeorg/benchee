@@ -251,7 +251,10 @@ defmodule Benchee.Formatters.Console.RunTime do
       @median_width,
       duration_output(median, run_time_unit),
       @percentile_width,
-      duration_output(Helpers.percentile_value(percentiles, percentile), run_time_unit)
+      if(is_nil(percentile),
+        do: "N/A",
+        else: duration_output(Helpers.percentile_value(percentiles, percentile), run_time_unit)
+      )
     ])
     |> to_string
   end

@@ -45,7 +45,7 @@ defmodule Benchee.Formatters.Console.Reductions do
     units = Conversion.units(scenarios, scaling_strategy)
     label_width = Helpers.label_width(scenarios)
     hide_statistics = all_have_deviation_of_0?(scenarios)
-    percentile = Helpers.displayed_percentile(reductions_statistics(scenarios))
+    percentile = scenarios |> reductions_statistics() |> Helpers.displayed_percentile()
 
     List.flatten([
       "\nReduction count statistics:\n",
@@ -168,7 +168,11 @@ defmodule Benchee.Formatters.Console.Reductions do
       @median_width,
       Helpers.count_output(median, reductions_unit),
       @percentile_width,
-      Helpers.count_output(Helpers.percentile_value(percentiles, percentile), reductions_unit)
+      if(is_nil(percentile),
+        do: "N/A",
+        else:
+          Helpers.count_output(Helpers.percentile_value(percentiles, percentile), reductions_unit)
+      )
     ])
     |> to_string
   end
