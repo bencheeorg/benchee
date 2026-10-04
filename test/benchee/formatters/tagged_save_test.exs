@@ -135,7 +135,29 @@ defmodule Benchee.Formatters.TaggedSaveTest do
 
       scenarios = scenarios_from_formatted(suite)
 
-      assert sorted_tags(scenarios) == ["#{@benchee_tag}-1", "#{@benchee_tag}-baseline"]
+      assert sorted_tags(scenarios) == [@benchee_tag, "#{@benchee_tag}-baseline"]
+    end
+
+    for suffix <- ["bar", "42", "-baseline", "--2", "-+2", "-3tail", "-3\n"] do
+      test "ignores unrelated tag suffix #{inspect(suffix)}" do
+        unrelated = @benchee_tag <> unquote(suffix)
+        loaded = %Scenario{job_name: "foo", tag: unrelated}
+        suite = %Suite{@suite | scenarios: [loaded, %Scenario{job_name: "foo"}]}
+
+        assert sorted_tags(scenarios_from_formatted(suite)) ==
+                 Enum.sort([@benchee_tag, unrelated])
+      end
+    end
+
+    test "ignores prefixes and escapes regexp metacharacters in the desired tag" do
+      desired = "a.b+"
+      tags = [desired, desired <> "-2", "prefix" <> desired <> "-99", "axb-100"]
+      loaded = Enum.map(tags, fn tag -> %Scenario{job_name: "foo", tag: tag} end)
+      suite = %Suite{@suite | scenarios: [%Scenario{job_name: "foo"} | loaded]}
+      {binary, _} = format(suite, %{@options | tag: desired})
+      [new | rest] = :erlang.binary_to_term(binary).scenarios
+      assert new.tag == desired <> "-3"
+      assert Enum.map(rest, & &1.tag) == tags
     end
 
     defp scenarios_from_formatted(suite) do
