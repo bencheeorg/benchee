@@ -53,22 +53,23 @@ defmodule Benchee.Formatters.Console.Helpers do
 
   # The percentile displayed in the reports is the highest one that was actually
   # calculated, as the configured ones are the only ones guaranteed to be there.
-  @spec displayed_percentile([Statistics.t()]) :: number
+  @spec displayed_percentile([Statistics.t()]) :: number | nil
   def displayed_percentile(statistics_list) do
     statistics_list
     |> Enum.flat_map(&percentile_ranks/1)
-    |> Enum.max(fn -> 99 end)
+    |> Enum.max(fn -> nil end)
   end
 
   defp percentile_ranks(%Statistics{percentiles: nil}), do: []
   defp percentile_ranks(%Statistics{percentiles: percentiles}), do: Map.keys(percentiles)
 
-  @spec percentile_header(number) :: String.t()
+  @spec percentile_header(number | nil) :: String.t()
+  def percentile_header(nil), do: "percentile"
   def percentile_header(percentile), do: "#{percentile}th %"
 
   @spec percentile_value(%{number => number}, number) :: number
   def percentile_value(percentiles, percentile) do
-    Map.get(percentiles, percentile) || percentiles |> Map.values() |> Enum.max()
+    Map.fetch!(percentiles, percentile)
   end
 
   @spec descriptor(String.t()) :: String.t()

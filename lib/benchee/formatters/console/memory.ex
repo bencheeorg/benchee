@@ -177,7 +177,10 @@ defmodule Benchee.Formatters.Console.Memory do
       @median_width,
       memory_output(median, memory_unit),
       @percentile_width,
-      memory_output(Helpers.percentile_value(percentiles, percentile), memory_unit)
+      if(is_nil(percentile),
+        do: "N/A",
+        else: memory_output(Helpers.percentile_value(percentiles, percentile), memory_unit)
+      )
     ])
     |> to_string
   end
