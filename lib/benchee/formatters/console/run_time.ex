@@ -107,7 +107,7 @@ defmodule Benchee.Formatters.Console.RunTime do
     %{unit_scaling: scaling_strategy} = config
     units = Conversion.units(scenarios, scaling_strategy)
     label_width = Helpers.label_width(scenarios)
-    percentile = scenarios |> run_time_statistics() |> Helpers.displayed_percentile()
+    percentile = Helpers.displayed_percentile(scenarios, :run_time_data)
 
     List.flatten([
       column_descriptors(label_width, percentile),
@@ -115,10 +115,6 @@ defmodule Benchee.Formatters.Console.RunTime do
       comparison_report(scenarios, units, label_width, config),
       extended_statistics_report(scenarios, units, label_width, config)
     ])
-  end
-
-  defp run_time_statistics(scenarios) do
-    Enum.map(scenarios, & &1.run_time_data.statistics)
   end
 
   @spec extended_statistics_report([Scenario.t()], unit_per_statistic, integer, map) :: [
@@ -211,7 +207,9 @@ defmodule Benchee.Formatters.Console.RunTime do
     |> to_string
   end
 
-  @spec scenario_reports([Scenario.t()], unit_per_statistic, integer, number | nil) :: [String.t()]
+  @spec scenario_reports([Scenario.t()], unit_per_statistic, integer, number | nil) :: [
+          String.t()
+        ]
   defp scenario_reports(scenarios, units, label_width, percentile) do
     Enum.map(scenarios, fn scenario ->
       format_scenario(scenario, units, label_width, percentile)
@@ -251,10 +249,7 @@ defmodule Benchee.Formatters.Console.RunTime do
       @median_width,
       duration_output(median, run_time_unit),
       @percentile_width,
-      if(is_nil(percentile),
-        do: "N/A",
-        else: duration_output(Helpers.percentile_value(percentiles, percentile), run_time_unit)
-      )
+      Helpers.percentile_output(percentiles, percentile, &duration_output(&1, run_time_unit))
     ])
     |> to_string
   end

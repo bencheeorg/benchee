@@ -54,7 +54,7 @@ defmodule Benchee.Formatters.Console.Memory do
     units = Conversion.units(scenarios, scaling_strategy)
     label_width = Helpers.label_width(scenarios)
     hide_statistics = all_have_deviation_of_0?(scenarios)
-    percentile = scenarios |> memory_statistics() |> Helpers.displayed_percentile()
+    percentile = Helpers.displayed_percentile(scenarios, :memory_usage_data)
 
     List.flatten([
       "\nMemory usage statistics:\n",
@@ -69,10 +69,6 @@ defmodule Benchee.Formatters.Console.Memory do
     Enum.all?(scenarios, fn scenario ->
       scenario.memory_usage_data.statistics.std_dev == 0.0
     end)
-  end
-
-  defp memory_statistics(scenarios) do
-    Enum.map(scenarios, & &1.memory_usage_data.statistics)
   end
 
   defp column_descriptors(label_width, hide_statistics, percentile)
@@ -105,9 +101,13 @@ defmodule Benchee.Formatters.Console.Memory do
     |> to_string
   end
 
-  @spec scenario_reports([Scenario.t()], unit_per_statistic, integer, boolean, number) :: [
-          String.t()
-        ]
+  @spec scenario_reports(
+          [Scenario.t()],
+          unit_per_statistic,
+          integer,
+          boolean,
+          number | nil
+        ) :: [String.t()]
   defp scenario_reports(scenarios, units, label_width, hide_statistics, percentile)
 
   defp scenario_reports([scenario | other_scenarios], units, label_width, true, _percentile) do
@@ -126,7 +126,7 @@ defmodule Benchee.Formatters.Console.Memory do
 
   @na "N/A"
 
-  @spec format_scenario(Scenario.t(), unit_per_statistic, integer, number) :: String.t()
+  @spec format_scenario(Scenario.t(), unit_per_statistic, integer, number | nil) :: String.t()
   defp format_scenario(scenario, units, label_width, percentile)
 
   defp format_scenario(
@@ -177,10 +177,7 @@ defmodule Benchee.Formatters.Console.Memory do
       @median_width,
       memory_output(median, memory_unit),
       @percentile_width,
-      if(is_nil(percentile),
-        do: "N/A",
-        else: memory_output(Helpers.percentile_value(percentiles, percentile), memory_unit)
-      )
+      Helpers.percentile_output(percentiles, percentile, &memory_output(&1, memory_unit))
     ])
     |> to_string
   end
