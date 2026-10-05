@@ -53,10 +53,16 @@ defmodule Benchee.Formatters.Console.Helpers do
 
   # The percentile displayed in the reports is the highest one that was actually
   # calculated, as the configured ones are the only ones guaranteed to be there.
-  @spec displayed_percentile([Statistics.t()]) :: number | nil
-  def displayed_percentile(statistics_list) do
-    statistics_list
-    |> Enum.flat_map(&percentile_ranks/1)
+  @spec displayed_percentile(
+          [Scenario.t()],
+          :run_time_data | :memory_usage_data | :reductions_data
+        ) ::
+          number | nil
+  def displayed_percentile(scenarios, data_key) do
+    scenarios
+    |> Enum.flat_map(fn scenario ->
+      scenario |> Map.fetch!(data_key) |> Map.fetch!(:statistics) |> percentile_ranks()
+    end)
     |> Enum.max(fn -> nil end)
   end
 
@@ -67,9 +73,14 @@ defmodule Benchee.Formatters.Console.Helpers do
   def percentile_header(nil), do: "percentile"
   def percentile_header(percentile), do: "#{percentile}th %"
 
-  @spec percentile_value(%{number => number}, number) :: number
-  def percentile_value(percentiles, percentile) do
-    Map.fetch!(percentiles, percentile)
+  # "N/A" if there is no rank to display or this scenario doesn't have it.
+  @spec percentile_output(%{number => number} | nil, number | nil, (number -> String.t())) ::
+          String.t()
+  def percentile_output(percentiles, rank, format_fun) do
+    case percentiles && Map.fetch(percentiles, rank) do
+      {:ok, value} -> format_fun.(value)
+      _ -> "N/A"
+    end
   end
 
   @spec descriptor(String.t()) :: String.t()
