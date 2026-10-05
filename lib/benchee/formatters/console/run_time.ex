@@ -191,7 +191,7 @@ defmodule Benchee.Formatters.Console.RunTime do
     |> to_string
   end
 
-  @spec column_descriptors(integer, number) :: String.t()
+  @spec column_descriptors(integer, number | nil) :: String.t()
   defp column_descriptors(label_width, percentile) do
     "\n~*s~*s~*s~*s~*s~*s\n"
     |> :io_lib.format([
@@ -211,14 +211,14 @@ defmodule Benchee.Formatters.Console.RunTime do
     |> to_string
   end
 
-  @spec scenario_reports([Scenario.t()], unit_per_statistic, integer, number) :: [String.t()]
+  @spec scenario_reports([Scenario.t()], unit_per_statistic, integer, number | nil) :: [String.t()]
   defp scenario_reports(scenarios, units, label_width, percentile) do
     Enum.map(scenarios, fn scenario ->
       format_scenario(scenario, units, label_width, percentile)
     end)
   end
 
-  @spec format_scenario(Scenario.t(), unit_per_statistic, integer, number) :: String.t()
+  @spec format_scenario(Scenario.t(), unit_per_statistic, integer, number | nil) :: String.t()
   defp format_scenario(
          scenario,
          %{run_time: run_time_unit, ips: ips_unit},
