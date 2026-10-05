@@ -54,7 +54,7 @@ defmodule Benchee.Formatters.Console.Memory do
     units = Conversion.units(scenarios, scaling_strategy)
     label_width = Helpers.label_width(scenarios)
     hide_statistics = all_have_deviation_of_0?(scenarios)
-    percentile = Helpers.displayed_percentile(memory_statistics(scenarios))
+    percentile = scenarios |> memory_statistics() |> Helpers.displayed_percentile()
 
     List.flatten([
       "\nMemory usage statistics:\n",

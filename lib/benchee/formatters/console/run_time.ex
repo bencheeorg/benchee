@@ -107,7 +107,7 @@ defmodule Benchee.Formatters.Console.RunTime do
     %{unit_scaling: scaling_strategy} = config
     units = Conversion.units(scenarios, scaling_strategy)
     label_width = Helpers.label_width(scenarios)
-    percentile = Helpers.displayed_percentile(run_time_statistics(scenarios))
+    percentile = scenarios |> run_time_statistics() |> Helpers.displayed_percentile()
 
     List.flatten([
       column_descriptors(label_width, percentile),
