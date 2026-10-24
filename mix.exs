@@ -14,6 +14,7 @@ defmodule Benchee.Mixfile do
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      aliases: aliases(),
       docs: docs(),
       package: package(),
       test_coverage: [tool: ExCoveralls],
@@ -21,7 +22,7 @@ defmodule Benchee.Mixfile do
       dialyzer: [
         flags: [:underspecs],
         plt_file: {:no_warn, "tools/plts/benchee.plt"},
-        plt_add_apps: [:table]
+        plt_add_apps: [:table, :ex_unit]
       ],
       name: "Benchee",
       description: """
@@ -34,12 +35,27 @@ defmodule Benchee.Mixfile do
   def cli do
     [
       preferred_envs: [
+        check: :test,
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.post": :test,
         "coveralls.html": :test,
         "coveralls.travis": :test,
         "safe_coveralls.travis": :test
+      ]
+    ]
+  end
+
+  # Mirrors what CI runs on the "lint"/"type_check" job (see .github/workflows/main.yml).
+  #
+  # Runs in the test env (see `cli/0`) as that's where credo, dialyxir and the tests all live.
+  defp aliases do
+    [
+      check: [
+        "format --check-formatted",
+        "credo",
+        "test --warnings-as-errors",
+        "dialyzer"
       ]
     ]
   end
@@ -52,11 +68,11 @@ defmodule Benchee.Mixfile do
       {:deep_merge, "~> 1.0"},
       {:statistex, "~> 1.1"},
       {:ex_guard, "~> 1.3", only: :dev},
-      {:credo, "~> 1.7.13", only: :dev, runtime: false},
+      {:credo, "~> 1.7.13", only: lint_envs(), runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:excoveralls, "~> 0.13", only: :test},
-      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
-      {:doctest_formatter, "~> 0.2", only: :dev, runtime: false}
+      {:dialyxir, "~> 1.0", only: lint_envs(), runtime: false},
+      {:doctest_formatter, "~> 0.2", only: lint_envs(), runtime: false}
     ]
 
     # table relies on __STACKTRACE__ which was introduced in 1.7, we still support ~>1.6 though
@@ -66,6 +82,12 @@ defmodule Benchee.Mixfile do
     else
       deps
     end
+  end
+
+  # credo & dialyxir are also available in :test so linting, type checking and testing can share
+  # one `_build`. Older elixir versions (which only run the tests) can't compile credo though.
+  defp lint_envs do
+    if Version.match?(System.version(), ">= 1.15.0"), do: [:dev, :test], else: :dev
   end
 
   defp package do
