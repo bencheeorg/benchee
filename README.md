@@ -1134,6 +1134,7 @@ For an overview of benchee's architecture, check out [architecture](./architectu
 * `mix test` to run tests
 * `mix dialyzer` to run dialyzer for type checking, might take a while on the first invocation (try building plts first with `mix dialyzer --plt`)
 * `mix credo` to find code style problems
+* `mix check` to run what CI runs in one go: format check, credo, tests and dialyzer
 * or run `mix guard` to run all of them continuously on file change
 
 
