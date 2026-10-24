@@ -40,10 +40,8 @@ defmodule BencheeTest do
             Enum.to_list(1..(1 + rem(count, 2) * 1000))
           end
         },
-        Keyword.merge(@test_configuration,
-          memory_time: 0.05,
-          reduction_time: 0.05
-        )
+        @test_configuration
+        |> Keyword.merge(memory_time: 0.05, reduction_time: 0.05)
         |> Keyword.merge(extra_config)
       )
     end)
