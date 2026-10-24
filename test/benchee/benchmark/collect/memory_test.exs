@@ -28,7 +28,7 @@ defmodule Benchee.Collect.MemoryTest do
     end
 
     test "will not leak processes if the applied function raises an exception" do
-      starting_processes = Enum.count(Process.list())
+      starting_processes = Process.list()
 
       # We're capturing the IO here so the error output doesn't clog up our
       # tests. We don't want stuff in our green dots!!
@@ -41,7 +41,11 @@ defmodule Benchee.Collect.MemoryTest do
 
       Process.sleep(50)
 
-      assert Enum.count(Process.list()) == starting_processes
+      leaked_processes = Process.list() -- starting_processes
+
+      assert leaked_processes == [],
+             "leaked processes: " <>
+               inspect(Enum.map(leaked_processes, &{&1, Process.info(&1, :current_function)}))
     end
   end
 end

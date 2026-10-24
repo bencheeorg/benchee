@@ -20,25 +20,37 @@ defmodule BencheeTest do
   @header_regex ~r/^Name.+ips.+average.+deviation.+median.+99th %$/m
   @test_configuration [time: 0.01, warmup: 0.005]
 
-  test "configured percentiles work through all console reports" do
+  # Runs a real benchmark with run time, memory and reduction measurements, where consecutive
+  # measurements differ from one another (alternating between a tiny and a big list).
+  #
+  # That matters as the console formatters drop the deviation/median/percentile columns when
+  # all measurements are the same (which is what happens with just 1 sample), and so the
+  # percentile assertions would be moot.
+  #
+  # The memory and reduction time is deliberately more than the run time/warmup: memory
+  # measurements are slow.
+  defp run_with_differing_samples(extra_config) do
     counter = :atomics.new(1, [])
 
-    output =
-      capture_io(fn ->
-        Benchee.run(
-          %{
-            "Sleeps" => fn ->
-              count = :atomics.add_get(counter, 1, 1)
-              Enum.to_list(1..(1 + rem(count, 2) * 1000))
-            end
-          },
-          Keyword.merge(@test_configuration,
-            memory_time: 0.01,
-            reduction_time: 0.01,
-            percentiles: [50, 90]
-          )
+    capture_io(fn ->
+      Benchee.run(
+        %{
+          "Doing Work" => fn ->
+            count = :atomics.add_get(counter, 1, 1)
+            Enum.to_list(1..(1 + rem(count, 2) * 1000))
+          end
+        },
+        Keyword.merge(@test_configuration,
+          memory_time: 0.05,
+          reduction_time: 0.05
         )
-      end)
+        |> Keyword.merge(extra_config)
+      )
+    end)
+  end
+
+  test "configured percentiles work through all console reports" do
+    output = run_with_differing_samples(percentiles: [50, 90])
 
     assert length(Regex.scan(~r/90th %/, output)) == 3
     refute output =~ "99th %"
@@ -47,24 +59,7 @@ defmodule BencheeTest do
   end
 
   test "empty configuration uses the calculated quartiles" do
-    counter = :atomics.new(1, [])
-
-    output =
-      capture_io(fn ->
-        Benchee.run(
-          %{
-            "Sleeps" => fn ->
-              count = :atomics.add_get(counter, 1, 1)
-              Enum.to_list(1..(1 + rem(count, 2) * 1000))
-            end
-          },
-          Keyword.merge(@test_configuration,
-            memory_time: 0.01,
-            reduction_time: 0.01,
-            percentiles: []
-          )
-        )
-      end)
+    output = run_with_differing_samples(percentiles: [])
 
     refute output =~ "99th %"
     assert length(Regex.scan(~r/75th %/, output)) == 3

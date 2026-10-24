@@ -23,6 +23,19 @@ defmodule Benchee.TestHelpers do
       retrying(asserting_function, n - 1)
   end
 
+  # Removes all messages from the mailbox of the current process.
+  #
+  # Useful for tests that count/inspect their messages and are run via `retrying/2`: a retry runs
+  # in the same process, so otherwise messages of failed attempts pile up and the retry can
+  # never succeed.
+  def flush_messages do
+    receive do
+      _message -> flush_messages()
+    after
+      0 -> :ok
+    end
+  end
+
   def assert_received_exactly(expected) do
     Enum.each(expected, fn message -> assert_received ^message end)
 
