@@ -1,5 +1,6 @@
 defmodule Benchee.ProfilingIntegrationTest do
-  use ExUnit.Case, async: true
+  # async is set to false as the profilers are global
+  use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
   import Benchee.TestHelpers

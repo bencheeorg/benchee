@@ -53,9 +53,9 @@ defmodule Benchee.FunctionOverheadAndOutliersTest do
     end
 
     # The easiest way to create an outlier is to just run something once
-    # and then take a "stable" measurement like reductions or memory
+    # and then take a "stable" measurement like memory.
     test "removes outliers" do
-      {:ok, agent} = Agent.start(fn -> 0 end)
+      counter = :atomics.new(1, [])
 
       output =
         capture_io(fn ->
@@ -64,20 +64,27 @@ defmodule Benchee.FunctionOverheadAndOutliersTest do
               %{
                 "flawed" => fn ->
                   # Produce some garbage but only once
-                  # can't use process dictionary as it's a different process every time
-                  if Agent.get(agent, & &1) < 1 do
-                    Enum.reduce(1..10_000, 0, &+/2)
-                    Agent.update(agent, &(&1 + 1))
+                  # can't use process dictionary as it's a different process every time.
+                  if :atomics.add_get(counter, 1, 1) == 1 do
+                    Enum.to_list(1..10_000)
                   end
                 end
               },
               time: 0,
               warmup: 0,
-              reduction_time: 0.05,
+              # We need the same number of samples every time, no matter how loaded the machine
+              # is (a memory measurement is slow and a single one can use up a short time budget,
+              # leaving us with just the outlier). So the time is generous and the number of
+              # samples is what stops the measuring - it's not waiting for the time to run out.
+              memory_time: 60,
+              max_sample_size: 50,
               exclude_outliers: true
             )
 
-          %{scenarios: [%{reductions_data: %{samples: samples, statistics: stats}}]} = suite
+          %{scenarios: [%{memory_usage_data: %{samples: samples, statistics: stats}}]} = suite
+
+          assert stats.sample_size == 49
+          assert length(samples) == 50
 
           assert [outlier] = stats.outliers
           assert outlier >= stats.upper_outlier_bound
@@ -93,7 +100,7 @@ defmodule Benchee.FunctionOverheadAndOutliersTest do
         end)
 
       # As the outlier is removed, all measurements are the same
-      assert output =~ ~r/all.*reduction.*same/i
+      assert output =~ ~r/all.*memory.*same/i
       assert output =~ ~r/exclud.*outlier.*true/i
     end
   end

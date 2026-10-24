@@ -10,6 +10,8 @@ defmodule Benchee.Benchmark.RunnerTest do
 
   # times are in ns, so this is 40ms
   @small_time 40_000_000
+  # 60s, to be used where we expect to terminate by other means (e.g. max_sample_size) way earlier
+  @generous_time 60_000_000_000
 
   @config %Configuration{
     parallel: 1,
@@ -486,16 +488,14 @@ defmodule Benchee.Benchmark.RunnerTest do
         %Suite{
           configuration: %Configuration{
             max_sample_size: max_sample_size,
-            # each one of those should easily be able to gather the samples in time
-            time: @small_time,
-            memory_time: @small_time,
-            reduction_time: @small_time
+            time: @generous_time,
+            memory_time: @generous_time,
+            reduction_time: @generous_time
           }
         }
         |> Benchmark.benchmark("some benchmark", fn -> 2 end)
         |> Benchmark.collect(FakeBenchmarkPrinter)
 
-      # if it starts going flakey might need to do <= which is in the spirit of max
       assert length(scenario.run_time_data.samples) == max_sample_size
       assert length(scenario.memory_usage_data.samples) == max_sample_size
       assert length(scenario.reductions_data.samples) == max_sample_size
@@ -772,6 +772,9 @@ defmodule Benchee.Benchmark.RunnerTest do
     test "each triggers for every invocation, scenario once" do
       # and the CI goes slowwwwww
       retrying(fn ->
+        # We count the messages in our mailbox below, and a retry runs in this very same process.
+        flush_messages()
+
         me = self()
 
         suite = %Suite{
