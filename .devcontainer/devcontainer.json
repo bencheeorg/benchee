@@ -1,0 +1,43 @@
+{
+  "name": "Benchee Elixir Dev",
+
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "username": "vscode",
+      "userUid": "automatic",
+      "userGid": "automatic"
+    }
+  },
+
+  // Non-root user; its UID/GID is remapped to match the host user on Linux
+  // so files created in the bind mount are owned by you, not root.
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "workspaceFolder": "/workspace",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "jakebecker.elixir-ls",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "files.trimTrailingWhitespace": true,
+        "editor.formatOnSave": true
+      }
+    }
+  },
+
+  "postCreateCommand": "mix local.hex --force && mix local.rebar --force && mix deps.get",
+
+  "runArgs": [
+    "--init"
+  ]
+}
