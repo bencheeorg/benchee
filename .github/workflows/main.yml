@@ -24,26 +24,26 @@ jobs:
         # We're also further limited by the support the setup-beam action offers:
         # https://github.com/erlef/setup-beam?tab=readme-ov-file#compatibility-between-operating-system-and-erlangotp
         include:
-          - elixir_version: '1.11'
-            otp_version: '24.3'
-          - elixir_version: '1.12'
-            otp_version: '24.3'
-          - elixir_version: '1.13'
-            otp_version: '25.3'
-          - elixir_version: '1.14'
-            otp_version: '25.3'
-          - elixir_version: '1.15'
-            otp_version: '26.2'
-          - elixir_version: '1.16'
-            otp_version: '26.2'
-          - elixir_version: '1.17'
-            otp_version: '27.3'
-          - elixir_version: '1.18'
-            otp_version: '27.3'
-          - elixir_version: '1.19'
-            otp_version: '28.3'
-          - elixir_version: '1.20.0'
-            otp_version: '29.0'
+          - elixir_version: "1.11"
+            otp_version: "24.3"
+          - elixir_version: "1.12"
+            otp_version: "24.3"
+          - elixir_version: "1.13"
+            otp_version: "25.3"
+          - elixir_version: "1.14"
+            otp_version: "25.3"
+          - elixir_version: "1.15"
+            otp_version: "26.2"
+          - elixir_version: "1.16"
+            otp_version: "26.2"
+          - elixir_version: "1.17"
+            otp_version: "27.3"
+          - elixir_version: "1.18"
+            otp_version: "27.3"
+          - elixir_version: "1.19"
+            otp_version: "28.3"
+          - elixir_version: "1.20"
+            otp_version: "29.1"
             type_check: true
             lint: true
 
@@ -122,8 +122,8 @@ jobs:
       - name: Setup Elixir
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.18'
-          otp-version: '27.3'
+          elixir-version: "1.18"
+          otp-version: "27.3"
       - name: Get deps
         run: mix deps.get
       - name: Test
