@@ -39,8 +39,6 @@ defmodule Benchee.EvaluationWarningTest do
     # https://elixirforum.com/t/starting-shutting-down-iex-with-a-port-gracefully/60388/2?u=pragtob
     # describes ctrl+g q, but without a TTY that was not reliable and left an orphaned `iex`
     # (a whole VM!) behind on every test run. So we tell it to halt and make sure it's gone.
-    # Don't send ctrl+g (\a) first, it opens iex' job control menu which then swallows the
-    # `System.halt()` and we'd wait for the timeout below.
     defp stop_iex(port) do
       case Port.info(port, :os_pid) do
         {:os_pid, os_pid} ->
